@@ -1,0 +1,81 @@
+// Paint example specifically for the TFTLCD breakout board.
+// If using the Arduino shield, use the tftpaint_shield.pde sketch instead!
+// DOES NOT CURRENTLY WORK ON ARDUINO LEONARDO
+
+#include <Adafruit_GFX.h>    // Core graphics library
+//#include "Adafruit_ILI9341_8bit_STM.h"
+#include <Adafruit_TFTLCD_8bit_STM32.h> // Hardware-specific library
+//#include <TouchScreen_STM.h>
+
+#include <SPI.h>
+
+/*****************************************************************************/
+#define LED_PIN PC13
+// Assign human-readable names to some common 16-bit color values:
+#define	BLACK   0x0000
+#define	BLUE    0x001F
+#define	RED     0xF800
+#define	GREEN   0x07E0
+#define CYAN    0x07FF
+#define MAGENTA 0xF81F
+#define YELLOW  0xFFE0
+#define WHITE   0xFFFF
+
+Adafruit_TFTLCD_8bit_STM32 tft;
+int counter;
+
+/*****************************************************************************/
+void setup()
+{
+	counter = 0;
+  pinMode(LED_PIN, OUTPUT);
+
+  Serial.begin(115200);
+  delay(6000);
+  SPI.begin();
+  SPI.setDataMode(SPI_MODE0);                                           
+  SPI.setBitOrder(MSBFIRST);
+
+  tft.reset();
+  uint16_t identifier = tft.readID();
+  if(identifier == 0x9325) {
+    Serial.println(F("Found ILI9325 LCD driver"));
+  } else if(identifier == 0x9328) {
+    Serial.println(F("Found ILI9328 LCD driver"));
+  } else if(identifier == 0x7575) {
+    Serial.println(F("Found HX8347G LCD driver"));
+  } else if(identifier == 0x9341) {
+    Serial.println(F("Found ILI9341 LCD driver"));
+  } else if(identifier == 0x8357) {
+    Serial.println(F("Found HX8357D LCD driver"));
+  } else {
+    Serial.print(F("Unknown LCD driver chip: "));
+    Serial.println(identifier, HEX);
+	while(1); //halt
+  }
+
+  tft.begin(identifier);
+  //tft.begin();
+ 
+  tft.setRotation(2);
+  tft.fillScreen(BLACK);
+  tft.setCursor(30 , 30);
+  tft.setTextColor(WHITE);
+  tft.setTextSize(3);
+  tft.println("test");
+  tft.setTextSize(1);
+  tft.setCursor(55 , 20);
+  tft.println("test");
+
+}
+
+/*****************************************************************************/
+void loop()
+{
+	Serial.println(counter++);
+
+	digitalWrite(LED_PIN, HIGH);   
+	delay(1000);             
+	digitalWrite(LED_PIN, LOW);   
+	delay(1000);   
+}
