@@ -38,7 +38,7 @@ static uint32_t gpioA[10];
  */
 void myLoop(void) 
 {    
-    static int rotation=0;
+    static int rotation=2;
     tft->setRotation(rotation);
     
     tft->fillScreen(BLACK);
@@ -52,7 +52,7 @@ void myLoop(void)
     tft->setTextColor(RED);    
     tft->setTextSize(6);
     tft->println(rotation);
-    delay(1000);
+    delay(5000);
     rotation=(rotation+1)&3;
 }
 
