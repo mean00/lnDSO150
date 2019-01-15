@@ -1,8 +1,6 @@
 *.sw
 nbproject/*
-cmake/*
 build/*
 build
-cmake
 
 
