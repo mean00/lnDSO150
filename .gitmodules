@@ -5,3 +5,6 @@
 [submodule "Adafruit_GFX"]
 	path = Adafruit_GFX
 	url = https://github.com/adafruit/Adafruit-GFX-Library.git
+[submodule "freertos"]
+	path = freertos
+	url = https://github.com/mean00/MapleFreeRTOS1000.git
