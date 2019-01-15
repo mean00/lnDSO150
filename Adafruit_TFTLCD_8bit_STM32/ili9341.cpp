@@ -188,17 +188,17 @@ void Adafruit_TFTLCD_8bit_STM32_ILI9341::setRotation(uint8_t x)
 
    switch (rotation) {
    case 1:
-     t = ILI9341_MADCTL_MX | ILI9341_MADCTL_MY | ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
+     t = ILI9341_MADCTL_MX | ILI9341_MADCTL_MY | ILI9341_MADCTL_MV | ILI9341_MADCTL_RGB;
      break;
    case 2:
-     t = ILI9341_MADCTL_MX | ILI9341_MADCTL_BGR;
+     t = ILI9341_MADCTL_MX | ILI9341_MADCTL_RGB;
      break;
    case 3:
-     t = ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
+     t = ILI9341_MADCTL_MV | ILI9341_MADCTL_RGB;
      break;
    case 0:
    default:
-    t = ILI9341_MADCTL_MY | ILI9341_MADCTL_BGR;
+    t = ILI9341_MADCTL_MY | ILI9341_MADCTL_RGB;
     break;
   }
    writeRegister8(ILI9341_MADCTL, t ); // MADCTL

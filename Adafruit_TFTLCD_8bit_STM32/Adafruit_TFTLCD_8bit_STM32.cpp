@@ -425,12 +425,13 @@ void Adafruit_TFTLCD_8bit_STM32::pushColors(uint16_t *data, int16_t len, boolean
 }
 
 #include "ili9341.h"
+#include "st7789.h"
 
 Adafruit_TFTLCD_8bit_STM32 *Adafruit_TFTLCD_8bit_STM32::spawn(int id)
 {
     switch(id)
     {
-        case 0x7789: 
+        case 0x7789: return  new Adafruit_TFTLCD_8bit_STM32_ST7789;break;
         case 0x9341: return  new Adafruit_TFTLCD_8bit_STM32_ILI9341;break;
         default : return NULL;
     }
