@@ -9,10 +9,7 @@
 class ILI9341 : public Adafruit_ILI9341_STM
 {
 public:  
-  typedef enum FontSize
-  {
-    SmallFont,MediumFont,BigFont
-  };
+ 
   
         ILI9341(int8_t _CS, int8_t _DC, int8_t _RST = -1);
         ~ILI9341();

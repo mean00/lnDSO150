@@ -51,7 +51,19 @@ class Adafruit_TFTLCD_8bit_STM32 : public Adafruit_GFX
 {
 
  public:
-
+ typedef enum FontSize
+  {
+    SmallFont,MediumFont,BigFont
+  };
+    class FontInfo
+        {
+        public:
+          int               maxHeight;          
+          int               maxWidth;
+          uint16_t         *filler;
+          const GFXfont    *font;        
+        };
+   
    static Adafruit_TFTLCD_8bit_STM32 *spawn(int id);
    
   //Adafruit_TFTLCD_8bit_STM32(uint8_t cs, uint8_t cd, uint8_t wr, uint8_t rd, uint8_t rst);
@@ -95,9 +107,22 @@ class Adafruit_TFTLCD_8bit_STM32 : public Adafruit_GFX
   uint16_t inline color565(uint8_t r, uint8_t g, uint8_t b) { return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3); }
   void     flood(uint16_t color, uint32_t len);
  private:
+   
 
   void     init();  
-          
+    FontInfo          fontInfo[3];
+    int               myDrawChar(int x, int y, unsigned char c,  int color, int bg,FontInfo &info);
+    int               mySquare(int x, int y, int w, int top, uint16_t *filler);
+    FontInfo          *currentFont;
+  // extended API
+public:  
+    void  setFontFamily(const GFXfont *small, const GFXfont *medium, const GFXfont *big);
+    void  myDrawString(const char *st, int padd_up_to_n_pixels=0);
+    void  setFontSize(FontSize size);
+    //
+    void drawBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);
+    void drawRLEBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);    
+  
 };
 
 #endif

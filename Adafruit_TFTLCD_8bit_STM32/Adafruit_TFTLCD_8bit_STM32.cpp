@@ -4,10 +4,6 @@
 #include "Adafruit_TFTLCD_8bit_STM32.h"
 #include "Adafruit_TFTLCD_8bit_STM32_priv.h"
 
-#include "ili932x.h"
-#include "ili9341.h"
-#include "hx8347g.h"
-#include "hx8357x.h"
 
 //gpio_reg_map * cntrlRegs;
 gpio_reg_map * dataRegs;
@@ -131,16 +127,6 @@ uint16_t Adafruit_TFTLCD_8bit_STM32::readID(void)
      return 0x7789;
   }  
   
-  if (lowId == 0x8000) 
-  { // eh close enough
-    // setc!
-    writeRegister24(HX8357D_SETC, 0xFF8357);
-    delay(300);
-    //Serial.println(readReg(0xD0), HEX);
-    if (readReg32(0xD0) == 0x990000) {
-      return 0x8357;
-    }
-  }
     
   uint16_t id = readReg32(0xD3);
   if (id != 0x9341 && id != 0x9338) 

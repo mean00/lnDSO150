@@ -8,6 +8,8 @@
 #include "SPI.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_TFTLCD_8bit_STM32.h"
+#include "Fonts/Targ56.h"
+#include "Fonts/digitLcd56.h"
 
 // overlaping:
 #define XM TFT_RS // 330 Ohm // must be an analog pin !!!
@@ -31,6 +33,7 @@ void mySetup()
     tft=Adafruit_TFTLCD_8bit_STM32::spawn(identifier);    
     tft->begin();
     tft->setRotation(1);
+    tft->setFontFamily(&Targa56pt7b, &DIGIT_LCD56pt7b, &DIGIT_LCD56pt7b);
 }
 static uint32_t gpioA[10];
 /**
@@ -52,8 +55,16 @@ void myLoop(void)
     tft->setTextColor(RED);    
     tft->setTextSize(6);
     tft->println(rotation);
-    delay(5000);
+    
+    
+     tft->setCursor(10,200);
+     tft->setTextColor(BLUE,RED);
+     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::SmallFont);
+     tft->myDrawString("Hello world!");
+     
+    
     rotation=(rotation+1)&3;
+    delay(5000);
 }
 
 
