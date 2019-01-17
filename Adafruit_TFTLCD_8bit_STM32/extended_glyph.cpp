@@ -102,12 +102,46 @@ int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int c
     {      
         col=column+left;     
         // mid
-        for( int xcol=0;xcol<w;xcol++)
+        for( int xcol=w-1;xcol>=0;xcol--)
         {
-            if(!bit)
+            if(!bit) // reload ?
             {
                 bits= *p++;
                 bit = 0x80;
+                if(xcol>=8) // speed up some special cases
+                {
+                    switch(bits)
+                    {
+                        
+                        case 0xff: 
+                                    *col++=color; *col++=color;
+                                     *col++=color; *col++=color;
+                                     *col++=color; *col++=color;
+                                     *col++=color; *col++=color;
+                                    xcol-=7;
+                                    bit=0;
+                                    continue;
+                                    break;
+                        case 0x00: 
+                                    *col++=bg;*col++=bg;*col++=bg;*col++=bg;
+                                    *col++=bg;*col++=bg;*col++=bg;*col++=bg;
+                                    xcol-=7;
+                                    bit=0;
+                                    continue;
+                        case 0x7f: 
+                                     *col++=bg; *col++=color;
+                                     *col++=color; *col++=color;
+                                     *col++=color; *col++=color;
+                                     *col++=color; *col++=color;
+                                    xcol-=7;
+                                    bit=0;
+                                    continue;
+                                                            
+                                    break;
+                        
+                        default:break;
+                    }
+                }
             }            
             if(bits & bit) 
                 finalColor=color;  
