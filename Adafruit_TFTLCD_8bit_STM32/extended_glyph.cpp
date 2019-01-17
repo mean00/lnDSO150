@@ -104,10 +104,14 @@ int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int c
         // mid
         for( int xcol=w-1;xcol>=0;xcol--)
         {
+#if 0
             if(!bit) // reload ?
             {
                 bits= *p++;
                 bit = 0x80;
+            }
+            
+            if(xcold)
                 if(xcol>=8) // speed up some special cases
                 {
                     switch(bits)
@@ -149,6 +153,7 @@ int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int c
                 finalColor=bg;
             *(col++)=finalColor;            
             bit=bit>>1;
+#endif            
         }
         pushColors(column,glyph->xAdvance,first);
         first=false;
