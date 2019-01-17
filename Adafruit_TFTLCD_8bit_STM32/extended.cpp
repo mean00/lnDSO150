@@ -36,15 +36,12 @@
      int leftOver=endX-cursor_x;
      if(leftOver>0)
      {
-         for(int i=0;i<2*currentFont->maxWidth;i++)
-             currentFont->filler[i]=textbgcolor;
          while(leftOver>0)
          {
              int rnd=leftOver;
             if(rnd>currentFont->maxWidth) rnd=currentFont->maxWidth;
             mySquare(cursor_x,cursor_y,
-                  rnd, currentFont->maxHeight+2,
-                  currentFont->filler);
+                  rnd, currentFont->maxHeight+2, textbgcolor);
             cursor_x+=rnd;
             leftOver=endX-cursor_x;
             
@@ -83,8 +80,7 @@ static void checkFont(const GFXfont *font, Adafruit_TFTLCD_8bit_STM32::FontInfo 
          if(y>mH) mH=y;
    }
     info->maxHeight=mH + 1;
-    info->maxWidth=mW;
-    info->filler=new uint16_t[mW*2+1];
+    info->maxWidth=mW;    
     info->font=font;
 }
 

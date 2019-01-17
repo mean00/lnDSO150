@@ -34,7 +34,7 @@ void mySetup()
     tft=Adafruit_TFTLCD_8bit_STM32::spawn(identifier);    
     tft->begin();
     tft->setRotation(1);
-    tft->setFontFamily(&Targa56pt7b, &DIGIT_LCD56pt7b, &FreeSansBold12pt7b);
+    tft->setFontFamily(&Targa56pt7b, &DIGIT_LCD56pt7b, &DIGIT_LCD56pt7b);
 }
 static uint32_t gpioA[10];
 /**
@@ -42,29 +42,32 @@ static uint32_t gpioA[10];
  */
 void myLoop(void) 
 {    
-    static int rotation=2;
+    uint32_t start,end,org,mine;
+    static int rotation=1;
     tft->setRotation(rotation);
     
     tft->fillScreen(BLACK);
     tft->setCursor(0, 0);
     tft->setTextColor(WHITE);  
-    tft->setTextSize(4);
-    tft->println("Hello World!");
-    tft->setTextColor(YELLOW); 
-    tft->setTextSize(5);
-    tft->println(1234.56);
-    tft->setTextColor(RED);    
-    tft->setTextSize(6);
-    tft->println(rotation);
+    tft->setTextSize(9);
+    start=millis();
+    tft->println("Hello");
+    end=millis();
+    org=end-start;
     
-    
-     tft->setCursor(10,200);
-     tft->setTextColor(BLUE,RED);
-     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::BigFont);
-     tft->myDrawString("Hello world!");
+         
      
-    
-    rotation=(rotation+1)&3;
+     tft->setTextColor(RED,BLUE);
+     tft->setCursor(10,140);
+     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);
+     start=millis();     
+     tft->myDrawString("Hello");
+     end=millis();
+    tft->setCursor(0, 40);
+    tft->println(org);
+
+     tft->setCursor(200, 70);
+     tft->println(end-start);
     delay(5000);
 }
 

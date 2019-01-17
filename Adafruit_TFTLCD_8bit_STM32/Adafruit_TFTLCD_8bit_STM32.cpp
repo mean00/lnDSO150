@@ -389,7 +389,7 @@ void Adafruit_TFTLCD_8bit_STM32::fillRect(int16_t x1, int16_t y1, int16_t w, int
 // previously been set to define the bounds.  Max 255 pixels at
 // a time (BMP examples read in small chunks due to limited RAM).
 /*****************************************************************************/
-void Adafruit_TFTLCD_8bit_STM32::pushColors(uint16_t *data, int16_t len, boolean first)
+void Adafruit_TFTLCD_8bit_STM32::pushColors(uint16_t *data, int len, boolean first)
 {
   uint16_t color;
   uint8_t  hi, lo;

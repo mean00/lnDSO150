@@ -93,7 +93,7 @@ class Adafruit_TFTLCD_8bit_STM32 : public Adafruit_GFX
 
        // These methods are public in order for BMP examples to work:
 
-  void     pushColors(uint16_t *data, int16_t len, boolean first);
+  void     pushColors(uint16_t *data, int len, boolean first);
   void     drawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t * bitmap);
   static uint16_t readID(void);
 /*****************************************************************************/
@@ -106,13 +106,14 @@ class Adafruit_TFTLCD_8bit_STM32 : public Adafruit_GFX
 /*****************************************************************************/
   uint16_t inline color565(uint8_t r, uint8_t g, uint8_t b) { return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3); }
   void     flood(uint16_t color, uint32_t len);
+  int      mySquare(int x, int y, int w, int h, uint16_t filler);
  private:
    
 
   void     init();  
     FontInfo          fontInfo[3];
     int               myDrawChar(int x, int y, unsigned char c,  int color, int bg,FontInfo &info);
-    int               mySquare(int x, int y, int w, int top, uint16_t *filler);
+    
     FontInfo          *currentFont;
   // extended API
 public:  

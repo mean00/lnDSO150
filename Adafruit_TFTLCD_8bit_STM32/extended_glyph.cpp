@@ -13,7 +13,7 @@
  * \brief Draw a square of w*xheight size at position x,y
  * \param filler is a prefill color array
  */
-int Adafruit_TFTLCD_8bit_STM32::mySquare(int x, int y, int w, int xheight, uint16_t *filler)
+int Adafruit_TFTLCD_8bit_STM32::mySquare(int x, int y, int w, int xheight, uint16_t filler)
 {
     if(w+x>=width())
     {
@@ -27,10 +27,7 @@ int Adafruit_TFTLCD_8bit_STM32::mySquare(int x, int y, int w, int xheight, uint1
             return 0;
     }
     setAddrWindow(x,y,                  x+w-1, y+xheight);
-    for(int row=0;row<xheight;row++)
-    {
-         pushColors(filler,w,0);
-    }
+    flood(filler,w*xheight);
     return 0;
 }
 
@@ -44,12 +41,6 @@ int Adafruit_TFTLCD_8bit_STM32::mySquare(int x, int y, int w, int xheight, uint1
  * @return 
  */
 
-#define SETCOLOR(x)  for(int i=0;i<infos.maxWidth*2;i++)        column[i]=x; //bg; /
-#if 0
-#define SETCOLORdebug SETCOLOR
-#else 
-#define SETCOLORdebug(...) {}
-#endif
 int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int color, int bg,FontInfo &infos)
 {
     c -= infos.font->first;
@@ -57,13 +48,12 @@ int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int c
     
     uint8_t *p= infos.font->bitmap+glyph->bitmapOffset;        
     int  w  = glyph->width;
-    int  h  = glyph->height;
-    uint16_t *column=infos.filler;    
-    uint16_t *col=column;
-
-    // prepare filler
-    SETCOLOR(bg);
-    SETCOLORdebug(ILI9341_BLUE);
+    int  h  = glyph->height;    
+    uint16_t column[TFTWIDTH];
+    
+    uint16_t oldbg=bg;
+    bg=YELLOW;
+    color=GREEN;
     
     // Special case, space, it has yOffsset > 0
     if(infos.font->first+c==' ')
@@ -72,21 +62,19 @@ int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int c
         int top=infos.maxHeight;
          mySquare(x,y-top,
                   infos.maxWidth,
-                  top+2,column);
+                  top+2,bg);
          return adv;
     }
     
-
     // top & bottom
     int top=infos.maxHeight+glyph->yOffset;
-    mySquare(x,y-infos.maxHeight,glyph->xAdvance,top,column);
+    mySquare(x,y-infos.maxHeight,glyph->xAdvance,top,bg);
 
     int bottom=-glyph->yOffset-h;
-    mySquare(x,y-bottom,glyph->xAdvance,bottom+2,column);      
+    mySquare(x,y-bottom,glyph->xAdvance,bottom+2,bg);      
+    
 
-    SETCOLOR(GREEN);
-
-    y+= glyph->yOffset;   
+    y+= glyph->yOffset;   // offset is <0 most of the time
     
     int left=glyph->xOffset;
     int right=glyph->xAdvance-(w+left);
@@ -94,16 +82,20 @@ int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int c
        
     int    finalColor;    
     int  bits = 0, bit = 0;
-    setAddrWindow(x,y,
-                  x+glyph->xAdvance-1, y+h);
+    setAddrWindow(x,y, x+glyph->xAdvance-1, y+h);
+    bg=oldbg;
+    uint16_t *col=column;
+    
+    // Pre-fill & left /right
+     for(int i=0;i<left;i++)
+            column[i]=bg;
+     for(int i=0;i<right;i++) 
+            column[left+w+i]=bg;    
+    // fill in body
+    bool first=true;
     for( int line=0;line<h;line++)
-    {
-      //setAddrWindow(x,y+line,  x+glyph->xAdvance, y+line+1);
-        col=column;
-     
-        // left
-        for(int i=0;i<left;i++)
-            *(col++)=bg;
+    {      
+        col=column+left;     
         // mid
         for( int xcol=0;xcol<w;xcol++)
         {
@@ -119,10 +111,8 @@ int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int c
             *(col++)=finalColor;            
             bit=bit>>1;
         }
-        // right
-        for(int i=0;i<right;i++) 
-            *(col++)=bg;        
-        pushColors(column,(col-column),0);
+        pushColors(column,glyph->xAdvance,first);
+        first=false;
     }   
     return glyph->xAdvance;
 }
