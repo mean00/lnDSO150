@@ -394,11 +394,6 @@ void Adafruit_TFTLCD_8bit_STM32::pushColors(uint16_t *data, int len, boolean fir
   uint16_t color;
   uint8_t  hi, lo;
   CS_ACTIVE;
-  if(first == true) 
-  { // Issue GRAM write command only on first call
-    CD_COMMAND;
-    pushColorsPreamble();    
-  }
   CD_DATA;
   while(len--) {
     color = *data++;

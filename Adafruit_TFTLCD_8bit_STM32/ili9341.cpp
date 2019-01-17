@@ -161,7 +161,7 @@ void     Adafruit_TFTLCD_8bit_STM32_ILI9341::floodPreamble()
  */
 void Adafruit_TFTLCD_8bit_STM32_ILI9341::pushColorsPreamble()
 {
-    write8(0x2C);
+    write8(ILI9341_MEMORYWRITE);
 }
 
 /**
@@ -204,3 +204,34 @@ void Adafruit_TFTLCD_8bit_STM32_ILI9341::setRotation(uint8_t x)
    writeRegister8(ILI9341_MADCTL, t ); // MADCTL
   
 }
+
+
+
+/*****************************************************************************/
+// Issues 'raw' an array of 16-bit color values to the LCD; used
+// externally by BMP examples.  Assumes that setWindowAddr() has
+// previously been set to define the bounds.  Max 255 pixels at
+// a time (BMP examples read in small chunks due to limited RAM).
+/*****************************************************************************/
+void Adafruit_TFTLCD_8bit_STM32_ILI9341::pushColors(uint16_t *data, int len, boolean first)
+{
+  uint16_t color;
+  uint8_t  hi, lo;
+  CS_ACTIVE;
+  if(first == true) 
+  { // Issue GRAM write command only on first call
+    CD_COMMAND;
+    pushColorsPreamble();    
+  }
+  CD_DATA;
+  while(len--) {
+    color = *data++;
+    hi    = color >> 8; // Don't simplify or merge these
+    lo    = color;      // lines, there's macro shenanigans
+    write8(hi);         // going on.
+    write8(lo);
+  }
+  CS_IDLE;
+}
+
+// EOF

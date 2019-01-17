@@ -93,7 +93,7 @@ class Adafruit_TFTLCD_8bit_STM32 : public Adafruit_GFX
 
        // These methods are public in order for BMP examples to work:
 
-  void     pushColors(uint16_t *data, int len, boolean first);
+
   void     drawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t * bitmap);
   static uint16_t readID(void);
 /*****************************************************************************/
@@ -123,7 +123,7 @@ public:
     //
     void drawBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);
     void drawRLEBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);    
-  
+    virtual void pushColors(uint16_t *data, int len, boolean first);
 };
 
 #endif

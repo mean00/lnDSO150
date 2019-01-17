@@ -50,6 +50,7 @@ public:
     virtual void     pushColorsPreamble();
     virtual void     invertDisplay(bool i);
     virtual void     setRotation(uint8_t x);
+    virtual void     pushColors(uint16_t *data, int len, boolean first);
 };
 
 
