@@ -49,7 +49,7 @@ void myLoop(void)
     tft->fillScreen(BLACK);
     tft->setCursor(0, 0);
     tft->setTextColor(WHITE);  
-    tft->setTextSize(9);
+    tft->setTextSize(10);
     start=millis();
     tft->println("Hello");
     end=millis();
@@ -57,17 +57,21 @@ void myLoop(void)
     
          
      
-     tft->setTextColor(RED,BLUE);
-     tft->setCursor(10,140);
-     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);
-     start=millis();     
-     tft->myDrawString("Hello");
-     end=millis();
-    tft->setCursor(0, 40);
+    tft->setTextColor(RED,BLUE);
+    tft->setCursor(10,140);
+    tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);
+    start=millis();     
+    tft->myDrawString("Hello");
+    end=millis();
+    
+    tft->setTextSize(5);
+    tft->setTextColor(WHITE,BLACK);
+    
+    tft->setCursor(0, 70);
     tft->println(org);
 
-     tft->setCursor(200, 70);
-     tft->println(end-start);
+    tft->setCursor(200, 70);
+    tft->println(end-start);
     delay(5000);
 }
 

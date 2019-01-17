@@ -40,6 +40,11 @@ int Adafruit_TFTLCD_8bit_STM32::mySquare(int x, int y, int w, int xheight, uint1
  * @param bg
  * @return 
  */
+#if 0
+    #define debug(x) x
+#else
+    #define debug(x) {}
+#endif
 
 int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int color, int bg,FontInfo &infos)
 {
@@ -51,9 +56,9 @@ int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int c
     int  h  = glyph->height;    
     uint16_t column[TFTWIDTH];
     
-    uint16_t oldbg=bg;
-    bg=YELLOW;
-    color=GREEN;
+    debug(uint16_t oldbg=bg);
+    debug(bg=YELLOW);
+    debug(color=GREEN);
     
     // Special case, space, it has yOffsset > 0
     if(infos.font->first+c==' ')
@@ -83,7 +88,7 @@ int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int c
     int    finalColor;    
     int  bits = 0, bit = 0;
     setAddrWindow(x,y, x+glyph->xAdvance-1, y+h);
-    bg=oldbg;
+    debug(bg=oldbg);
     uint16_t *col=column;
     
     // Pre-fill & left /right
