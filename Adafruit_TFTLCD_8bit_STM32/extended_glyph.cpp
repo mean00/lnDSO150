@@ -54,7 +54,7 @@ int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int c
     uint8_t *p= infos.font->bitmap+glyph->bitmapOffset;        
     int  w  = glyph->width;
     int  h  = glyph->height;    
-    uint16_t column[TFTWIDTH];
+    uint8_t  column[TFTWIDTH];
     
     debug(uint16_t oldbg=bg);
     debug(bg=YELLOW);
@@ -89,13 +89,11 @@ int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int c
     int  bits = 0, bit = 0;
     setAddrWindow(x,y, x+glyph->xAdvance-1, y+h);
     debug(bg=oldbg);
-    uint16_t *col=column;
+    uint8_t  *col=column;
     
     // Pre-fill & left /right
-     for(int i=0;i<left;i++)
-            column[i]=bg;
-     for(int i=0;i<right;i++) 
-            column[left+w+i]=bg;    
+    memset(column,0,left);
+    memset(column+left+w,0,right);
     // fill in body
     bool first=true;
     for( int line=h-1;line>=0;line--)
@@ -107,49 +105,51 @@ int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int c
             if(!bit) // reload ?
             {
                 bits= *p++;
-                bit = 0x80;
                 if(xcol>=8) // speed up some special cases
                 {
                     switch(bits)
                     {
-                        
+                     
+                         case 0x0f:  
+                                    *col++=0; *col++=0;*col++=0; *col++=0;
+                                    *col++=1; *col++=1;*col++=1; *col++=1;
+                                    xcol-=7;
+                                    bit=0;
+                                    continue;
+                                    break;
+                        case 0xf0:  
+                                    *col++=1; *col++=1;*col++=1; *col++=1;
+                                    *col++=0; *col++=0;*col++=0; *col++=0;
+                                    xcol-=7;
+                                    bit=0;
+                                    continue;
+                                    break;                                    
                         case 0xff:  
-                                    *col++=color; *col++=color;*col++=color; *col++=color;
-                                    *col++=color; *col++=color;*col++=color; *col++=color;
+                                    *col++=1; *col++=1;*col++=1; *col++=1;
+                                    *col++=1; *col++=1;*col++=1; *col++=1;
                                     xcol-=7;
                                     bit=0;
                                     continue;
                                     break;
                         case 0x00: 
-                                    *col++=bg;*col++=bg;*col++=bg;*col++=bg;
-                                    *col++=bg;*col++=bg;*col++=bg;*col++=bg;
+                                    *col++=0;*col++=0;*col++=0;*col++=0;
+                                    *col++=0;*col++=0;*col++=0;*col++=0;
                                     xcol-=7;
                                     bit=0;
                                     continue;
-                        case 0x7f: 
-                                    *col++=bg; *col++=color;
-                                    *col++=color; *col++=color;
-                                    *col++=color; *col++=color;
-                                    *col++=color; *col++=color;
-                                    xcol-=7;
-                                    bit=0;
-                                    continue;
-                                                            
                                     break;
                         
                         default:break;
                     }
                 }
-            }            
-            if(bits & bit) 
-                finalColor=color;  
-            else
-                finalColor=bg;
-            *(col++)=finalColor;            
+                bit = 0x80;
+            }      
+                            
+            *col++=!!(bits & bit) ;  
             bit=bit>>1;
         }
         // 9ms here
-        pushColors(column,glyph->xAdvance,first);
+        push2Colors(column,glyph->xAdvance,first,color,bg);
         first=false;
     }   
     return glyph->xAdvance;

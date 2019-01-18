@@ -230,11 +230,53 @@ void Adafruit_TFTLCD_8bit_STM32_ILI9341::pushColors(uint16_t *data, int len, boo
     hi    = color >> 8; // Don't simplify or merge these
     lo    = color;      // lines, there's macro shenanigans   
     dataRegs->BSRR = (((hi^0xFF)<<16) | (hi)); 
-    WR_STROBE; 
+    WR_STROBE;         
     dataRegs->BSRR = (((lo^0xFF)<<16) | (lo)); 
     WR_STROBE; 
   }
   CS_IDLE;
+}
+/**
+ * 
+ * @param data
+ * @param len
+ * @param first
+ * @param fg
+ * @param bg
+ */
+void     Adafruit_TFTLCD_8bit_STM32_ILI9341::push2Colors(uint8_t *data, int len, boolean first,uint16_t fg, uint16_t bg)
+{
+    
+ 
+  CS_ACTIVE;
+  if(first == true) 
+  { // Issue GRAM write command only on first call
+    CD_COMMAND;
+    write8(ILI9341_MEMORYWRITE);
+    CD_DATA;
+  }  
+  
+  uint8_t  hiF=fg>>8, loF=fg&0xff;
+  int8_t  hiB=bg>>8, loB=bg&0xff;
+
+  
+  while(len--) 
+  {
+    if(*data++)
+    {
+        dataRegs->BSRR = (((hiF^0xFF)<<16) | (hiF)); 
+        WR_STROBE;         
+        dataRegs->BSRR = (((loF^0xFF)<<16) | (loF)); 
+        WR_STROBE;  
+        continue;
+    }
+    dataRegs->BSRR = (((hiB^0xFF)<<16) | (hiB)); 
+    WR_STROBE;         
+    dataRegs->BSRR = (((loB^0xFF)<<16) | (loB)); 
+    WR_STROBE;  
+  }
+  CS_IDLE;
+    
 }
 
 // EOF

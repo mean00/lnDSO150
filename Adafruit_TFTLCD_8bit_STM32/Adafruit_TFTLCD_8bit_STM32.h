@@ -124,6 +124,7 @@ public:
     void drawBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);
     void drawRLEBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);    
     virtual void pushColors(uint16_t *data, int len, boolean first);
+    virtual void push2Colors(uint8_t *data, int len, boolean first,uint16_t fg, uint16_t bg) {};
 };
 
 #endif

@@ -35,6 +35,7 @@ void mySetup()
     tft->begin();
     tft->setRotation(1);
     tft->setFontFamily(&Targa56pt7b, &DIGIT_LCD56pt7b, &DIGIT_LCD56pt7b);
+    tft->fillScreen(BLACK);
 }
 static uint32_t gpioA[10];
 /**
@@ -55,7 +56,7 @@ void myLoop(void)
     tft->setTextSize(10);
 #endif    
     
-    tft->fillScreen(BLACK);
+    
     tft->setCursor(0, 0);
     tft->setTextColor(WHITE);  
     
@@ -83,7 +84,7 @@ void myLoop(void)
     tft->setCursor(200, 70);
     
     tft->println(end-start);
-    delay(5000);
+    //delay(5000);
 }
 
 

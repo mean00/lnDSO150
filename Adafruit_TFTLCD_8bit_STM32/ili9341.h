@@ -51,6 +51,7 @@ public:
     virtual void     invertDisplay(bool i);
     virtual void     setRotation(uint8_t x);
     virtual void     pushColors(uint16_t *data, int len, boolean first);
+    virtual void     push2Colors(uint8_t *data, int len, boolean first,uint16_t fg, uint16_t bg);
 };
 
 
