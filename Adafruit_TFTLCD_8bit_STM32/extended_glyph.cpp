@@ -113,7 +113,7 @@ int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int c
                     switch(bits)
                     {
                         
-                        case 0xff: 
+                        case 0xff:  
                                     *col++=color; *col++=color;*col++=color; *col++=color;
                                     *col++=color; *col++=color;*col++=color; *col++=color;
                                     xcol-=7;

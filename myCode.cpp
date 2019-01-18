@@ -46,10 +46,19 @@ void myLoop(void)
     static int rotation=1;
     tft->setRotation(rotation);
     
+#if 0
+    tft->setTextSize(0);
+    tft->setFont(&DIGIT_LCD56pt7b);
+    
+#else
+    tft->setFont(NULL);
+    tft->setTextSize(10);
+#endif    
+    
     tft->fillScreen(BLACK);
     tft->setCursor(0, 0);
     tft->setTextColor(WHITE);  
-    tft->setTextSize(10);
+    
     start=millis();
     tft->println("Hello");
     end=millis();
@@ -59,18 +68,20 @@ void myLoop(void)
      
     tft->setTextColor(RED,BLUE);
     tft->setCursor(10,140);
-    tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);
+    tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::SmallFont);
     start=millis();     
     tft->myDrawString("Hello");
     end=millis();
     
     tft->setTextSize(5);
     tft->setTextColor(WHITE,BLACK);
+    tft->setFont(NULL);
     
-    tft->setCursor(0, 70);
+    tft->setCursor(10, 70);
     tft->println(org);
 
     tft->setCursor(200, 70);
+    
     tft->println(end-start);
     delay(5000);
 }

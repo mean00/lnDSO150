@@ -221,15 +221,18 @@ void Adafruit_TFTLCD_8bit_STM32_ILI9341::pushColors(uint16_t *data, int len, boo
   if(first == true) 
   { // Issue GRAM write command only on first call
     CD_COMMAND;
-    pushColorsPreamble();    
-  }
-  CD_DATA;
-  while(len--) {
+    write8(ILI9341_MEMORYWRITE);
+    CD_DATA;
+  }  
+  while(len--) 
+  {
     color = *data++;
     hi    = color >> 8; // Don't simplify or merge these
-    lo    = color;      // lines, there's macro shenanigans
-    write8(hi);         // going on.
-    write8(lo);
+    lo    = color;      // lines, there's macro shenanigans   
+    dataRegs->BSRR = (((hi^0xFF)<<16) | (hi)); 
+    WR_STROBE; 
+    dataRegs->BSRR = (((lo^0xFF)<<16) | (lo)); 
+    WR_STROBE; 
   }
   CS_IDLE;
 }

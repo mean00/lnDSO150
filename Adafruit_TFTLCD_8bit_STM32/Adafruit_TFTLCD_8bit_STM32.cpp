@@ -29,16 +29,7 @@ void Adafruit_TFTLCD_8bit_STM32::reset(void)
 	pinMode(TFT_WR, OUTPUT);
 	pinMode(TFT_RS, OUTPUT);
 	pinMode(TFT_CS, OUTPUT);
-        
-        GPIOA->regs->CRL=0xa2022220U;
-        GPIOA->regs->CRH=0x288004b4U;
-  
-        GPIOB->regs->CRL=0x88888888U;
-        GPIOB->regs->CRH=0x8884ff1aU;
 
-        GPIOC->regs->CRL=0x44444444U;
-        GPIOC->regs->CRH=0x22244444U;
-        
 	CS_IDLE; // Set all control bits to HIGH (idle)
 	CD_DATA; // Signals are ACTIVE LOW
 	WR_IDLE;
@@ -395,7 +386,8 @@ void Adafruit_TFTLCD_8bit_STM32::pushColors(uint16_t *data, int len, boolean fir
   uint8_t  hi, lo;
   CS_ACTIVE;
   CD_DATA;
-  while(len--) {
+  while(len--) 
+  {
     color = *data++;
     hi    = color >> 8; // Don't simplify or merge these
     lo    = color;      // lines, there's macro shenanigans
