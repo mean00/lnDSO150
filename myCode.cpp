@@ -14,8 +14,9 @@
 #include "MapleFreeRTOS1000.h"
 #include "MapleFreeRTOS1000_pp.h"
 #include "Rotary.h"
-void MainTask( void *a );
-HardwareTimer pwmtimer(1);
+static void MainTask( void *a );
+static void splash(void);
+HardwareTimer pwmtimer(2);
 
 
 Adafruit_TFTLCD_8bit_STM32 *tft;
@@ -30,7 +31,7 @@ void mySetup()
     Serial.println("Init"); 
     
     identifier = tft->readID();
-    if(!identifier) identifier=0x9341;
+    if(!identifier) identifier=0x7789;
     tft=Adafruit_TFTLCD_8bit_STM32::spawn(0x7789);   
     if(!tft)
     {
@@ -38,21 +39,35 @@ void mySetup()
     }
     tft->begin();
     tft->setRotation(1);
-    tft->setFontFamily(&Targa56pt7b, &DIGIT_LCD56pt7b, &DIGIT_LCD56pt7b);
+    tft->setFontFamily(&FreeSansBold12pt7b, &DIGIT_LCD56pt7b, &DIGIT_LCD56pt7b);
     tft->fillScreen(BLACK);
     
-    tft->setCursor(150, 10);
-    tft->println("Go!");
+    splash();
     
-    // square freq tester is A7
+    
+    // square freq tester is A7    
+    
     pinMode(PA7,PWM);
+    pwmtimer.setMode(3,TIMER_PWM);
     pwmtimer.setPeriod(1000);
+    
     
     
    // Ok let's go, switch to FreeRTOS
    xTaskCreate( MainTask, "MainTask", 500, NULL, 10, NULL );
    vTaskStartScheduler();      
 }
+
+void splash()
+{
+        tft->setCursor(10, 10);
+        tft->setTextColor(WHITE,BLACK);
+        tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::SmallFont);
+        tft->myDrawString("DSO-STM32duino");
+        delay(500);
+        tft->fillScreen(BLACK);
+}
+
 /**
  * 
  * @param a
