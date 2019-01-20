@@ -11,6 +11,10 @@
 #include "Fonts/Targ56.h"
 #include "Fonts/digitLcd56.h"
 #include "Fonts/FreeSansBold12pt7b.h"
+#include "MapleFreeRTOS1000.h"
+#include "MapleFreeRTOS1000_pp.h"
+
+void MainTask( void *a );
 
 // overlaping:
 #define XM TFT_RS // 330 Ohm // must be an analog pin !!!
@@ -41,8 +45,44 @@ void mySetup()
     tft->setRotation(1);
     tft->setFontFamily(&Targa56pt7b, &DIGIT_LCD56pt7b, &DIGIT_LCD56pt7b);
     tft->fillScreen(BLACK);
+    
+   // Ok let's go, switch to FreeRTOS
+   xTaskCreate( MainTask, "MainTask", 500, NULL, 10, NULL );
+   vTaskStartScheduler();      
 }
-static uint32_t gpioA[10];
+/**
+ * 
+ * @param a
+ */
+void MainTask( void *a )
+{
+    tft->setTextSize(5);
+    while(1)
+    {
+        xDelay(10);
+        static int refresh=0;
+
+        refresh++;
+        if(refresh>=1000)
+        {
+            // Redraw
+             tft->fillScreen(BLACK);
+             refresh=0;
+        }
+         // Read GPIOB
+        uint32_t val= GPIOB->regs->IDR;
+        tft->setCursor(200, 90);    
+    #define CHECK_BUTTON(pin, txt) if(!(val & 1<<pin))  {tft->setCursor(200, 30*(pin-3));     tft->println(txt);}
+
+        CHECK_BUTTON(3,"B ");
+        CHECK_BUTTON(7,"Ok ");
+        CHECK_BUTTON(6,"Tr ");
+        CHECK_BUTTON(5,"Se ");
+        CHECK_BUTTON(4,"Vt ");
+    }
+}
+
+
 /**
  * 
  */
