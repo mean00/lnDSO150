@@ -19,6 +19,7 @@
 #include "Adafruit_GFX.h"
 #include "Adafruit_TFTLCD_8bit_STM32.h"
 #include "MapleFreeRTOS1000.h"
+#include "Rotary.h"
 extern void mySetup();
 extern void myLoop();
 

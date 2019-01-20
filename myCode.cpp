@@ -13,14 +13,9 @@
 #include "Fonts/FreeSansBold12pt7b.h"
 #include "MapleFreeRTOS1000.h"
 #include "MapleFreeRTOS1000_pp.h"
-
+#include "Rotary.h"
 void MainTask( void *a );
-
-// overlaping:
-#define XM TFT_RS // 330 Ohm // must be an analog pin !!!
-#define YP TFT_CS // 500 Ohm // must be an analog pin !!!
-#define XP PB0 //TFT_D0 // 330 Ohm // can be a digital pin
-#define YM PB1 //TFT_D1 // 500 Ohm // can be a digital pin
+HardwareTimer pwmtimer(1);
 
 
 Adafruit_TFTLCD_8bit_STM32 *tft;
@@ -46,6 +41,14 @@ void mySetup()
     tft->setFontFamily(&Targa56pt7b, &DIGIT_LCD56pt7b, &DIGIT_LCD56pt7b);
     tft->fillScreen(BLACK);
     
+    tft->setCursor(150, 10);
+    tft->println("Go!");
+    
+    // square freq tester is A7
+    pinMode(PA7,PWM);
+    pwmtimer.setPeriod(1000);
+    
+    
    // Ok let's go, switch to FreeRTOS
    xTaskCreate( MainTask, "MainTask", 500, NULL, 10, NULL );
    vTaskStartScheduler();      
@@ -63,7 +66,7 @@ void MainTask( void *a )
         static int refresh=0;
 
         refresh++;
-        if(refresh>=1000)
+        if(refresh>=300)
         {
             // Redraw
              tft->fillScreen(BLACK);
