@@ -6,6 +6,8 @@ class DSOControl
 public:
   enum DSOButton
   {
+    DSO_BUTTON_UP=0,
+    DSO_BUTTON_DOWN=1,
     DSO_BUTTON_ROTARY=3,
     DSO_BUTTON_VOLTAGE=4,
     DSO_BUTTON_TIME=5,

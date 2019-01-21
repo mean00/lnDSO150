@@ -35,13 +35,22 @@ const unsigned char ttable[7][4] = {
 
 static DSOControl *instance=NULL;
 /**
- * 
+ * \brief This one is for left/right
  * @param a
  */
-static void _myInterrupt(void *a)
+static void _myInterruptRE(void *a)
 {
     instance->interrupt((int)a);
 }
+/**
+ * \brief: this one is for other buttons
+ * @param a
+ */
+static void _myInterruptButton(void *a)
+{
+    
+}
+
 /**
  * 
  */
@@ -57,10 +66,30 @@ DSOControl::DSOControl()
  */
 bool DSOControl::setup()
 {
-    pinMode(PB0,INPUT_PULLUP);
-    pinMode(PB1,INPUT_PULLUP);
-    attachInterrupt(PB0,_myInterrupt,(void *)0,FALLING);  
-    attachInterrupt(PB1,_myInterrupt,(void *)1,FALLING);  
+#define pinAsInput(x) pinMode(PB0+x,INPUT_PULLUP);
+    
+    
+    pinAsInput(DSO_BUTTON_UP);
+    pinAsInput(DSO_BUTTON_DOWN);
+    
+    pinAsInput(DSO_BUTTON_ROTARY);
+    pinAsInput(DSO_BUTTON_VOLTAGE);
+    pinAsInput(DSO_BUTTON_TIME);
+    pinAsInput(DSO_BUTTON_TRIGGER);
+    pinAsInput(DSO_BUTTON_OK);
+      
+    
+#define attachRE(x)       attachInterrupt((uint8_t)(PB0+x),_myInterruptRE,(void *)x,FALLING );
+#define attachButton(x)   attachInterrupt((uint8_t)(PB0+x),_myInterruptButton,(void *)x,CHANGE);
+    
+    attachRE(DSO_BUTTON_UP);
+    attachRE(DSO_BUTTON_DOWN);
+    
+    attachButton(DSO_BUTTON_ROTARY);
+    attachButton(DSO_BUTTON_VOLTAGE);
+    attachButton(DSO_BUTTON_TIME);
+    attachButton(DSO_BUTTON_TRIGGER);
+    attachButton(DSO_BUTTON_OK);
 }
 /**
  * 
