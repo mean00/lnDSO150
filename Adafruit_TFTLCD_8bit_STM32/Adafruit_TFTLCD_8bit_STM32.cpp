@@ -5,11 +5,9 @@
 #include "Adafruit_TFTLCD_8bit_STM32_priv.h"
 
 
-//gpio_reg_map * cntrlRegs;
-gpio_reg_map * dataRegs;
 uint32_t intReg;
 uint32_t opReg;
-
+gpio_reg_map * dataRegs;
 /*****************************************************************************/
 // Constructor
 /*****************************************************************************/

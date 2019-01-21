@@ -154,7 +154,12 @@ void Adafruit_TFTLCD_8bit_STM32_ILI9341::drawPixel(int16_t x, int16_t y, uint16_
  */
 void     Adafruit_TFTLCD_8bit_STM32_ILI9341::floodPreamble()
 {
-    writeCommand(ILI9341_MEMORYWRITE); // 16 bit  
+    uint8_t hi,lo;
+    
+    hi=ILI9341_MEMORYWRITE>>8;
+    lo=ILI9341_MEMORYWRITE&0xff;
+    write8(hi);
+    write8(lo);
 }
 /**
  * 
