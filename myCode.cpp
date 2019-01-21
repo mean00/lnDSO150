@@ -14,13 +14,15 @@
 #include "MapleFreeRTOS1000.h"
 #include "MapleFreeRTOS1000_pp.h"
 #include "Rotary.h"
+#include "testSignal.h"
 static void MainTask( void *a );
 static void splash(void);
-HardwareTimer pwmtimer(3);
+
 
 // PA7 is timer3 channel2
 
 Adafruit_TFTLCD_8bit_STM32 *tft;
+testSignal *myTestSignal;
 static uint16_t identifier=0;
 /**
  * 
@@ -44,32 +46,8 @@ void mySetup()
     tft->fillScreen(BLACK);
     
     splash();
-    
-    
-    // square freq tester is A7    
-    
-    pinMode(PA7,PWM);  
-    pwmtimer.pause();
-    pwmtimer.setPrescaleFactor(18);
-    pwmtimer.setCount(0);
-    pwmtimer.setOverflow(4000);
-    pwmtimer.setCompare(TIMER_CH2, 2000);  
-    pwmtimer.refresh();
-    pwmtimer.resume();
-
-#if 0
-    if(0)
-    {
-        pinMode(PA12,OUTPUT); // AmpSel, 0.3v
-        digitalWrite(PA12,1);
-    }
-    else
-    {
-        pinMode(PA12,INPUT_PULLUP); // AmpSel
-    }
-#endif
-    
-    
+    myTestSignal=new testSignal(  PA7,PA12, 3,TIMER_CH2);
+    myTestSignal->setFrequency(1000); // 1Khz
     
    // Ok let's go, switch to FreeRTOS
    xTaskCreate( MainTask, "MainTask", 500, NULL, 10, NULL );
