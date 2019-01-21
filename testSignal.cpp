@@ -11,24 +11,27 @@
 testSignal::testSignal(int pin,int pinAmp,int timer, int channel)
 {
     this->pinAmp=pinAmp;
+    this->channel=channel;
     pwmtimer=new HardwareTimer(timer);
     digitalWrite(pin,1);
     pinMode(pin,PWM);  
-    pwmtimer->pause();
-    pwmtimer->setPrescaleFactor(18);
-    pwmtimer->setCount(0);
-    pwmtimer->setOverflow(4000);
-    pwmtimer->setCompare(channel, 2000);  
-    pwmtimer->refresh();
-    pwmtimer->resume();
-    
+    setFrequency(1000);
 }
 /**
  */
  bool testSignal::setFrequency(int fq)
  {
-     return true;
- }
+    pwmtimer->pause();
+    pwmtimer->setPrescaleFactor(18);
+    //  4Mhz tick
+    int v=(4000000/fq)&~1;
+    pwmtimer->setCount(0);
+    pwmtimer->setOverflow(v);
+    pwmtimer->setCompare(channel, v/2);  
+    pwmtimer->refresh();
+    pwmtimer->resume();
+    return true;
+}
  /**
   */
  bool testSignal::setAmplitute(bool  large)

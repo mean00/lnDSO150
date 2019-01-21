@@ -73,6 +73,7 @@ void MainTask( void *a )
     tft->setTextSize(5);
     while(1)
     {
+#if 0        
         xDelay(10);
         static int refresh=0;
 
@@ -94,6 +95,29 @@ void MainTask( void *a )
         CHECK_BUTTON(5,"Se ");
         CHECK_BUTTON(4,"Vt ");
     }
+#endif
+        int fq=2000;
+        tft->fillScreen(BLACK);   
+        myTestSignal->setFrequency(fq);
+        tft->setCursor(200, 30);
+        tft->println(fq);
+        xDelay(5000);
+        
+        fq=500;
+        tft->fillScreen(BLACK);   
+        myTestSignal->setFrequency(fq);
+        tft->setCursor(200, 30);
+        tft->println(fq);
+        xDelay(5000);
+
+        fq=1000;
+        tft->fillScreen(BLACK);   
+        myTestSignal->setFrequency(fq);
+        tft->setCursor(200, 30);
+        tft->println(fq);
+        xDelay(5000);
+    }
+        
 }
 
 

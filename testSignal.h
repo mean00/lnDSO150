@@ -13,5 +13,6 @@ public:
 protected:
             HardwareTimer *pwmtimer;
             int            pinAmp;
+            int            channel;
             
 };
