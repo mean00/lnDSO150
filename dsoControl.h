@@ -15,11 +15,12 @@ public:
     DSO_BUTTON_OK=7
   };
 
-    DSOControl();
+         DSOControl();
     bool setup();
     bool getButtonState(DSOButton button);
     int  getRotaryValue();
-    void interrupt(int button);
+    void interruptRE(int button);
+    void interruptButton(int button);
 protected:
     int state;
     int counter;

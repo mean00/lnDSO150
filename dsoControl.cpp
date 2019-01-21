@@ -5,6 +5,10 @@
 #include <Wire.h>
 #include "dsoControl.h"
 #include "dsoControl_internal.h"
+#define ButtonToPin(x) (PB0+x)
+#define pinAsInput(x)     pinMode(ButtonToPin(x),INPUT_PULLUP);
+#define attachRE(x)       attachInterrupt(ButtonToPin(x),_myInterruptRE,(void *)x,FALLING );
+#define attachButton(x)   attachInterrupt(ButtonToPin(x),_myInterruptButton,(void *)x,CHANGE);
 
 
 static DSOControl *instance=NULL;
@@ -14,7 +18,7 @@ static DSOControl *instance=NULL;
  */
 static void _myInterruptRE(void *a)
 {
-    instance->interrupt((int)a);
+    instance->interruptRE(!!a);
 }
 /**
  * \brief: this one is for other buttons
@@ -22,7 +26,7 @@ static void _myInterruptRE(void *a)
  */
 static void _myInterruptButton(void *a)
 {
-    
+    instance->interruptButton((int)a);
 }
 
 /**
@@ -30,25 +34,9 @@ static void _myInterruptButton(void *a)
  */
 DSOControl::DSOControl()
 {
-      state = R_START;
-      instance=this;
-      counter=0;
-}
-
-#define ButtonToPin(x) (PB0+x)
-
-/**
- * 
- * @return 
- */
-bool DSOControl::setup()
-{
-#define pinAsInput(x) pinMode(ButtonToPin(x),INPUT_PULLUP);
-
-#define attachRE(x)       attachInterrupt(ButtonToPin(x),_myInterruptRE,(void *)x,FALLING );
-#define attachButton(x)   attachInterrupt(ButtonToPin(x),_myInterruptButton,(void *)x,CHANGE);
-    
-    
+    state = R_START;
+    instance=this;
+    counter=0;
     pinAsInput(DSO_BUTTON_UP);
     pinAsInput(DSO_BUTTON_DOWN);
     
@@ -57,32 +45,58 @@ bool DSOControl::setup()
     pinAsInput(DSO_BUTTON_TIME);
     pinAsInput(DSO_BUTTON_TRIGGER);
     pinAsInput(DSO_BUTTON_OK);
-      
-    
-    
+}
+
+
+
+/**
+ * 
+ * @return 
+ */
+bool DSOControl::setup()
+{
     attachRE(DSO_BUTTON_UP);
     attachRE(DSO_BUTTON_DOWN);
-    
+/*    
     attachButton(DSO_BUTTON_ROTARY);
     attachButton(DSO_BUTTON_VOLTAGE);
     attachButton(DSO_BUTTON_TIME);
     attachButton(DSO_BUTTON_TRIGGER);
     attachButton(DSO_BUTTON_OK);
+ * */
 }
 /**
  * 
  * @param a
  */
-void DSOControl::interrupt(int a)
+void DSOControl::interruptButton(int a)
+{
+    
+}
+
+/**
+ * 
+ * @param a
+ */
+void DSOControl::interruptRE(int a)
 {
    
   // Grab state of input pins.
-  unsigned char pinstate = (((!a) << 1) | (a&1));
+  int pinstate = (((a==0) << 1) | (a==1));
   // Determine new state from the pins and state table.
   state = ttable[state & 0xf][pinstate];
   // Return emit bits, ie the generated event.
-  if(state==DIR_CW) counter++;
-  if(state==DIR_CCW) counter--;
+  switch(state&DIR_MASK)
+  {
+    case DIR_CW:
+            counter++;
+            break;
+    case DIR_CCW: 
+            counter--;
+            break;
+    default: 
+            break;
+  }
   
 }
 /**
