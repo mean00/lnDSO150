@@ -4,34 +4,8 @@
 
 #include <Wire.h>
 #include "dsoControl.h"
+#include "dsoControl_internal.h"
 
-#define DIR_CW 0x10
-#define DIR_CCW 0x20
-
-#define R_START 0x0
-#define R_CW_FINAL 0x1
-#define R_CW_BEGIN 0x2
-#define R_CW_NEXT 0x3
-#define R_CCW_BEGIN 0x4
-#define R_CCW_FINAL 0x5
-#define R_CCW_NEXT 0x6
-
-const unsigned char ttable[7][4] = {
-  // R_START
-  {R_START,    R_CW_BEGIN,  R_CCW_BEGIN, R_START},
-  // R_CW_FINAL
-  {R_CW_NEXT,  R_START,     R_CW_FINAL,  R_START | DIR_CW},
-  // R_CW_BEGIN
-  {R_CW_NEXT,  R_CW_BEGIN,  R_START,     R_START},
-  // R_CW_NEXT
-  {R_CW_NEXT,  R_CW_BEGIN,  R_CW_FINAL,  R_START},
-  // R_CCW_BEGIN
-  {R_CCW_NEXT, R_START,     R_CCW_BEGIN, R_START},
-  // R_CCW_FINAL
-  {R_CCW_NEXT, R_CCW_FINAL, R_START,     R_START | DIR_CCW},
-  // R_CCW_NEXT
-  {R_CCW_NEXT, R_CCW_FINAL, R_CCW_BEGIN, R_START},
-};
 
 static DSOControl *instance=NULL;
 /**
@@ -60,13 +34,19 @@ DSOControl::DSOControl()
       instance=this;
       counter=0;
 }
+
+#define ButtonToPin(x) (PB0+x)
+
 /**
  * 
  * @return 
  */
 bool DSOControl::setup()
 {
-#define pinAsInput(x) pinMode(PB0+x,INPUT_PULLUP);
+#define pinAsInput(x) pinMode(ButtonToPin(x),INPUT_PULLUP);
+
+#define attachRE(x)       attachInterrupt(ButtonToPin(x),_myInterruptRE,(void *)x,FALLING );
+#define attachButton(x)   attachInterrupt(ButtonToPin(x),_myInterruptButton,(void *)x,CHANGE);
     
     
     pinAsInput(DSO_BUTTON_UP);
@@ -79,8 +59,6 @@ bool DSOControl::setup()
     pinAsInput(DSO_BUTTON_OK);
       
     
-#define attachRE(x)       attachInterrupt((uint8_t)(PB0+x),_myInterruptRE,(void *)x,FALLING );
-#define attachButton(x)   attachInterrupt((uint8_t)(PB0+x),_myInterruptButton,(void *)x,CHANGE);
     
     attachRE(DSO_BUTTON_UP);
     attachRE(DSO_BUTTON_DOWN);
@@ -99,7 +77,7 @@ void DSOControl::interrupt(int a)
 {
    
   // Grab state of input pins.
-  unsigned char pinstate = (((a==0) << 1) | (a==1));
+  unsigned char pinstate = (((!a) << 1) | (a&1));
   // Determine new state from the pins and state table.
   state = ttable[state & 0xf][pinstate];
   // Return emit bits, ie the generated event.

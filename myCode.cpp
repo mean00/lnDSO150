@@ -54,7 +54,7 @@ void mySetup()
     
     controlButtons=new DSOControl ;
     controlButtons->setup();
-    interrupts();
+    
    // Ok let's go, switch to FreeRTOS
    xTaskCreate( MainTask, "MainTask", 500, NULL, 10, NULL );
    vTaskStartScheduler();      
@@ -114,6 +114,7 @@ void setTestSignal(int fq,bool high)
  */
 void MainTask( void *a )
 {
+    interrupts();
     tft->setTextSize(5);
     while(1)
     {
