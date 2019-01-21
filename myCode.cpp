@@ -16,8 +16,9 @@
 #include "Rotary.h"
 static void MainTask( void *a );
 static void splash(void);
-HardwareTimer pwmtimer(2);
+HardwareTimer pwmtimer(3);
 
+// PA7 is timer3 channel2
 
 Adafruit_TFTLCD_8bit_STM32 *tft;
 static uint16_t identifier=0;
@@ -47,9 +48,26 @@ void mySetup()
     
     // square freq tester is A7    
     
-    pinMode(PA7,PWM);
-    pwmtimer.setMode(3,TIMER_PWM);
-    pwmtimer.setPeriod(1000);
+    pinMode(PA7,PWM);  
+    pwmtimer.pause();
+    pwmtimer.setPrescaleFactor(18);
+    pwmtimer.setCount(0);
+    pwmtimer.setOverflow(4000);
+    pwmtimer.setCompare(TIMER_CH2, 2000);  
+    pwmtimer.refresh();
+    pwmtimer.resume();
+
+#if 0
+    if(0)
+    {
+        pinMode(PA12,OUTPUT); // AmpSel, 0.3v
+        digitalWrite(PA12,1);
+    }
+    else
+    {
+        pinMode(PA12,INPUT_PULLUP); // AmpSel
+    }
+#endif
     
     
     
