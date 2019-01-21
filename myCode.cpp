@@ -1,7 +1,7 @@
 /***************************************************
- Digitally controlled power supply
+ STM32 duino based firmware for DSO SHELL/150
  *  * GPL v2
- * (c) mean 2018 fixounet@free.fr
+ * (c) mean 2019 fixounet@free.fr
  ****************************************************/
 
 #include <Wire.h>
@@ -15,6 +15,7 @@
 #include "MapleFreeRTOS1000_pp.h"
 #include "Rotary.h"
 #include "testSignal.h"
+#include "dsoControl.h"
 static void MainTask( void *a );
 static void splash(void);
 
@@ -23,7 +24,9 @@ static void splash(void);
 
 Adafruit_TFTLCD_8bit_STM32 *tft;
 testSignal *myTestSignal;
+DSOControl *controlButtons;
 static uint16_t identifier=0;
+static int counter=0;
 /**
  * 
  */
@@ -46,9 +49,12 @@ void mySetup()
     tft->fillScreen(BLACK);
     
     splash();
-    myTestSignal=new testSignal(  PA7,PA12, 3,TIMER_CH2);
+    myTestSignal=new testSignal(  PA7,PB12, 3,TIMER_CH2);
     myTestSignal->setFrequency(1000); // 1Khz
     
+    controlButtons=new DSOControl ;
+    controlButtons->setup();
+    interrupts();
    // Ok let's go, switch to FreeRTOS
    xTaskCreate( MainTask, "MainTask", 500, NULL, 10, NULL );
    vTaskStartScheduler();      
@@ -62,6 +68,44 @@ void splash()
         tft->myDrawString("DSO-STM32duino");
         delay(500);
         tft->fillScreen(BLACK);
+}
+
+void printButton(int b,const char *txt)
+{
+    if(controlButtons->getButtonState((DSOControl::DSOButton)b))
+    {
+        tft->setCursor(20, 30*(b-3));     
+        tft->println(txt); 
+    }
+     
+}
+void setTestSignal(int fq,bool high)
+{
+        tft->fillScreen(BLACK);   
+        myTestSignal->setFrequency(fq);
+        myTestSignal->setAmplitute(high);
+        tft->setCursor(20, 30);
+        tft->println(fq);
+        tft->setCursor(200, 30);
+        tft->println(high);
+        //
+        for(int i=0;i<500;i++)
+        {
+            xDelay(10);
+            printButton(3,"RotB    ");
+            printButton(7,"Ok      ");
+            printButton(6,"Trigger ");
+            printButton(5,"Time    ");
+            printButton(4,"Voltage ");
+            
+            int a=controlButtons->getRotaryValue();
+            if(a)
+            {
+                counter+=a;
+                tft->setCursor(200, 200);
+                tft->println(counter);
+            }
+        }
 }
 
 /**
@@ -96,26 +140,16 @@ void MainTask( void *a )
         CHECK_BUTTON(4,"Vt ");
     }
 #endif
-        int fq=2000;
-        tft->fillScreen(BLACK);   
-        myTestSignal->setFrequency(fq);
-        tft->setCursor(200, 30);
-        tft->println(fq);
-        xDelay(5000);
-        
-        fq=500;
-        tft->fillScreen(BLACK);   
-        myTestSignal->setFrequency(fq);
-        tft->setCursor(200, 30);
-        tft->println(fq);
-        xDelay(5000);
+        setTestSignal(10000,true);
+        setTestSignal(10000,false);
 
-        fq=1000;
-        tft->fillScreen(BLACK);   
-        myTestSignal->setFrequency(fq);
-        tft->setCursor(200, 30);
-        tft->println(fq);
-        xDelay(5000);
+        setTestSignal(2000,true);
+        setTestSignal(2000,false);
+        setTestSignal(1000,true);
+        setTestSignal(1000,false);
+        setTestSignal(500,true);
+        setTestSignal(500,false);
+
     }
         
 }

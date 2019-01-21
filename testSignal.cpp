@@ -1,5 +1,5 @@
 /***************************************************
- 
+  DSO-stm32duino test signal driver
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
 
@@ -14,7 +14,8 @@ testSignal::testSignal(int pin,int pinAmp,int timer, int channel)
     this->channel=channel;
     pwmtimer=new HardwareTimer(timer);
     digitalWrite(pin,1);
-    pinMode(pin,PWM);  
+    pinMode(pin,PWM); 
+    setAmplitute(true);
     setFrequency(1000);
 }
 /**
@@ -33,28 +34,25 @@ testSignal::testSignal(int pin,int pinAmp,int timer, int channel)
     return true;
 }
  /**
+  * The actual output is connected like that
+  *    PA7  --- R16
+  *    PA12 --- R31 Ohm----> out
+  * 
+  *     So if PA12 is floating, out is the PA7 output @3.3v
+  *     if PA12 is output to the ground, output is 3.3*R31/(R16+R31)= ~ 100 mv
+  * 
+  * 
   */
  bool testSignal::setAmplitute(bool  large)
  {
-#if 0
-
-    if(0) /// 3.3 v
-    {
-        pinMode(PA12,INPUT_PULLUP);
-    }else
-    {
-        pinMode(PA12,OUTPUT);
-        digitalWrite(PA12,0);
-    }
-    
-#if 0
-        3.3 V => PA12 = intput + pullup
-        pa7=output, no pullup
-                
-        0.1V => PA12=> output, no pullup, output=0              
-#endif
-    
-#endif     
+     if(large)
+     {
+           pinMode(pinAmp,INPUT_FLOATING);
+     }else
+     {
+          pinMode(pinAmp,OUTPUT_OPEN_DRAIN);
+          digitalWrite(pinAmp,0);
+     }
      return true;
  }
  
