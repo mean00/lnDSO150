@@ -12,6 +12,7 @@ testSignal::testSignal(int pin,int pinAmp,int timer, int channel)
 {
     this->pinAmp=pinAmp;
     pwmtimer=new HardwareTimer(timer);
+    digitalWrite(pin,1);
     pinMode(pin,PWM);  
     pwmtimer->pause();
     pwmtimer->setPrescaleFactor(18);
@@ -20,7 +21,7 @@ testSignal::testSignal(int pin,int pinAmp,int timer, int channel)
     pwmtimer->setCompare(channel, 2000);  
     pwmtimer->refresh();
     pwmtimer->resume();
-    digitalWrite(pin,1);
+    
 }
 /**
  */
