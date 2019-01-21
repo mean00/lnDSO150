@@ -82,17 +82,17 @@ void DSOControl::interruptRE(int a)
 {
    
   // Grab state of input pins.
-  int pinstate = (((a==0) << 1) | (a==1));
+  int pinstate =  ( GPIOB->regs->IDR)&3;
   // Determine new state from the pins and state table.
   state = ttable[state & 0xf][pinstate];
   // Return emit bits, ie the generated event.
   switch(state&DIR_MASK)
   {
     case DIR_CW:
-            counter++;
+            counter--;
             break;
     case DIR_CCW: 
-            counter--;
+            counter++;
             break;
     default: 
             break;
