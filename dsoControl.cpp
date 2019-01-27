@@ -31,10 +31,11 @@
 #include "dsoControl.h"
 #include "dsoControl_internal.h"
 
-#define TICK             10
+#define TICK                  10
 #define LONG_PRESS_THRESHOLD (1000/TICK)
 #define SHORT_PRESS_THRESHOLD (2)
 #define HOLDOFF_THRESHOLD     (50/TICK)
+#define COUNT_MAX             3
 
  enum DSOButtonState
   {
@@ -48,7 +49,7 @@
 #define attachRE(x)       attachInterrupt(ButtonToPin(x),_myInterruptRE,(void *)x,FALLING );
 
 #define NB_BUTTONS 8
-#define COUNT_MAX 3
+
   
 /**
  */
@@ -128,7 +129,7 @@ public:
                                 if(_pinCounter>LONG_PRESS_THRESHOLD && _state==StatePressed) // only one long
                                 {
                                     _state=StateLongPressed;
-                                    _events|=EVENT_LONG_PRESS;
+                                    _events|=EVENT_LONG_PRESS;                                    
                                 }
                                 break;
                         }                       
@@ -209,7 +210,7 @@ void DSOControl::runLoop()
             
             int k=!(val&(1<<i));
             
-            int oldCount=button._pinState;
+            int oldCount=button._pinCounter;
             button.integrate(k);
             button.runMachine(oldCount);
           
