@@ -34,31 +34,124 @@
 #define TICK             10
 #define LONG_PRESS_THRESHOLD (1000/TICK)
 #define SHORT_PRESS_THRESHOLD (2)
+#define HOLDOFF_THRESHOLD     (50/TICK)
 
  enum DSOButtonState
   {
     StateIdle=0,
     StatePressed=1,
-    StateLongPressed=2
+    StateLongPressed=2,
+    StateHoldOff=3
   };
-#define ButtonToPin(x) (PB0+x)
+#define ButtonToPin(x)    (PB0+x)
 #define pinAsInput(x)     pinMode(ButtonToPin(x),INPUT_PULLUP);
 #define attachRE(x)       attachInterrupt(ButtonToPin(x),_myInterruptRE,(void *)x,FALLING );
 
 #define NB_BUTTONS 8
+#define COUNT_MAX 3
+  
+/**
+ */
+class singleButton
+{
+public:
+                    singleButton()
+                    {
+                        _state=StateIdle;
+                        _events=0;
+                        _holdOffCounter=0;
+                        _pinState=0;
+                        _pinCounter=0;
+                    }
+                    bool holdOff() // Return true if in holdoff mode
+                    {
+                        if(_state!=StateHoldOff)
+                            return false;
+                        _holdOffCounter++;
+                        if(_holdOffCounter>HOLDOFF_THRESHOLD)
+                        {
+                            _state=StateIdle;
+                            return false;
+                        }
+                        return true;
+                    }
+                    void goToHoldOff()
+                    {
+                        _state=StateHoldOff;
+                        _holdOffCounter=0;
+                    }
+                    void integrate(bool k)
+                    {         
+                        // Integrator part
+                        if(k)
+                        {
+                            _pinCounter++;
+                        }else
+                        {
+                            if(_pinCounter) 
+                            {
+                                if(_pinCounter>=COUNT_MAX) _pinCounter=COUNT_MAX-1;
+                                else
+                                    _pinCounter--;
+                            }
+                        }
+                    }
+                    
+                    void runMachine(int oldCount)
+                    {
+                        
+                        int oldPin=_pinState;
+                        int newPin=_pinCounter>(COUNT_MAX-1);
 
-static DSOControl *instance=NULL;
-static int          pinState[NB_BUTTONS];
-static int          pinCount[NB_BUTTONS];
-static int          events[NB_BUTTONS];
-static int          states[NB_BUTTONS];
+                        int s=oldPin+oldPin+newPin;
+                        switch(s)
+                        {
+                            default:
+                            case 0: // flat
+                                break;
+                            case 2:
+                            { // released
+                                if(_state==StatePressed)
+                                {                        
+                                    if(oldCount>SHORT_PRESS_THRESHOLD)
+                                    {
+                                        _events|=EVENT_SHORT_PRESS;
+                                    }
+                                }
+                                goToHoldOff();
+                                break;
+                            }
+                            case 1: // Pressed
+                                _state=StatePressed;
+                                break;
+                            case 3: // Still pressed
+                                if(_pinCounter>LONG_PRESS_THRESHOLD && _state==StatePressed) // only one long
+                                {
+                                    _state=StateLongPressed;
+                                    _events|=EVENT_LONG_PRESS;
+                                }
+                                break;
+                        }                       
+                        _pinState=newPin;
+                    }        
+                    
+    DSOButtonState _state;
+    int            _events;
+    int            _holdOffCounter;
+    int            _pinState;
+    int            _pinCounter;
+};
+  
+static DSOControl  *instance=NULL;
+
+static singleButton _buttons[NB_BUTTONS];
 
 static int state;  // rotary state
 static int counter; // rotary counter
 
 static TaskHandle_t taskHandle;
 
-#define COUNT_MAX 3
+
 
 
 /**
@@ -69,6 +162,7 @@ static void _myInterruptRE(void *a)
 {
     instance->interruptRE(!!a);
 }
+
 
 /**
  * 
@@ -87,13 +181,6 @@ DSOControl::DSOControl()
     pinAsInput(DSO_BUTTON_TRIGGER);
     pinAsInput(DSO_BUTTON_OK);
     
-    for(int i=0;i<NB_BUTTONS;i++)
-    {
-        pinState[i]=0;
-        pinCount[i]=0;
-        states[i]=StateIdle;
-    }
-    
 }
 
 
@@ -102,6 +189,8 @@ static void trampoline(void *a)
     DSOControl *ctrl=(DSOControl*)a;
     ctrl->runLoop();
 }
+
+
 /**
  * 
  */
@@ -111,62 +200,19 @@ void DSOControl::runLoop()
     while(1)
     {
         xDelay(TICK);
-        uint32_t val= GPIOB->regs->IDR;      
+        uint32_t val= GPIOB->regs->IDR;     
         for(int i=DSO_BUTTON_ROTARY;i<=DSO_BUTTON_OK;i++)
         {
-            int k=!(val&(1<<i));
-            int *c=pinCount+i;
-            int oldCount=*c;
-            if(k)
-            {
-                (*c)++;
-            }else
-            {
-                if(*c) 
-                {
-                    if(*c>=COUNT_MAX) *c=COUNT_MAX-1;
-                    else
-                        (*c)--;
-                }
-            }
-            int oldPin=pinState[i];
-            int newPin=(*c)>(COUNT_MAX-1);
+            singleButton &button=_buttons[i];
+            if(button.holdOff()) 
+                continue;
             
-            int s=oldPin+oldPin+newPin;
-            switch(s)
-            {
-                default:
-                case 0:
-                    break;
-                case 2:
-                { // released
-                    if(states[i]==StatePressed)
-                    {
-                        states[i]=StateIdle;
-                        if(oldCount>SHORT_PRESS_THRESHOLD)
-                        {
-                            events[i]=EVENT_SHORT_PRESS;
-                            Serial.print("Short");
-                            Serial.println(i);
-                        }
-                    }
-                    states[i]=StateIdle;
-                    break;
-                }
-                case 1: // Pressed
-                    states[i]=StatePressed;
-                    break;
-                case 3: // Still pressed
-                    if(*c>LONG_PRESS_THRESHOLD && states[i]==StatePressed) // only one long
-                    {
-                        states[i]=StateLongPressed;
-                        events[i]=EVENT_LONG_PRESS;
-                        Serial.print("Long");
-                        Serial.println(i);
-                    }
-                    break;
-            }                       
-            pinState[i]=newPin;
+            int k=!(val&(1<<i));
+            
+            int oldCount=button._pinState;
+            button.integrate(k);
+            button.runMachine(oldCount);
+          
         }        
     }
 }
@@ -213,7 +259,7 @@ void DSOControl::interruptRE(int a)
  */
 bool DSOControl::getButtonState(DSOControl::DSOButton button)
 {
-    return pinState[button];
+    return _buttons[button]._pinState;
 }
 /**
  * 
@@ -222,8 +268,10 @@ bool DSOControl::getButtonState(DSOControl::DSOButton button)
  */
 int  DSOControl::getButtonEvents(DSOButton button)
 {
-    int evt=events[button];
-    events[button]=0;
+    noInterrupts(); // very short, better than sem ?
+    int evt=_buttons[button]._events;
+    _buttons[button]._events=0;
+    interrupts();
     return evt;
 }
 

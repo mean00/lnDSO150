@@ -21,33 +21,34 @@ extern void splash(void);
 extern Adafruit_TFTLCD_8bit_STM32 *tft;
 extern DSOControl *controlButtons;
 
-
+/**
+ * 
+ */
 void testButtons(void)
 {
     while(1)
     {
-        
         tft->fillScreen(BLACK);   
         splash();
         for(int i=0;i<8;i++)
         {
             int evt=controlButtons->getButtonEvents((DSOControl::DSOButton)i);
-             tft->setCursor(20, 30+i*20);
-             tft->print(i);
+            tft->setCursor(20, 30+i*20);
+            tft->print(i);
+            Serial.print(i);
             if(evt & EVENT_SHORT_PRESS)
             {
                 tft->print(" SHORT");
+                Serial.println("Short");
                 
             }
             if(evt & EVENT_LONG_PRESS)
             {
                 tft->print(" LONG");
+                Serial.println("Long");
             }
         }
-        xDelay(3000);
-         
+        xDelay(1000);         
     }
-    
-    
 }
 //-
