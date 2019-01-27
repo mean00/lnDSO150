@@ -4,7 +4,7 @@
 #pragma once
 #include <Adafruit_GFX.h>
 #include <libmaple/gpio.h>
-
+#include "DSO_config.h"
 /*****************************************************************************/
 // Define pins and Output Data Registers
 /*****************************************************************************/
@@ -37,6 +37,9 @@
 #define RST_HIGH     { GPIOB->regs->BSRR = TFT_RST_MASK; }
 #define RST_LOW      { GPIOB->regs->BRR  = TFT_RST_MASK; }
 #define CS_IDLE	 { GPIOC->regs->BSRR = TFT_CS_MASK; }
+
+#ifndef USE_RXTX_PIN_FOR_ROTARY
+
 #define CS_ACTIVE  { intReg = EXTI_BASE->IMR;\
                     opReg = GPIOB->regs->ODR;\
                     EXTI_BASE->IMR = 0 ; \
@@ -47,6 +50,20 @@
                     GPIOB->regs->CRL = 0x88888888; \
                     GPIOC->regs->BSRR = TFT_CS_MASK ; \
                     EXTI_BASE->IMR = intReg; }
+
+
+#else // when RX/TX pins are used for rotary encoder, no need to mask interrupts
+#define CS_ACTIVE  { opReg = GPIOB->regs->ODR;\                    
+                    GPIOB->regs->CRL = 0x33333333 ;\
+                    GPIOC->regs->BRR  = TFT_CS_MASK; }
+
+#define CS_IDLE    { GPIOB->regs->ODR = opReg;\
+                    GPIOB->regs->CRL = 0x88888888; \
+                    GPIOC->regs->BSRR = TFT_CS_MASK ; \
+                    }
+
+
+#endif
 
 #define CS_ACTIVE_CD_COMMAND {CS_ACTIVE;CD_COMMAND}
 #define WR_STROBE { WR_ACTIVE; WR_IDLE; }

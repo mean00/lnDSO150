@@ -30,6 +30,7 @@
 #include "MapleFreeRTOS1000_pp.h"
 #include "dsoControl.h"
 #include "dsoControl_internal.h"
+#include "DSO_config.h"
 
 #define TICK                  10
 #define LONG_PRESS_THRESHOLD (1000/TICK)
@@ -50,6 +51,8 @@
 
 #define NB_BUTTONS 8
 
+#define TX_PIN PA9
+#define RX_PIN PA10
   
 /**
  */
@@ -173,8 +176,14 @@ DSOControl::DSOControl()
     state = R_START;
     instance=this;
     counter=0;
+    
+#ifdef USE_RXTX_PIN_FOR_ROTARY
+    pinMode(TX_PIN,INPUT_PULLUP);
+    pinMode(RX_PIN,INPUT_PULLUP);
+#else    
     pinAsInput(DSO_BUTTON_UP);
     pinAsInput(DSO_BUTTON_DOWN);
+#endif
     
     pinAsInput(DSO_BUTTON_ROTARY);
     pinAsInput(DSO_BUTTON_VOLTAGE);
@@ -224,19 +233,34 @@ void DSOControl::runLoop()
  */
 bool DSOControl::setup()
 {
+#ifdef USE_RXTX_PIN_FOR_ROTARY         
+     attachInterrupt(TX_PIN,_myInterruptRE,(void *)DSO_BUTTON_UP,FALLING );
+     attachInterrupt(RX_PIN,_myInterruptRE,(void *)DSO_BUTTON_DOWN,FALLING );
+#else
     attachRE(DSO_BUTTON_UP);
     attachRE(DSO_BUTTON_DOWN);
+#endif
     xTaskCreate( trampoline, "Control", 150, this, 15, &taskHandle );       
 }
 /**
  * 
  * @param a
  */
+
+#ifdef USE_RXTX_PIN_FOR_ROTARY
+void DSOControl::interruptRE(int a)
+{   
+  // Grab state of input pins.
+  static int portA =  ( GPIOA->regs->IDR);
+  int pinstate=2&&(portA&(1<<(TX_PIN-PA0)))+(portA&(1<<(RX_PIN-PA0)));
+#else
+
 void DSOControl::interruptRE(int a)
 {
    
   // Grab state of input pins.
   int pinstate =  ( GPIOB->regs->IDR)&3;
+#endif  
   // Determine new state from the pins and state table.
   state = ttable[state & 0xf][pinstate];
   // Return emit bits, ie the generated event.

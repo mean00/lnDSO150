@@ -26,6 +26,7 @@ extern DSOControl *controlButtons;
  */
 void testButtons(void)
 {
+    int reCounter=0;
     while(1)
     {
         tft->fillScreen(BLACK);   
@@ -48,6 +49,9 @@ void testButtons(void)
                 Serial.println("Long");
             }
         }
+        reCounter+=controlButtons->getRotaryValue();
+        tft->setCursor(200, 30);
+        tft->print(reCounter);
         xDelay(1000);         
     }
 }

@@ -8,8 +8,7 @@
 #include "SPI.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_TFTLCD_8bit_STM32.h"
-#include "Fonts/Targ56.h"
-#include "Fonts/digitLcd56.h"
+//#include "Fonts/digitLcd56.h"
 #include "Fonts/FreeSansBold12pt7b.h"
 #include "MapleFreeRTOS1000.h"
 #include "MapleFreeRTOS1000_pp.h"
@@ -48,7 +47,7 @@ void mySetup()
     }
     tft->begin();
     tft->setRotation(1);
-    tft->setFontFamily(&FreeSansBold12pt7b, &DIGIT_LCD56pt7b, &DIGIT_LCD56pt7b);
+    tft->setFontFamily(&FreeSansBold12pt7b, &FreeSansBold12pt7b, &FreeSansBold12pt7b);  
     tft->fillScreen(BLACK);
     
     splash();
