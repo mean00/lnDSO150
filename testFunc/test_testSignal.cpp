@@ -36,6 +36,7 @@ void setTestSignal(int fq,bool high)
         tft->println(fq);
         tft->setCursor(200, 30);
         tft->println(high);
+        xDelay(2000);
         
 }
 

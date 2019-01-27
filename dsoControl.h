@@ -24,7 +24,7 @@ public:
          DSOControl();
     bool setup();
     bool getButtonState(DSOButton button);
-    int  getButtonEvent(DSOButton button);
+    int  getButtonEvents(DSOButton button);
     int  getRotaryValue();
     void interruptRE(int button);
     void interruptButton(int button);

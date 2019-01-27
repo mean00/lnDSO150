@@ -217,6 +217,18 @@ bool DSOControl::getButtonState(DSOControl::DSOButton button)
 }
 /**
  * 
+ * @param button
+ * @return 
+ */
+int  DSOControl::getButtonEvents(DSOButton button)
+{
+    int evt=events[button];
+    events[button]=0;
+    return evt;
+}
+
+/**
+ * 
  * @return 
  */
 int  DSOControl::getRotaryValue()

@@ -18,10 +18,7 @@
 #include "HardwareSerial.h"
 static void MainTask( void *a );
 void splash(void);
-
-
-// PA7 is timer3 channel2
-
+//--
 Adafruit_TFTLCD_8bit_STM32 *tft;
 testSignal *myTestSignal;
 DSOControl *controlButtons;
@@ -31,6 +28,7 @@ static int counter=0;
 // Test functions
 //
 extern void testTestSignal();
+extern void testButtons();
 /**
  * 
  */
@@ -71,8 +69,7 @@ void splash(void)
         tft->setCursor(45, 10);
         tft->setTextColor(WHITE,BLACK);
         tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::SmallFont);
-        tft->myDrawString("    DSO-STM32duino");
-        
+        tft->myDrawString("    DSO-STM32duino");        
 }
 
 
@@ -86,8 +83,8 @@ void MainTask( void *a )
     tft->setTextSize(3);
     controlButtons->setup();
     
-    testTestSignal();
-        
+   // testTestSignal();
+     testButtons();   
 }
 
 //-
