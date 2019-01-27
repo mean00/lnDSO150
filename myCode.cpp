@@ -15,8 +15,9 @@
 #include "MapleFreeRTOS1000_pp.h"
 #include "testSignal.h"
 #include "dsoControl.h"
+#include "HardwareSerial.h"
 static void MainTask( void *a );
-static void splash(void);
+void splash(void);
 
 
 // PA7 is timer3 channel2
@@ -26,6 +27,10 @@ testSignal *myTestSignal;
 DSOControl *controlButtons;
 static uint16_t identifier=0;
 static int counter=0;
+//
+// Test functions
+//
+extern void testTestSignal();
 /**
  * 
  */
@@ -33,6 +38,7 @@ void mySetup()
 {
     
     afio_cfg_debug_ports( AFIO_DEBUG_SW_ONLY); // Unlock PB3 & PB4
+    Serial.begin(115200);
     Serial.println("Init"); 
     
     identifier = tft->readID();
@@ -53,13 +59,14 @@ void mySetup()
     myTestSignal->setFrequency(1000); // 1Khz
     
     controlButtons=new DSOControl ;
+       
     
     // Ok let's go, switch to FreeRTOS
     xTaskCreate( MainTask, "MainTask", 500, NULL, 10, NULL );
     vTaskStartScheduler();      
 }
 
-void splash()
+void splash(void)
 {
         tft->setCursor(45, 10);
         tft->setTextColor(WHITE,BLACK);
@@ -68,47 +75,6 @@ void splash()
         
 }
 
-void printButton(int b,const char *txt)
-{
-    if(controlButtons->getButtonState((DSOControl::DSOButton)b))
-    {
-        tft->setCursor(20, 30+b*25);     
-        tft->println(txt); 
-    }
-     
-}
-void setTestSignal(int fq,bool high)
-{
-    static uint32_t bh, bl;
-    
-        tft->fillScreen(BLACK);   
-        splash();
-        myTestSignal->setFrequency(fq);
-        myTestSignal->setAmplitute(high);
-        tft->setCursor(20, 30);
-        tft->println(fq);
-        tft->setCursor(200, 30);
-        tft->println(high);
-        //
-        //EXTI_BASE->IMR=3;
-        for(int i=0;i<500;i++)
-        {
-
-            xDelay(10);
-            printButton(3,"RotB    ");
-            printButton(7,"Ok      ");
-            printButton(6,"Trigger ");
-            printButton(5,"Time    ");
-            printButton(4,"Voltage ");
-            int a=controlButtons->getRotaryValue();
-            if(a)
-            {
-                counter+=a;
-                tft->setCursor(200, 200);
-                tft->println(counter);
-            }
-        }
-}
 
 /**
  * 
@@ -120,19 +86,7 @@ void MainTask( void *a )
     tft->setTextSize(3);
     controlButtons->setup();
     
-    while(1)
-    {
-        setTestSignal(10000,true);
-        setTestSignal(10000,false);
-
-        setTestSignal(2000,true);
-        setTestSignal(2000,false);
-        setTestSignal(1000,true);
-        setTestSignal(1000,false);
-        setTestSignal(500,true);
-        setTestSignal(500,false);
-
-    }
+    testTestSignal();
         
 }
 

@@ -58,7 +58,7 @@ SET(libPrefix ${ARDUINO_DEFAULT_BOARD}_)
 generate_arduino_firmware(Dso150 
                 SKETCH dso150.ino
                 #SRCS   ${ILI}/ILI9341_exi2cPowerSupplytended.cpp ${ILI}/ILI9341_extended_glyph.cpp myCode.cpp  simplerMCP4725/simplerMCP4725.cpp ${MCP23017_FREERTOS}/MCP23017_rtos.cpp  myAdc/myAdc.cpp
-                SRCS    myCode.cpp  testSignal.cpp dsoControl.cpp
+                SRCS    myCode.cpp  testSignal.cpp dsoControl.cpp testFunc/test_testSignal.cpp
                 PORT ${ARDUINO_DEFAULT_PORT}
                 BOARD_CPU ${ARDUINO_CPU}
                 )

@@ -1,9 +1,15 @@
 #pragma once
+
+
+#define EVENT_LONG_PRESS  1
+#define EVENT_SHORT_PRESS 2
+
 /**
  */
 class DSOControl
 {
 public:
+ 
   enum DSOButton
   {
     DSO_BUTTON_UP=0,
@@ -18,11 +24,12 @@ public:
          DSOControl();
     bool setup();
     bool getButtonState(DSOButton button);
+    int  getButtonEvent(DSOButton button);
     int  getRotaryValue();
     void interruptRE(int button);
     void interruptButton(int button);
+    void runLoop();
 protected:
-    int state;
-    int counter;
+    
 };
 // EOF
