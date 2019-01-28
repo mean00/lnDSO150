@@ -36,7 +36,7 @@ void testButtons(void)
             int evt=controlButtons->getButtonEvents((DSOControl::DSOButton)i);
             tft->setCursor(20, 30+i*20);
             tft->print(i);
-            Serial.print(i);
+            //Serial.print(i);
             if(evt & EVENT_SHORT_PRESS)
             {
                 tft->print(" SHORT");
@@ -52,7 +52,8 @@ void testButtons(void)
         reCounter+=controlButtons->getRotaryValue();
         tft->setCursor(200, 30);
         tft->print(reCounter);
-        xDelay(1000);         
+        tft->setCursor(200, 90);
+        xDelay(100);         
     }
 }
 //-

@@ -1,0 +1,1 @@
+#define USE_RXTX_PIN_FOR_ROTARY 1

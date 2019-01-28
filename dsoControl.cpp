@@ -17,6 +17,7 @@
  * 
  
  * PA1..A4    x      SENSEL
+ * PA9/PA10   INPUT Uart RX/TX used for rotary encoder
  * PA5        INPUT  CPLSEL
  * 
  
@@ -156,8 +157,6 @@ static int counter; // rotary counter
 static TaskHandle_t taskHandle;
 
 
-
-
 /**
  * \brief This one is for left/right
  * @param a
@@ -178,7 +177,7 @@ DSOControl::DSOControl()
     counter=0;
     
 #ifdef USE_RXTX_PIN_FOR_ROTARY
-    pinMode(TX_PIN,INPUT_PULLUP);
+    pinMode(TX_PIN,INPUT_PULLUP); // ok
     pinMode(RX_PIN,INPUT_PULLUP);
 #else    
     pinAsInput(DSO_BUTTON_UP);
@@ -234,8 +233,8 @@ void DSOControl::runLoop()
 bool DSOControl::setup()
 {
 #ifdef USE_RXTX_PIN_FOR_ROTARY         
-     attachInterrupt(TX_PIN,_myInterruptRE,(void *)DSO_BUTTON_UP,FALLING );
-     attachInterrupt(RX_PIN,_myInterruptRE,(void *)DSO_BUTTON_DOWN,FALLING );
+     attachInterrupt(TX_PIN,_myInterruptRE,(void *)DSO_BUTTON_UP,CHANGE );
+     attachInterrupt(RX_PIN,_myInterruptRE,(void *)DSO_BUTTON_DOWN,CHANGE );
 #else
     attachRE(DSO_BUTTON_UP);
     attachRE(DSO_BUTTON_DOWN);
@@ -247,18 +246,11 @@ bool DSOControl::setup()
  * @param a
  */
 
-#ifdef USE_RXTX_PIN_FOR_ROTARY
 void DSOControl::interruptRE(int a)
 {   
-  // Grab state of input pins.
-  static int portA =  ( GPIOA->regs->IDR);
-  int pinstate=2&&(portA&(1<<(TX_PIN-PA0)))+(portA&(1<<(RX_PIN-PA0)));
+#ifdef USE_RXTX_PIN_FOR_ROTARY    
+  int pinstate= ((( GPIOA->regs->IDR))>>9)&3;
 #else
-
-void DSOControl::interruptRE(int a)
-{
-   
-  // Grab state of input pins.
   int pinstate =  ( GPIOB->regs->IDR)&3;
 #endif  
   // Determine new state from the pins and state table.
@@ -267,10 +259,10 @@ void DSOControl::interruptRE(int a)
   switch(state&DIR_MASK)
   {
     case DIR_CW:
-            counter--;
+            counter++;
             break;
     case DIR_CCW: 
-            counter++;
+            counter--;
             break;
     default: 
             break;
