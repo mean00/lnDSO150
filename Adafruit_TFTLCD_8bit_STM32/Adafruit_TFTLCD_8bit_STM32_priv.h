@@ -5,6 +5,11 @@
 #include <Adafruit_GFX.h>
 #include <libmaple/gpio.h>
 #include "DSO_config.h"
+#include "MapleFreeRTOS1000_pp.h"
+
+extern xMutex PortAMutex;
+
+
 /*****************************************************************************/
 // Define pins and Output Data Registers
 /*****************************************************************************/
@@ -53,11 +58,15 @@
 
 
 #else // when RX/TX pins are used for rotary encoder, no need to mask interrupts
-#define CS_ACTIVE  { opReg = GPIOB->regs->ODR;\                    
+#define CS_ACTIVE  {  \        
+                    PortAMutex.lock(); \
+                    opReg = GPIOB->regs->ODR;\                    
                     GPIOB->regs->CRL = 0x33333333 ;\
                     GPIOC->regs->BRR  = TFT_CS_MASK; }
 
-#define CS_IDLE    { GPIOB->regs->ODR = opReg;\
+#define CS_IDLE    { \
+                    PortAMutex.unlock(); \
+                    GPIOB->regs->ODR = opReg;\
                     GPIOB->regs->CRL = 0x88888888; \
                     GPIOC->regs->BSRR = TFT_CS_MASK ; \
                     }

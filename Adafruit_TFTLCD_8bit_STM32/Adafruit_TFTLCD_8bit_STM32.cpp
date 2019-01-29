@@ -3,7 +3,9 @@
 
 #include "Adafruit_TFTLCD_8bit_STM32.h"
 #include "Adafruit_TFTLCD_8bit_STM32_priv.h"
+#include "MapleFreeRTOS1000_pp.h"
 
+xMutex PortAMutex;
 
 uint32_t intReg;
 uint32_t opReg;
@@ -27,7 +29,7 @@ void Adafruit_TFTLCD_8bit_STM32::reset(void)
 	pinMode(TFT_WR, OUTPUT);
 	pinMode(TFT_RS, OUTPUT);
 	pinMode(TFT_CS, OUTPUT);
-
+        PortAMutex.lock(); // will be unlocked in IDLE
 	CS_IDLE; // Set all control bits to HIGH (idle)
 	CD_DATA; // Signals are ACTIVE LOW
 	WR_IDLE;

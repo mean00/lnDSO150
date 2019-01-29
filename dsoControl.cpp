@@ -22,7 +22,7 @@
  * PA5        INPUT  CPLSEL
  * 
  
- 
+ STM32duino info here : http://wiki.stm32duino.com/index.php?title=Generic_pin_mapping
  */
 // Rotary encoder part : Derived from  Rotary encoder handler for arduino * Copyright 2011 Ben Buxton. Licenced under the GNU GPL Version 3. * Contact: bb@cactii.net
 // Debounce part derived from http://www.kennethkuhn.com/electronics/debounce.c
@@ -34,10 +34,10 @@
 #include "dsoControl_internal.h"
 #include "DSO_config.h"
 
-#define TICK                  10
-#define LONG_PRESS_THRESHOLD (1000/TICK)
-#define SHORT_PRESS_THRESHOLD (2)
-#define HOLDOFF_THRESHOLD     (50/TICK)
+#define TICK                  10 // 10 ms
+#define LONG_PRESS_THRESHOLD (2000/TICK) // 1s
+#define SHORT_PRESS_THRESHOLD (3)
+#define HOLDOFF_THRESHOLD     (100/TICK)
 #define COUNT_MAX             3
 
  enum DSOButtonState
@@ -55,6 +55,8 @@
 
 #define TX_PIN PA9
 #define RX_PIN PA10
+  
+extern xMutex PortAMutex; // lock against LCD  
   
 /**
  */
@@ -218,9 +220,9 @@ void DSOControl::runLoop()
     while(1)
     {
         xDelay(TICK);
-        noInterrupts(); // Protect against LCD
+        PortAMutex.lock(); // make sure we have control over GPIOB
         uint32_t val= GPIOB->regs->IDR;     
-        interrupts();
+        PortAMutex.unlock();
         for(int i=DSO_BUTTON_ROTARY;i<=DSO_BUTTON_OK;i++)
         {
             singleButton &button=_buttons[i];
