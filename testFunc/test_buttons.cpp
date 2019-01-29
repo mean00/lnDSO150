@@ -20,7 +20,7 @@ extern void splash(void);
 //--
 extern Adafruit_TFTLCD_8bit_STM32 *tft;
 extern DSOControl *controlButtons;
-
+extern int ints;
 /**
  * 
  */
@@ -53,6 +53,8 @@ void testButtons(void)
         tft->setCursor(200, 30);
         tft->print(reCounter);
         tft->setCursor(200, 90);
+        tft->setCursor(200, 160);
+        tft->print(ints);
         xDelay(100);         
     }
 }

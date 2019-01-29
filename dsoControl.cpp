@@ -156,13 +156,14 @@ static int counter; // rotary counter
 
 static TaskHandle_t taskHandle;
 
-
+int ints=0;
 /**
  * \brief This one is for left/right
  * @param a
  */
 static void _myInterruptRE(void *a)
 {
+    ints++;
     instance->interruptRE(!!a);
 }
 
@@ -209,7 +210,9 @@ void DSOControl::runLoop()
     while(1)
     {
         xDelay(TICK);
+        noInterrupts(); // Protect against LCD
         uint32_t val= GPIOB->regs->IDR;     
+        interrupts();
         for(int i=DSO_BUTTON_ROTARY;i<=DSO_BUTTON_OK;i++)
         {
             singleButton &button=_buttons[i];
