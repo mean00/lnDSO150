@@ -6,8 +6,10 @@ It uses my port of arduino-stm32-cmake as a build system
 
 It is very early, dont expect it to work AT ALL.
 
-The current stage is to get the screen properly working
-Then button & rotary encoder
-Then actual capture
+
+Status so far:
+* Screen ok (with ST7789, unsure about ILI9341)
+* Rotary encoder ok (rewired to RX1/TX1)
+* Micro USB port used a serial Ok
 
 Come back in 6 months
