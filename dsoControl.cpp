@@ -5,6 +5,7 @@
  * PC13/14/15 OUTPUT LCD control 
  * PB0--PB7   OUTPUT LCD Databus
  * PA0        x      ADCIN
+ * PA5        x      CPLSEL (DC/AC/GND)
  * PA6        OUTPUT LCD nRD
  * PA7        OUTPUT Test signal
  * PA8        INPUT  Trig
@@ -191,6 +192,8 @@ DSOControl::DSOControl()
     pinAsInput(DSO_BUTTON_TRIGGER);
     pinAsInput(DSO_BUTTON_OK);
     
+    pinMode(PA5,INPUT_ANALOG);
+    
 }
 
 
@@ -200,6 +203,11 @@ static void trampoline(void *a)
     ctrl->runLoop();
 }
 
+int  DSOControl::getCouplingState()
+{
+    
+    return analogRead(PA5);
+}
 
 /**
  * 

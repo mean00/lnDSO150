@@ -55,6 +55,10 @@ void testButtons(void)
         tft->setCursor(200, 90);
         tft->setCursor(200, 160);
         tft->print(ints);
+        
+        tft->setCursor(200, 210);
+        tft->print(        controlButtons->getCouplingState());
+        
         xDelay(100);         
     }
 }

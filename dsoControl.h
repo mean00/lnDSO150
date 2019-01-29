@@ -29,6 +29,7 @@ public:
     void interruptRE(int button);
     void interruptButton(int button);
     void runLoop();
+    int  getCouplingState();
 protected:
     
 };
