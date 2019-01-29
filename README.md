@@ -12,4 +12,6 @@ Status so far:
 * Rotary encoder ok (rewired to RX1/TX1)
 * Micro USB port used a serial Ok
 
+There are some blogger entriess with  progress here https://goingbacktoelectronic.blogspot.com/
+
 Come back in 6 months
