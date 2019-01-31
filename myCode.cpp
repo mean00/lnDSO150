@@ -28,6 +28,7 @@ static int counter=0;
 //
 extern void testTestSignal();
 extern void testButtons();
+extern void testAdc();
 /**
  * 
  */
@@ -56,7 +57,7 @@ void mySetup()
     myTestSignal->setFrequency(1000); // 1Khz
     
     controlButtons=new DSOControl ;
-       
+    pinMode(PA0,INPUT_ANALOG);
     
     // Ok let's go, switch to FreeRTOS
     xTaskCreate( MainTask, "MainTask", 500, NULL, 10, NULL );
@@ -65,6 +66,7 @@ void mySetup()
 
 void splash(void)
 {
+        tft->fillScreen(BLACK);   
         tft->setCursor(45, 10);
         tft->setTextColor(WHITE,BLACK);
         tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::SmallFont);
@@ -83,7 +85,8 @@ void MainTask( void *a )
     controlButtons->setup();
     
    // testTestSignal();
-     testButtons();   
+   //  testButtons();   
+      testAdc();   
 }
 
 //-

@@ -37,6 +37,7 @@ public:
     void interruptRE(int button);
     void interruptButton(int button);
     void runLoop();
+    int  setInputGain(int val); // This drives SENSEL... Warning the mapping is not straightforward !
     DSOCoupling   getCouplingState();
 protected:
     adc_dev *couplingDevice;

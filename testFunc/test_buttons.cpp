@@ -28,8 +28,7 @@ void testButtons(void)
 {
     int reCounter=0;
     while(1)
-    {
-        tft->fillScreen(BLACK);   
+    {        
         splash();
         for(int i=0;i<8;i++)
         {

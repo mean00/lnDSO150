@@ -5,6 +5,8 @@
  * PC13/14/15 OUTPUT LCD control 
  * PB0--PB7   OUTPUT LCD Databus
  * PA0        x      ADCIN
+ * PA1..PA3   x      Gain 2nd stage SENSEL0..SENSEL2
+ * PA4        x      Gain 1st stage SENSEL3
  * PA5        x      CPLSEL (DC/AC/GND)
  * PA6        OUTPUT LCD nRD
  * PA7        OUTPUT Test signal
@@ -376,4 +378,22 @@ int  DSOControl::getRotaryValue()
     interrupts();
     return r;
 }
+
+/**
+ * \fn setInputGain
+ * @param val
+ * @return 
+ */
+int  DSOControl::setInputGain(int val)
+{
+    int set=val&0xf; // 4 bits
+    int unset=~set;
+    
+    set<<=1; // PA1 to PA4
+    unset<<=1; 
+    
+    GPIOA->regs->BRR=set;
+    GPIOA->regs->BSRR=unset;
+}
+
 //

@@ -27,8 +27,7 @@ extern void splash(void);
 void setTestSignal(int fq,bool high)
 {
     static uint32_t bh, bl;
-    
-        tft->fillScreen(BLACK);   
+            
         splash();
         myTestSignal->setFrequency(fq);
         myTestSignal->setAmplitute(high);
