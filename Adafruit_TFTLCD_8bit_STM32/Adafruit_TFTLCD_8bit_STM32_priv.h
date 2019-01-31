@@ -64,11 +64,11 @@ extern xMutex PortAMutex;
                     GPIOB->regs->CRL = 0x33333333 ;\
                     GPIOC->regs->BRR  = TFT_CS_MASK; }
 
-#define CS_IDLE    { \
-                    PortAMutex.unlock(); \
+#define CS_IDLE    { \                    
                     GPIOB->regs->ODR = opReg;\
                     GPIOB->regs->CRL = 0x88888888; \
                     GPIOC->regs->BSRR = TFT_CS_MASK ; \
+                    PortAMutex.unlock(); \
                     }
 
 
