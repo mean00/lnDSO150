@@ -20,6 +20,14 @@ public:
     DSO_BUTTON_TRIGGER=6,
     DSO_BUTTON_OK=7
   };
+  
+  enum DSOCoupling
+  {
+    DSO_COUPLING_GND=0,
+    DSO_COUPLING_DC=1,
+    DSO_COUPLING_AC=2
+  };
+  
 
          DSOControl();
     bool setup();
@@ -29,8 +37,15 @@ public:
     void interruptRE(int button);
     void interruptButton(int button);
     void runLoop();
-    int  getCouplingState();
+    DSOCoupling   getCouplingState();
 protected:
+    adc_dev *couplingDevice;
+    uint8    couplingChannel;
     
+    
+    void        couplingStart() ;
+    int         couplingRestart(); 
+    int         couplingValue;
+    DSOCoupling couplingState;
 };
 // EOF

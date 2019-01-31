@@ -59,7 +59,7 @@ void testButtons(void)
         tft->setCursor(200, 210);
         tft->print(        controlButtons->getCouplingState());
         
-        xDelay(100);         
+        //xDelay(30);         
     }
 }
 //-

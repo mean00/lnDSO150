@@ -40,6 +40,8 @@
 #define HOLDOFF_THRESHOLD     (100/TICK)
 #define COUNT_MAX             3
 
+
+
  enum DSOButtonState
   {
     StateIdle=0,
@@ -55,6 +57,8 @@
 
 #define TX_PIN PA9
 #define RX_PIN PA10
+
+#define COUPLING_PIN PA5
   
 extern xMutex PortAMutex; // lock against LCD  
   
@@ -170,6 +174,17 @@ static void _myInterruptRE(void *a)
     instance->interruptRE(!!a);
 }
 
+/**
+ * 
+ * @param v
+ * @return 
+ */
+static DSOControl::DSOCoupling couplingFromAdc(int v)
+{
+    if(v>4000)      return DSOControl::DSO_COUPLING_AC;
+    if(v<500)       return DSOControl::DSO_COUPLING_GND;
+                    return DSOControl::DSO_COUPLING_DC;
+}
 
 /**
  * 
@@ -194,8 +209,11 @@ DSOControl::DSOControl()
     pinAsInput(DSO_BUTTON_TRIGGER);
     pinAsInput(DSO_BUTTON_OK);
     
-    pinMode(PA5,INPUT_ANALOG);
-    
+    pinMode(COUPLING_PIN,INPUT_ANALOG);
+    couplingDevice= PIN_MAP[COUPLING_PIN].adc_device;
+    couplingChannel=PIN_MAP[COUPLING_PIN].adc_channel;
+    couplingState=couplingFromAdc(analogRead(COUPLING_PIN));
+    couplingStart();
 }
 
 
@@ -205,10 +223,48 @@ static void trampoline(void *a)
     ctrl->runLoop();
 }
 
-int  DSOControl::getCouplingState()
+/**
+ * 
+ * @param dev
+ * @param channel
+ * @return 
+ */
+void DSOControl::couplingStart() 
 {
+    adc_reg_map *regs = couplingDevice->regs;
+
+    adc_set_reg_seqlen(couplingDevice, 1);
+
+    regs->SQR3 = couplingChannel;
+    regs->CR2 |= ADC_CR2_SWSTART;
+}
+/**
+ * \brief this is called every 10ms or so
+ * We read the previous ADC scan and start the next one
+ * no need to wait for it to complete, it will be done in background
+ * @return 
+ */
+int DSOControl::couplingRestart() 
+{
+   
+    adc_reg_map *regs = couplingDevice->regs;
+    int r= (regs->DR & ADC_DR_DATA);
+  
+    regs->SQR3 = couplingChannel;
+    regs->CR2 |= ADC_CR2_SWSTART;
+    while (!(regs->SR & ADC_SR_EOC))
+        ;
     
-    return analogRead(PA5);
+    return r;
+}
+
+/**
+ * 
+ * @return 
+ */
+DSOControl::DSOCoupling  DSOControl::getCouplingState()
+{
+    return couplingState;
 }
 
 /**
@@ -220,6 +276,8 @@ void DSOControl::runLoop()
     while(1)
     {
         xDelay(TICK);
+        couplingValue=couplingRestart(); // We let the ADC work in background...
+        couplingState=couplingFromAdc(couplingValue);
         PortAMutex.lock(); // make sure we have control over GPIOB
         uint32_t val= GPIOB->regs->IDR;     
         PortAMutex.unlock();
