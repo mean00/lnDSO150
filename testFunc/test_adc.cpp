@@ -26,32 +26,71 @@ extern int ints;
  */
 void testAdc(void)
 {
-    int val[256];
+#define NB_SAMPLES 512
+    uint16_t val[NB_SAMPLES+1];
     int reCounter=0;
+    controlButtons->setInputGain(8); // Full blast
+    
+#if 0    
+    while(1)
+    {
+        splash();
+        int before=millis();
+        for(int i=0;i<10000;i++)
+        {
+            analogRead(PA0);
+        }
+        int after=millis();
+        tft->setCursor(20, 30);
+        tft->println(before);
+        
+        tft->setCursor(20, 90);
+        tft->println(after);
+        
+        tft->setCursor(20, 130);
+        tft->println(after-before);
+
+        
+        xDelay(2000);
+    }
+    
+#endif    
+      pinMode(PA0,INPUT_ANALOG);
     while(1)
     {
         for(int i=0;i<16;i++)
         {
-            controlButtons->setInputGain(i);
-            for(int j=0;j<256;j++)
+         //   controlButtons->setInputGain(i);
+            
+            
+            for(int j=0;j<NB_SAMPLES;j++)
             {
                 val[j]=analogRead(PA0);
+                vTaskDelay(portTICK_PERIOD_MS/10);
             }
             int min=4096,max=0;
-            for(int j=0;j<256;j++)
+            for(int j=0;j<NB_SAMPLES;j++)
             {
                 if(val[j]<min) min=val[j];
                 if(val[j]>max) max=val[j];
                         
             }
             splash();
+            for(int j=0;j<NB_SAMPLES;j++)
+            {
+                float f=val[j*(NB_SAMPLES)/256]; // 00--4096
+                f/=20; // 0..200
+                tft->drawPixel(j,240-f,YELLOW);
+                
+                
+            }
             tft->setCursor(20, 30);
             tft->println(i);
             tft->setCursor(20, 60);
             tft->println(min);
             tft->setCursor(20, 90);
             tft->println(max);
-            xDelay(3000);
+            //xDelay(3000);
         }
     }
 }

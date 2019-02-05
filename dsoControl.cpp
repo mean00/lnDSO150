@@ -62,6 +62,8 @@
 
 #define COUPLING_PIN PA5
   
+#define SENSEL_PIN PA1 //(1..4)
+  
 extern xMutex PortAMutex; // lock against LCD  
   
 /**
@@ -210,6 +212,9 @@ DSOControl::DSOControl()
     pinAsInput(DSO_BUTTON_TIME);
     pinAsInput(DSO_BUTTON_TRIGGER);
     pinAsInput(DSO_BUTTON_OK);
+    
+    for(int i=0;i<4;i++)    
+        pinMode(SENSEL_PIN+i,OUTPUT); // SENSEL
     
     pinMode(COUPLING_PIN,INPUT_ANALOG);
     couplingDevice= PIN_MAP[COUPLING_PIN].adc_device;
@@ -381,19 +386,28 @@ int  DSOControl::getRotaryValue()
 
 /**
  * \fn setInputGain
+ * \brief SENSEL control, 2 stage amplifier
+ * First stage is SENSEL3 (PA4) : /1 or /120
+ * Second stage is SENSEL0..2 (PA1,PA2,PA3= : /1../40
+ * 
+ * The 2nd stage order is weird,
+ * /40 2
+ * /20 3
+ * /10 0
+ * /4  7
+ * /2  6
+ * /1  4
+ * 
  * @param val
  * @return 
  */
 int  DSOControl::setInputGain(int val)
 {
-    int set=val&0xf; // 4 bits
-    int unset=~set;
-    
-    set<<=1; // PA1 to PA4
-    unset<<=1; 
-    
-    GPIOA->regs->BRR=set;
-    GPIOA->regs->BSRR=unset;
+    int set=val&0xf; // 4 useful bits
+    int unset=(~set)&0x0f;    
+    GPIOA->regs->BSRR=(set<<1);
+    GPIOA->regs->BRR=(unset<<1);
+    return 0;
 }
 
 //
