@@ -17,7 +17,7 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 #include "SPI.h"
 #include "MapleFreeRTOS1000.h"
 #include "MapleFreeRTOS1000_pp.h"
-#include "adc.h"
+#include "dso_adc.h"
 
 // Analog input
 #define ANALOG_MAX_VALUE 4096
