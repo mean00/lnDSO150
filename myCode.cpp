@@ -15,12 +15,14 @@
 #include "testSignal.h"
 #include "dsoControl.h"
 #include "HardwareSerial.h"
+#include "dso_adc.h"
 static void MainTask( void *a );
 void splash(void);
 //--
 Adafruit_TFTLCD_8bit_STM32 *tft;
 testSignal *myTestSignal;
 DSOControl *controlButtons;
+DSOADC    *adc;
 static uint16_t identifier=0;
 static int counter=0;
 //
@@ -29,6 +31,7 @@ static int counter=0;
 extern void testTestSignal();
 extern void testButtons();
 extern void testAdc();
+extern void testAdc2();
 /**
  * 
  */
@@ -58,8 +61,8 @@ void mySetup()
     myTestSignal->setAmplitute(true);
     
     controlButtons=new DSOControl ;
-    pinMode(PA0,INPUT_ANALOG);
-   
+    
+    adc=new DSOADC;
     
     // Ok let's go, switch to FreeRTOS
     xTaskCreate( MainTask, "MainTask", 500, NULL, 10, NULL );
@@ -88,7 +91,8 @@ void MainTask( void *a )
     
    // testTestSignal();
    //  testButtons();   
-      testAdc();   
+      //testAdc();   
+    testAdc2();   
 }
 
 //-

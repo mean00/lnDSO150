@@ -44,6 +44,27 @@
 
 
 
+int ampMapping[16]=
+{
+    1 , // GND
+    12, // x14
+    14, // x7
+    15, // x3.5
+    8, // x1.4
+    13, // x0.7
+    11, // x0.35
+    
+    4, // /7
+    6, // /14
+    7, // /29
+    0, // /71
+    5, // /143
+    3,  // /286
+    
+    3,3,3 // Filler
+};
+
+
  enum DSOButtonState
   {
     StateIdle=0,
@@ -403,6 +424,7 @@ int  DSOControl::getRotaryValue()
  */
 int  DSOControl::setInputGain(int val)
 {
+    val=ampMapping[val]; // monotone version
     int set=val&0xf; // 4 useful bits
     int unset=(~set)&0x0f;    
     GPIOA->regs->BSRR=(set<<1);
