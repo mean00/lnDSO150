@@ -32,6 +32,7 @@ extern void testTestSignal();
 extern void testButtons();
 extern void testAdc();
 extern void testAdc2();
+extern void testDisplay();
 /**
  * 
  */
@@ -92,7 +93,8 @@ void MainTask( void *a )
    // testTestSignal();
    //  testButtons();   
       //testAdc();   
-    testAdc2();   
+    //testAdc2();   
+    testDisplay();
 }
 
 //-

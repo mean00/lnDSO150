@@ -28,7 +28,7 @@ extern DSOADC    *adc;
 /**
  * 
  */
-void testAdc2(void)
+void testDisplay(void)
 {
     int reCounter=0;
     
