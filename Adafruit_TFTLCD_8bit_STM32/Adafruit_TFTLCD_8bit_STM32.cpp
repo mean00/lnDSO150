@@ -295,6 +295,48 @@ void Adafruit_TFTLCD_8bit_STM32::flood(uint16_t color, uint32_t len)
 }
 
 
+/*****************************************************************************/
+// Fast block fill operation for fillScreen, fillRect, H/V line, etc.
+// Requires setAddrWindow() has previously been called to set the fill
+// bounds.  'len' is inclusive, MUST be >= 1.
+/*****************************************************************************/
+void Adafruit_TFTLCD_8bit_STM32::flood2(uint16_t color, uint16_t bg,uint32_t len)
+{
+  uint16_t blocks;
+  uint8_t  i, hi = color >> 8,
+              lo = color;
+
+  uint8_t hiBg=bg>>8;
+  uint8_t loBg=bg&0xff;
+  CS_ACTIVE_CD_COMMAND;
+  floodPreamble();
+  
+
+  // Write first pixel normally, decrement counter by 1
+  CD_DATA;
+  write8(hi);
+  write8(lo);
+  len--;
+
+  blocks = (uint16_t)(len / 64); // 64 pixels/block
+   {
+    while(blocks--) {
+      i = 16; // 64 pixels/block / 4 pixels/pass
+      do {
+        write8(hi); write8(lo); 
+        write8(hi); write8(lo); 
+        write8(hi); write8(lo);
+        write8(hiBg); write8(loBg);
+      } while(--i);
+    }
+	i = len & 63;
+    while (i--) { // write here the remaining data
+      write8(hi); write8(lo);
+    }
+  }
+  CS_IDLE;
+}
+
 
 /*****************************************************************************/
 void Adafruit_TFTLCD_8bit_STM32::drawFastHLine(int16_t x, int16_t y, int16_t length, uint16_t color)
@@ -318,7 +360,28 @@ void Adafruit_TFTLCD_8bit_STM32::drawFastHLine(int16_t x, int16_t y, int16_t len
   setAddrWindow(x, y, x2, y);
   flood(color, length);  
 }
+/**
+ */
+void     Adafruit_TFTLCD_8bit_STM32::drawFastHLineDotted(int16_t x, int16_t y, int16_t length, uint16_t color, uint16_t bg)
+{
+    int16_t x2;
+    // Initial off-screen clipping
+  if((length <= 0     ) ||
+     (y      <  0     ) || ( y                  >= _height) ||
+     (x      >= _width) || ((x2 = (x+length-1)) <  0      )) return;
 
+  if(x < 0) {        // Clip left
+    length += x;
+    x       = 0;
+  }
+  if(x2 >= _width) { // Clip right
+    x2      = _width - 1;
+    length  = x2 - x + 1;
+  }
+
+  setAddrWindow(x, y, x2, y);
+  flood2(color, bg,length);  
+}
 
 /*****************************************************************************/
 void Adafruit_TFTLCD_8bit_STM32::drawFastVLine(int16_t x, int16_t y, int16_t length, uint16_t color)
@@ -341,7 +404,28 @@ void Adafruit_TFTLCD_8bit_STM32::drawFastVLine(int16_t x, int16_t y, int16_t len
   setAddrWindow(x, y, x, y2);
   flood(color, length); 
 }
+/**
+ */
+void     Adafruit_TFTLCD_8bit_STM32::drawFastVLineDotted(int16_t x, int16_t y, int16_t length, uint16_t color,uint16_t bg)
+{
+  int16_t y2;
 
+  // Initial off-screen clipping
+  if((length <= 0      ) ||
+     (x      <  0      ) || ( x                  >= _width) ||
+     (y      >= _height) || ((y2 = (y+length-1)) <  0     )) return;
+  if(y < 0) {         // Clip top
+    length += y;
+    y       = 0;
+  }
+  if(y2 >= _height) { // Clip bottom
+    y2      = _height - 1;
+    length  = y2 - y + 1;
+  }
+
+  setAddrWindow(x, y, x, y2);
+  flood2(color, bg,length); 
+}
 
 /*****************************************************************************/
 void Adafruit_TFTLCD_8bit_STM32::fillRect(int16_t x1, int16_t y1, int16_t w, int16_t h, uint16_t fillcolor)
