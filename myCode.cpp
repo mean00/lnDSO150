@@ -93,8 +93,8 @@ void MainTask( void *a )
    // testTestSignal();
    //  testButtons();   
       //testAdc();   
-    //testAdc2();   
-    testDisplay();
+    testAdc2();   
+    //testDisplay();
 }
 
 //-

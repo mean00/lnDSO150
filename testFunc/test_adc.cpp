@@ -16,82 +16,63 @@
 #include "testSignal.h"
 #include "dsoControl.h"
 #include "HardwareSerial.h"
+#include "dso_adc.h"
 extern void splash(void);
+
+static void drawGrid(void);
 //--
 extern Adafruit_TFTLCD_8bit_STM32 *tft;
 extern DSOControl *controlButtons;
 extern int ints;
+extern DSOADC    *adc;
 /**
  * 
  */
+
+void testOne(adc_smp_rate one, adc_prescaler two,int sc)
+{
+    static uint32 before,after;
+    adc->setTimeScale(one,two);
+    before= micros();
+   
+   adc->takeSamples(1024);
+   after= micros();
+   //printf("%d:%d => %d\n",(int)one,sc,after-before);
+   Serial.print("Rate:");
+   Serial.print(one);
+   Serial.print("Prescaler:");
+   Serial.print(sc);
+   Serial.print("Time(us):");
+   Serial.println(after-before);
+}
+
 void testAdc(void)
 {
-#define NB_SAMPLES 512
-    uint16_t val[NB_SAMPLES+1];
-    int reCounter=0;
-    controlButtons->setInputGain(8); // Full blast
-    
-#if 0    
+    controlButtons->setInputGain(7); // x1.4
     while(1)
     {
-        splash();
-        int before=millis();
-        for(int i=0;i<10000;i++)
+        
+        for(int i=ADC_SMPR_1_5;i<=ADC_SMPR_239_5;i++)
         {
-            analogRead(PA0);
+            testOne((adc_smp_rate)i,ADC_PRE_PCLK2_DIV_2,2);
+            testOne((adc_smp_rate)i,ADC_PRE_PCLK2_DIV_4,4);
+            testOne((adc_smp_rate)i,ADC_PRE_PCLK2_DIV_6,6);
+            testOne((adc_smp_rate)i,ADC_PRE_PCLK2_DIV_8,8);
         }
-        int after=millis();
-        tft->setCursor(20, 30);
-        tft->println(before);
-        
-        tft->setCursor(20, 90);
-        tft->println(after);
-        
-        tft->setCursor(20, 130);
-        tft->println(after-before);
-
-        
-        xDelay(2000);
+        xDelay(5000);
     }
-    
-#endif    
-      pinMode(PA0,INPUT_ANALOG);
-    while(1)
-    {
-        for(int i=0;i<16;i++)
-        {
-         //   controlButtons->setInputGain(i);
-            
-            
-            for(int j=0;j<NB_SAMPLES;j++)
-            {
-                val[j]=analogRead(PA0);
-                vTaskDelay(portTICK_PERIOD_MS/10);
-            }
-            int min=4096,max=0;
-            for(int j=0;j<NB_SAMPLES;j++)
-            {
-                if(val[j]<min) min=val[j];
-                if(val[j]>max) max=val[j];
-                        
-            }
-            splash();
-            for(int j=0;j<NB_SAMPLES;j++)
-            {
-                float f=val[j*(NB_SAMPLES)/256]; // 00--4096
-                f/=20; // 0..200
-                tft->drawPixel(j,240-f,YELLOW);
-                
-                
-            }
-            tft->setCursor(20, 30);
-            tft->println(i);
-            tft->setCursor(20, 60);
-            tft->println(min);
-            tft->setCursor(20, 90);
-            tft->println(max);
-            //xDelay(3000);
-        }
-    }
+  
 }
 //-
+#define SCALE_STEP 24
+#define C 10
+void drawGrid(void)
+{
+    uint16_t fgColor=(0x1F)<<5;
+    for(int i=0;i<=C;i++)
+    {
+        tft->drawFastHLine(0,SCALE_STEP*i,SCALE_STEP*C,fgColor);
+        tft->drawFastVLine(SCALE_STEP*i,0,SCALE_STEP*C,fgColor);
+    }
+       tft->drawFastHLine(0,239,SCALE_STEP*C,fgColor);
+}

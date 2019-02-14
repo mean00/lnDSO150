@@ -50,25 +50,26 @@ void testAdc2(void)
     cal/=256;
     
     controlButtons->setInputGain(7); // x1.4
-    adc->setTimeScale(currentScale); // 10 us *1024 => 10 ms scan
+    adc->setTimeScale(ADC_SMPR_1_5,ADC_PRE_PCLK2_DIV_2); // 10 us *1024 => 10 ms scan
     while(1)
     {
-        splash();
+       // splash();
+        tft->fillScreen(BLACK);   
         drawGrid();
         tft->setCursor(200, 160);
-        tft->print(currentScale);
+        //tft->print(currentScale);
         
       //  for(int i=0;i<16;i++)
         {
             int count;
             int i=0;
-            adc->takeSamples(240);
+            adc->initiateSampling(256);
             uint32_t *xsamples=adc->getSamples(count);
             for(int j=0;j<count;j++)
             {
-                samples[j]=(int)(xsamples[j] >>16)-cal; //&0xffff;
+                samples[j]=(int)(xsamples[j] >>16);//-cal; //&0xffff;
             }
-
+            adc->reclaimSamples(xsamples);
             int min=4095,max=-4096;
             avg=0;
             for(int j=0;j<count;j++)
@@ -81,6 +82,8 @@ void testAdc2(void)
             avg/=count;
                         
             float last=samples[0]; // 00--4096
+            if(last>239) last=239;
+            if(last<0) last=0;
             last/=20;
             for(int j=1;j<count;j++)
             {
@@ -88,12 +91,17 @@ void testAdc2(void)
                 next/=20; // 0..200
                 if(next>239) next=239;
                 if(next<0) next=0;
-                tft->drawFastVLine(16*i+j,last,next,YELLOW);
+                
+                if(next==last) last++;
+                if(next>last)
+                    tft->drawFastVLine(16*i+j,last,1+next-last,YELLOW);
+                else
+                    tft->drawFastVLine(16*i+j,next,1+last-next,YELLOW);
                 last=next;
             }
         }
         tft->setCursor(200, 200);
-        tft->print((int)avg);
+        //tft->print((int)avg);
         xDelay(300);
         int inc=controlButtons->getRotaryValue();
         if(inc)
@@ -105,20 +113,25 @@ void testAdc2(void)
         }
         if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_TIME)&EVENT_SHORT_PRESS)
         {            
-            adc->setTimeScale(currentScale); 
+         //   adc->setTimeScale(currentScale); 
         }
     }
 }
 //-
 #define SCALE_STEP 24
 #define C 10
+#define CENTER_CROSS 1
 void drawGrid(void)
 {
-    uint16_t fgColor=(0x1F)<<5;
+    uint16_t fgColor=(0xF)<<5;
     for(int i=0;i<=C;i++)
     {
         tft->drawFastHLine(0,SCALE_STEP*i,SCALE_STEP*C,fgColor);
         tft->drawFastVLine(SCALE_STEP*i,0,SCALE_STEP*C,fgColor);
     }
-       tft->drawFastHLine(0,239,SCALE_STEP*C,fgColor);
+    tft->drawFastHLine(0,239,SCALE_STEP*C,fgColor);
+    
+    tft->drawFastHLine(SCALE_STEP*(C/2-CENTER_CROSS),SCALE_STEP*5,SCALE_STEP*CENTER_CROSS*2,WHITE);
+    tft->drawFastVLine(SCALE_STEP*5,SCALE_STEP*(C/2-CENTER_CROSS),SCALE_STEP*CENTER_CROSS*2,WHITE);
 }
+    

@@ -45,6 +45,13 @@ const uint8_t ILI9341_regValues_ada[] = {        // Adafruit_TFTLCD only works w
 	0xB7, 1, 0x07,      //Entry Mode [00]
 //	TFTLCD_DELAY8, 1,
 };
+inline void writeCommand(uint16_t c)
+{
+	CS_ACTIVE;
+        CD_COMMAND;
+	write8(c>>8);
+	write8(c);
+}
 
 /*
 .write16: 36_write8: 0__write8: 36__write8: 48_
