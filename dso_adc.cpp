@@ -117,19 +117,21 @@ bool    DSOADC::initiateSampling (int count)
  */
 uint32_t *DSOADC::getSamples(int &count)
 {
+again:
     noInterrupts();
-    if(capturedBuffers.empty())
+    uint32_t *data=capturedBuffers.takeFromIsr();
+    if(data)
     {
+        count=requestedSamples;
         interrupts();
-        dmaSemaphore->take(10000); // 10 sec timeout
-        dma_disable(DMA1, DMA_CH1); //End of trasfer, disable DMA and Continuous mode.
-    }else
-    {
-        interrupts();
+        return data;
     }
-    uint32_t *data=capturedBuffers.take();
+    interrupts();
+    dmaSemaphore->take(10000); // 10 sec timeout
+    dma_disable(DMA1, DMA_CH1); //End of trasfer, disable DMA and Continuous mode.
     count=requestedSamples;
-    xAssert(data);
+    data=capturedBuffers.take();
+    if(!data) goto again;
     return data;
 }
 /**
