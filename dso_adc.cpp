@@ -32,7 +32,7 @@ DSOADC *instance=NULL;
 //uint16_t dataPoints[maxSamples];
 int requestedSamples;
 uint32_t *currentSamplingBuffer=NULL;
-
+uint32_t vcc; // power Supply in mv
 #define ADC_CR1_FASTINT 0x70000 // Fast interleave mode DUAL MODE bits 19-16
 
 
@@ -61,11 +61,31 @@ DSOADC::DSOADC()
   }
 }
 /**
+ */
+uint32_t DSOADC::getVCCmv()
+{
+    return vcc;
+}
+/**
  * 
  */
 void DSOADC::setADCs ()
 {
-  //  const adc_dev *dev = PIN_MAP[analogInPin].adc_device;
+  
+ // 1 - Read VCC
+   adc_reg_map *regs = ADC1->regs;
+   regs->CR2 |= ADC_CR2_TSVREFE;    // enable VREFINT and temp sensor
+   regs->SMPR1 =  ADC_SMPR1_SMP17;  // sample ra
+   vcc=0;
+   for(int i=0;i<8;i++)
+   {
+       delay(10);   
+       vcc+= (1200 * 4096) / adc_read(ADC1, 17); 
+   }
+   vcc/=8;
+    
+ // 2 - Setup ADC
+    
   int pinMapADCin = PIN_MAP[analogInPin].adc_channel;
   adc_set_sample_rate(ADC1, ADC_SMPR_1_5); //=0,58uS/sample.  ADC_SMPR_13_5 = 1.08uS - use this one if Rin>10Kohm,
   adc_set_sample_rate(ADC2, ADC_SMPR_1_5);    // if not may get some sporadic noise. see datasheet.

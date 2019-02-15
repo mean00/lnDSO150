@@ -60,7 +60,7 @@ public:
             bool    initiateSampling (int count);
             uint32_t *getSamples(int &count);
             void     reclaimSamples(uint32_t *buffer);
-            
+    static  uint32_t getVCCmv();
             
             
 protected:

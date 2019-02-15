@@ -29,13 +29,18 @@ extern testSignal *myTestSignal;
 //
 float voltageScale;
 //
-extern bool transform(int32_t *bfer, int count, int offset, float voltageScale,float &xmin,float &xmax);
+bool transform(int32_t *bfer, float *out,int count, int offset, float voltageScale,float &xmin,float &xmax);
 
 float inputScale[16]={0,1./14.,1./7.,1./3.5,
                      1./1.4,1./0.7,1./0.35,7,
                      14,29,71,143,
                      286,286,286};
 
+int calibration[16]={1893,1868,1880,1890,
+                    1896,1887,1891,1904,
+                    1790,1788,1786,1887,1896};
+
+float samples[256];
 void updateCurrentVoltageScale(int scale);
 /**
  * 
@@ -43,25 +48,7 @@ void updateCurrentVoltageScale(int scale);
 void testAdc2(void)
 {
     int reCounter=0;
-    
-    
-    int32_t samples[256];
-    
-    int currentScale=10;
-    
-    // Calibrate...
-    
-    int cal=0;
-    int avg;
-    controlButtons->setInputGain(0);
-    for(int i=0;i<256;i++)
-    {
-        cal+=analogRead(PA0);
-        xDelay(2);
-    }
-    cal>>=8;
-    
-    
+    int currentScale=10;        
     controlButtons->setInputGain(7); // x1.4
     currentScale=7;
     updateCurrentVoltageScale(currentScale);
@@ -70,54 +57,65 @@ void testAdc2(void)
     float xmin,xmax;
     while(1)
     {
-       // splash();
-        tft->fillScreen(BLACK);   
-        drawGrid();
-        tft->setCursor(200, 160);
-        tft->print(cal);
-        
-      //  for(int i=0;i<16;i++)
         {
             int count;
             int i=0;
-            adc->initiateSampling(256);
+            adc->initiateSampling(240);
             uint32_t *xsamples=adc->getSamples(count);
-            for(int j=0;j<count;j++)
-            {
-                samples[j]=(int)(xsamples[j] >>16); //-cal; //&0xffff;
-            }
+            transform((int32_t *)xsamples,samples,count,calibration[currentScale],voltageScale,xmin,xmax);
             adc->reclaimSamples(xsamples);
-            transform(samples,count,2289,voltageScale,xmin,xmax);
-                      
-             tft->setCursor(20, 120);
+            
+
+            tft->setCursor(240, 100);
+            tft->print((float)DSOADC::getVCCmv()/1000.);
+
+            tft->setCursor(240, 120);
             tft->print(xmin);
-            tft->setCursor(20, 140);
+            tft->setCursor(240, 140);
             tft->print(xmax);
             
             float last=samples[0]; // 00--4096
-            last/=1024*256;
+            last*=24;
             if(last>239) last=239;
             if(last<0) last=0;
+            last=239-last;
             
+            uint16_t colors[240];
             for(int j=1;j<count;j++)
             {
-                float next=samples[j]; // 1=1024 V
-                next*=32;
-                next/=1024; // 0..200
+                float next=samples[j]; // in volt
+                next*=24;              //1 Vol / div
+                
                 if(next>239) next=239;
                 if(next<0) next=0;
                 
+                next=239-next;
                 if(next==last) last++;
+                uint16_t color;
+                if(!(j%24))
+                    color=(0xF)<<5;
+                else 
+                    color=0;
+                for(int i=0;i<240;i++) colors[i]=color;
+                int start,end;
                 if(next>last)
-                    tft->drawFastVLine(j,last,1+next-last,YELLOW);
+                {
+                    start=last;
+                    end=next;
+                }
                 else
-                    tft->drawFastVLine(j,next,1+last-next,YELLOW);
+                {
+                    start=next;
+                    end=last;
+                    
+                }
+                for(int i=start;i<=end;i++) colors[i]=YELLOW;
+                tft->setAddrWindow(j,0,j,240);
+                tft->pushColors(colors,240,true);
                 last=next;
             }
         }
-        tft->setCursor(200, 200);
-        tft->print((int)avg);
-        xDelay(300);
+        xDelay(100);
         int inc=controlButtons->getRotaryValue();
         if(inc)
         {
@@ -155,8 +153,8 @@ void drawGrid(void)
 void updateCurrentVoltageScale(int scale)
 {
     float v=inputScale[scale];
-    v*=3.3;
-    v/=4096; 
+    v*=(float)DSOADC::getVCCmv();
+    v/=4096000.; 
     voltageScale=v; // output in V
     
 }
