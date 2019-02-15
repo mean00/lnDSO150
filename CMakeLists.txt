@@ -15,7 +15,7 @@ cmake_minimum_required(VERSION 2.8)
 Project("Hello_stm32" C CXX ASM)
 
 print_board_list()
-ADD_DEFINITIONS("-O3")
+#ADD_DEFINITIONS("-O3")
 
 set(ARDUINO_DEFAULT_BOARD genericSTM32F103C)        # Default Board ID, when not specified
 set(ARDUINO_DEFAULT_PORT ttyACM0) # Default Port, when not specified
@@ -59,7 +59,7 @@ SET(libPrefix ${ARDUINO_DEFAULT_BOARD}_)
 generate_arduino_firmware(Dso150 
                 SKETCH dso150.ino
                 #SRCS   ${ILI}/ILI9341_exi2cPowerSupplytended.cpp ${ILI}/ILI9341_extended_glyph.cpp myCode.cpp  simplerMCP4725/simplerMCP4725.cpp ${MCP23017_FREERTOS}/MCP23017_rtos.cpp  myAdc/myAdc.cpp
-                SRCS    myCode.cpp  testSignal.cpp dsoControl.cpp testFunc/test_testSignal.cpp testFunc/test_buttons.cpp testFunc/test_adc.cpp dso_adc.cpp testFunc/test_adc2.cpp testFunc/test_display.cpp
+                SRCS    myCode.cpp  testSignal.cpp dsoControl.cpp testFunc/test_testSignal.cpp testFunc/test_buttons.cpp testFunc/test_adc.cpp dso_adc.cpp testFunc/test_adc2.cpp testFunc/test_display.cpp transform.cpp
                 PORT ${ARDUINO_DEFAULT_PORT}
                 BOARD_CPU ${ARDUINO_CPU}
                 )

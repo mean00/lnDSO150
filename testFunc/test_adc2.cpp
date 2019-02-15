@@ -25,6 +25,18 @@ extern Adafruit_TFTLCD_8bit_STM32 *tft;
 extern DSOControl *controlButtons;
 extern int ints;
 extern DSOADC    *adc;
+extern testSignal *myTestSignal;
+//
+float voltageScale;
+//
+extern bool transform(int32_t *bfer, int count, int offset, float voltageScale,float &xmin,float &xmax);
+
+float inputScale[16]={0,1./14.,1./7.,1./3.5,
+                     1./1.4,1./0.7,1./0.35,7,
+                     14,29,71,143,
+                     286,286,286};
+
+void updateCurrentVoltageScale(int scale);
 /**
  * 
  */
@@ -33,7 +45,7 @@ void testAdc2(void)
     int reCounter=0;
     
     
-    int samples[256];
+    int32_t samples[256];
     
     int currentScale=10;
     
@@ -47,17 +59,22 @@ void testAdc2(void)
         cal+=analogRead(PA0);
         xDelay(2);
     }
-    cal/=256;
+    cal>>=8;
+    
     
     controlButtons->setInputGain(7); // x1.4
+    currentScale=7;
+    updateCurrentVoltageScale(currentScale);
     adc->setTimeScale(ADC_SMPR_1_5,ADC_PRE_PCLK2_DIV_2); // 10 us *1024 => 10 ms scan
+    myTestSignal->setFrequency(20*1000); // 20Khz
+    float xmin,xmax;
     while(1)
     {
        // splash();
         tft->fillScreen(BLACK);   
         drawGrid();
         tft->setCursor(200, 160);
-        //tft->print(currentScale);
+        tft->print(cal);
         
       //  for(int i=0;i<16;i++)
         {
@@ -67,41 +84,39 @@ void testAdc2(void)
             uint32_t *xsamples=adc->getSamples(count);
             for(int j=0;j<count;j++)
             {
-                samples[j]=(int)(xsamples[j] >>16);//-cal; //&0xffff;
+                samples[j]=(int)(xsamples[j] >>16); //-cal; //&0xffff;
             }
             adc->reclaimSamples(xsamples);
-            int min=4095,max=-4096;
-            avg=0;
-            for(int j=0;j<count;j++)
-            {
-                if(samples[j]<min) min=samples[j];
-                if(samples[j]>max) max=samples[j];
-                avg+=samples[j];
-
-            }
-            avg/=count;
-                        
+            transform(samples,count,2289,voltageScale,xmin,xmax);
+                      
+             tft->setCursor(20, 120);
+            tft->print(xmin);
+            tft->setCursor(20, 140);
+            tft->print(xmax);
+            
             float last=samples[0]; // 00--4096
+            last/=1024*256;
             if(last>239) last=239;
             if(last<0) last=0;
-            last/=20;
+            
             for(int j=1;j<count;j++)
             {
-                float next=samples[j]; // 00--4096
-                next/=20; // 0..200
+                float next=samples[j]; // 1=1024 V
+                next*=32;
+                next/=1024; // 0..200
                 if(next>239) next=239;
                 if(next<0) next=0;
                 
                 if(next==last) last++;
                 if(next>last)
-                    tft->drawFastVLine(16*i+j,last,1+next-last,YELLOW);
+                    tft->drawFastVLine(j,last,1+next-last,YELLOW);
                 else
-                    tft->drawFastVLine(16*i+j,next,1+last-next,YELLOW);
+                    tft->drawFastVLine(j,next,1+last-next,YELLOW);
                 last=next;
             }
         }
         tft->setCursor(200, 200);
-        //tft->print((int)avg);
+        tft->print((int)avg);
         xDelay(300);
         int inc=controlButtons->getRotaryValue();
         if(inc)
@@ -110,6 +125,7 @@ void testAdc2(void)
             if(currentScale<0) currentScale=0;
             currentScale&=0xf;
              controlButtons->setInputGain(currentScale);;
+             updateCurrentVoltageScale(currentScale);
         }
         if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_TIME)&EVENT_SHORT_PRESS)
         {            
@@ -135,3 +151,12 @@ void drawGrid(void)
     tft->drawFastVLine(SCALE_STEP*5,SCALE_STEP*(C/2-CENTER_CROSS),SCALE_STEP*CENTER_CROSS*2,WHITE);
 }
     
+
+void updateCurrentVoltageScale(int scale)
+{
+    float v=inputScale[scale];
+    v*=3.3;
+    v/=4096; 
+    voltageScale=v; // output in V
+    
+}

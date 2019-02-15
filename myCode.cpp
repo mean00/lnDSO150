@@ -58,7 +58,7 @@ void mySetup()
     splash();
     delay(500);
     myTestSignal=new testSignal(  PA7,PB12, 3,TIMER_CH2);
-    myTestSignal->setFrequency(100); // 1Khz
+    myTestSignal->setFrequency(1000); // 1Khz
     myTestSignal->setAmplitute(true);
     
     controlButtons=new DSOControl ;

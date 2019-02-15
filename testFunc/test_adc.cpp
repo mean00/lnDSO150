@@ -35,7 +35,7 @@ void testOne(adc_smp_rate one, adc_prescaler two,int sc)
     adc->setTimeScale(one,two);
     before= micros();
    
-   adc->takeSamples(1024);
+   adc->initiateSampling(1024);
    after= micros();
    //printf("%d:%d => %d\n",(int)one,sc,after-before);
    Serial.print("Rate:");
