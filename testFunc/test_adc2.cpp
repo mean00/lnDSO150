@@ -61,7 +61,7 @@ void testAdc2(void)
     controlButtons->setInputGain(7); // x1.4
     currentScale=7;
     updateCurrentVoltageScale(currentScale);
-    adc->setTimeScale(ADC_SMPR_1_5,ADC_PRE_PCLK2_DIV_2); // 10 us *1024 => 10 ms scan
+    
     myTestSignal->setFrequency(20*1000); // 20Khz
     float xmin,xmax;
     while(1)
