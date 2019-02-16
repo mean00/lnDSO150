@@ -17,6 +17,7 @@
 #include "dsoControl.h"
 #include "HardwareSerial.h"
 #include "dso_adc.h"
+#include "pattern.h"
 extern void splash(void);
 
 static void drawGrid(void);
@@ -57,15 +58,18 @@ void testAdc2(void)
     float xmin,xmax;
     while(1)
     {
+        int markStart,markEnd;
         {
             int count;
             int i=0;
             adc->initiateSampling(240);
             uint32_t *xsamples=adc->getSamples(count);
+            markStart=millis();
             transform((int32_t *)xsamples,samples,count,calibration[currentScale],voltageScale,xmin,xmax);
             adc->reclaimSamples(xsamples);
             
-
+            
+            
             tft->setCursor(240, 100);
             tft->print((float)DSOADC::getVCCmv()/1000.);
 
@@ -81,6 +85,7 @@ void testAdc2(void)
             last=239-last;
             
             uint16_t colors[240];
+            markStart=millis();
             for(int j=1;j<count;j++)
             {
                 float next=samples[j]; // in volt
@@ -115,7 +120,10 @@ void testAdc2(void)
                 last=next;
             }
         }
-        xDelay(100);
+        markEnd=millis();
+        tft->setCursor(240, 20);
+        tft->print(markEnd-markStart);
+        xDelay(200); // 50 i/s
         int inc=controlButtons->getRotaryValue();
         if(inc)
         {
