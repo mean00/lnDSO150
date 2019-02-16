@@ -11,7 +11,7 @@ Status so far:
 * Screen ok (with ST7789, unsure about ILI9341)
 * Rotary encoder ok (rewired to RX1/TX1)
 * Micro USB port used a serial Ok
-
+* Eeprom code from http://www.arduino-projekte.de/
 There are some blogger entriess with  progress here https://goingbacktoelectronic.blogspot.com/
 
 Come back in 6 months

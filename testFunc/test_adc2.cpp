@@ -18,6 +18,7 @@
 #include "HardwareSerial.h"
 #include "dso_adc.h"
 #include "pattern.h"
+#include "dso_global.h"
 extern void splash(void);
 
 static void drawGrid(void);
@@ -36,10 +37,6 @@ float inputScale[16]={0,1./14.,1./7.,1./3.5,
                      1./1.4,1./0.7,1./0.35,7,
                      14,29,71,143,
                      286,286,286};
-
-int calibration[16]={1893,1868,1880,1890,
-                    1896,1887,1891,1904,
-                    1790,1788,1786,1887,1896};
 
 float samples[256];
 void updateCurrentVoltageScale(int scale);
@@ -76,7 +73,7 @@ void testAdc2(void)
             adc->initiateSampling(240);
             uint32_t *xsamples=adc->getSamples(count);
             markStart=millis();
-            transform((int32_t *)xsamples,samples,count,calibration[currentScale],voltageScale,xmin,xmax);
+            transform((int32_t *)xsamples,samples,count,calibrationDC[currentScale],voltageScale,xmin,xmax);
             adc->reclaimSamples(xsamples);
             
             

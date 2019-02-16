@@ -17,6 +17,8 @@
 #include "dsoControl.h"
 #include "HardwareSerial.h"
 #include "dso_adc.h"
+#include "dso_eeprom.h"
+#include "dso_calibrate.h"
 static void MainTask( void *a );
 void splash(void);
 //--
@@ -35,6 +37,7 @@ extern void testAdc();
 extern void testAdc2();
 extern void testDisplay();
 extern void testCalibrate(void);
+extern void testI2c( void);
 /**
  * 
  */
@@ -92,12 +95,19 @@ void MainTask( void *a )
     tft->setTextSize(3);
     controlButtons->setup();
     
+    if(!DSOEeprom::read())
+    {
+         DSOCalibrate::calibrate();
+         DSOEeprom::write();
+    }
+    
    // testTestSignal();
    //  testButtons();   
       //testAdc();   
-    //testAdc2();   
-    testDisplay();
+    testAdc2();   
+    //testDisplay();
     //testCalibrate();
+    //testI2c();
     while(1)
     {};
 }

@@ -19,6 +19,13 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 #include "MapleFreeRTOS1000_pp.h"
 #include "dso_adc.h"
 
+/**
+ */
+
+uint16_t calibrationHash=0;
+uint16_t calibrationDC[16];
+uint16_t calibrationAC[16];
+
 // Analog input
 #define ANALOG_MAX_VALUE 4096
 // Samples - depends on available RAM 6K is about the limit on an STM32F103C8T6
