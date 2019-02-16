@@ -34,6 +34,19 @@ void testDisplay(void)
         splash();
         drawGrid();
         drawRightBar();
+        
+        
+        tft->setTextColor(WHITE,BLACK);
+        tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::SmallFont);
+        tft->setCursor(242,10);
+        tft->myDrawString("1000mv");        
+
+        tft->setCursor(242,40);
+        tft->myDrawString("10mv/D");        
+        tft->setCursor(242,60);
+        tft->myDrawString("100us/D");        
+        
+        
     while(1)
     {
        

@@ -46,6 +46,17 @@ void updateCurrentVoltageScale(int scale);
 /**
  * 
  */
+
+static inline int fromSample(float v)
+{
+    v*=24;              //1 Vol / div       
+    v+=120;
+    if(v>239) v=239;
+    if(v<0) v=0;
+    v=239-v;
+    return (int)v;
+}
+
 void testAdc2(void)
 {
     int reCounter=0;
@@ -78,31 +89,19 @@ void testAdc2(void)
             tft->setCursor(240, 140);
             tft->print(xmax);
             
-            float last=samples[0]; // 00--4096
-            last*=24;
-            if(last>239) last=239;
-            if(last<0) last=0;
-            last=239-last;
             
-            uint16_t colors[240];
-            markStart=millis();
+            int last=fromSample(samples[0]);            
+            
+            
             for(int j=1;j<count;j++)
             {
-                float next=samples[j]; // in volt
-                next*=24;              //1 Vol / div
-                
-                if(next>239) next=239;
-                if(next<0) next=0;
-                
-                next=239-next;
-                if(next==last) last++;
-                uint16_t color;
-                if(!(j%24))
-                    color=(0xF)<<5;
-                else 
-                    color=0;
-                for(int i=0;i<240;i++) colors[i]=color;
+                int next=fromSample(samples[j]); // in volt
+
                 int start,end;
+                if(next==last)
+                {
+                    last++;
+                }
                 if(next>last)
                 {
                     start=last;
@@ -114,16 +113,26 @@ void testAdc2(void)
                     end=last;
                     
                 }
-                for(int i=start;i<=end;i++) colors[i]=YELLOW;
+                
+                int seg1=start;
+                int seg2=end-start;
+                int seg3=239-end;
+                
+                uint16_t *bg=(uint16_t *)defaultPattern;
+                if(!(j%24)) bg=(uint16_t *)darkGreenPattern;
+                
                 tft->setAddrWindow(j,0,j,240);
-                tft->pushColors(colors,240,true);
+                tft->pushColors((uint16_t *)bg,seg1,true);
+                tft->pushColors((uint16_t *)yellowPattern,seg2,false); 
+                tft->pushColors((uint16_t *)bg+240-seg3,seg3,false);
+                
                 last=next;
             }
         }
         markEnd=millis();
         tft->setCursor(240, 20);
         tft->print(markEnd-markStart);
-        xDelay(200); // 50 i/s
+      //  xDelay(60); // 50 i/s
         int inc=controlButtons->getRotaryValue();
         if(inc)
         {
@@ -138,7 +147,7 @@ void testAdc2(void)
          //   adc->setTimeScale(currentScale); 
         }
     }
-}
+} 
 //-
 #define SCALE_STEP 24
 #define C 10

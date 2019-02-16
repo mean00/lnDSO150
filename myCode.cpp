@@ -9,6 +9,7 @@
 #include "Adafruit_GFX.h"
 #include "Adafruit_TFTLCD_8bit_STM32.h"
 //#include "Fonts/digitLcd56.h"
+#include "Fonts/waree9.h"
 #include "Fonts/waree12.h"
 #include "MapleFreeRTOS1000.h"
 #include "MapleFreeRTOS1000_pp.h"
@@ -53,7 +54,7 @@ void mySetup()
     }
     tft->begin();
     tft->setRotation(1);
-    tft->setFontFamily(&Waree12pt7b, &Waree12pt7b, &Waree12pt7b);  
+    tft->setFontFamily(&Waree9pt7b, &Waree9pt7b, &Waree12pt7b);  
     tft->fillScreen(BLACK);
     
     splash();
@@ -94,11 +95,12 @@ void MainTask( void *a )
    // testTestSignal();
    //  testButtons();   
       //testAdc();   
-    testAdc2();   
-    //testDisplay();
+    //testAdc2();   
+    testDisplay();
     //testCalibrate();
     while(1)
     {};
 }
 
 //-
+
