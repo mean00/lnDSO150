@@ -30,15 +30,15 @@ extern DSOADC    *adc;
 extern testSignal *myTestSignal;
 //
 float voltageScale;
-//
-bool transform(int32_t *bfer, float *out,int count, int offset, float voltageScale,float &xmin,float &xmax);
+extern VoltageSettings vSettings[11] ;
 
-float inputScale[16]={0,1./14.,1./7.,1./3.5,
-                     1./1.4,1./0.7,1./0.35,7,
-                     14,29,71,143,
-                     286,286,286};
+//
+bool transform(int32_t *bfer, float *out,int count, VoltageSettings *set,float &xmin,float &xmax,float &avg);
+
+ 
 
 float samples[256];
+int currentVSettings=5;
 void updateCurrentVoltageScale(int scale);
 /**
  * 
@@ -46,7 +46,7 @@ void updateCurrentVoltageScale(int scale);
 
 static inline int fromSample(float v)
 {
-    v*=24;              //1 Vol / div       
+    v*=vSettings[currentVSettings].displayGain;              //1 Vol / div       
     v+=120;
     if(v>239) v=239;
     if(v<0) v=0;
@@ -57,13 +57,10 @@ static inline int fromSample(float v)
 void testAdc2(void)
 {
     int reCounter=0;
-    int currentScale=10;        
-    controlButtons->setInputGain(7); // x1.4
-    currentScale=7;
-    updateCurrentVoltageScale(currentScale);
-    
+    updateCurrentVoltageScale(7);
+    tft->setTextSize(2);
     myTestSignal->setFrequency(20*1000); // 20Khz
-    float xmin,xmax;
+    float xmin,xmax,avg;
     while(1)
     {
         int markStart,markEnd;
@@ -73,19 +70,27 @@ void testAdc2(void)
             adc->initiateSampling(240);
             uint32_t *xsamples=adc->getSamples(count);
             markStart=millis();
-            transform((int32_t *)xsamples,samples,count,calibrationDC[currentScale],voltageScale,xmin,xmax);
+            int scale=vSettings[currentVSettings].inputGain;
+            transform((int32_t *)xsamples,samples,count,vSettings+currentVSettings,xmin,xmax,avg);
             adc->reclaimSamples(xsamples);
             
             
             
             tft->setCursor(240, 100);
             tft->print((float)DSOADC::getVCCmv()/1000.);
-
             tft->setCursor(240, 120);
             tft->print(xmin);
             tft->setCursor(240, 140);
-            tft->print(xmax);
+            tft->print(xmax);            
+            tft->setCursor(240, 160);
+            tft->print(avg);            
             
+            tft->setCursor(240, 60);
+            tft->print(scale);
+
+            tft->setCursor(240, 40);
+            tft->print(vSettings[currentVSettings].name);
+
             
             int last=fromSample(samples[0]);            
             
@@ -133,15 +138,11 @@ void testAdc2(void)
         int inc=controlButtons->getRotaryValue();
         if(inc)
         {
-            currentScale+=inc;
-            if(currentScale<0) currentScale=0;
-            currentScale&=0xf;
-             controlButtons->setInputGain(currentScale);;
-             updateCurrentVoltageScale(currentScale);
-        }
-        if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_TIME)&EVENT_SHORT_PRESS)
-        {            
-         //   adc->setTimeScale(currentScale); 
+            currentVSettings+=inc;
+            if(currentVSettings<0) currentVSettings=10;
+            if(currentVSettings>10) currentVSettings=currentVSettings-10;
+            tft->fillScreen(0);
+            updateCurrentVoltageScale(currentVSettings);
         }
     }
 } 
@@ -166,9 +167,6 @@ void drawGrid(void)
 
 void updateCurrentVoltageScale(int scale)
 {
-    float v=inputScale[scale];
-    v*=(float)DSOADC::getVCCmv();
-    v/=4096000.; 
-    voltageScale=v; // output in V
-    
+    currentVSettings=scale;
+    controlButtons->setInputGain( vSettings[currentVSettings].inputGain); // x1.4
 }

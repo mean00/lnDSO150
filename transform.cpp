@@ -23,18 +23,22 @@
  * @param voltageSCale
  * @return 
  */
-bool transform(int32_t *bfer, float *out,int count, int offset, float voltageScale,float &xmin,float &xmax)
+bool transform(int32_t *bfer, float *out,int count, VoltageSettings *set,float &xmin,float &xmax,float &avg)
 {
+   if(!count) return false;
    xmin=200;
    xmax=-200;
+   avg=0;
    for(int i=0;i<count;i++)
    {
        float f=bfer[i]>>16;
-       f-=offset;
-       f*=voltageScale;
+       f-=set->offset;
+       f*=set->multiplier;
        if(f>xmax) xmax=f;
        if(f<xmin) xmin=f;       
-       out[i]=f; // Unit is now *1024, avoid using float later on
+       out[i]=f; // Unit is now in volt
+       avg+=f;
    }
+   avg/=count;
    return true;
 }

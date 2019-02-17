@@ -68,6 +68,14 @@ void mySetup()
     
     controlButtons=new DSOControl ;
     
+    controlButtons->setup();
+    
+    if(!DSOEeprom::read())
+    {
+         DSOCalibrate::calibrate();
+         DSOEeprom::write();
+    }
+    
     adc=new DSOADC;
     
     // Ok let's go, switch to FreeRTOS
@@ -93,13 +101,7 @@ void MainTask( void *a )
 {
     interrupts();
     tft->setTextSize(3);
-    controlButtons->setup();
-    
-    if(!DSOEeprom::read())
-    {
-         DSOCalibrate::calibrate();
-         DSOEeprom::write();
-    }
+  
     
    // testTestSignal();
    //  testButtons();   

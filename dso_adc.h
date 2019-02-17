@@ -4,6 +4,18 @@
 // Sampling Queue
 
 #define SAMPLING_QUEUE_SIZE 4
+
+typedef struct VoltageSettings
+{
+    const char *name;
+    int         inputGain;
+    float       displayGain;
+    float       multiplier;
+    int         offset;
+
+};
+
+
 class SampleingQueue
 {
 public:

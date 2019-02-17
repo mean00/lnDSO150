@@ -22,6 +22,43 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 /**
  */
 
+//
+// this is 1/Gain for each range
+// i.e. attenuation
+//
+float inputScale[16]={
+  /*[0] */  0, // GND
+  /*[1] */  6.13/100., // /1  *14
+  /*[2] */  12.26/100., // /2  *7
+  /*[3] */  24.45/100., // /4  *3.5
+  /*[4] */  61.64/100., // /10  *1.4
+  /*[5] */  125./100., // /20  *0.8
+  /*[6] */  250./100., // /40    *0.4
+    
+  /*[7] */  6.13914, // /1  /6.1
+  /*[8] */  12.26, //2      /12
+  /*[9] */  24.45,  //4     /24
+  /*[a] */  61.64,  //10     /60
+  /*[b] */  125, //20     /125
+  /*[c] */  250 // 40    /250
+};
+VoltageSettings vSettings[11]=
+{
+    {"1mv",     1,24000.},
+    {"5mv",     2,4800.},
+    {"10mv",    3,2400.},
+    {"20mv",    4 ,1200.},
+    {"50mv",    5,480.},
+    {"100mv",   6,240.},
+    {"200mv",   7,120.},
+    {"500mv",   8,48.},
+    {"1v",      9,24.},
+    {"2v",      10,12.},
+    {"5v",      11,4.8}
+};
+/**
+ */
+
 uint16_t calibrationHash=0;
 uint16_t calibrationDC[16];
 uint16_t calibrationAC[16];
@@ -83,14 +120,24 @@ void DSOADC::setADCs ()
    adc_reg_map *regs = ADC1->regs;
    regs->CR2 |= ADC_CR2_TSVREFE;    // enable VREFINT and temp sensor
    regs->SMPR1 =  ADC_SMPR1_SMP17;  // sample ra
-   vcc=0;
-   for(int i=0;i<8;i++)
+#define NB_SAMPLE 16
+   float fvcc=0;
+   for(int i=0;i<NB_SAMPLE;i++)
    {
        delay(10);   
-       vcc+= (1200 * 4096) / adc_read(ADC1, 17); 
+       fvcc+=  adc_read(ADC1, 17); 
    }
-   vcc/=8;
+    fvcc=(1200. * 4096.*NB_SAMPLE) /fvcc;   
+    fvcc=3300;
+    vcc=(int)fvcc;
     
+    
+    // 1b fill up the conversion table
+    for(int i=0;i<11;i++)
+    {
+        vSettings[i].offset=calibrationDC[i+1];
+        vSettings[i].multiplier=inputScale[i+1]*fvcc/4096000.;
+    }
  // 2 - Setup ADC
     
   int pinMapADCin = PIN_MAP[analogInPin].adc_channel;
