@@ -13,20 +13,18 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  
  */
 
-#include <Wire.h>
-#include "SPI.h"
-#include "MapleFreeRTOS1000.h"
-#include "MapleFreeRTOS1000_pp.h"
-#include "dso_adc.h"
+#include "dso_global.h"
 
 /**
  */
-
+#define maxSamples   256 //1024*6
+#define analogInPin  PA0
+#define ADC_CR1_FASTINT 0x70000 // Fast interleave mode DUAL MODE bits 19-16
 //
 // this is 1/Gain for each range
 // i.e. attenuation
 //
-float inputScale[16]={
+const float inputScale[16]={
   /*[0] */  0, // GND
   /*[1] */  6.13/100., // /1  *14
   /*[2] */  12.26/100., // /2  *7
@@ -42,43 +40,32 @@ float inputScale[16]={
   /*[b] */  125, //20     /125
   /*[c] */  250 // 40    /250
 };
+/*
+ * Partially filled global gain array
+ * Remaining columns will be filled at runtime
+ */
 VoltageSettings vSettings[11]=
 {
-    {"1mv",     1,24000.},
-    {"5mv",     2,4800.},
-    {"10mv",    3,2400.},
-    {"20mv",    4 ,1200.},
-    {"50mv",    5,480.},
-    {"100mv",   6,240.},
-    {"200mv",   7,120.},
-    {"500mv",   8,48.},
-    {"1v",      9,24.},
-    {"2v",      10,12.},
-    {"5v",      11,4.8}
+    {"1mv",     1,  24000.},
+    {"5mv",     2,  4800.},
+    {"10mv",    3,  2400.},
+    {"20mv",    4 , 1200.},
+    {"50mv",    5,  480.},
+    {"100mv",   6,  240.},
+    {"200mv",   7,  120.},
+    {"500mv",   8,  48.},
+    {"1v",      9,  24.},
+    {"2v",      10, 12.},
+    {"5v",      11, 4.8}
 };
 /**
  */
-
-uint16_t calibrationHash=0;
-uint16_t calibrationDC[16];
-uint16_t calibrationAC[16];
-
-// Analog input
-#define ANALOG_MAX_VALUE 4096
-// Samples - depends on available RAM 6K is about the limit on an STM32F103C8T6
-// Bear in mind that the ILI9341 display is only able to display 240x320 pixels, at any time but we can output far more to the serial port, we effectively only show a window on our samples on the TFT.
-# define maxSamples 256 //1024*6
-
-const int8_t analogInPin = PA0;   // Analog input pin: any of LQFP44 pins (PORT_PIN), 10 (PA0), 11 (PA1), 12 (PA2), 13 (PA3), 14 (PA4), 15 (PA5), 16 (PA6), 17 (PA7), 18 (PB0), 19  (PB1)
-xBinarySemaphore  *dmaSemaphore;
-DSOADC *instance=NULL;
-// Array for the ADC data
-//uint16_t dataPoints[maxSamples];
 int requestedSamples;
 uint32_t *currentSamplingBuffer=NULL;
 uint32_t vcc; // power Supply in mv
-#define ADC_CR1_FASTINT 0x70000 // Fast interleave mode DUAL MODE bits 19-16
 
+xBinarySemaphore  *dmaSemaphore;
+DSOADC             *instance=NULL;
 
 
 

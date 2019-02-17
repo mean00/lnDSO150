@@ -4,21 +4,12 @@
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
 
-#include <Wire.h>
-#include "SPI.h"
-#include "Adafruit_GFX.h"
-#include "Adafruit_TFTLCD_8bit_STM32.h"
-//#include "Fonts/digitLcd56.h"
+#include "dso_global.h"
 #include "Fonts/waree9.h"
 #include "Fonts/waree12.h"
-#include "MapleFreeRTOS1000.h"
-#include "MapleFreeRTOS1000_pp.h"
 #include "testSignal.h"
-#include "dsoControl.h"
 #include "HardwareSerial.h"
-#include "dso_adc.h"
 #include "dso_eeprom.h"
-#include "dso_calibrate.h"
 static void MainTask( void *a );
 void splash(void);
 //--
@@ -27,7 +18,14 @@ testSignal *myTestSignal;
 DSOControl *controlButtons;
 DSOADC    *adc;
 static uint16_t identifier=0;
-static int counter=0;
+
+
+// Globals
+uint16_t calibrationHash=0;
+uint16_t calibrationDC[16];
+uint16_t calibrationAC[16];
+
+
 //
 // Test functions
 //

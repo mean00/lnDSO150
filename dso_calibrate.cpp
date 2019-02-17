@@ -1,18 +1,7 @@
 
 
-#include "Adafruit_GFX.h"
-#include "Adafruit_TFTLCD_8bit_STM32.h"
-#include "MapleFreeRTOS1000.h"
-#include "MapleFreeRTOS1000_pp.h"
-#include "dsoControl.h"
-#include "dso_adc.h"
 #include "dso_global.h"
-#include "dso_calibrate.h"
 
-//--
-extern Adafruit_TFTLCD_8bit_STM32 *tft;
-extern DSOControl *controlButtons;
-extern DSOADC    *adc;
 /**
  * 
  * @param array
