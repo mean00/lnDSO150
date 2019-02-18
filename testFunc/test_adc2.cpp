@@ -54,6 +54,10 @@ static inline int fromSample(float v)
     return (int)v;
 }
 
+uint8_t prePos[240];
+uint8_t preLength[240];
+
+bool first=true;
 void testAdc2(void)
 {
     int reCounter=0;
@@ -74,7 +78,7 @@ void testAdc2(void)
             transform((int32_t *)xsamples,samples,count,vSettings+currentVSettings,xmin,xmax,avg);
             adc->reclaimSamples(xsamples);
             
-            
+#if 0            
             
             tft->setCursor(240, 100);
             tft->print((float)DSOADC::getVCCmv()/1000.);
@@ -90,15 +94,15 @@ void testAdc2(void)
 
             tft->setCursor(240, 40);
             tft->print(vSettings[currentVSettings].name);
-
+#endif
             
             int last=fromSample(samples[0]);            
             
             
             for(int j=1;j<count;j++)
             {
-                int next=fromSample(samples[j]); // in volt
-
+                 int next=fromSample(samples[j]); // in volt
+               
                 int start,end;
                 if(next==last)
                 {
@@ -119,20 +123,32 @@ void testAdc2(void)
                 int seg1=start;
                 int seg2=end-start;
                 int seg3=239-end;
-                
+
                 uint16_t *bg=(uint16_t *)defaultPattern;
                 if(!(j%24)) bg=(uint16_t *)darkGreenPattern;
+
                 
-                tft->setAddrWindow(j,0,j,240);
-                tft->pushColors((uint16_t *)bg,seg1,true);
-                tft->pushColors((uint16_t *)yellowPattern,seg2,false); 
-                tft->pushColors((uint16_t *)bg+240-seg3,seg3,false);
+                if(first)
+                {
+                    first=false;
+                }else
+                {
+                    // cleanup prev draw
+                    tft->setAddrWindow(j,prePos[j],j,240);
+                    tft->pushColors(((uint16_t *)bg)+prePos[j],
+                                        preLength[j],true);
+                }
+                
+                tft->drawFastVLine(j,start,seg2,YELLOW);
+                preLength[j]=seg2;
+                prePos[j]=start;
                 
                 last=next;
             }
         }
-        markEnd=millis();
+        
         tft->setCursor(240, 20);
+        markEnd=millis();
         tft->print(markEnd-markStart);
       //  xDelay(60); // 50 i/s
         int inc=controlButtons->getRotaryValue();
