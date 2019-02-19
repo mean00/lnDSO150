@@ -31,19 +31,19 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
     for(int j=1;j<count;j++)
     {
         int next=data[j]; // in pixel
-        if(!next) last=1;
-        if(next>=238) next=238;
-        
-        if(next>last)
+        sz=abs(next-last);        
+        start=min(last,next);
+                
+        if(!sz)
         {
-            start=last;
-            sz=next-last;
+            if(next>=237) next=237;
+            sz=1;
         }
-        else
+        if(!start)
         {
-            start=next;
-            sz=last-next;
+            start=1;
         }
+
 
         uint16_t *bg=(uint16_t *)defaultPattern;
         if(!(j%24)) bg=(uint16_t *)darkGreenPattern;
