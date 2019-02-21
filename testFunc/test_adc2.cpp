@@ -31,14 +31,18 @@ extern testSignal *myTestSignal;
 //
 float voltageScale;
 extern VoltageSettings vSettings[11] ;
+extern TimeSettings tSettings[5];
 
 //
-bool transform(int32_t *bfer, float *out,int count, VoltageSettings *set,float &xmin,float &xmax,float &avg);
+int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expand,float &xmin,float &xmax,float &avg);
 
  
 
 float samples[256];
 int currentVSettings=5;
+int currentTSettings=0;
+
+void updateTimeScale();
 
 /**
  * 
@@ -56,7 +60,11 @@ static inline int fromSample(float v)
 
 uint8_t waveForm[240];
 
-
+int currentDiv=3;
+bool voltageMode=false;
+uint32_t acquisitionTime;
+extern uint32_t convTime;
+int expand;
 bool first=true;
 void testAdc2(void)
 {
@@ -64,23 +72,36 @@ void testAdc2(void)
     DSODisplay::drawGrid();
     int reCounter=0;
     currentVSettings=7;
-     controlButtons->setInputGain( vSettings[currentVSettings].inputGain); // x1.4
+    controlButtons->setInputGain( vSettings[currentVSettings].inputGain); // x1.4
     tft->setTextSize(2);
-    myTestSignal->setFrequency(20*1000); // 20Khz
+    myTestSignal->setFrequency(2000); // 20Khz
+    updateTimeScale();
+    
     float xmin,xmax,avg;
+    
     while(1)
     {
         int markStart,markEnd;
 
         int count;
         int i=0;
-        adc->initiateSampling(240);
+        // Ask samples , taking expand into account
+        
+        adc->initiateSampling((240*expand)/4096);
         uint32_t *xsamples=adc->getSamples(count);
         markStart=millis();
         int scale=vSettings[currentVSettings].inputGain;
-        transform((int32_t *)xsamples,samples,count,vSettings+currentVSettings,xmin,xmax,avg);
+        
+        count=transform((int32_t *)xsamples,samples,count,vSettings+currentVSettings,expand,xmin,xmax,avg);
+        acquisitionTime=convTime;
         adc->reclaimSamples(xsamples);
             
+        tft->setCursor(240, 100);
+        tft->print(currentTSettings);
+        tft->setCursor(240, 120);
+        tft->print(currentDiv);
+        tft->setCursor(240, 200);
+        tft->print(acquisitionTime);
 #if 0            
             
             tft->setCursor(240, 100);
@@ -110,14 +131,41 @@ void testAdc2(void)
         tft->print(markEnd-markStart);      
         int inc=controlButtons->getRotaryValue();
         if(inc)
-        {
-            currentVSettings+=inc;
-            if(currentVSettings<0) currentVSettings=10;
-            if(currentVSettings>10) currentVSettings=currentVSettings-10;
-            DSODisplay::drawGrid();
-            controlButtons->setInputGain( vSettings[currentVSettings].inputGain); // x1.4
-        }
+            if(voltageMode)
+            {
+                currentVSettings+=inc;
+                if(currentVSettings<0) currentVSettings=10;
+                if(currentVSettings>10) currentVSettings=currentVSettings-10;
+                DSODisplay::drawGrid();
+                controlButtons->setInputGain( vSettings[currentVSettings].inputGain); // x1.4
+            }
+            else
+            {
+#if 0
+                int x=(int)currentTime;
+                x+=inc;
+                currentTime=(adc_smp_rate)x;
+                if(currentTime>ADC_SMPR_239_5) currentTime=ADC_SMPR_239_5;
+                if(currentTime<ADC_SMPR_1_5) currentTime=ADC_SMPR_1_5;
+                adc->setTimeScale(currentTime,ADC_PRE_PCLK2_DIV_2); 
+#endif
+                currentTSettings+=inc;
+                if(currentTSettings>4) currentTSettings=4;
+                if(currentTSettings<0) currentTSettings=0;
+                DSODisplay::drawGrid();
+                updateTimeScale();
+                
+            }
+         
     }
 } 
+
+void updateTimeScale()
+{
+    adc->setTimeScale(tSettings[currentTSettings].rate,tSettings[currentTSettings].prescaler);     
+    expand=tSettings[currentTSettings].expand4096;
+    tft->setCursor(240, 50);
+    tft->print(tSettings[currentTSettings].name);
+}
 
 // EOF    

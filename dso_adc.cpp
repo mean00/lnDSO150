@@ -17,9 +17,10 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 
 /**
  */
-#define maxSamples   256 //1024*6
+#define maxSamples   (360) //1024*6
 #define analogInPin  PA0
 #define ADC_CR1_FASTINT 0x70000 // Fast interleave mode DUAL MODE bits 19-16
+uint32_t convTime;
 //
 // this is 1/Gain for each range
 // i.e. attenuation
@@ -58,6 +59,20 @@ VoltageSettings vSettings[11]=
     {"2v",      10, 12.},
     {"5v",      11, 4.8}
 };
+/**
+ These the time/div settings, it is computed to maximume accuracy 
+ * and sample a bit too fast, so that we can decimate it
+ *  */
+TimeSettings tSettings[5]
+{
+    {"25us",    ADC_PRE_PCLK2_DIV_2,ADC_SMPR_13_5,5909},
+    {"50us",    ADC_PRE_PCLK2_DIV_2,ADC_SMPR_55_5,4496},
+    {"100us",   ADC_PRE_PCLK2_DIV_4,ADC_SMPR_55_5,4517},
+    {"500us",   ADC_PRE_PCLK2_DIV_4,ADC_SMPR_239_5,6095},
+    {"1ms",     ADC_PRE_PCLK2_DIV_8,ADC_SMPR_239_5,6095}
+};
+
+
 /**
  */
 int requestedSamples;
@@ -223,6 +238,7 @@ bool DSOADC::startSampling (int count,uint32_t *buffer)
     
   requestedSamples=count;
   currentSamplingBuffer=buffer;
+  convTime=micros();
   dma_init(DMA1);
   dma_attach_interrupt(DMA1, DMA_CH1, DMA1_CH1_Event);
 
@@ -265,6 +281,7 @@ void DSOADC::DMA1_CH1_Event()
  */
 void DSOADC::captureComplete()
 {
+    convTime=micros()-convTime;
     capturedBuffers.addFromIsr(currentSamplingBuffer);
     currentSamplingBuffer=NULL;
     dmaSemaphore->giveFromInterrupt();

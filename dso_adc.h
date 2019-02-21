@@ -6,7 +6,7 @@
 
 // Sampling Queue
 
-#define SAMPLING_QUEUE_SIZE 4
+#define SAMPLING_QUEUE_SIZE 3
 
 /* 
  * \brief Describe a voltage setting
@@ -20,6 +20,14 @@ typedef struct VoltageSettings
     float       multiplier;     /// Gain of the internal amplifier, multiply by this to get volts
     int         offset;         /// Offset of sampled data , you need to substract it
 
+};
+
+typedef struct TimeSettings
+{
+  const char    *name;
+  adc_prescaler  prescaler;
+  adc_smp_rate   rate;
+  int            expand4096;
 };
 
 /**
