@@ -31,7 +31,7 @@ extern testSignal *myTestSignal;
 //
 float voltageScale;
 extern VoltageSettings vSettings[11] ;
-extern TimeSettings tSettings[5];
+extern TimeSettings tSettings[6];
 
 //
 int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expand,float &xmin,float &xmax,float &avg);
@@ -150,7 +150,7 @@ void testAdc2(void)
                 adc->setTimeScale(currentTime,ADC_PRE_PCLK2_DIV_2); 
 #endif
                 currentTSettings+=inc;
-                if(currentTSettings>4) currentTSettings=4;
+                if(currentTSettings>5) currentTSettings=5;
                 if(currentTSettings<0) currentTSettings=0;
                 DSODisplay::drawGrid();
                 updateTimeScale();
