@@ -33,6 +33,7 @@ extern void testTestSignal();
 extern void testButtons();
 extern void testAdc();
 extern void testAdc2();
+extern void testAdc3();
 extern void testDisplay();
 extern void testCalibrate(void);
 extern void testI2c( void);
@@ -105,6 +106,7 @@ void MainTask( void *a )
    //  testButtons();   
       //testAdc();   
     testAdc2();   
+    //testAdc3();  
     //testDisplay();
     //testCalibrate();
     //testI2c();

@@ -14,67 +14,17 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  */
 
 #include "dso_global.h"
+#include "dso_adc_priv.h"
 
 /**
  */
-#define maxSamples   (360) //1024*6
+
 #define analogInPin  PA0
 #define ADC_CR1_FASTINT 0x70000 // Fast interleave mode DUAL MODE bits 19-16
 uint32_t convTime;
 extern HardwareTimer Timer2;
 adc_reg_map *adc_Register;
-static int currentIndex;
-//
-// this is 1/Gain for each range
-// i.e. attenuation
-//
-const float inputScale[16]={
-  /*[0] */  0, // GND
-  /*[1] */  6.11/100., // /1  *14
-  /*[2] */  12.19/100., // /2  *7
-  /*[3] */  24.39/100., // /4  *3.5
-  /*[4] */  61.64/100., // /10  *1.4
-  /*[5] */  125./100., // /20  *0.8
-  /*[6] */  243.9/100., // /40    *0.4 100 mv
-    
-  /*[7] */  6.11, // /1  /6.1   200mv
-  /*[8] */  12.19, //2      /12  500mv
-  /*[9] */  24.39,  //4     /24  1V
-  /*[a] */  61.64,  //10     /60
-  /*[b] */  125, //20     /125
-  /*[c] */  250 // 40    /250
-};
-/*
- * Partially filled global gain array
- * Remaining columns will be filled at runtime
- */
-VoltageSettings vSettings[11]=
-{
-    {"1mv",     1,  24000.},
-    {"5mv",     2,  4800.},
-    {"10mv",    3,  2400.},
-    {"20mv",    4 , 1200.},
-    {"50mv",    5,  480.},
-    {"100mv",   6,  240.},
-    {"200mv",   7,  120.},
-    {"500mv",   8,  48.},
-    {"1v",      9,  24.},
-    {"2v",      10, 12.},
-    {"5v",      11, 4.8}
-};
-/**
- These the time/div settings, it is computed to maximume accuracy 
- * and sample a bit too fast, so that we can decimate it
- *  */
-TimeSettings tSettings[6]
-{
-    {"10us",    ADC_PRE_PCLK2_DIV_2,ADC_SMPR_1_5,   4390},
-    {"25us",    ADC_PRE_PCLK2_DIV_2,ADC_SMPR_13_5,  5909},
-    {"50us",    ADC_PRE_PCLK2_DIV_2,ADC_SMPR_55_5,  4496},
-    {"100us",   ADC_PRE_PCLK2_DIV_4,ADC_SMPR_55_5,  4517},
-    {"500us",   ADC_PRE_PCLK2_DIV_4,ADC_SMPR_239_5, 6095},
-    {"1ms",     ADC_PRE_PCLK2_DIV_8,ADC_SMPR_239_5, 6095}
-};
+
 
 
 /**
@@ -161,20 +111,6 @@ void DSOADC::setADCs ()
   ADC2->regs->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
   ADC2->regs->SQR3 = pinMapADCin;
 }
-/**
- * 
- * @param fqInHz
- * @return 
- */
-bool DSOADC::setSlowMode(int fqInHz)
-{
-    
-    Timer2.setChannel1Mode(TIMER_OUTPUTCOMPARE);
-    Timer2.setPeriod(1000000/fqInHz); // in microseconds
-    Timer2.setCompare1(1); // overflow might be small
-    Timer2.attachCompare1Interrupt(Timer2_Event);
-
-}
 
 
 /**
@@ -205,45 +141,6 @@ bool    DSOADC::initiateSampling (int count)
     return startSampling(count,bfer);
     
 }
-  /**
-  * 
-  * @param count
-  * @return 
-  */
-bool    DSOADC::initiateTimerSampling (int count)
-{    
-    if(!capturedBuffers.empty())
-        return true; // We have data !
-    
-    uint32_t *bfer=availableBuffers.take();
-    if(!bfer) return false;
-    
-    return startTimerSampling(count,bfer);
-    
-}
-/**
- * 
- * @param count
- * @param buffer
- * @return 
- */
-bool DSOADC::startTimerSampling (int count,uint32_t *buffer)
-{
-    if(count>maxSamples)
-        count=maxSamples;   
-    currentIndex=0;
-    requestedSamples=count;
-    currentSamplingBuffer=buffer;
-    currentIndex=0;
-    adc_dev *dev = PIN_MAP[PA0].adc_device;
-    uint32 tmp = dev->regs->SQR1;
-    tmp &= ~ADC_SQR1_L;
-    adc_Register->SQR3 = 0;
-    setSlowMode(4800);
-    adc_Register->CR2 |= ADC_CR2_SWSTART;    
-    adc_Register->SQR1 = tmp;
-    // start timer
-} 
 /**
  * 
  * @param count
@@ -336,27 +233,6 @@ void DSOADC::adc_dma_disable(const adc_dev * dev)
 void DSOADC::DMA1_CH1_Event() 
 {
     instance->captureComplete();
-}
-void DSOADC::Timer2_Event() 
-{
-    instance->timerCapture();
-}
-/**
- * \fn timerCapture
- * \brief this is one is called by a timer interrupt
- */
-void DSOADC::timerCapture()
-{
-    // read previous cap
-    currentSamplingBuffer[currentIndex++]=adc_Register->DR;
-    // start new one
-    
-    if(currentIndex>=requestedSamples)
-    {
-        captureComplete();
-        return;
-    }
-    adc_Register->CR2 |= ADC_CR2_SWSTART;        
 }
 /**
  */

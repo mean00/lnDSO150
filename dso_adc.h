@@ -89,18 +89,24 @@ public:
                     DSOADC();
             bool    setTimeScale(adc_smp_rate one, adc_prescaler two);
             bool    initiateSampling (int count);
+            bool    initiateTimerSampling (int count);
             uint32_t *getSamples(int &count);
             void     reclaimSamples(uint32_t *buffer);
+            bool     setSlowMode(int fqInHz);
     static  uint32_t getVCCmv();
             
             
 protected:
             bool startSampling (int count,uint32_t *buffer);
+            bool startTimerSampling (int count,uint32_t *buffer);
             void setADCs ();
     static  void adc_dma_disable(const adc_dev * dev) ;            
     static  void adc_dma_enable(const adc_dev * dev) ;    
     static  void DMA1_CH1_Event();
             void captureComplete();
+    static  void Timer2_Event();
+            void timerCapture();
+
 protected:
   
             int             _sampled;
@@ -108,5 +114,5 @@ protected:
             SampleingQueue capturedBuffers;
             
 };
-
+#define maxSamples   (360) //1024*6
 // EOF
