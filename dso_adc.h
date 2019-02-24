@@ -106,6 +106,7 @@ protected:
             void captureComplete();
     static  void Timer2_Event();
             void timerCapture();
+            bool startInternalDmaSampling ();
 
 protected:
   

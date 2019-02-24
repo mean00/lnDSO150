@@ -71,10 +71,10 @@ void testAdc3(void)
     DSODisplay::init();
     DSODisplay::drawGrid();
     int reCounter=0;
-    currentVSettings=7;
+    currentVSettings=8;
     controlButtons->setInputGain( vSettings[currentVSettings].inputGain); // x1.4
     tft->setTextSize(2);
-    myTestSignal->setFrequency(100); // 20Khz
+    myTestSignal->setFrequency(100); // 100 hz /10 ms period
     updateTimeScale();
     
     float xmin,xmax,avg;
@@ -102,7 +102,7 @@ void testAdc3(void)
         tft->print(currentDiv);
         tft->setCursor(240, 200);
         tft->print(acquisitionTime);
-#if 0            
+#if 1            
             
             tft->setCursor(240, 100);
             tft->print((float)DSOADC::getVCCmv()/1000.);
