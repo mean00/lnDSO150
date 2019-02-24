@@ -61,7 +61,7 @@ static inline int fromSample(float v)
 static uint8_t waveForm[240];
 
 static int currentDiv=3;
-static bool voltageMode=false;
+static bool voltageMode=true;
 static uint32_t acquisitionTime;
 extern uint32_t convTime;
 static int expand;
@@ -74,7 +74,7 @@ void testAdc3(void)
     currentVSettings=7;
     controlButtons->setInputGain( vSettings[currentVSettings].inputGain); // x1.4
     tft->setTextSize(2);
-    myTestSignal->setFrequency(2000); // 20Khz
+    myTestSignal->setFrequency(100); // 20Khz
     updateTimeScale();
     
     float xmin,xmax,avg;
@@ -93,7 +93,7 @@ void testAdc3(void)
         int scale=vSettings[currentVSettings].inputGain;
         
         count=transform((int32_t *)xsamples,samples,count,vSettings+currentVSettings,expand,xmin,xmax,avg);
-        acquisitionTime=convTime;
+        acquisitionTime=convTime/1000;
         adc->reclaimSamples(xsamples);
             
         tft->setCursor(240, 100);

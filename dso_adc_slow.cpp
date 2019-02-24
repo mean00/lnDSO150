@@ -30,7 +30,7 @@ extern int requestedSamples;
 extern uint32_t *currentSamplingBuffer;
 extern DSOADC             *instance;
 int currentIndex=0;
-
+extern uint32_t convTime;
 /**
  * 
  * @param fqInHz
@@ -41,9 +41,8 @@ bool DSOADC::setSlowMode(int fqInHz)
     
     Timer2.setChannel1Mode(TIMER_OUTPUTCOMPARE);
     Timer2.setPeriod(1000000/fqInHz); // in microseconds
-    Timer2.setCompare1(1); // overflow might be small
     Timer2.attachCompare1Interrupt(Timer2_Event);
-
+    Timer2.setCompare1(1); // overflow might be small
 }
 
   /**
@@ -80,6 +79,7 @@ bool DSOADC::startTimerSampling (int count,uint32_t *buffer)
     uint32 tmp = dev->regs->SQR1;
     tmp &= ~ADC_SQR1_L;
     adc_Register->SQR3 = 0;
+    convTime=micros();
     setSlowMode(4800);
     adc_Register->CR2 |= ADC_CR2_SWSTART;    
     adc_Register->SQR1 = tmp;
@@ -95,16 +95,24 @@ void DSOADC::Timer2_Event()
  */
 void DSOADC::timerCapture()
 {
+    
     // read previous cap
+#if 0    
     currentSamplingBuffer[currentIndex++]=adc_Register->DR;
+#else
+    currentSamplingBuffer[currentIndex++]=analogRead(PA0);
+#endif
     // start new one
     
     if(currentIndex>=requestedSamples)
     {
+        Timer2.detachInterrupt(1);        
         captureComplete();
         return;
     }
+#if 0    
     adc_Register->CR2 |= ADC_CR2_SWSTART;        
+#endif
 }
 
 

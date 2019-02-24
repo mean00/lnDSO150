@@ -7,7 +7,7 @@
 // Sampling Queue
 
 #define SAMPLING_QUEUE_SIZE 3
-
+#define maxSamples   (360) //1024*6
 /* 
  * \brief Describe a voltage setting
  */
@@ -114,5 +114,5 @@ protected:
             SampleingQueue capturedBuffers;
             
 };
-#define maxSamples   (360) //1024*6
+
 // EOF

@@ -105,8 +105,8 @@ void MainTask( void *a )
    // testTestSignal();
    //  testButtons();   
       //testAdc();   
-    testAdc2();   
-    //testAdc3();  
+    //testAdc2();   
+     testAdc3();  
     //testDisplay();
     //testCalibrate();
     //testI2c();
