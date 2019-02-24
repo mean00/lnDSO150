@@ -1,8 +1,8 @@
 /**
  
  *  This is the slow capture mode
- *  i.e. we use a timer to get samples
- * Only used when fq is >> compared to maximum sampling time 
+ * i.e. we setup n Samples acquisition through DMA
+ * and a timer interrupt grabs the result 
  */
 
 #include "dso_global.h"
@@ -108,7 +108,7 @@ void DSOADC::timerCapture()
     uint32_t avg=0;
     for(int i=0;i<DMA_OVERSAMPLING_COUNT;i++)
         avg+=dmaOverSampleBuffer[i];
-    avg/=DMA_OVERSAMPLING_COUNT;
+    avg=(avg+DMA_OVERSAMPLING_COUNT/2+1)/DMA_OVERSAMPLING_COUNT;
     currentSamplingBuffer[currentIndex]=avg;
     currentIndex++;
     if(currentIndex>requestedSamples)
@@ -118,7 +118,7 @@ void DSOADC::timerCapture()
         captureComplete();
         return;
     }
-    dma_init(DMA1); 
+    //dma_init(DMA1); 
     dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, dmaOverSampleBuffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
     dma_set_num_transfers(DMA1, DMA_CH1, DMA_OVERSAMPLING_COUNT );
     dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.

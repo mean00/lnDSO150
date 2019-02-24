@@ -74,7 +74,7 @@ void testAdc3(void)
     currentVSettings=8;
     controlButtons->setInputGain( vSettings[currentVSettings].inputGain); // x1.4
     tft->setTextSize(2);
-    myTestSignal->setFrequency(100); // 100 hz /10 ms period
+    myTestSignal->setFrequency(25); // 100 hz /10 ms period
     updateTimeScale();
     
     float xmin,xmax,avg;
