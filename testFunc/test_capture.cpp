@@ -50,8 +50,7 @@ void testCapture(void)
     float xmin,xmax,avg;
     
     while(1)
-    {
-        
+    {        
         int count=DSOCapture::oneShotCapture(240,samples);  
         DSOCapture::captureToDisplay(count,samples,waveForm);        
         DSODisplay::drawWaveForm(count,waveForm);

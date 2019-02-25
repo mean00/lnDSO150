@@ -1,3 +1,8 @@
+/***************************************************
+ STM32 duino based firmware for DSO SHELL/150
+ *  * GPL v2
+ * (c) mean 2019 fixounet@free.fr
+ ****************************************************/
 #include "dso_global.h"
 #include "dsoDisplay.h"
 #include "pattern.h"
