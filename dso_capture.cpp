@@ -30,7 +30,7 @@ DSOCapture::DSO_TIME_BASE DSOCapture::getTimeBase()
  * @param voltRange
  * @return 
  */
-bool     setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange)
+bool     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange)
 {
     currentVoltageRange=voltRange;
     return true;
@@ -73,7 +73,7 @@ bool     DSOCapture::initiateSampling (int count)
     {
         //
         int ex=count*tSettings[currenTimeBase].expand4096;
-        return adc->initiateSampling(count);
+        return adc->initiateSampling(ex/4096);
     }else
     {
         adc->setSlowMode(timerBases[currenTimeBase].fq);
@@ -111,7 +111,7 @@ int DSOCapture::oneShotCapture(int count,float *outbuffer)
     
     int scale=vSettings[currentVoltageRange].inputGain;
     float xmin,xmax,avg;    
-    count=transform((int32_t *)buffer,outbuffer,count,vSettings+currentVoltageRange,tSettings[currenTimeBase].expand4096,xmin,xmax,avg);
+    count=transform((int32_t *)buffer,outbuffer,available,vSettings+currentVoltageRange,tSettings[currenTimeBase].expand4096,xmin,xmax,avg);
     
     reclaimSamples(buffer);
     return count;
