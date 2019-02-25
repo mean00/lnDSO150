@@ -1,4 +1,5 @@
 
+#pragma once
 /**
  */
 class DSOCapture
@@ -25,7 +26,26 @@ public:
       DSO_TIME_BASE_500MS,
       DSO_TIME_BASE_1S
     };
+    
+    enum DSO_VOLTAGE_RANGE
+    {
+      DSO_VOLTAGE_1MV,
+      DSO_VOLTAGE_5MV,
+      DSO_VOLTAGE_10MV,
+      DSO_VOLTAGE_20MV,
+      DSO_VOLTAGE_50MV,
+      DSO_VOLTAGE_100MV,
+      DSO_VOLTAGE_200MV,
+      DSO_VOLTAGE_500MV,
+      DSO_VOLTAGE_1V,
+      DSO_VOLTAGE_2V,
+      DSO_VOLTAGE_5V
+    };
+     
+    static bool     setVoltageRange(DSO_VOLTAGE_RANGE voltRange);
+    static DSO_VOLTAGE_RANGE getVoltageRange();
     static bool     setTimeBase(DSO_TIME_BASE timeBase);
+    static DSO_TIME_BASE getTimeBase();
     static bool     initiateSampling (int count);
     static uint32_t *getSamples(int &count);
     static void     reclaimSamples(uint32_t *buffer);

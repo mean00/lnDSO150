@@ -16,6 +16,8 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 #include "dso_global.h"
 #include "dso_adc_priv.h"
 
+
+
 /**
  */
 
@@ -24,8 +26,8 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 uint32_t convTime;
 extern HardwareTimer Timer2;
 adc_reg_map *adc_Register;
-
-
+extern VoltageSettings vSettings[];
+extern const float inputScale[];
 
 /**
  */

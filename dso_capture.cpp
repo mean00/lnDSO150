@@ -1,29 +1,44 @@
 #include "dso_global.h"
 #include "dso_adc.h"
 #include "dso_capture.h"
+#include "dso_capture_priv.h"
 
 static int currenTimeBase=0;
+static int currentVoltageRange=0;
 bool   captureFast=true;
 extern DSOADC    *adc;
 /**
  */
-typedef struct TimerTimeBase
-{
-  DSOCapture::DSO_TIME_BASE timeBase;
-  const char    *name;
-  int           fq;  
-};
+
+
 /**
+ * 
+ * @return 
  */
-static const TimerTimeBase timerBases[]
+DSOCapture::DSO_TIME_BASE DSOCapture::getTimeBase()
 {
-    { DSOCapture::DSO_TIME_BASE_5MS,    "5ms",  4800},
-    { DSOCapture::DSO_TIME_BASE_10MS,   "10ms", 2400},
-    { DSOCapture::DSO_TIME_BASE_50MS,   "50ms", 480},
-    { DSOCapture::DSO_TIME_BASE_100MS,  "100ms",240},
-    { DSOCapture::DSO_TIME_BASE_500MS,  "500ms",48},
-    { DSOCapture::DSO_TIME_BASE_1S,     "1s",   24}    
-};
+    if(captureFast) 
+        return (DSOCapture::DSO_TIME_BASE)currenTimeBase;
+    return (DSOCapture::DSO_TIME_BASE)(currenTimeBase+DSO_TIME_BASE::DSO_TIME_BASE_5MS);
+}
+/**
+ * 
+ * @param voltRange
+ * @return 
+ */
+bool     setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange)
+{
+    currentVoltageRange=voltRange;
+    return true;
+}
+/**
+ * 
+ * @return 
+ */
+DSOCapture::DSO_VOLTAGE_RANGE getVoltageRange()
+{
+    return (DSOCapture::DSO_VOLTAGE_RANGE)currentVoltageRange;
+}
 
 /**
  * 
@@ -52,6 +67,8 @@ bool     DSOCapture::initiateSampling (int count)
 {
     if(captureFast)
     {
+        //
+        int ex=count*tSettings[currenTimeBase].expand4096;
         return adc->initiateSampling(count);
     }else
     {

@@ -13,6 +13,7 @@
 #include "Adafruit_GFX.h"
 #include "Adafruit_TFTLCD_8bit_STM32.h"
 #include "dsoControl.h"
+#include "dso_capture.h"
 
 
 
@@ -24,6 +25,6 @@ extern uint16_t calibrationAC[16];
 
 extern Adafruit_TFTLCD_8bit_STM32 *tft;
 extern DSOControl                 *controlButtons;
-extern DSOADC                     *adc;
+extern DSOCapture                 *capture;
 
 // EOF

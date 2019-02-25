@@ -1,7 +1,8 @@
 
 
 #include "dso_global.h"
-
+#include "dso_adc.h"
+extern DSOADC                     *adc;
 /**
  * 
  * @param array
