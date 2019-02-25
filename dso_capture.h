@@ -41,7 +41,7 @@ public:
       DSO_VOLTAGE_2V,
       DSO_VOLTAGE_5V
     };
-     
+    static int      oneShotCapture(int count,float *outbuffer) ;
     static bool     setVoltageRange(DSO_VOLTAGE_RANGE voltRange);
     static DSO_VOLTAGE_RANGE getVoltageRange();
     static bool     setTimeBase(DSO_TIME_BASE timeBase);
@@ -49,6 +49,8 @@ public:
     static bool     initiateSampling (int count);
     static uint32_t *getSamples(int &count);
     static void     reclaimSamples(uint32_t *buffer);
+    
+    static bool     captureToDisplay(int count,float *samples,uint8_t *waveForm);
 
     
 protected:

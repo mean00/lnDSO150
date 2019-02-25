@@ -7,6 +7,9 @@ static int currenTimeBase=0;
 static int currentVoltageRange=0;
 bool   captureFast=true;
 extern DSOADC    *adc;
+
+extern int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expand,float &xmin,float &xmax,float &avg);
+
 /**
  */
 
@@ -92,4 +95,45 @@ uint32_t *DSOCapture::getSamples(int &count)
 void     DSOCapture::reclaimSamples(uint32_t *buffer)
 {
     adc->reclaimSamples(buffer);
+}
+
+/**
+ * 
+ * @param count
+ * @return 
+ */
+int DSOCapture::oneShotCapture(int count,float *outbuffer)
+{
+    int available;
+    initiateSampling(count);
+    uint32_t *buffer=    getSamples(available);
+    
+    int scale=vSettings[currentVoltageRange].inputGain;
+    float xmin,xmax,avg;    
+    count=transform((int32_t *)buffer,outbuffer,count,vSettings+currentVoltageRange,tSettings[currenTimeBase].expand4096,xmin,xmax,avg);
+    
+    reclaimSamples(buffer);
+    return count;
+}
+/**
+ * 
+ * @param count
+ * @param samples
+ * @param waveForm
+ * @return 
+ */
+bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
+{
+    float gain=vSettings[currentVoltageRange].displayGain;
+    for(int j=0;j<count;j++)
+        {
+            float v=samples[j];
+            v*=gain;
+            v+=120;
+            if(v>239) v=239;
+            if(v<0) v=0;
+            v=239-v;
+            waveForm[j]=(uint8_t)v;
+        }
+    return true;
 }
