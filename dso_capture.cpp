@@ -39,6 +39,15 @@ bool     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange)
  * 
  * @return 
  */
+DSOCapture::DSO_VOLTAGE_RANGE DSOCapture::getVoltageRange()
+{
+     return (DSOCapture::DSO_VOLTAGE_RANGE )currentVoltageRange;
+}
+
+/**
+ * 
+ * @return 
+ */
 DSOCapture::DSO_VOLTAGE_RANGE getVoltageRange()
 {
     return (DSOCapture::DSO_VOLTAGE_RANGE)currentVoltageRange;
@@ -137,4 +146,24 @@ bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
             waveForm[j]=(uint8_t)v;
         }
     return true;
+}
+/**
+ * 
+ * @return 
+ */
+const char *DSOCapture::getTimeBaseAsText()
+{
+    if(captureFast)
+    {
+        return tSettings[currenTimeBase].name;
+    }
+    return timerBases[currenTimeBase].name;
+}
+/**
+ * 
+ * @return 
+ */
+const char *DSOCapture::getVoltageRangeAsText()
+{
+    return vSettings[currentVoltageRange].name;
 }

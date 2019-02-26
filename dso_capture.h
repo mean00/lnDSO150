@@ -28,7 +28,8 @@ public:
       DSO_TIME_BASE_50MS,
       DSO_TIME_BASE_100MS,
       DSO_TIME_BASE_500MS,
-      DSO_TIME_BASE_1S
+      DSO_TIME_BASE_1S,
+      DSO_TIME_BASE_MAX=DSO_TIME_BASE_1S
     };
     
     enum DSO_VOLTAGE_RANGE
@@ -43,7 +44,8 @@ public:
       DSO_VOLTAGE_500MV,
       DSO_VOLTAGE_1V,
       DSO_VOLTAGE_2V,
-      DSO_VOLTAGE_5V
+      DSO_VOLTAGE_5V,
+      DSO_VOLTAGE_MAX=DSO_VOLTAGE_5V
     };
     static int      oneShotCapture(int count,float *outbuffer) ;
     static bool     setVoltageRange(DSO_VOLTAGE_RANGE voltRange);
@@ -55,7 +57,8 @@ public:
     static void     reclaimSamples(uint32_t *buffer);
     
     static bool     captureToDisplay(int count,float *samples,uint8_t *waveForm);
-
+    static const char *getTimeBaseAsText();
+    static const char *getVoltageRangeAsText();
     
 protected:
   
