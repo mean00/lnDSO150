@@ -103,9 +103,12 @@ void DSOADC::Timer2_Event()
  * \brief this is one is called by a timer interrupt
  */
 void DSOADC::timerCapture()
-{
-    
+{    
     uint32_t avg=0;
+    if(!currentSamplingBuffer)
+    {
+        return; // spurious interrupt
+    }
     for(int i=0;i<DMA_OVERSAMPLING_COUNT;i++)
         avg+=dmaOverSampleBuffer[i];
     avg=(avg+DMA_OVERSAMPLING_COUNT/2+1)/DMA_OVERSAMPLING_COUNT;

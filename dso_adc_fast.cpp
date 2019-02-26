@@ -218,7 +218,16 @@ void DSOADC::adc_dma_enable(const adc_dev * dev)
 {
   bb_peri_set_bit(&dev->regs->CR2, ADC_CR2_DMA_BIT, 1);
 }
-
+/**
+ * 
+ */
+void SPURIOUS_INTERRUPT()
+{
+    while(1)
+    {
+        
+    };
+}
 
 /**
 * @brief Disable DMA requests
@@ -228,6 +237,7 @@ void DSOADC::adc_dma_enable(const adc_dev * dev)
 void DSOADC::adc_dma_disable(const adc_dev * dev) 
 {
   bb_peri_set_bit(&dev->regs->CR2, ADC_CR2_DMA_BIT, 0);
+  dma_attach_interrupt(DMA1, DMA_CH1, SPURIOUS_INTERRUPT);
 }
 /**
  * 
