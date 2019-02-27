@@ -8,10 +8,10 @@
 #include "dso_capture.h"
 #include "dso_capture_priv.h"
 
-static int currenTimeBase=0;
-static int currentVoltageRange=0;
-bool   captureFast=true;
-extern DSOADC    *adc;
+static int      currenTimeBase=0;
+static int      currentVoltageRange=0;
+static bool     captureFast=true;
+extern DSOADC   *adc;
 
 extern int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expand,float &xmin,float &xmax,float &avg);
 
@@ -44,14 +44,6 @@ DSOCapture::DSO_VOLTAGE_RANGE DSOCapture::getVoltageRange()
      return (DSOCapture::DSO_VOLTAGE_RANGE )currentVoltageRange;
 }
 
-/**
- * 
- * @return 
- */
-DSOCapture::DSO_VOLTAGE_RANGE getVoltageRange()
-{
-    return (DSOCapture::DSO_VOLTAGE_RANGE)currentVoltageRange;
-}
 
 /**
  * 

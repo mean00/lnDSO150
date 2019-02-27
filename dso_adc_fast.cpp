@@ -16,7 +16,7 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 #include "dso_global.h"
 #include "dso_adc_priv.h"
 
-
+int dmaSpuriousInterrupt=0;
 
 /**
  */
@@ -223,10 +223,7 @@ void DSOADC::adc_dma_enable(const adc_dev * dev)
  */
 void SPURIOUS_INTERRUPT()
 {
-    while(1)
-    {
-        
-    };
+    dmaSpuriousInterrupt++;
 }
 
 /**
@@ -245,6 +242,7 @@ void DSOADC::adc_dma_disable(const adc_dev * dev)
 void DSOADC::DMA1_CH1_Event() 
 {
     instance->captureComplete();
+    adc_dma_disable(ADC1);
 }
 /**
  */

@@ -338,7 +338,7 @@ bool DSOControl::setup()
     attachRE(DSO_BUTTON_UP);
     attachRE(DSO_BUTTON_DOWN);
 #endif
-    xTaskCreate( trampoline, "Control", 150, this, 15, &taskHandle );       
+    xTaskCreate( trampoline, "Control", 450, this, 15, &taskHandle );       
 }
 /**
  * 

@@ -79,7 +79,7 @@ void mySetup()
     adc=new DSOADC;
     
     // Ok let's go, switch to FreeRTOS
-    xTaskCreate( MainTask, "MainTask", 500, NULL, 10, NULL );
+    xTaskCreate( MainTask, "MainTask", 700, NULL, 10, NULL );
     vTaskStartScheduler();      
 }
 
@@ -106,12 +106,12 @@ void MainTask( void *a )
    // testTestSignal();
    //  testButtons();   
       //testAdc();   
-    testAdc2();   
+    //testAdc2();   
      //testAdc3();  
     //testDisplay();
     //testCalibrate();
     //testI2c();
-    //testCapture();
+    testCapture();
     while(1)
     {};
 }
