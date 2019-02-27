@@ -104,7 +104,7 @@ void testCapture(void)
     int reCounter=0;
     
     tft->setTextSize(2);
-    myTestSignal->setFrequency(20000); // 20Khz
+    myTestSignal->setFrequency(2000); // 20Khz
 
     DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_50MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);

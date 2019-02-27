@@ -112,7 +112,10 @@ int DSOCapture::oneShotCapture(int count,float *outbuffer)
     
     int scale=vSettings[currentVoltageRange].inputGain;
     float xmin,xmax,avg;    
-    count=transform((int32_t *)buffer,outbuffer,available,vSettings+currentVoltageRange,tSettings[currenTimeBase].expand4096,xmin,xmax,avg);
+    if(captureFast)
+        count=transform((int32_t *)buffer,outbuffer,available,vSettings+currentVoltageRange,tSettings[currenTimeBase].expand4096,xmin,xmax,avg);
+    else
+        count=transform((int32_t *)buffer,outbuffer,available,vSettings+currentVoltageRange,4096,xmin,xmax,avg);
     
     reclaimSamples(buffer);
     return count;
@@ -159,3 +162,4 @@ const char *DSOCapture::getVoltageRangeAsText()
 {
     return vSettings[currentVoltageRange].name;
 }
+// EOF
