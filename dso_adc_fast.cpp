@@ -132,15 +132,9 @@ void DSOADC::setADCs ()
   * @param count
   * @return 
   */
-bool    DSOADC::initiateSampling (int count)
+bool    DSOADC::prepareDMASampling (void)
 {    
-    if(!capturedBuffers.empty())
-        return true; // We have data !
-    
-    uint32_t *bfer=availableBuffers.take();
-    if(!bfer) return false;
-    
-    return startSampling(count,bfer);
+ 
     
 }
 /**
@@ -187,10 +181,15 @@ void     DSOADC::reclaimSamples(uint32_t *buffer)
 
 
 
-bool DSOADC::startSampling (int count,uint32_t *buffer)
+bool DSOADC::startDMASampling (int count)
 {
   // This loop uses dual interleaved mode to get the best performance out of the ADCs
   //
+     if(!capturedBuffers.empty())
+        return true; // We have data !
+    
+    uint32_t *buffer=availableBuffers.take();
+    if(!buffer) return false;    
 
   if(count>maxSamples)
         count=maxSamples;
@@ -208,7 +207,6 @@ bool DSOADC::startSampling (int count,uint32_t *buffer)
   dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
   return true;
 }
-
 /**
 * @brief Enable DMA requests
 * @param dev ADC device on which to enable DMA requests

@@ -6,6 +6,9 @@
 #pragma once
 /**
  */
+#include "transform.h"
+/**
+ */
 class DSOCapture
 {
 public:
@@ -47,12 +50,13 @@ public:
       DSO_VOLTAGE_5V,
       DSO_VOLTAGE_MAX=DSO_VOLTAGE_5V
     };
-    static int      oneShotCapture(int count,float *outbuffer) ;
+    static int      oneShotCapture(int count,float *outbuffer,CaptureStats &stats) ;
     static bool     setVoltageRange(DSO_VOLTAGE_RANGE voltRange);
     static DSO_VOLTAGE_RANGE getVoltageRange();
     static bool     setTimeBase(DSO_TIME_BASE timeBase);
     static DSO_TIME_BASE getTimeBase();
-    static bool     initiateSampling (int count);
+    static bool     prepareSampling ();
+    static bool     startSampling (int count);
     static uint32_t *getSamples(int &count);
     static void     reclaimSamples(uint32_t *buffer);
     

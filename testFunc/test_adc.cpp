@@ -31,11 +31,13 @@ extern DSOADC    *adc;
 
 void testOne(adc_smp_rate one, adc_prescaler two,int sc)
 {
-    static uint32 before,after;
-    adc->setTimeScale(one,two);
-    before= micros();
+   static uint32 before,after;
+   adc->setTimeScale(one,two);
+   before= micros();
    
-   adc->initiateSampling(1024);
+   adc->prepareDMASampling ();            
+   adc->startDMASampling (1024);
+    
    after= micros();
    //printf("%d:%d => %d\n",(int)one,sc,after-before);
    Serial.print("Rate:");

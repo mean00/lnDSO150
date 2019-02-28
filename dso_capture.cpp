@@ -7,13 +7,12 @@
 #include "dso_adc.h"
 #include "dso_capture.h"
 #include "dso_capture_priv.h"
-
-static int      currenTimeBase=0;
+#include "transform.h"
+static int      currentTimeBase=0;
 static int      currentVoltageRange=0;
 static bool     captureFast=true;
 extern DSOADC   *adc;
 
-extern int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expand,float &xmin,float &xmax,float &avg);
 
 /**
  * 
@@ -22,8 +21,8 @@ extern int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,i
 DSOCapture::DSO_TIME_BASE DSOCapture::getTimeBase()
 {
     if(captureFast) 
-        return (DSOCapture::DSO_TIME_BASE)currenTimeBase;
-    return (DSOCapture::DSO_TIME_BASE)(currenTimeBase+DSO_TIME_BASE::DSO_TIME_BASE_5MS);
+        return (DSOCapture::DSO_TIME_BASE)currentTimeBase;
+    return (DSOCapture::DSO_TIME_BASE)(currentTimeBase+DSO_TIME_BASE::DSO_TIME_BASE_5MS);
 }
 /**
  * 
@@ -55,12 +54,12 @@ bool     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE timeBase)
     if(timeBase<DSO_TIME_BASE::DSO_TIME_BASE_5MS) // fast mode
     {
         captureFast   =true;
-        currenTimeBase=timeBase;
+        currentTimeBase=timeBase;
         
     }else
     {
         captureFast=false;
-        currenTimeBase=timeBase-DSO_TIME_BASE::DSO_TIME_BASE_5MS;
+        currentTimeBase=timeBase-DSO_TIME_BASE::DSO_TIME_BASE_5MS;
     }
 }
 /**
@@ -68,19 +67,31 @@ bool     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE timeBase)
  * @param count
  * @return 
  */
-bool     DSOCapture::initiateSampling (int count)
+bool     DSOCapture::prepareSampling ()
 {
     if(captureFast)
     {
-        //
-        int ex=count*tSettings[currenTimeBase].expand4096;
-        return adc->initiateSampling(ex/4096);
+        //      
+        return adc->prepareDMASampling();
     }else
     {
-        adc->setSlowMode(timerBases[currenTimeBase].fq);
-        return adc->initiateTimerSampling(count);
+        return adc->prepareTimerSampling(timerBases[currentTimeBase].fq);
     }
 }
+/**
+ * 
+ * @return 
+ */
+bool     DSOCapture::startSampling (int count)
+{
+    if(captureFast)
+    {
+        int ex=count*tSettings[currentTimeBase].expand4096;
+        return adc->startDMASampling(ex);
+    }
+    return adc->startTimerSampling(count);
+}
+
 /**
  * 
  * @param count
@@ -104,18 +115,19 @@ void     DSOCapture::reclaimSamples(uint32_t *buffer)
  * @param count
  * @return 
  */
-int DSOCapture::oneShotCapture(int count,float *outbuffer)
+int DSOCapture::oneShotCapture(int count,float *outbuffer,CaptureStats &stats)
 {
     int available;
-    initiateSampling(count);
+    prepareSampling();
+    if(!startSampling(count)) return 0;
     uint32_t *buffer=    getSamples(available);
     
     int scale=vSettings[currentVoltageRange].inputGain;
-    float xmin,xmax,avg;    
+    
     if(captureFast)
-        count=transform((int32_t *)buffer,outbuffer,available,vSettings+currentVoltageRange,tSettings[currenTimeBase].expand4096,xmin,xmax,avg);
+        count=transform((int32_t *)buffer,outbuffer,available,vSettings+currentVoltageRange,tSettings[currentTimeBase].expand4096,stats);
     else
-        count=transform((int32_t *)buffer,outbuffer,available,vSettings+currentVoltageRange,4096,xmin,xmax,avg);
+        count=transform((int32_t *)buffer,outbuffer,available,vSettings+currentVoltageRange,4096,stats);
     
     reclaimSamples(buffer);
     return count;
@@ -134,10 +146,9 @@ bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
         {
             float v=samples[j];
             v*=gain;
-            v+=120;
+            v=239+120-v;             
             if(v>239) v=239;
-            if(v<0) v=0;
-            v=239-v;
+            if(v<0) v=0;           
             waveForm[j]=(uint8_t)v;
         }
     return true;
@@ -150,9 +161,9 @@ const char *DSOCapture::getTimeBaseAsText()
 {
     if(captureFast)
     {
-        return tSettings[currenTimeBase].name;
+        return tSettings[currentTimeBase].name;
     }
-    return timerBases[currenTimeBase].name;
+    return timerBases[currentTimeBase].name;
 }
 /**
  * 

@@ -12,7 +12,7 @@
 #include "HardwareSerial.h"
 #include "dso_adc.h"
 
-
+#include "transform.h"
 
 /**
  * \fn transform
@@ -23,12 +23,12 @@
  * @param voltageSCale
  * @return 
  */
-int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expand,float &xmin,float &xmax,float &avg)
+int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats)
 {
    if(!count) return false;
-   xmin=200;
-   xmax=-200;
-   avg=0;
+   stats.xmin=200;
+   stats.xmax=-200;
+   stats.avg=0;
    int ocount=(count*4096)/expand;
    ocount&=0xffe;
    int dex=0;
@@ -37,12 +37,12 @@ int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expa
        float f=bfer[dex/4096]>>16;
        f-=set->offset;
        f*=set->multiplier;
-       if(f>xmax) xmax=f;
-       if(f<xmin) xmin=f;       
+       if(f>stats.xmax) stats.xmax=f;
+       if(f<stats.xmin) stats.xmin=f;       
        out[i]=f; // Unit is now in volt
-       avg+=f;
+       stats.avg+=f;
        dex+=expand;
    }
-   avg/=count;
+   stats.avg/=count;
    return ocount;
 }

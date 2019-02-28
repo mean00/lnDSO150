@@ -20,6 +20,7 @@
 #include "dso_global.h"
 #include "dsoDisplay.h"
 
+
 extern void splash(void);
 static void drawGrid(void);
 
@@ -94,29 +95,43 @@ static void buttonManagement()
         if(dirty)
             redraw();
 }
+
+static void drawStats(CaptureStats &stats)
+{
+#define AND_ONE(x,y) {    tft->setCursor(242, y*20); tft->print(x);}    
+    
+    AND_ONE("Min",0);
+    AND_ONE(stats.xmin,1);
+    AND_ONE("Max",2);
+    AND_ONE(stats.xmax,3);
+    AND_ONE("Avg",4);
+    AND_ONE(stats.avg,5);
+    
+}
+
 /**
  * 
  */
 void testCapture(void)
 {
     DSODisplay::init();
-   
+    CaptureStats stats;
     int reCounter=0;
     
     tft->setTextSize(2);
-    myTestSignal->setFrequency(2000); // 20Khz
+    myTestSignal->setFrequency(15000); // 20Khz
 
-    DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_50MS);
+    DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_1MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
     redraw();
     float xmin,xmax,avg;
     
     while(1)
     {        
-        int count=DSOCapture::oneShotCapture(240,samples);  
+        int count=DSOCapture::oneShotCapture(240,samples,stats);  
         DSOCapture::captureToDisplay(count,samples,waveForm);        
         DSODisplay::drawWaveForm(count,waveForm);
-        
+        drawStats(stats);
         buttonManagement();        
     }
         

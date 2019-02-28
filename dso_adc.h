@@ -91,17 +91,18 @@ class DSOADC
 public:
                     DSOADC();
             bool    setTimeScale(adc_smp_rate one, adc_prescaler two);
-            bool    initiateSampling (int count);
-            bool    initiateTimerSampling (int count);
+            bool    prepareDMASampling ();
+            bool    prepareTimerSampling (int fq);
             uint32_t *getSamples(int &count);
             void     reclaimSamples(uint32_t *buffer);
             bool     setSlowMode(int fqInHz);
     static  uint32_t getVCCmv();
             
             
-protected:
-            bool startSampling (int count,uint32_t *buffer);
-            bool startTimerSampling (int count,uint32_t *buffer);
+
+            bool startDMASampling (int count);
+            bool startTimerSampling (int count);
+protected:            
             void setADCs ();
     static  void adc_dma_disable(const adc_dev * dev) ;            
     static  void adc_dma_enable(const adc_dev * dev) ;    
@@ -110,6 +111,8 @@ protected:
     static  void Timer2_Event();
             void timerCapture();
             bool startInternalDmaSampling ();
+            
+            
 
 protected:
   

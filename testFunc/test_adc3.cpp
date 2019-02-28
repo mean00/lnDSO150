@@ -19,6 +19,7 @@
 #include "dso_adc.h"
 #include "dso_global.h"
 #include "dsoDisplay.h"
+#include "transform.h"
 extern void splash(void);
 
 
@@ -44,7 +45,7 @@ static const TimeSettings tSettings[6]
 
 
 //
-int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expand,float &xmin,float &xmax,float &avg);
+
 
  
 
@@ -92,17 +93,17 @@ void testAdc3(void)
     while(1)
     {
         int markStart,markEnd;
-
+        CaptureStats stats;
         int count;
         int i=0;
         // Ask samples , taking expand into account
-        
-        adc->initiateTimerSampling((240*expand)/4096);
+        adc->prepareTimerSampling (1000);            
+        adc->startTimerSampling ((240*expand)/4096);
         uint32_t *xsamples=adc->getSamples(count);
         markStart=millis();
         int scale=vSettings[currentVSettings].inputGain;
         
-        count=transform((int32_t *)xsamples,samples,count,vSettings+currentVSettings,expand,xmin,xmax,avg);
+        count=transform((int32_t *)xsamples,samples,count,vSettings+currentVSettings,expand,stats);
         acquisitionTime=convTime/1000;
         adc->reclaimSamples(xsamples);
             

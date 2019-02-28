@@ -72,7 +72,7 @@ bool DSOADC::startInternalDmaSampling ()
   * @param count
   * @return 
   */
-bool    DSOADC::initiateTimerSampling (int count)
+bool    DSOADC::prepareTimerSampling (int fq)
 {    
     pinMode(analogInPin, INPUT_ANALOG);
     if(!capturedBuffers.empty())
@@ -82,9 +82,7 @@ bool    DSOADC::initiateTimerSampling (int count)
     if(!bfer) 
         return false;
     nbSlowCapture++;
-    setSlowMode(4800);
-    startTimerSampling(count,bfer);
-    
+    setSlowMode(fq);        
     return true;
     
 }
@@ -94,8 +92,14 @@ bool    DSOADC::initiateTimerSampling (int count)
  * @param buffer
  * @return 
  */
-bool DSOADC::startTimerSampling (int count,uint32_t *buffer)
+bool DSOADC::startTimerSampling (int count)
 {
+    if(!capturedBuffers.empty())
+        return true; // We have data !
+    
+    uint32_t *buffer=availableBuffers.take();
+    if(!buffer) return false;    
+
     if(count>maxSamples)
         count=maxSamples;   
     requestedSamples=count;

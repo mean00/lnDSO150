@@ -34,7 +34,7 @@ void doCalibrate(uint16_t *array,int color, const char *txt)
     for(int range=0;range<14;range++)
     {
         controlButtons->setInputGain(range);        
-        adc->initiateSampling(64);
+        adc->prepareDMASampling();
         int count;
         uint32_t *xsamples=adc->getSamples(count);
         int sum=0;
