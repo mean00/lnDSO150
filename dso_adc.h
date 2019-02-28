@@ -91,7 +91,7 @@ class DSOADC
 public:
                     DSOADC();
             bool    setTimeScale(adc_smp_rate one, adc_prescaler two);
-            bool    prepareDMASampling ();
+            bool    prepareDMASampling (adc_smp_rate rate,adc_prescaler scale);
             bool    prepareTimerSampling (int fq);
             uint32_t *getSamples(int &count);
             void     reclaimSamples(uint32_t *buffer);

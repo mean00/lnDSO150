@@ -32,6 +32,7 @@ DSOCapture::DSO_TIME_BASE DSOCapture::getTimeBase()
 bool     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange)
 {
     currentVoltageRange=voltRange;
+    controlButtons->setInputGain(vSettings[currentVoltageRange].inputGain);
     return true;
 }
 /**
@@ -71,8 +72,9 @@ bool     DSOCapture::prepareSampling ()
 {
     if(captureFast)
     {
-        //      
-        return adc->prepareDMASampling();
+        //     
+        const TimeSettings *set= tSettings+currentTimeBase;
+        return adc->prepareDMASampling(set->rate,set->prescaler);
     }else
     {
         return adc->prepareTimerSampling(timerBases[currentTimeBase].fq);
@@ -146,7 +148,7 @@ bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
         {
             float v=samples[j];
             v*=gain;
-            v=239+120-v;             
+            v=120-v;             
             if(v>239) v=239;
             if(v<0) v=0;           
             waveForm[j]=(uint8_t)v;

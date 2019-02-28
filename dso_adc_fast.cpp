@@ -132,10 +132,10 @@ void DSOADC::setADCs ()
   * @param count
   * @return 
   */
-bool    DSOADC::prepareDMASampling (void)
+bool    DSOADC::prepareDMASampling (adc_smp_rate rate,adc_prescaler scale)
 {    
- 
-    
+    setTimeScale(rate,scale);
+    return true;
 }
 /**
  * 
