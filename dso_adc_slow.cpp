@@ -28,6 +28,9 @@ int notRunning=0;
 bool timerRunning=false;
 int nbSlowCapture=0;
 
+
+extern SampleSet *currentSet;
+
 #define DMA_OVERSAMPLING_COUNT 4
 static uint32_t dmaOverSampleBuffer[DMA_OVERSAMPLING_COUNT] __attribute__ ((aligned (8)));;
 
@@ -73,18 +76,9 @@ bool DSOADC::startInternalDmaSampling ()
   * @return 
   */
 bool    DSOADC::prepareTimerSampling (int fq)
-{    
-    pinMode(analogInPin, INPUT_ANALOG);
-    if(!capturedBuffers.empty())
-        return true; // We have data !
-    
-    uint32_t *bfer=availableBuffers.take();
-    if(!bfer) 
-        return false;
-    nbSlowCapture++;
+{        
     setSlowMode(fq);        
-    return true;
-    
+    return true;    
 }
 /**
  * 
@@ -97,13 +91,14 @@ bool DSOADC::startTimerSampling (int count)
     if(!capturedBuffers.empty())
         return true; // We have data !
     
-    uint32_t *buffer=availableBuffers.take();
-    if(!buffer) return false;    
+    currentSet=availableBuffers.take();
+    if(!currentSet) return false;    
 
     if(count>maxSamples)
         count=maxSamples;   
     requestedSamples=count;
-    currentSamplingBuffer=buffer;
+    currentSet->samples=count;
+    currentSamplingBuffer=currentSet->data;
     currentIndex=0;
     convTime=micros();
     timerRunning=true;
@@ -139,6 +134,7 @@ void DSOADC::timerCapture()
     currentIndex++;
     if(currentIndex>requestedSamples)
     {
+        currentSet->samples=currentIndex;
         timerRunning=false;
         dma_disable(DMA1, DMA_CH1);
         Timer2.setMode(TIMER_CH1,TIMER_DISABLED);

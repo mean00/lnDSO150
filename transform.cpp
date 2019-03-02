@@ -23,6 +23,7 @@
  * @param voltageSCale
  * @return 
  */
+int maxOcountSeeen=0;
 int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats)
 {
    if(!count) return false;
@@ -30,6 +31,11 @@ int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expa
    stats.xmax=-200;
    stats.avg=0;
    int ocount=(count*4096)/expand;
+   if(ocount>240)
+   {
+       maxOcountSeeen=ocount;
+       ocount=240;
+   }
    ocount&=0xffe;
    int dex=0;
    for(int i=0;i<ocount;i++)

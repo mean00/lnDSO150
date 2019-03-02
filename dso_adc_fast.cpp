@@ -28,12 +28,14 @@ extern HardwareTimer Timer2;
 adc_reg_map *adc_Register;
 extern VoltageSettings vSettings[];
 extern const float inputScale[];
+SampleSet *currentSet=NULL;
 
 /**
  */
 int requestedSamples;
 uint32_t *currentSamplingBuffer=NULL;
 uint32_t vcc; // power Supply in mv
+
 
 xBinarySemaphore  *dmaSemaphore;
 DSOADC             *instance=NULL;
@@ -56,11 +58,14 @@ DSOADC::DSOADC()
   for(int i=0;i<SAMPLING_QUEUE_SIZE;i++)
   {
       uint32_t *data=new uint32_t[maxSamples];
+      SampleSet  *set=new SampleSet;
       if(!data)
       {
           xAssert(0);
       }
-      availableBuffers.addFromIsr(data);
+      set->data=data;
+      set->samples=0;
+      availableBuffers.addFromIsr(set);
   }
 }
 /**
@@ -142,33 +147,31 @@ bool    DSOADC::prepareDMASampling (adc_smp_rate rate,adc_prescaler scale)
  * @param count
  * @return 
  */
-uint32_t *DSOADC::getSamples(int &count)
+SampleSet *DSOADC::getSamples()
 {
 again:
     noInterrupts();
-    uint32_t *data=capturedBuffers.takeFromIsr();
-    if(data)
+    SampleSet *set=capturedBuffers.takeFromIsr();
+    if(set)
     {
-        count=requestedSamples;
-        interrupts();
-        return data;
+            interrupts();
+            return set;
     }
     interrupts();
     dmaSemaphore->take(10000); // 10 sec timeout
-    dma_disable(DMA1, DMA_CH1); //End of trasfer, disable DMA and Continuous mode.
-    count=requestedSamples;
-    data=capturedBuffers.take();
-    if(!data) goto again;
-    return data;
+    //dma_disable(DMA1, DMA_CH1); //End of trasfer, disable DMA and Continuous mode.
+    set=capturedBuffers.take();
+    if(!set) goto again;    
+    return set;
 }
 /**
  * 
  * @param buffer
  * @return 
  */
-void     DSOADC::reclaimSamples(uint32_t *buffer)
+void     DSOADC::reclaimSamples(SampleSet *set)
 {
-    availableBuffers.add(buffer);
+    availableBuffers.add(set);
 }
  
 
@@ -185,23 +188,23 @@ bool DSOADC::startDMASampling (int count)
 {
   // This loop uses dual interleaved mode to get the best performance out of the ADCs
   //
-     if(!capturedBuffers.empty())
-        return true; // We have data !
+  if(!capturedBuffers.empty())
+       return true; // We have data !
     
-    uint32_t *buffer=availableBuffers.take();
-    if(!buffer) return false;    
+  currentSet=availableBuffers.take();
+  if(!currentSet) return false;    
 
   if(count>maxSamples)
         count=maxSamples;
     
   requestedSamples=count;  
-  currentSamplingBuffer=buffer;
+  currentSamplingBuffer=currentSet->data;
   convTime=micros();
   dma_init(DMA1);
   dma_attach_interrupt(DMA1, DMA_CH1, DMA1_CH1_Event);
 
   adc_dma_enable(ADC1);
-  dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, buffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
+  dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, currentSamplingBuffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
   dma_set_num_transfers(DMA1, DMA_CH1, requestedSamples );
 
   dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
@@ -247,8 +250,21 @@ void DSOADC::DMA1_CH1_Event()
 void DSOADC::captureComplete()
 {
     convTime=micros()-convTime;
-    capturedBuffers.addFromIsr(currentSamplingBuffer);
+    currentSet->samples=requestedSamples;
+    capturedBuffers.addFromIsr(currentSet);
+    currentSet=NULL;
     currentSamplingBuffer=NULL;
     dmaSemaphore->giveFromInterrupt();
 }
-
+/**
+ * \bried cleanup already captured stuff
+ */
+void DSOADC::clearCapturedData()
+{
+    while(!capturedBuffers.empty())
+    {
+        SampleSet *b=capturedBuffers.take();
+        if(!b) break;
+        availableBuffers.add(b);
+    }
+}

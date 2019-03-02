@@ -57,12 +57,13 @@ public:
     static DSO_TIME_BASE getTimeBase();
     static bool     prepareSampling ();
     static bool     startSampling (int count);
-    static uint32_t *getSamples(int &count);
-    static void     reclaimSamples(uint32_t *buffer);
+    static SampleSet *getSamples();
+    static void     reclaimSamples(SampleSet *set);
     
     static bool     captureToDisplay(int count,float *samples,uint8_t *waveForm);
     static const char *getTimeBaseAsText();
     static const char *getVoltageRangeAsText();
+    static void        clearCapturedData();
     
 protected:
   

@@ -33,10 +33,19 @@ typedef struct TimeSettings
   int            expand4096;
 };
 
+typedef struct SampleSet
+{
+  int       samples;
+  uint32_t  *data;
+};
+
+
 /**
  * \class SampleingQueue
  * \brief simple std::vector alternative to store free buffers & buffers containing captured data
  */
+
+
 class SampleingQueue
 {
 public:
@@ -44,11 +53,11 @@ public:
     {
         count=0;
     }
-    void addFromIsr(uint32_t *ptr)
+    void addFromIsr(SampleSet *ptr)
     {
-        data[count++]=ptr;
+        dataSet[count++]=ptr;
     }
-    void add(uint32_t *ptr)
+    void add(SampleSet *ptr)
     {
         noInterrupts();
         addFromIsr(ptr);
@@ -58,17 +67,17 @@ public:
     {
         return !count;
     }
-    uint32_t *takeFromIsr()
+    SampleSet *takeFromIsr()
     {
         if(!count) return NULL;
-        uint32_t *out=data[0];
-        memmove(data,data+1,(count-1)*4);
+        SampleSet *out=dataSet[0];
+        memmove(dataSet,dataSet+1,(count-1)*4);
         count--;
         return out;
     }
-    uint32_t *take()
+    SampleSet *take()
     {
-        uint32_t *out;
+        SampleSet *out;
         noInterrupts();
         out=takeFromIsr();
         interrupts();
@@ -76,8 +85,8 @@ public:
     }
 
 protected:
-    uint32_t *data[SAMPLING_QUEUE_SIZE];
-    int      count;
+    int       count;
+    SampleSet *dataSet[SAMPLING_QUEUE_SIZE];
     
     
 };
@@ -93,8 +102,8 @@ public:
             bool    setTimeScale(adc_smp_rate one, adc_prescaler two);
             bool    prepareDMASampling (adc_smp_rate rate,adc_prescaler scale);
             bool    prepareTimerSampling (int fq);
-            uint32_t *getSamples(int &count);
-            void     reclaimSamples(uint32_t *buffer);
+            SampleSet *getSamples();
+            void     reclaimSamples(SampleSet *buffer);
             bool     setSlowMode(int fqInHz);
     static  uint32_t getVCCmv();
             
@@ -102,6 +111,7 @@ public:
 
             bool startDMASampling (int count);
             bool startTimerSampling (int count);
+            void clearCapturedData();
 protected:            
             void setADCs ();
     static  void adc_dma_disable(const adc_dev * dev) ;            
@@ -111,6 +121,7 @@ protected:
     static  void Timer2_Event();
             void timerCapture();
             bool startInternalDmaSampling ();
+
             
             
 

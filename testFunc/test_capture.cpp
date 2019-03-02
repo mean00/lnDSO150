@@ -30,7 +30,7 @@ extern DSOControl *controlButtons;
 extern testSignal *myTestSignal;
 //
 
-static uint8_t waveForm[240];
+static uint8_t waveForm[256]; // take a bit more, we have rounding issues
 static float  samples[256];
 static bool voltageMode=false;
 
@@ -40,13 +40,13 @@ static void redraw()
 {
       DSODisplay::drawGrid();
       
-        tft->setCursor(241, 100);
+        tft->setCursor(241, 180);
         tft->print(capture->getTimeBaseAsText());
 
-        tft->setCursor(241, 140);
+        tft->setCursor(241, 200);
         tft->print(capture->getVoltageRangeAsText());
         
-        tft->setCursor(241, 180);
+        tft->setCursor(241, 220);
         if(voltageMode)
             tft->print("VOLT");
         else
@@ -66,8 +66,8 @@ static void buttonManagement()
         }
         if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_TIME) & EVENT_SHORT_PRESS)
         {
-            voltageMode=false;
             dirty=true;
+            voltageMode=false;            
         }
         
         if(inc)
@@ -87,7 +87,9 @@ static void buttonManagement()
                 if(v<0) v=0;
                 if(v>DSOCapture::DSO_TIME_BASE_MAX) v=DSOCapture::DSO_TIME_BASE_MAX;
                 DSOCapture::DSO_TIME_BASE  t=(DSOCapture::DSO_TIME_BASE )v;
+                DSOCapture::clearCapturedData();
                 capture->setTimeBase( t);
+                
             }
             // Redraw background
             dirty=true;
@@ -119,7 +121,7 @@ void testCapture(void)
     int reCounter=0;
     
     tft->setTextSize(2);
-    myTestSignal->setFrequency(15000); // 20Khz
+    myTestSignal->setFrequency(100); // 20Khz
 
     DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_1MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);

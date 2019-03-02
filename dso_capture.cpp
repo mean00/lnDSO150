@@ -8,10 +8,14 @@
 #include "dso_capture.h"
 #include "dso_capture_priv.h"
 #include "transform.h"
+
+static int      canary1=0xabcde01234;
 static int      currentTimeBase=0;
 static int      currentVoltageRange=0;
 static bool     captureFast=true;
+static int      canary2=0xabcde01234;
 extern DSOADC   *adc;
+
 
 
 /**
@@ -50,8 +54,13 @@ DSOCapture::DSO_VOLTAGE_RANGE DSOCapture::getVoltageRange()
  * @param timeBase
  * @return 
  */
+
 bool     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE timeBase)
 {
+    if(timeBase>DSO_TIME_BASE_MAX)
+    {
+        xAssert(0);
+    }
     if(timeBase<DSO_TIME_BASE::DSO_TIME_BASE_5MS) // fast mode
     {
         captureFast   =true;
@@ -99,17 +108,17 @@ bool     DSOCapture::startSampling (int count)
  * @param count
  * @return 
  */
-uint32_t *DSOCapture::getSamples(int &count)
+SampleSet *DSOCapture::getSamples()
 {
-    return adc->getSamples(count);
+    return adc->getSamples();
 }
 /**
  * 
  * @param buffer
  */
-void     DSOCapture::reclaimSamples(uint32_t *buffer)
+void     DSOCapture::reclaimSamples(SampleSet *set)
 {
-    adc->reclaimSamples(buffer);
+    adc->reclaimSamples(set);
 }
 
 /**
@@ -122,16 +131,16 @@ int DSOCapture::oneShotCapture(int count,float *outbuffer,CaptureStats &stats)
     int available;
     prepareSampling();
     if(!startSampling(count)) return 0;
-    uint32_t *buffer=    getSamples(available);
+    SampleSet *set=    getSamples();
     
     int scale=vSettings[currentVoltageRange].inputGain;
     
     if(captureFast)
-        count=transform((int32_t *)buffer,outbuffer,available,vSettings+currentVoltageRange,tSettings[currentTimeBase].expand4096,stats);
+        count=transform((int32_t *)set->data,outbuffer,set->samples,vSettings+currentVoltageRange,tSettings[currentTimeBase].expand4096,stats);
     else
-        count=transform((int32_t *)buffer,outbuffer,available,vSettings+currentVoltageRange,4096,stats);
+        count=transform((int32_t *)set->data,outbuffer,set->samples,vSettings+currentVoltageRange,4096,stats);
     
-    reclaimSamples(buffer);
+    reclaimSamples(set);
     return count;
 }
 /**
@@ -175,4 +184,12 @@ const char *DSOCapture::getVoltageRangeAsText()
 {
     return vSettings[currentVoltageRange].name;
 }
+/**
+ * 
+ */
+void        DSOCapture::clearCapturedData()
+{
+    adc->clearCapturedData();
+}
+
 // EOF

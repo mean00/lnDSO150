@@ -30,6 +30,8 @@ void header(int color,const char *txt)
 void doCalibrate(uint16_t *array,int color, const char *txt)
 {
     header(color,txt);        
+#warning FIXME
+#if 0 
     
     for(int range=0;range<14;range++)
     {
@@ -48,6 +50,7 @@ void doCalibrate(uint16_t *array,int color, const char *txt)
         adc->reclaimSamples(xsamples);
         array[range]=sum;
     }
+#endif    
 }
 
 /**

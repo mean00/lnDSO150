@@ -27,6 +27,7 @@ void DSODisplay::init()
  */
 void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
 {
+    //tft->fillScreen(0);
     int last=data[0];
     if(!last) last=1;
     if(last>=238) last=238;
