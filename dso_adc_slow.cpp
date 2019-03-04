@@ -63,10 +63,10 @@ static void dummy_dma_interrupt_handler(void)
 bool DSOADC::startInternalDmaSampling ()
 {
   dma_attach_interrupt(DMA1, DMA_CH1, dummy_dma_interrupt_handler);  
-  dma_init(DMA1);  
-  adc_dma_enable(ADC1);
+  dma_init(DMA1);    
   dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, dmaOverSampleBuffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
   dma_set_num_transfers(DMA1, DMA_CH1, DMA_OVERSAMPLING_COUNT );
+  adc_dma_enable(ADC1);
   dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
   return true;
 }
