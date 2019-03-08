@@ -31,6 +31,8 @@ extern DSOADC    *adc;
 
 void testOne(adc_smp_rate one, adc_prescaler two,int sc)
 {
+#warning FIXME
+#if 0
    static uint32 before,after;
    adc->setTimeScale(one,two);
    before= micros();
@@ -46,6 +48,7 @@ void testOne(adc_smp_rate one, adc_prescaler two,int sc)
    Serial.print(sc);
    Serial.print("Time(us):");
    Serial.println(after-before);
+#endif
 }
 
 void testAdc(void)

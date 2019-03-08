@@ -12,27 +12,40 @@
 
 #define analogInPin  PA0
 
+#define CAPTURE_TIMER_CHANNEL TIMER_CH1
 
 extern HardwareTimer Timer2;
 extern adc_reg_map *adc_Register;
 
+enum CaptureState
+{
+    Capture_idle,
+    Capture_armed,
+    Capture_dmaDone,
+    Capture_timerDone,
+    Capture_complete
+};
+static CaptureState captureState=Capture_idle;
 /**
  */
-extern int requestedSamples;
-extern uint32_t *currentSamplingBuffer;
-extern DSOADC             *instance;
-int currentIndex=0;
-extern uint32_t convTime;
-int spurious=0;
-int notRunning=0;
-bool timerRunning=false;
+extern int                  requestedSamples;
+extern uint32_t             *currentSamplingBuffer;
+extern DSOADC               *instance;
+       int                  currentIndex=0;
+extern uint32_t             convTime;
+int spuriousTimer=0;
+
 int nbSlowCapture=0;
+static int skippedDma=0;
+static int nbTimer=0;
+static int nbDma=0;
 
 
 extern SampleSet *currentSet;
 
 #define DMA_OVERSAMPLING_COUNT 4
 static uint32_t dmaOverSampleBuffer[DMA_OVERSAMPLING_COUNT] __attribute__ ((aligned (8)));;
+extern void Oopps();
 
 
 /**
@@ -42,16 +55,19 @@ static uint32_t dmaOverSampleBuffer[DMA_OVERSAMPLING_COUNT] __attribute__ ((alig
  */
 bool DSOADC::setSlowMode(int fqInHz)
 {    
-    Timer2.attachInterrupt(TIMER_CH1, Timer2_Event);
-    Timer2.setPeriod(1000000/fqInHz); // in microseconds
-    Timer2.setCompare(TIMER_CH1, 1);    
+    Timer2.attachInterrupt(CAPTURE_TIMER_CHANNEL, Timer2_Event);
+    Timer2.setPeriod(1000000/(fqInHz*16)); // in microseconds, oversampled 16 times
+    return true;
 }
 /*
  * Can we skip that ?
  */
 static void dummy_dma_interrupt_handler(void)
 {
-    
+    if(captureState!=Capture_armed)
+        Oopps();
+    captureState=Capture_dmaDone;
+    nbDma++;
 }
 
 /**
@@ -76,7 +92,8 @@ bool DSOADC::startInternalDmaSampling ()
   * @return 
   */
 bool    DSOADC::prepareTimerSampling (int fq)
-{        
+{      
+    setTimeScale(ADC_SMPR_55_5,ADC_PRE_PCLK2_DIV_2);
     setSlowMode(fq);        
     return true;    
 }
@@ -101,13 +118,21 @@ bool DSOADC::startTimerSampling (int count)
     currentSamplingBuffer=currentSet->data;
     currentIndex=0;
     convTime=micros();
-    timerRunning=true;
-    startInternalDmaSampling();        
-    Timer2.setMode(TIMER_CH1, TIMER_OUTPUTCOMPARE); // start timer
     
+    noInterrupts();
+    captureState=Capture_armed;
+    startInternalDmaSampling();   
+    
+    Timer2.setCompare(CAPTURE_TIMER_CHANNEL, 16);    
+    Timer2.setMode(CAPTURE_TIMER_CHANNEL, TIMER_OUTPUTCOMPARE); // start timer
+    Timer2.refresh();
+    Timer2.resume();
+    
+    interrupts();
 } 
 void DSOADC::Timer2_Event() 
-{
+{    
+    nbTimer++;
     instance->timerCapture();
 }
 /**
@@ -117,14 +142,29 @@ void DSOADC::Timer2_Event()
 void DSOADC::timerCapture()
 {    
     uint32_t avg=0;
-    if(!timerRunning)
+    switch(captureState)
     {
-        notRunning++;
-        return;
+        case Capture_armed: // skipped one ADC DMA ?
+            skippedDma++;
+            return;
+        case Capture_dmaDone:
+            captureState=Capture_timerDone;
+            break;
+        case Capture_timerDone:
+            spuriousTimer++;
+            //Oopps();
+            return;
+            break;
+        case Capture_complete:
+            break;
+        default:
+            Oopps();
+            break;
     }
+    
     if(!currentSamplingBuffer)
     {
-        spurious++;
+        Oopps();
         return; // spurious interrupt
     }
     for(int i=0;i<DMA_OVERSAMPLING_COUNT;i++)
@@ -132,16 +172,19 @@ void DSOADC::timerCapture()
     avg=(avg+DMA_OVERSAMPLING_COUNT/2+1)/DMA_OVERSAMPLING_COUNT;
     currentSamplingBuffer[currentIndex]=avg;
     currentIndex++;
-    if(currentIndex>requestedSamples)
+    if(currentIndex>=requestedSamples)
     {
-        currentSet->samples=currentIndex;
-        timerRunning=false;
+        currentSet->samples=requestedSamples;
+        
         dma_disable(DMA1, DMA_CH1);
-        Timer2.setMode(TIMER_CH1,TIMER_DISABLED);
+        Timer2.setMode(CAPTURE_TIMER_CHANNEL,TIMER_DISABLED);
+        Timer2.pause();
+        captureState=Capture_complete;
         captureComplete();
         return;
     }
     // Ask for next set of samples
+    captureState=Capture_armed;
     dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, dmaOverSampleBuffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
     dma_set_num_transfers(DMA1, DMA_CH1, DMA_OVERSAMPLING_COUNT );
     dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.

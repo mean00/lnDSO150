@@ -86,6 +86,8 @@ void testAdc2(void)
     updateTimeScale();
     
     float xmin,xmax,avg;
+#warning FIXME
+#if 0
     
     while(1)
     {
@@ -168,6 +170,7 @@ void testAdc2(void)
             }
          
     }
+#endif
 } 
 
 void updateTimeScale()

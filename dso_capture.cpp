@@ -133,6 +133,8 @@ int DSOCapture::oneShotCapture(int count,float *outbuffer,CaptureStats &stats)
     if(!startSampling(count)) return 0;
     SampleSet *set=    getSamples();
     
+    if(!set) return 0;
+    
     int scale=vSettings[currentVoltageRange].inputGain;
     
     if(captureFast)

@@ -129,8 +129,7 @@ void DSOADC::setADCs ()
  {
     adc_set_sample_rate(ADC1, one); //=0,58uS/sample.  ADC_SMPR_13_5 = 1.08uS - use this one if Rin>10Kohm,
     adc_set_prescaler(two);
-
-     return true;
+    return true;
  }
  /**
   * 
@@ -268,4 +267,15 @@ void DSOADC::clearCapturedData()
         if(!b) break;
         availableBuffers.add(b);
     }
+}
+
+/**
+ * 
+ */
+void Oopps()
+{
+    while(1)
+    {
+        
+    };
 }

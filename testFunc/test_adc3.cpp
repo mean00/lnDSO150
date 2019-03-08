@@ -92,6 +92,8 @@ void testAdc3(void)
     expand=4096;
     while(1)
     {
+#warning FIXME
+#if 0
         int markStart,markEnd;
         CaptureStats stats;
         int count;
@@ -167,7 +169,7 @@ void testAdc3(void)
                 updateTimeScale();
                 
             }
-         
+#endif         
     }
 } 
 
