@@ -32,13 +32,15 @@ extern DSOADC    *adc;
 void testOne(adc_smp_rate one, adc_prescaler two,int sc)
 {
 #warning FIXME
-#if 0
+
    static uint32 before,after;
-   adc->setTimeScale(one,two);
+   
    before= micros();
    
-   adc->prepareDMASampling ();            
+   adc->prepareDMASampling (one,two);            
    adc->startDMASampling (1024);
+   SampleSet    *set=adc->getSamples();
+   adc->reclaimSamples(set);
     
    after= micros();
    //printf("%d:%d => %d\n",(int)one,sc,after-before);
@@ -48,7 +50,7 @@ void testOne(adc_smp_rate one, adc_prescaler two,int sc)
    Serial.print(sc);
    Serial.print("Time(us):");
    Serial.println(after-before);
-#endif
+
 }
 
 void testAdc(void)
