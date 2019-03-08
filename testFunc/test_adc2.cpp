@@ -86,8 +86,7 @@ void testAdc2(void)
     updateTimeScale();
     
     float xmin,xmax,avg;
-#warning FIXME
-#if 0
+
     
     while(1)
     {
@@ -97,16 +96,19 @@ void testAdc2(void)
         int count;
         int i=0;
         // Ask samples , taking expand into account
-        adc->prepareDMASampling ();            
+        
+        adc->prepareDMASampling (tSettings[currentTSettings].rate,tSettings[currentTSettings].prescaler);            
         adc->startDMASampling ((240*expand)/4096);
         
-        uint32_t *xsamples=adc->getSamples(count);
+        SampleSet    *set=adc->getSamples();
+        count=set->samples;
+        uint32_t *xsamples=set->data;
         markStart=millis();
         int scale=vSettings[currentVSettings].inputGain;
         
         count=transform((int32_t *)xsamples,samples,count,vSettings+currentVSettings,expand,stats);
         acquisitionTime=convTime;
-        adc->reclaimSamples(xsamples);
+        adc->reclaimSamples(set);
             
         tft->setCursor(240, 100);
         tft->print(currentTSettings);
@@ -114,7 +116,7 @@ void testAdc2(void)
         tft->print(currentDiv);
         tft->setCursor(240, 200);
         tft->print(acquisitionTime);
-#if 0            
+       
             
             tft->setCursor(240, 100);
             tft->print((float)DSOADC::getVCCmv()/1000.);
@@ -130,7 +132,6 @@ void testAdc2(void)
 
             tft->setCursor(240, 40);
             tft->print(vSettings[currentVSettings].name);
-#endif
             
         for(int j=0;j<count;j++)
         {
@@ -170,12 +171,11 @@ void testAdc2(void)
             }
          
     }
-#endif
 } 
 
 void updateTimeScale()
 {
-    adc->setTimeScale(tSettings[currentTSettings].rate,tSettings[currentTSettings].prescaler);     
+    
     expand=tSettings[currentTSettings].expand4096;
     tft->setCursor(240, 50);
     tft->print(tSettings[currentTSettings].name);
