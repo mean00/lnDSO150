@@ -92,8 +92,7 @@ void testAdc3(void)
     expand=4096;
     while(1)
     {
-#warning FIXME
-#if 0
+
         int markStart,markEnd;
         CaptureStats stats;
         int count;
@@ -101,13 +100,17 @@ void testAdc3(void)
         // Ask samples , taking expand into account
         adc->prepareTimerSampling (1000);            
         adc->startTimerSampling ((240*expand)/4096);
-        uint32_t *xsamples=adc->getSamples(count);
+        
+        SampleSet    *set=adc->getSamples();
+        count=set->samples;
+        uint32_t *xsamples=set->data;
+        
         markStart=millis();
         int scale=vSettings[currentVSettings].inputGain;
         
         count=transform((int32_t *)xsamples,samples,count,vSettings+currentVSettings,expand,stats);
         acquisitionTime=convTime/1000;
-        adc->reclaimSamples(xsamples);
+        adc->reclaimSamples(set);
             
         tft->setCursor(240, 100);
         tft->print(currentTSettings);
@@ -169,7 +172,7 @@ void testAdc3(void)
                 updateTimeScale();
                 
             }
-#endif         
+        
     }
 } 
 
