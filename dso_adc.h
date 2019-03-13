@@ -39,6 +39,7 @@ typedef struct SampleSet
   uint32_t  *data;
 };
 
+static bool triggered=false;
 
 /**
  * \class SampleingQueue
@@ -91,12 +92,24 @@ protected:
     
 };
 
+
+
+
 /**
  * \class DSOADC
  * \brief wrapper on top of the DMA-ADC engine
  */
 class DSOADC
 {
+public:  
+  enum TriggerMode
+  {
+    Trigger_Rising,
+    Trigger_Falling,
+    Trigger_Both,
+  };
+  
+  
 public:
                     DSOADC();
             bool    setTimeScale(adc_smp_rate one, adc_prescaler two);
@@ -121,7 +134,8 @@ protected:
     static  void Timer2_Event();
             void timerCapture();
             bool startInternalDmaSampling ();
-
+            bool setTriggerMode(TriggerMode mode);
+    static void TriggerInterrupt();
             
             
 
@@ -134,3 +148,4 @@ protected:
 };
 
 // EOF
+

@@ -22,6 +22,8 @@ int dmaSpuriousInterrupt=0;
  */
 
 #define analogInPin  PA0
+#define triggerPin   PA8
+
 #define ADC_CR1_FASTINT 0x70000 // Fast interleave mode DUAL MODE bits 19-16
 uint32_t convTime;
 extern HardwareTimer Timer2;
@@ -29,7 +31,7 @@ adc_reg_map *adc_Register;
 extern VoltageSettings vSettings[];
 extern const float inputScale[];
 SampleSet *currentSet=NULL;
-
+DSOADC::TriggerMode triggerMode=DSOADC::Trigger_Both;
 /**
  */
 int requestedSamples;
@@ -117,9 +119,30 @@ void DSOADC::setADCs ()
 
   ADC2->regs->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
   ADC2->regs->SQR3 = pinMapADCin;
+  
+  setTriggerMode(DSOADC::Trigger_Both);
 }
-
-
+/**
+ * 
+ * @param mode
+ * @return 
+ */
+ bool DSOADC::setTriggerMode(TriggerMode mode)
+ {
+     ExtIntTriggerMode m;
+     triggerMode=mode;
+     switch(triggerMode)
+     {
+        case DSOADC::Trigger_Falling: m=FALLING;break;
+        case DSOADC::Trigger_Rising: m=RISING;break;
+        case DSOADC::Trigger_Both:   m=CHANGE;break;
+        default: xAssert(0);break;
+     }
+      // Hook trigger interrupt  
+   attachInterrupt(triggerPin,TriggerInterrupt,m );
+ }
+ 
+ 
 /**
  * 
  * @param timeScaleUs
@@ -245,6 +268,12 @@ void DSOADC::DMA1_CH1_Event()
     instance->captureComplete();
     adc_dma_disable(ADC1);
 }
+
+void DSOADC::TriggerInterrupt()
+{
+    triggered=true;
+}
+
 /**
  */
 void DSOADC::captureComplete()

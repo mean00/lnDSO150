@@ -128,12 +128,16 @@ void testCapture(void)
     redraw();
     float xmin,xmax,avg;
     
+    int counter=0;
+    
     while(1)
     {        
         int count=DSOCapture::oneShotCapture(240,samples,stats);  
         DSOCapture::captureToDisplay(count,samples,waveForm);        
         DSODisplay::drawWaveForm(count,waveForm);
-        drawStats(stats);
+        counter=(counter+1)%8;
+        if(!counter)
+            drawStats(stats);
         buttonManagement();        
     }
         
