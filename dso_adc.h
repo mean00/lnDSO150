@@ -119,7 +119,9 @@ public:
             void     reclaimSamples(SampleSet *buffer);
             bool     setSlowMode(int fqInHz);
     static  uint32_t getVCCmv();
-            
+            bool     setTriggerMode(TriggerMode mode);
+            bool     getTriggerState();
+            bool     setVrefPWM(int ratio); // Trigger 
             
 
             bool startDMASampling (int count);
@@ -134,7 +136,7 @@ protected:
     static  void Timer2_Event();
             void timerCapture();
             bool startInternalDmaSampling ();
-            bool setTriggerMode(TriggerMode mode);
+            
     static void TriggerInterrupt();
             
             

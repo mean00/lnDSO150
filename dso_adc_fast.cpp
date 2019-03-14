@@ -11,18 +11,21 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  We use PA0 as input pin
  * DMA1, channel 0
  
+ * Vref is using PWM mode for Timer4/Channel 3
+ * 
  */
 
 #include "dso_global.h"
 #include "dso_adc_priv.h"
 
 int dmaSpuriousInterrupt=0;
-
+extern HardwareTimer Timer4;
 /**
  */
 
 #define analogInPin  PA0
 #define triggerPin   PA8
+#define vRefPin      PB8 // Trigger reference voltage
 
 #define ADC_CR1_FASTINT 0x70000 // Fast interleave mode DUAL MODE bits 19-16
 uint32_t convTime;
@@ -120,6 +123,11 @@ void DSOADC::setADCs ()
   ADC2->regs->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
   ADC2->regs->SQR3 = pinMapADCin;
   
+  pinMode(triggerPin,INPUT);
+    
+  Timer4.setPeriod(1000); // 1Khz pwm
+  pinMode(vRefPin,PWM);
+  pwmWrite(vRefPin,0);
   setTriggerMode(DSOADC::Trigger_Both);
 }
 /**
@@ -134,15 +142,31 @@ void DSOADC::setADCs ()
      switch(triggerMode)
      {
         case DSOADC::Trigger_Falling: m=FALLING;break;
-        case DSOADC::Trigger_Rising: m=RISING;break;
-        case DSOADC::Trigger_Both:   m=CHANGE;break;
+        case DSOADC::Trigger_Rising:  m=RISING;break;
+        case DSOADC::Trigger_Both:    m=CHANGE;break;
         default: xAssert(0);break;
      }
       // Hook trigger interrupt  
    attachInterrupt(triggerPin,TriggerInterrupt,m );
  }
+ /**
+  * 
+  * @param ratio
+  * @return 
+  */
+ bool DSOADC::setVrefPWM(int ratio)
+ {
+     pwmWrite(vRefPin,ratio);
+ }
  
- 
+ /**
+  * 
+  * @return 
+  */
+ bool     DSOADC::getTriggerState()
+ {
+     return !!digitalRead(PA8);
+ }
 /**
  * 
  * @param timeScaleUs
