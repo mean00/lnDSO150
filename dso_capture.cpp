@@ -121,6 +121,7 @@ void     DSOCapture::reclaimSamples(SampleSet *set)
     adc->reclaimSamples(set);
 }
 
+
 /**
  * 
  * @param count
@@ -136,11 +137,10 @@ int DSOCapture::oneShotCapture(int count,float *outbuffer,CaptureStats &stats)
     if(!set) return 0;
     
     int scale=vSettings[currentVoltageRange].inputGain;
-    
     if(captureFast)
-        count=transform((int32_t *)set->data,outbuffer,set->samples,vSettings+currentVoltageRange,tSettings[currentTimeBase].expand4096,stats);
+        count=transform((int32_t *)set->data,outbuffer,set->samples,vSettings+currentVoltageRange,tSettings[currentTimeBase].expand4096,stats,1.0,DSOADC::Trigger_Both);
     else
-        count=transform((int32_t *)set->data,outbuffer,set->samples,vSettings+currentVoltageRange,4096,stats);
+        count=transform((int32_t *)set->data,outbuffer,set->samples,vSettings+currentVoltageRange,4096,stats,1.0,DSOADC::Trigger_Both);
     
     reclaimSamples(set);
     return count;

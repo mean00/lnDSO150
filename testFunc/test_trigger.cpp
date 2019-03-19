@@ -62,13 +62,14 @@ void testTrigger(void)
         tft->print(ratio);
         if(!trigger)
         {
-            while(1)
+           // while(1)
             {
                   tft->setCursor(10, 60);
                   tft->print("Match"); 
             }
         }
         ratio+=1000;
+        ratio&=0xFFFF;
         adc->setVrefPWM(ratio); 
         xDelay(50);
     }

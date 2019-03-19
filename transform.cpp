@@ -24,7 +24,7 @@
  * @return 
  */
 int maxOcountSeeen=0;
-int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats)
+int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode)
 {
    if(!count) return false;
    stats.xmin=200;
@@ -38,17 +38,45 @@ int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expa
    }
    ocount&=0xffe;
    int dex=0;
-   for(int i=0;i<ocount;i++)
+   
+   // First
+   float f;
    {
-       float f=bfer[dex/4096]>>16;
+       f=bfer[0/4096]>>16;       
+       f-=set->offset;
+       f*=set->multiplier;       
+       if(f>stats.xmax) stats.xmax=f;
+       if(f<stats.xmin) stats.xmin=f;       
+       out[0]=f; // Unit is now in volt
+       stats.avg+=f;
+       dex+=expand;
+   }
+   
+   // med
+   stats.trigger=-1;
+   
+   for(int i=1;i<ocount;i++)
+   {
+     
+       f=bfer[dex/4096]>>16;
        f-=set->offset;
        f*=set->multiplier;
        if(f>stats.xmax) stats.xmax=f;
        if(f<stats.xmin) stats.xmin=f;       
        out[i]=f; // Unit is now in volt
+       
+       if(stats.trigger==-1)
+       {
+            if(mode!=DSOADC::Trigger_Rising)
+                if(out[i-1]<triggerValue&&out[i]>=triggerValue) stats.trigger=i;
+            if(mode!=DSOADC::Trigger_Falling)
+                if(out[i-1]>triggerValue&&out[i]<=triggerValue) stats.trigger=i;
+       }
+       
        stats.avg+=f;
        dex+=expand;
-   }
+   }   
+   
    stats.avg/=count;
    return ocount;
 }

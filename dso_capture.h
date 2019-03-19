@@ -12,7 +12,7 @@
 class DSOCapture
 {
 public:
-    enum
+    enum 
     {
       DSO_MODE_CONTINOUS,
       DSO_MODE_TRIGGERED_SINGLE,

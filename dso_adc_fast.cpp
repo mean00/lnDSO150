@@ -125,7 +125,7 @@ void DSOADC::setADCs ()
   
   pinMode(triggerPin,INPUT);
     
-  Timer4.setPeriod(1000); // 1Khz pwm
+  Timer4.setPeriod(2000); // 5Khz pwm
   pinMode(vRefPin,PWM);
   pwmWrite(vRefPin,0);
   setTriggerMode(DSOADC::Trigger_Both);
