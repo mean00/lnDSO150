@@ -12,7 +12,7 @@
 #include "dso_calibrate.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_TFTLCD_8bit_STM32.h"
-#include "dsoControl.h"
+#include "dso_control.h"
 #include "dso_capture.h"
 
 

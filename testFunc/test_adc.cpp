@@ -14,7 +14,7 @@
 #include "MapleFreeRTOS1000.h"
 #include "MapleFreeRTOS1000_pp.h"
 #include "testSignal.h"
-#include "dsoControl.h"
+#include "dso_control.h"
 #include "HardwareSerial.h"
 #include "dso_adc.h"
 extern void splash(void);

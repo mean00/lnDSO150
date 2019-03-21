@@ -14,7 +14,7 @@
 #include "MapleFreeRTOS1000.h"
 #include "MapleFreeRTOS1000_pp.h"
 #include "testSignal.h"
-#include "dsoControl.h"
+#include "dso_control.h"
 #include "HardwareSerial.h"
 #include "AH_24Cxx.h"
 #include "SoftWire.h"

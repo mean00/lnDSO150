@@ -32,8 +32,8 @@
 
 #include <Wire.h>
 #include "MapleFreeRTOS1000_pp.h"
-#include "dsoControl.h"
-#include "dsoControl_internal.h"
+#include "dso_control.h"
+#include "dso_control_internal.h"
 #include "DSO_config.h"
 
 #define TICK                  10 // 10 ms
