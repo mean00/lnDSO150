@@ -71,11 +71,6 @@ void mySetup()
     
     controlButtons->setup();
     
-    if(!DSOEeprom::read())
-    {
-         DSOCalibrate::calibrate();
-         DSOEeprom::write();
-    }
     
     adc=new DSOADC;
     
@@ -104,13 +99,20 @@ void MainTask( void *a )
     tft->setTextSize(3);
   
     
+    if(!DSOEeprom::read())
+    {
+         DSOCalibrate::calibrate();
+         DSOEeprom::write();
+    }
+   
+    
    // testTestSignal();
    //  testButtons();   
       //testAdc();   
     //testAdc2();   //fast
      //testAdc3();   // slow
     //testDisplay();
-    //testCalibrate();
+   // testCalibrate();
     //testI2c();
     testCapture();
     //testTrigger();

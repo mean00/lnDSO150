@@ -106,7 +106,7 @@ void testAdc2(void)
         markStart=millis();
         int scale=vSettings[currentVSettings].inputGain;
         
-        count=transform((int32_t *)xsamples,samples,count,vSettings+currentVSettings,expand,stats);
+        count=transform((int32_t *)xsamples,samples,count,vSettings+currentVSettings,expand,stats,1.0,DSOADC::Trigger_Both);
         acquisitionTime=convTime;
         adc->reclaimSamples(set);
             
