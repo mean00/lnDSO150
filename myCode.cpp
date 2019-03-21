@@ -71,8 +71,8 @@ void mySetup()
     
     controlButtons->setup();
     
-    
     adc=new DSOADC;
+    
     
     // Ok let's go, switch to FreeRTOS
     xTaskCreate( MainTask, "MainTask", 700, NULL, 10, NULL );
@@ -98,19 +98,21 @@ void MainTask( void *a )
     interrupts();
     tft->setTextSize(3);
   
+  
     
     if(!DSOEeprom::read())
     {
          DSOCalibrate::calibrate();
-         DSOEeprom::write();
+         DSOEeprom::write();         
     }
    
+    adc->readCalibrationValue(); // re-read calibration value
     
    // testTestSignal();
    //  testButtons();   
       //testAdc();   
     //testAdc2();   //fast
-     //testAdc3();   // slow
+   //  testAdc3();   // slow
     //testDisplay();
    // testCalibrate();
     //testI2c();

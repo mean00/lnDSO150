@@ -82,11 +82,8 @@ void testAdc2(void)
     currentVSettings=7;
     controlButtons->setInputGain( vSettings[currentVSettings].inputGain); // x1.4
     tft->setTextSize(2);
-    myTestSignal->setFrequency(2000); // 20Khz
+    myTestSignal->setFrequency(2000); // 2Khz
     updateTimeScale();
-    
-    float xmin,xmax,avg;
-
     
     while(1)
     {
@@ -118,20 +115,20 @@ void testAdc2(void)
         tft->print(acquisitionTime);
        
             
-            tft->setCursor(240, 100);
-            tft->print((float)DSOADC::getVCCmv()/1000.);
-            tft->setCursor(240, 120);
-            tft->print(xmin);
-            tft->setCursor(240, 140);
-            tft->print(xmax);            
-            tft->setCursor(240, 160);
-            tft->print(avg);            
-            
-            tft->setCursor(240, 60);
-            tft->print(scale);
+        tft->setCursor(240, 100);
+        tft->print((float)DSOADC::getVCCmv()/1000.);
+        tft->setCursor(240, 120);
+        tft->print(stats.xmin);
+        tft->setCursor(240, 140);
+        tft->print(stats.xmax);            
+        tft->setCursor(240, 160);
+        tft->print(stats.avg);            
 
-            tft->setCursor(240, 40);
-            tft->print(vSettings[currentVSettings].name);
+        tft->setCursor(240, 60);
+        tft->print(scale);
+
+        tft->setCursor(240, 40);
+        tft->print(vSettings[currentVSettings].name);
             
         for(int j=0;j<count;j++)
         {

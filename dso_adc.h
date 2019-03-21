@@ -118,6 +118,7 @@ public:
             SampleSet *getSamples();
             void     reclaimSamples(SampleSet *buffer);
             bool     setSlowMode(int fqInHz);
+            bool     readCalibrationValue();
     static  uint32_t getVCCmv();
             bool     setTriggerMode(TriggerMode mode);
             bool     getTriggerState();

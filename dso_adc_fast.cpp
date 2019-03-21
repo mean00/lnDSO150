@@ -79,16 +79,20 @@ uint32_t DSOADC::getVCCmv()
 {
     return vcc;
 }
+
 /**
  * 
+ * @return 
  */
-void DSOADC::setADCs ()
+bool DSOADC::readCalibrationValue()
 {
- // 1 - Read VCC
+    #define NB_SAMPLE 16
+
    adc_Register = ADC1->regs;
    adc_Register->CR2 |= ADC_CR2_TSVREFE;    // enable VREFINT and temp sensor
    adc_Register->SMPR1 =  ADC_SMPR1_SMP17;  // sample ra
-#define NB_SAMPLE 16
+
+    
    float fvcc=0;
    for(int i=0;i<NB_SAMPLE;i++)
    {
@@ -106,6 +110,19 @@ void DSOADC::setADCs ()
         vSettings[i].offset=calibrationDC[i+1];
         vSettings[i].multiplier=inputScale[i+1]*fvcc/4096000.;
     }
+    return true;
+}
+
+/**
+ * 
+ */
+void DSOADC::setADCs ()
+{
+ // 1 - Read VCC
+   adc_Register = ADC1->regs;
+   adc_Register->CR2 |= ADC_CR2_TSVREFE;    // enable VREFINT and temp sensor
+   adc_Register->SMPR1 =  ADC_SMPR1_SMP17;  // sample ra
+
  // 2 - Setup ADC
     
   int pinMapADCin = PIN_MAP[analogInPin].adc_channel;
