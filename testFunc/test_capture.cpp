@@ -133,21 +133,26 @@ void testCapture(void)
     while(1)
     {        
         int lastTime=millis();
-        int count=DSOCapture::oneShotCapture(240,samples,stats);  
+        int count=DSOCapture::triggeredCapture(240,samples,stats);  
+        if(!count) 
+        {
+            buttonManagement();
+            continue;
+        }
         DSOCapture::captureToDisplay(count,samples,waveForm);        
         DSODisplay::drawWaveForm(count,waveForm);
         counter=(counter+1)%8;
         
         if(lastTrigger!=-1)
         {
-             tft->drawFastVLine(lastTrigger,1,239,BLACK);
+             DSODisplay::drawVerticalTrigger(false,lastTrigger);
              lastTrigger=-1;
         }
         
         if(stats.trigger!=-1)
         {
             lastTrigger=stats.trigger;
-            tft->drawFastVLine(stats.trigger,1,239,RED);
+            DSODisplay::drawVerticalTrigger(true,lastTrigger);
         }
         
         if(!counter)

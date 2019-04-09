@@ -14,6 +14,7 @@ public:
             static void  init();
             static void  drawWaveForm(int count,const uint8_t *data);
             static void  drawGrid(void);
+            static void  drawVerticalTrigger(bool drawOrErase,int column);
   
   
 };

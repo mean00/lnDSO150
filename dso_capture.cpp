@@ -145,6 +145,36 @@ int DSOCapture::oneShotCapture(int count,float *outbuffer,CaptureStats &stats)
     reclaimSamples(set);
     return count;
 }
+
+/**
+ * 
+ * @param count
+ * @return 
+ */
+int DSOCapture::triggeredCapture(int count,float *outbuffer,CaptureStats &stats)
+{
+    int available;
+    
+    DSO_CAPTURE_STATE state=DSO_STATE_RUN;
+    while(1)
+    {    
+        prepareSampling();
+        if(!startSampling(2*count)) return 0;
+        SampleSet *set=    getSamples();
+        if(!set) 
+            return 0;
+
+        int scale=vSettings[currentVoltageRange].inputGain;
+        if(captureFast)
+            count=transform((int32_t *)set->data,outbuffer,set->samples,vSettings+currentVoltageRange,tSettings[currentTimeBase].expand4096,stats,1.0,DSOADC::Trigger_Both);
+        else
+            count=transform((int32_t *)set->data,outbuffer,set->samples,vSettings+currentVoltageRange,4096,stats,1.0,DSOADC::Trigger_Both);    
+        reclaimSamples(set);
+        if(stats.trigger!=-1) 
+            break;
+    }
+    return count;
+}
 /**
  * 
  * @param count

@@ -88,4 +88,22 @@ void DSODisplay::drawGrid(void)
     tft->drawFastHLine(SCALE_STEP*(C/2-CENTER_CROSS),SCALE_STEP*5,SCALE_STEP*CENTER_CROSS*2,WHITE);
     tft->drawFastVLine(SCALE_STEP*5,SCALE_STEP*(C/2-CENTER_CROSS),SCALE_STEP*CENTER_CROSS*2,WHITE);
 }
-    
+/**
+ * 
+ * @param drawOrErase
+ */    
+void  DSODisplay::drawVerticalTrigger(bool drawOrErase,int column)
+{
+    if(drawOrErase)
+     tft->drawFastVLine(column,1,239,RED);
+    else
+    {
+        uint16_t *bg=(uint16_t *)defaultPattern;
+        if(!(column%24)) 
+            bg=(uint16_t *)darkGreenPattern;
+        tft->setAddrWindow(column,0,column,240);
+        tft->pushColors(((uint16_t *)bg),   240,true);
+    }
+}
+
+// EOF
