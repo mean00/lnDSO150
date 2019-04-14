@@ -1,6 +1,8 @@
-*.sw
+*.sw*
 nbproject/*
 build/*
 build
+*.rej
+.back
 
 
