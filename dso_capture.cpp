@@ -10,7 +10,7 @@
 #include "transform.h"
 
 static int      canary1=0xabcde01234;
-static int      currentTimeBase=0;
+static int      currentTimeBase=DSOCapture::DSO_TIME_BASE_10MS;
 static int      currentVoltageRange=0;
 static bool     captureFast=true;
 static int      canary2=0xabcde01234;

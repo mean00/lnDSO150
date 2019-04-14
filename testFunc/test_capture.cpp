@@ -122,7 +122,7 @@ void testCapture(void)
     tft->setTextSize(2);
     myTestSignal->setFrequency(500); // 20Khz
 
-    DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_5MS);
+    DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_10MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
     redraw();
     float xmin,xmax,avg;
@@ -133,7 +133,7 @@ void testCapture(void)
     while(1)
     {        
         int lastTime=millis();
-        int count=DSOCapture::triggeredCapture(240,samples,stats);  
+        int count=DSOCapture::oneShotCapture(240,samples,stats);  
         if(!count) 
         {
             buttonManagement();

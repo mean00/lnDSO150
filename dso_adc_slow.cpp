@@ -16,6 +16,9 @@
 
 extern HardwareTimer Timer2;
 extern adc_reg_map *adc_Register;
+static int slowTriggerValue=2048;
+static int oldTriggerValue=4096;
+bool slowTriggered=false;
 
 enum CaptureState
 {
@@ -44,7 +47,9 @@ static int nbDma=0;
 extern SampleSet *currentSet;
 
 #define DMA_OVERSAMPLING_COUNT 4
+#define TIMER_BUFFER_SIZE      512
 static uint32_t dmaOverSampleBuffer[DMA_OVERSAMPLING_COUNT] __attribute__ ((aligned (8)));;
+static uint32_t timerBuffer[TIMER_BUFFER_SIZE] __attribute__ ((aligned (8)));;
 extern void Oopps();
 
 
@@ -77,7 +82,9 @@ static void dummy_dma_interrupt_handler(void)
  * @return 
  */
 bool DSOADC::startInternalDmaSampling ()
-{
+{  
+  slowTriggered=false;
+  oldTriggerValue=4096;
   dma_attach_interrupt(DMA1, DMA_CH1, dummy_dma_interrupt_handler);  
   dma_init(DMA1);    
   dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, dmaOverSampleBuffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
@@ -135,13 +142,21 @@ void DSOADC::Timer2_Event()
     nbTimer++;
     instance->timerCapture();
 }
+
+#define NEXT_TRANSFER() \ 
+    captureState=Capture_armed; \
+    dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, dmaOverSampleBuffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT)); \
+    dma_set_num_transfers(DMA1, DMA_CH1, DMA_OVERSAMPLING_COUNT ); \
+    dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
+
+
 /**
  * \fn timerCapture
  * \brief this is one is called by a timer interrupt
  */
 void DSOADC::timerCapture()
 {    
-    uint32_t avg=0;
+    uint32_t avg2=0;
     switch(captureState)
     {
         case Capture_armed: // skipped one ADC DMA ?
@@ -168,10 +183,46 @@ void DSOADC::timerCapture()
         return; // spurious interrupt
     }
     for(int i=0;i<DMA_OVERSAMPLING_COUNT;i++)
-        avg+=dmaOverSampleBuffer[i];
-    avg=(avg+DMA_OVERSAMPLING_COUNT/2+1)/DMA_OVERSAMPLING_COUNT;
-    currentSamplingBuffer[currentIndex]=avg;
+    {
+        uint32_t val=dmaOverSampleBuffer[i]>>16;
+        avg2+=val;        
+    }    
+    avg2=(avg2+DMA_OVERSAMPLING_COUNT/2+1)/DMA_OVERSAMPLING_COUNT;
+    timerBuffer[currentIndex]=avg2;
     currentIndex++;
+
+    if(!slowTriggered && currentIndex >= requestedSamples/2)
+    {
+        uint32_t copy=oldTriggerValue;
+        oldTriggerValue=avg2;
+        if(copy>slowTriggerValue && avg2<slowTriggerValue)
+        {
+            NEXT_TRANSFER();
+            slowTriggered=true;
+            // rescale
+#if 0            
+            int offset=currentIndex-requestedSamples/2;
+            if(offset>0)
+            {
+                memmove(timerBuffer,timerBuffer+offset*4,requestedSamples*2);
+                currentIndex-=offset;
+            }
+#endif            
+            return;
+            
+        }        
+        
+    }
+    if( currentIndex>(TIMER_BUFFER_SIZE*3)/4  && !slowTriggered)
+    {   // reset, till we get a trigger
+        NEXT_TRANSFER();
+        // Remove requestedSample/4 samples
+        int sz=TIMER_BUFFER_SIZE*sizeof(float);
+        memmove(timerBuffer,timerBuffer+sz/4,(currentIndex-TIMER_BUFFER_SIZE/4)*4);
+        currentIndex-=TIMER_BUFFER_SIZE>>2;
+        return;
+    }
+
     if(currentIndex>=requestedSamples)
     {
         currentSet->samples=requestedSamples;
@@ -180,14 +231,12 @@ void DSOADC::timerCapture()
         Timer2.setMode(CAPTURE_TIMER_CHANNEL,TIMER_DISABLED);
         Timer2.pause();
         captureState=Capture_complete;
+        for(int i=0;i<requestedSamples;i++)
+            currentSamplingBuffer[i]=timerBuffer[i]<<16;
         captureComplete();
         return;
     }
-    // Ask for next set of samples
-    captureState=Capture_armed;
-    dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, dmaOverSampleBuffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
-    dma_set_num_transfers(DMA1, DMA_CH1, DMA_OVERSAMPLING_COUNT );
-    dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
+    NEXT_TRANSFER();
 }
 
 // EOF
