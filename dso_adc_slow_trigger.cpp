@@ -96,10 +96,12 @@ void DSOADC::timerTriggerCapture()
         Oopps();
         return; // spurious interrupt
     }
+    uint16_t *ptr=((uint16_t *)dmaOverSampleBuffer)+1;
+   
     for(int i=0;i<DMA_OVERSAMPLING_COUNT;i++)
-    {
-        uint32_t val=dmaOverSampleBuffer[i]>>16;
-        avg2+=val;        
+    {        
+        avg2+=*ptr;
+        ptr+=2;
     }    
     avg2=(avg2+DMA_OVERSAMPLING_COUNT/2+1)/DMA_OVERSAMPLING_COUNT;
     
