@@ -127,7 +127,7 @@ public:
 
             bool startDMASampling (int count);
             bool startTimerSampling (int count);
-            bool startTriggeredTimerSampling (int count,float triggerValue);
+            bool startTriggeredTimerSampling (int count,uint32_t triggerADC);
             void clearCapturedData();
 protected:            
             void setADCs ();

@@ -74,7 +74,8 @@ public:
     static int         voltToADCValue(float v);
     static void        updateTriggersValue();
     static void        setTriggerValue(float volt);
-    static float       getTriggerValue(float volt);
+    static float       getTriggerValue();
+    static int         voltageToPixel(float v);
     
 protected:
   

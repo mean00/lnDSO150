@@ -17,11 +17,11 @@ uint32_t timerRead,timerWrite;
  * @param buffer
  * @return 
  */
-bool DSOADC::startTriggeredTimerSampling (int count,float triggerVolr)
+bool DSOADC::startTriggeredTimerSampling (int count,uint32_t triggerADC)
 {
     if(!capturedBuffers.empty())
         return true; // We have data !
-    
+    slowTriggerValue=triggerADC;
     currentSet=availableBuffers.take();
     if(!currentSet) return false;    
 

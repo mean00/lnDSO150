@@ -129,7 +129,15 @@ void testCapture(void)
     
     int counter=0;
     int lastTrigger=-1;
-    DSOCapture::setTriggerValue(2.7);
+    int triggerLine;
+    
+    DSOCapture::setTriggerValue(1.5);
+    float f=DSOCapture::getTriggerValue();
+    triggerLine=DSOCapture::voltageToPixel(f);
+    
+    
+    // 
+    
     while(1)
     {        
         int lastTime=millis();
@@ -139,7 +147,10 @@ void testCapture(void)
             buttonManagement();
             continue;
         }
-        DSOCapture::captureToDisplay(count,samples,waveForm);        
+        DSOCapture::captureToDisplay(count,samples,waveForm);  
+        // Remove trigger
+        DSODisplay::drawVoltageTrigger(false,triggerLine);
+        
         DSODisplay::drawWaveForm(count,waveForm);
         counter=(counter+1)%8;
         
@@ -154,7 +165,7 @@ void testCapture(void)
             lastTrigger=stats.trigger;
             DSODisplay::drawVerticalTrigger(true,lastTrigger);
         }
-        
+        DSODisplay::drawVoltageTrigger(true,triggerLine);
         if(!counter)
             drawStats(stats);
         buttonManagement();        

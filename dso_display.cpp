@@ -105,5 +105,20 @@ void  DSODisplay::drawVerticalTrigger(bool drawOrErase,int column)
         tft->pushColors(((uint16_t *)bg),   240,true);
     }
 }
+void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
+{
+    if(line<1) line=1;
+    if(line>238) line=238;
+    if(drawOrErase)
+        tft->drawFastHLine(1,1+line,238,BLUE);
+    else
+    {
+        uint16_t *bg=(uint16_t *)defaultPattern;
+        if(!(line%24)) 
+            bg=(uint16_t *)darkGreenPattern;
+        tft->setAddrWindow(0,1+line,239,1+line);
+        tft->pushColors(((uint16_t *)bg),   240,true);
+    }
+}
 
 // EOF

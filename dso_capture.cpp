@@ -110,8 +110,8 @@ bool     DSOCapture::startSampling (int count)
  */
 bool     DSOCapture::startTriggerSampling (int count)
 {
-    
-    return adc->startTriggeredTimerSampling(count,triggerValueFloat);
+    triggerValueADC=voltToADCValue(triggerValueFloat);
+    return adc->startTriggeredTimerSampling(count,triggerValueADC);
 }
 /**
  * 
@@ -169,7 +169,7 @@ void        DSOCapture::setTriggerValue(float volt)
  * @param volt
  * @return 
  */
-float       DSOCapture::getTriggerValue(float volt)
+float       DSOCapture::getTriggerValue(void)
 {
     return triggerValueFloat;
 }
@@ -239,6 +239,23 @@ bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
             waveForm[j]=(uint8_t)v;
         }
     return true;
+}
+
+/**
+ * 
+ * @param count
+ * @param samples
+ * @param waveForm
+ * @return 
+ */
+int DSOCapture::voltageToPixel(float v)
+{    
+    float gain=vSettings[currentVoltageRange].displayGain;
+    v*=gain;
+    v=120-v;             
+    if(v>239) v=239;
+    if(v<0) v=0;           
+    return (int)v;
 }
 /**
  * 
