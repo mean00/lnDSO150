@@ -127,6 +127,7 @@ public:
 
             bool startDMASampling (int count);
             bool startTimerSampling (int count);
+            bool startTriggeredTimerSampling (int count,float triggerValue);
             void clearCapturedData();
 protected:            
             void setADCs ();
@@ -135,8 +136,13 @@ protected:
     static  void DMA1_CH1_Event();
             void captureComplete();
     static  void Timer2_Event();
+    static  void Timer2Trigger_Event();
+
             void timerCapture();
+            void timerTriggerCapture();
+            
             bool startInternalDmaSampling ();
+            
             
     static void TriggerInterrupt();
             

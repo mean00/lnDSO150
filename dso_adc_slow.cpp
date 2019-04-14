@@ -189,6 +189,6 @@ void DSOADC::timerCapture()
     dma_set_num_transfers(DMA1, DMA_CH1, DMA_OVERSAMPLING_COUNT );
     dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
 }
-
+#include "dso_adc_slow_trigger.cpp"
 // EOF
 

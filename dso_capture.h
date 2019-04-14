@@ -63,6 +63,7 @@ public:
     static DSO_TIME_BASE getTimeBase();
     static bool        prepareSampling ();
     static bool        startSampling (int count);
+    static bool        startTriggerSampling (int count);
     static SampleSet   *getSamples();
     static void        reclaimSamples(SampleSet *set);
     

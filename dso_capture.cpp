@@ -104,7 +104,15 @@ bool     DSOCapture::startSampling (int count)
     }
     return adc->startTimerSampling(count);
 }
-
+/**
+ * 
+ * @return 
+ */
+bool     DSOCapture::startTriggerSampling (int count)
+{
+    
+    return adc->startTriggeredTimerSampling(count,triggerValueFloat);
+}
 /**
  * 
  * @param count
@@ -195,7 +203,7 @@ int DSOCapture::triggeredCapture(int count,float *outbuffer,CaptureStats &stats)
     while(1)
     {    
         prepareSampling();
-        if(!startSampling(2*count)) return 0;
+        if(!startTriggerSampling(count)) return 0;
         SampleSet *set=    getSamples();
         if(!set) 
             return 0;
