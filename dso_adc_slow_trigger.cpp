@@ -21,7 +21,12 @@ bool DSOADC::startTriggeredTimerSampling (int count,uint32_t triggerADC)
 {
     if(!capturedBuffers.empty())
         return true; // We have data !
+    // Reset settings
     slowTriggerValue=triggerADC;
+    oldTriggerValue=triggerADC-1;
+    slowTriggered=false;
+    currentIndex=0;
+    //
     currentSet=availableBuffers.take();
     if(!currentSet) return false;    
 
@@ -30,7 +35,7 @@ bool DSOADC::startTriggeredTimerSampling (int count,uint32_t triggerADC)
     requestedSamples=count;
     currentSet->samples=count;
     currentSamplingBuffer=currentSet->data;
-    currentIndex=0;
+    
     convTime=micros();
     
     noInterrupts();
@@ -114,28 +119,32 @@ void DSOADC::timerTriggerCapture()
     {
         uint32_t copy=oldTriggerValue;
         oldTriggerValue=avg2;
+        // -|_
         if(copy>slowTriggerValue && avg2<slowTriggerValue)
         {
-            NEXT_TRANSFER();
             slowTriggered=true;
-            timerRead=timerWrite-(requestedSamples/2);
-            return;
-            
+            timerRead=timerWrite-(requestedSamples/2);            
+            NEXT_TRANSFER();
+            return;            
         }                
     }
   
-
+    // do we have enough sample ?
     if(slowTriggered && (timerWrite-timerRead)>=requestedSamples)
     {
-        currentSet->samples=requestedSamples;
-        
+        currentSet->samples=requestedSamples;        
         dma_disable(DMA1, DMA_CH1);
         Timer2.setMode(CAPTURE_TIMER_CHANNEL,TIMER_DISABLED);
         Timer2.pause();
         captureState=Capture_complete;
+        uint32_t  *source=timerBuffer+timerRead;
+        uint32_t  *end=timerBuffer+TIMER_BUFFER_SIZE;
+        
         for(int i=0;i<requestedSamples;i++)
-        {
-            currentSamplingBuffer[i]=timerBuffer[(timerRead+i)%TIMER_BUFFER_SIZE]<<16;
+        {            
+            currentSamplingBuffer[i]=(*(source++))<<16;
+            if(source>=end)
+                    source=timerBuffer;
         }
         captureComplete();
         return;
