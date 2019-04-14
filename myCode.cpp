@@ -73,7 +73,7 @@ void mySetup()
     
     adc=new DSOADC;
     
-    
+    tft->fillScreen(BLACK);
     // Ok let's go, switch to FreeRTOS
     xTaskCreate( MainTask, "MainTask", 700, NULL, 10, NULL );
     vTaskStartScheduler();      

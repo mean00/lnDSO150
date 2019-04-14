@@ -14,6 +14,8 @@ static int      currentTimeBase=0;
 static int      currentVoltageRange=0;
 static bool     captureFast=true;
 static int      canary2=0xabcde01234;
+static int      triggerValueADC=0;
+static float    triggerValueFloat=0;
 extern DSOADC   *adc;
 
 
@@ -145,6 +147,40 @@ int DSOCapture::oneShotCapture(int count,float *outbuffer,CaptureStats &stats)
     reclaimSamples(set);
     return count;
 }
+/**
+ * 
+ * @param volt
+ */
+void        DSOCapture::setTriggerValue(float volt)
+{
+        triggerValueFloat=volt;
+        triggerValueADC=voltToADCValue(triggerValueFloat);
+}
+/**
+ * 
+ * @param volt
+ * @return 
+ */
+float       DSOCapture::getTriggerValue(float volt)
+{
+    return triggerValueFloat;
+}
+
+
+
+/**
+ * 
+ * @param v
+ * @param set
+ * @return 
+ */
+int DSOCapture::voltToADCValue(float v)
+{
+    VoltageSettings *set=&(vSettings[currentVoltageRange]);
+    float out=v/set->multiplier;
+    out+=set->offset;
+    return (int)out;    
+}
 
 /**
  * 
@@ -183,7 +219,7 @@ int DSOCapture::triggeredCapture(int count,float *outbuffer,CaptureStats &stats)
  * @return 
  */
 bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
-{
+{    
     float gain=vSettings[currentVoltageRange].displayGain;
     for(int j=0;j<count;j++)
         {

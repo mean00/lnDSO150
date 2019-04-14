@@ -70,6 +70,10 @@ public:
     static const char *getTimeBaseAsText();
     static const char *getVoltageRangeAsText();
     static void        clearCapturedData();
+    static int         voltToADCValue(float v);
+    static void        updateTriggersValue();
+    static void        setTriggerValue(float volt);
+    static float       getTriggerValue(float volt);
     
 protected:
   

@@ -35,7 +35,6 @@ static float  samples[256];
 static bool voltageMode=false;
 
 
-
 static void redraw()
 {
       DSODisplay::drawGrid();
@@ -78,7 +77,7 @@ static void buttonManagement()
                 v+=inc;
                 if(v<0) v=0;
                 if(v>DSOCapture::DSO_VOLTAGE_MAX) v=DSOCapture::DSO_VOLTAGE_MAX;
-                capture->setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)v);
+                capture->setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)v);                                
             }
             else // Timingmode
             {
@@ -130,6 +129,7 @@ void testCapture(void)
     
     int counter=0;
     int lastTrigger=-1;
+    DSOCapture::setTriggerValue(2.7);
     while(1)
     {        
         int lastTime=millis();
