@@ -204,7 +204,7 @@ void DSOADC::timerCapture()
             int offset=currentIndex-requestedSamples/2;
             if(offset>0)
             {
-                currentIndex-=offset;
+                currentIndex-=offset; // new sizez
                 memmove(timerBuffer,timerBuffer+offset*4,currentIndex*4);                
             }
 
