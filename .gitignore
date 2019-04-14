@@ -3,6 +3,6 @@ nbproject/*
 build/*
 build
 *.rej
-.back
+*.back
 
 
