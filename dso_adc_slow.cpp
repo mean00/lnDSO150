@@ -200,14 +200,14 @@ void DSOADC::timerCapture()
             NEXT_TRANSFER();
             slowTriggered=true;
             // rescale
-#if 0            
+            
             int offset=currentIndex-requestedSamples/2;
             if(offset>0)
             {
-                memmove(timerBuffer,timerBuffer+offset*4,requestedSamples*2);
                 currentIndex-=offset;
+                memmove(timerBuffer,timerBuffer+offset*4,currentIndex*4);                
             }
-#endif            
+
             return;
             
         }        
