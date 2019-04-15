@@ -120,7 +120,7 @@ void testCapture(void)
     int reCounter=0;
     
     tft->setTextSize(2);
-    myTestSignal->setFrequency(500); // 20Khz
+    myTestSignal->setFrequency(100); // 20Khz
 
     DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_10MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
@@ -131,7 +131,7 @@ void testCapture(void)
     int lastTrigger=-1;
     int triggerLine;
     
-    DSOCapture::setTriggerValue(1.5);
+    DSOCapture::setTriggerValue(3.);
     float f=DSOCapture::getTriggerValue();
     triggerLine=DSOCapture::voltageToPixel(f);
     

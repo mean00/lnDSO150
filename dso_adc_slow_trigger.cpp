@@ -108,7 +108,7 @@ void DSOADC::timerTriggerCapture()
         Timer2.setMode(CAPTURE_TIMER_CHANNEL,TIMER_DISABLED);
         Timer2.pause();
         captureState=Capture_complete;
-        uint32_t  *source=timerBuffer+timerRead;
+        uint32_t  *source=timerBuffer+(timerRead%TIMER_BUFFER_SIZE);
         uint32_t  *end=timerBuffer+TIMER_BUFFER_SIZE;
         
         for(int i=0;i<requestedSamples;i++)

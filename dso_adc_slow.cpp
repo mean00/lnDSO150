@@ -56,7 +56,7 @@ extern void Oopps();
 bool DSOADC::setSlowMode(int fqInHz)
 {    
     Timer2.attachInterrupt(CAPTURE_TIMER_CHANNEL, Timer2_Event);
-    Timer2.setPeriod(1000000/(fqInHz*16)); // in microseconds, oversampled 16 times
+    Timer2.setPeriod(1000000/(fqInHz)); // in microseconds, oversampled 16 times
     return true;
 }
 /*
