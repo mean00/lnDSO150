@@ -143,7 +143,7 @@ protected:
             
             bool startInternalDmaSampling ();
             
-            
+            bool validateAverageSample(uint32_t &avg);
     static void TriggerInterrupt();
             
             

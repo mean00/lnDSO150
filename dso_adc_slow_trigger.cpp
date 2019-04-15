@@ -71,39 +71,8 @@ void DSOADC::Timer2Trigger_Event()
 void DSOADC::timerTriggerCapture()
 {    
     uint32_t avg2=0;
-    switch(captureState)
-    {
-        case Capture_armed: // skipped one ADC DMA ?
-            skippedDma++;
-            return;
-        case Capture_dmaDone:
-            captureState=Capture_timerDone;
-            break;
-        case Capture_timerDone:
-            spuriousTimer++;
-            //Oopps();
-            return;
-            break;
-        case Capture_complete:
-            break;
-        default:
-            Oopps();
-            break;
-    }
-    
-    if(!currentSamplingBuffer)
-    {
-        Oopps();
-        return; // spurious interrupt
-    }
-    uint16_t *ptr=((uint16_t *)dmaOverSampleBuffer)+1;
-   
-    for(int i=0;i<DMA_OVERSAMPLING_COUNT;i++)
-    {        
-        avg2+=*ptr;
-        ptr+=2;
-    }    
-    avg2=(avg2+DMA_OVERSAMPLING_COUNT/2+1)/DMA_OVERSAMPLING_COUNT;
+    if(! validateAverageSample(avg2))
+        return;
     
     
     if(timerWrite>0x20000200 && timerRead > 0x20000200)

@@ -136,24 +136,24 @@ void DSOADC::Timer2_Event()
     instance->timerCapture();
 }
 /**
- * \fn timerCapture
- * \brief this is one is called by a timer interrupt
+ * 
+ * @param avg
+ * @return 
  */
-void DSOADC::timerCapture()
-{    
-    uint32_t avg=0;
+bool   DSOADC::validateAverageSample(uint32_t &avg)
+{
     switch(captureState)
     {
         case Capture_armed: // skipped one ADC DMA ?
             skippedDma++;
-            return;
+            return false;
         case Capture_dmaDone:
             captureState=Capture_timerDone;
             break;
         case Capture_timerDone:
             spuriousTimer++;
             //Oopps();
-            return;
+            return false;
             break;
         case Capture_complete:
             break;
@@ -165,12 +165,29 @@ void DSOADC::timerCapture()
     if(!currentSamplingBuffer)
     {
         Oopps();
-        return; // spurious interrupt
+        return false; // spurious interrupt
     }
+    avg=0;
+    uint16_t *ptr=((uint16_t *)dmaOverSampleBuffer)+1;
+   
     for(int i=0;i<DMA_OVERSAMPLING_COUNT;i++)
-        avg+=dmaOverSampleBuffer[i];
+    {        
+        avg+=*ptr;
+        ptr+=2;
+    }    
     avg=(avg+DMA_OVERSAMPLING_COUNT/2+1)/DMA_OVERSAMPLING_COUNT;
-    currentSamplingBuffer[currentIndex]=avg;
+    return true;
+    }
+/**
+ * \fn timerCapture
+ * \brief this is one is called by a timer interrupt
+ */
+void DSOADC::timerCapture()
+{    
+    uint32_t avg=0;
+    if(! validateAverageSample(avg))
+        return;
+    currentSamplingBuffer[currentIndex]=avg<<16;
     currentIndex++;
     if(currentIndex>=requestedSamples)
     {
