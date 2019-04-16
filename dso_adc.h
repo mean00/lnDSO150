@@ -63,7 +63,7 @@ public:
             bool    setTimeScale(adc_smp_rate one, adc_prescaler two);
             bool    prepareDMASampling (adc_smp_rate rate,adc_prescaler scale);
             bool    prepareTimerSampling (int fq);
-            bool    getSamples(SampleSet &set)           ;
+            bool    getSamples(SampleSet &set1,SampleSet &set2)           ;
             bool     setSlowMode(int fqInHz);
             bool     readCalibrationValue();
     static  uint32_t getVCCmv();

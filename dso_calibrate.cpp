@@ -49,7 +49,7 @@ void header(int color,const char *txt,DSOControl::DSOCoupling target)
 void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupling target)
 {
     header(color,txt,target); 
-    
+#if 0    
     
     SampleSet set;
     uint32_t data [256];
@@ -73,6 +73,7 @@ void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupl
         sum/=set.samples;
         array[range]=sum;
     }
+#endif    
 }
 
 /**

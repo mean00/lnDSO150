@@ -199,20 +199,12 @@ bool    DSOADC::prepareDMASampling (adc_smp_rate rate,adc_prescaler scale)
  * @param count
  * @return 
  */
-bool DSOADC::getSamples(SampleSet &set)
+bool DSOADC::getSamples(SampleSet &set1,SampleSet &set2)
 {
     if(!dmaSemaphore->take(10000))
         return false;
-    // Copy data from cap1 & cap2...
-    uint32_t *s=set.data;
-    set.samples=_cap1.samples+_cap2.samples;
-    memcpy(s,_cap1.data,_cap1.samples*sizeof(uint32_t));
-    
-    if(_cap2.samples)
-    {
-        s+=_cap1.samples;
-        memcpy(s,_cap2.data,_cap2.samples*sizeof(uint32_t));
-    }
+    set1=_cap1;
+    set2=_cap2;
     return true;
 }
  

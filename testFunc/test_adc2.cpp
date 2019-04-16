@@ -97,9 +97,10 @@ void testAdc2(void)
         adc->prepareDMASampling (tSettings[currentTSettings].rate,tSettings[currentTSettings].prescaler);            
         adc->startDMASampling ((240*expand)/4096);
         
-        SampleSet    *set=adc->getSamples();
-        count=set->samples;
-        uint32_t *xsamples=set->data;
+        SampleSet  s1,s2;
+        bool r=adc->getSamples(s1,s2);
+        count=s1.samples;
+        uint32_t *xsamples=s1.data;
         markStart=millis();
         int scale=vSettings[currentVSettings].inputGain;
         

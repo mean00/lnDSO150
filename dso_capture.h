@@ -76,6 +76,8 @@ public:
     static void        setTriggerValue(float volt);
     static float       getTriggerValue();
     static int         voltageToPixel(float v);
+    static void        initialize();
+    static void        task(void *);
     
 protected:
   

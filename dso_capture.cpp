@@ -8,6 +8,7 @@
 #include "dso_capture.h"
 #include "dso_capture_priv.h"
 #include "transform.h"
+#include "DSO_config.h"
 
 static int      canary1=0xabcde01234;
 static int      currentTimeBase=DSOCapture::DSO_TIME_BASE_10MS;
@@ -18,8 +19,14 @@ static int      triggerValueADC=0;
 static float    triggerValueFloat=0;
 extern DSOADC   *adc;
 
-
-
+static TaskHandle_t captureTaskHandle;
+/**
+ * 
+ */
+void DSOCapture::initialize()
+{
+    xTaskCreate( (TaskFunction_t)DSOCapture::task, "Capture", 200, NULL, DSO_CAPTURE_TASK_PRIORITY, &captureTaskHandle );    
+}
 /**
  * 
  * @return 
@@ -120,7 +127,35 @@ bool     DSOCapture::startTriggerSampling (int count)
  */
 bool DSOCapture::getSamples(SampleSet &set)
 {
-    return adc->getSamples(set);
+//    return adc->getSamples(set);
+    return false;
+}
+/**
+ * 
+ * @return 
+ */
+void DSOCapture::task(void *a)
+{
+    xDelay(5);
+    SampleSet set1,set2; // shallow copy
+    while(1)
+    {
+        if(!adc->getSamples(set1,set2))
+            continue;
+#if 0        
+        int scale=vSettings[currentVoltageRange].inputGain;
+        if(captureFast)
+        {
+            count=transform((int32_t *)set.data,samples,set.samples,vSettings+currentVoltageRange,tSettings[currentTimeBase].expand4096,stats,1.0,DSOADC::Trigger_Both);
+        }
+        else
+        {
+            count=transform((int32_t *)set.data,samples,set.samples,vSettings+currentVoltageRange,4096,stats,1.0,DSOADC::Trigger_Both);
+        }
+        return count;
+#endif            
+    }
+
 }
 
 
@@ -139,7 +174,7 @@ int DSOCapture::oneShotCapture(int count,float *samples,CaptureStats &stats)
     prepareSampling();
     if(!startSampling(count)) return 0;
     bool r=    getSamples(set);
-    
+    xDelay(10);
     if(!r) return 0;
     
     int scale=vSettings[currentVoltageRange].inputGain;

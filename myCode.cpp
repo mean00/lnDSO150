@@ -10,6 +10,7 @@
 #include "testSignal.h"
 #include "HardwareSerial.h"
 #include "dso_eeprom.h"
+#include "DSO_config.h"
 static void MainTask( void *a );
 void splash(void);
 //--
@@ -75,7 +76,7 @@ void mySetup()
     
     tft->fillScreen(BLACK);
     // Ok let's go, switch to FreeRTOS
-    xTaskCreate( MainTask, "MainTask", 700, NULL, 10, NULL );
+    xTaskCreate( MainTask, "MainTask", 700, NULL, DSO_MAIN_TASK_PRIORITY, NULL );
     vTaskStartScheduler();      
 }
 
@@ -107,7 +108,7 @@ void MainTask( void *a )
     }
    
     adc->readCalibrationValue(); // re-read calibration value
-    
+    DSOCapture::initialize();
    // testTestSignal();
    //  testButtons();   
       //testAdc();   

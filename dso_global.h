@@ -27,4 +27,6 @@ extern Adafruit_TFTLCD_8bit_STM32 *tft;
 extern DSOControl                 *controlButtons;
 extern DSOCapture                 *capture;
 
+
+
 // EOF
