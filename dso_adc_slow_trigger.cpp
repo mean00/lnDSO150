@@ -4,8 +4,6 @@
  * i.e. we setup n Samples acquisition through DMA
  * and a timer interrupt grabs the result 
  */
-#define TIMER_BUFFER_SIZE 256
-static uint32_t timerBuffer[TIMER_BUFFER_SIZE] __attribute__ ((aligned (8)));;
 
 
 static bool slowTriggered;
@@ -19,22 +17,17 @@ uint32_t timerRead,timerWrite;
  */
 bool DSOADC::startTriggeredTimerSampling (int count,uint32_t triggerADC)
 {
-    if(!capturedBuffers.empty())
-        return true; // We have data !
     // Reset settings
     slowTriggerValue=triggerADC;
     oldTriggerValue=triggerADC-1;
     slowTriggered=false;
     currentIndex=0;
     //
-    currentSet=availableBuffers.take();
-    if(!currentSet) return false;    
-
-    if(count>maxSamples)
-        count=maxSamples;   
+    if(count>ADC_INTERNAL_BUFFER_SIZE/2)
+        count=ADC_INTERNAL_BUFFER_SIZE/2;
+  
     requestedSamples=count;
-    currentSet->samples=count;
-    currentSamplingBuffer=currentSet->data;
+
     
     convTime=micros();
     
@@ -80,9 +73,9 @@ void DSOADC::timerTriggerCapture()
         timerRead-= 0x20000000;
         timerWrite-=0x20000000;
     }
-    int xindex=timerWrite%TIMER_BUFFER_SIZE;
+    int xindex=timerWrite%ADC_INTERNAL_BUFFER_SIZE;
     
-    timerBuffer[xindex]=avg2;
+    adcInternalBuffer[xindex]=avg2;
     timerWrite++;
 
     // enough preloaded ?
@@ -103,21 +96,32 @@ void DSOADC::timerTriggerCapture()
     // do we have enough sample ?
     if(slowTriggered && (timerWrite-timerRead)>=requestedSamples)
     {
-        currentSet->samples=requestedSamples;        
         dma_disable(DMA1, DMA_CH1);
         Timer2.setMode(CAPTURE_TIMER_CHANNEL,TIMER_DISABLED);
         Timer2.pause();
         captureState=Capture_complete;
-        uint32_t  *source=timerBuffer+(timerRead%TIMER_BUFFER_SIZE);
-        uint32_t  *end=timerBuffer+TIMER_BUFFER_SIZE;
+        uint32_t  *source=adcInternalBuffer+(timerRead%ADC_INTERNAL_BUFFER_SIZE);
+        uint32_t  *end=adcInternalBuffer+ADC_INTERNAL_BUFFER_SIZE;
         
-        for(int i=0;i<requestedSamples;i++)
-        {            
-            currentSamplingBuffer[i]=(*(source++))<<16;
-            if(source>=end)
-                    source=timerBuffer;
+         
+        SampleSet one,two;
+        int len=timerWrite-timerRead;
+        if((timerWrite%ADC_INTERNAL_BUFFER_SIZE)>(timerRead%ADC_INTERNAL_BUFFER_SIZE))
+        {
+            one.samples=len;
+            one.data=adcInternalBuffer+(timerRead);
+            two.samples=0;
+            two.data=NULL;
+        }else
+        {
+            int left=ADC_INTERNAL_BUFFER_SIZE-(timerRead%ADC_INTERNAL_BUFFER_SIZE);
+            one.samples=len;
+            one.data=adcInternalBuffer+(timerRead);
+            two.samples=len-left;
+            two.data=adcInternalBuffer;
         }
-        captureComplete();
+        captureComplete(one,two);
+
         return;
     }
     NEXT_TRANSFER();

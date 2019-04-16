@@ -29,7 +29,6 @@ static CaptureState captureState=Capture_idle;
 /**
  */
 extern int                  requestedSamples;
-extern uint32_t             *currentSamplingBuffer;
 extern DSOADC               *instance;
        int                  currentIndex=0;
 extern uint32_t             convTime;
@@ -40,8 +39,6 @@ static int skippedDma=0;
 static int nbTimer=0;
 static int nbDma=0;
 
-
-extern SampleSet *currentSet;
 
 #define DMA_OVERSAMPLING_COUNT 4
 static uint32_t dmaOverSampleBuffer[DMA_OVERSAMPLING_COUNT] __attribute__ ((aligned (8)));;
@@ -105,17 +102,12 @@ bool    DSOADC::prepareTimerSampling (int fq)
  */
 bool DSOADC::startTimerSampling (int count)
 {
-    if(!capturedBuffers.empty())
-        return true; // We have data !
-    
-    currentSet=availableBuffers.take();
-    if(!currentSet) return false;    
 
-    if(count>maxSamples)
-        count=maxSamples;   
+   if(count>ADC_INTERNAL_BUFFER_SIZE/2)
+        count=ADC_INTERNAL_BUFFER_SIZE/2;
     requestedSamples=count;
-    currentSet->samples=count;
-    currentSamplingBuffer=currentSet->data;
+
+
     currentIndex=0;
     convTime=micros();
     
@@ -162,11 +154,6 @@ bool   DSOADC::validateAverageSample(uint32_t &avg)
             break;
     }
     
-    if(!currentSamplingBuffer)
-    {
-        Oopps();
-        return false; // spurious interrupt
-    }
     avg=0;
     uint16_t *ptr=((uint16_t *)dmaOverSampleBuffer)+1;
    
@@ -187,17 +174,21 @@ void DSOADC::timerCapture()
     uint32_t avg=0;
     if(! validateAverageSample(avg))
         return;
-    currentSamplingBuffer[currentIndex]=avg<<16;
+    adcInternalBuffer[currentIndex]=avg<<16;
     currentIndex++;
     if(currentIndex>=requestedSamples)
-    {
-        currentSet->samples=requestedSamples;
-        
+    {                
         dma_disable(DMA1, DMA_CH1);
         Timer2.setMode(CAPTURE_TIMER_CHANNEL,TIMER_DISABLED);
         Timer2.pause();
         captureState=Capture_complete;
-        captureComplete();
+        
+        SampleSet one,two;
+        two.samples=0;
+        one.samples=requestedSamples;
+        one.data=adcInternalBuffer;
+        two.data=NULL;
+        captureComplete(one,two);
         return;
     }
     // Ask for next set of samples

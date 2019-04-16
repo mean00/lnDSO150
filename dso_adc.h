@@ -9,8 +9,7 @@
 
 // Sampling Queue
 
-#define SAMPLING_QUEUE_SIZE 3
-#define maxSamples   (360) //1024*6
+#define ADC_INTERNAL_BUFFER_SIZE 1024
 /* 
  * \brief Describe a voltage setting
  */
@@ -41,57 +40,6 @@ typedef struct SampleSet
 
 static bool triggered=false;
 
-/**
- * \class SampleingQueue
- * \brief simple std::vector alternative to store free buffers & buffers containing captured data
- */
-
-
-class SampleingQueue
-{
-public:
-    SampleingQueue()
-    {
-        count=0;
-    }
-    void addFromIsr(SampleSet *ptr)
-    {
-        dataSet[count++]=ptr;
-    }
-    void add(SampleSet *ptr)
-    {
-        noInterrupts();
-        addFromIsr(ptr);
-        interrupts();
-    }
-    bool empty()
-    {
-        return !count;
-    }
-    SampleSet *takeFromIsr()
-    {
-        if(!count) return NULL;
-        SampleSet *out=dataSet[0];
-        memmove(dataSet,dataSet+1,(count-1)*4);
-        count--;
-        return out;
-    }
-    SampleSet *take()
-    {
-        SampleSet *out;
-        noInterrupts();
-        out=takeFromIsr();
-        interrupts();
-        return out;
-    }
-
-protected:
-    int       count;
-    SampleSet *dataSet[SAMPLING_QUEUE_SIZE];
-    
-    
-};
-
 
 
 
@@ -115,8 +63,7 @@ public:
             bool    setTimeScale(adc_smp_rate one, adc_prescaler two);
             bool    prepareDMASampling (adc_smp_rate rate,adc_prescaler scale);
             bool    prepareTimerSampling (int fq);
-            SampleSet *getSamples();
-            void     reclaimSamples(SampleSet *buffer);
+            bool    getSamples(SampleSet &set)           ;
             bool     setSlowMode(int fqInHz);
             bool     readCalibrationValue();
     static  uint32_t getVCCmv();
@@ -134,7 +81,7 @@ protected:
     static  void adc_dma_disable(const adc_dev * dev) ;            
     static  void adc_dma_enable(const adc_dev * dev) ;    
     static  void DMA1_CH1_Event();
-            void captureComplete();
+            void captureComplete(SampleSet &one, SampleSet &two);
     static  void Timer2_Event();
     static  void Timer2Trigger_Event();
 
@@ -151,9 +98,9 @@ protected:
 protected:
   
             int             _sampled;
-            SampleingQueue availableBuffers;
-            SampleingQueue capturedBuffers;
-            
+            SampleSet       _cap1,_cap2;
+ 
+static      uint32_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];            
 };
 
 // EOF

@@ -18,6 +18,8 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 #include "dso_global.h"
 #include "dso_adc_priv.h"
 
+uint32_t DSOADC::adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];
+
 int dmaSpuriousInterrupt=0;
 extern HardwareTimer Timer4;
 /**
@@ -33,12 +35,10 @@ extern HardwareTimer Timer2;
 adc_reg_map *adc_Register;
 extern VoltageSettings vSettings[];
 extern const float inputScale[];
-SampleSet *currentSet=NULL;
 DSOADC::TriggerMode triggerMode=DSOADC::Trigger_Both;
 /**
  */
 int requestedSamples;
-uint32_t *currentSamplingBuffer=NULL;
 uint32_t vcc; // power Supply in mv
 
 
@@ -60,18 +60,7 @@ DSOADC::DSOADC()
   
   adc_Register=  PIN_MAP[PA0].adc_device->regs;
   
-  for(int i=0;i<SAMPLING_QUEUE_SIZE;i++)
-  {
-      uint32_t *data=new uint32_t[maxSamples];
-      SampleSet  *set=new SampleSet;
-      if(!data)
-      {
-          xAssert(0);
-      }
-      set->data=data;
-      set->samples=0;
-      availableBuffers.addFromIsr(set);
-  }
+
 }
 /**
  */
@@ -210,31 +199,21 @@ bool    DSOADC::prepareDMASampling (adc_smp_rate rate,adc_prescaler scale)
  * @param count
  * @return 
  */
-SampleSet *DSOADC::getSamples()
+bool DSOADC::getSamples(SampleSet &set)
 {
-again:
-    noInterrupts();
-    SampleSet *set=capturedBuffers.takeFromIsr();
-    if(set)
+    if(!dmaSemaphore->take(10000))
+        return false;
+    // Copy data from cap1 & cap2...
+    uint32_t *s=set.data;
+    set.samples=_cap1.samples+_cap2.samples;
+    memcpy(s,_cap1.data,_cap1.samples*sizeof(uint32_t));
+    
+    if(_cap2.samples)
     {
-            interrupts();
-            return set;
+        s+=_cap1.samples;
+        memcpy(s,_cap2.data,_cap2.samples*sizeof(uint32_t));
     }
-    interrupts();
-    dmaSemaphore->take(10000); // 10 sec timeout
-    //dma_disable(DMA1, DMA_CH1); //End of trasfer, disable DMA and Continuous mode.
-    set=capturedBuffers.take();
-    if(!set) goto again;    
-    return set;
-}
-/**
- * 
- * @param buffer
- * @return 
- */
-void     DSOADC::reclaimSamples(SampleSet *set)
-{
-    availableBuffers.add(set);
+    return true;
 }
  
 
@@ -251,23 +230,18 @@ bool DSOADC::startDMASampling (int count)
 {
   // This loop uses dual interleaved mode to get the best performance out of the ADCs
   //
-  if(!capturedBuffers.empty())
-       return true; // We have data !
     
-  currentSet=availableBuffers.take();
-  if(!currentSet) return false;    
 
-  if(count>maxSamples)
-        count=maxSamples;
+  if(count>ADC_INTERNAL_BUFFER_SIZE/2)
+        count=ADC_INTERNAL_BUFFER_SIZE/2;
     
   requestedSamples=count;  
-  currentSamplingBuffer=currentSet->data;
   convTime=micros();
   dma_init(DMA1);
   dma_attach_interrupt(DMA1, DMA_CH1, DMA1_CH1_Event);
 
   
-  dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, currentSamplingBuffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
+  dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, adcInternalBuffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
   dma_set_num_transfers(DMA1, DMA_CH1, requestedSamples );
   adc_dma_enable(ADC1);
   dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
@@ -306,7 +280,12 @@ void DSOADC::adc_dma_disable(const adc_dev * dev)
  */
 void DSOADC::DMA1_CH1_Event() 
 {
-    instance->captureComplete();
+    SampleSet one,two;
+    two.samples=0;
+    one.samples=requestedSamples;
+    one.data=adcInternalBuffer;
+    two.data=NULL;
+    instance->captureComplete(one,two);
     adc_dma_disable(ADC1);
 }
 
@@ -317,13 +296,11 @@ void DSOADC::TriggerInterrupt()
 
 /**
  */
-void DSOADC::captureComplete()
+void DSOADC::captureComplete(SampleSet &one, SampleSet &two)
 {
     convTime=micros()-convTime;
-    currentSet->samples=requestedSamples;
-    capturedBuffers.addFromIsr(currentSet);
-    currentSet=NULL;
-    currentSamplingBuffer=NULL;
+    _cap1=one;
+    _cap2=two;
     dmaSemaphore->giveFromInterrupt();
 }
 /**
@@ -331,12 +308,7 @@ void DSOADC::captureComplete()
  */
 void DSOADC::clearCapturedData()
 {
-    while(!capturedBuffers.empty())
-    {
-        SampleSet *b=capturedBuffers.take();
-        if(!b) break;
-        availableBuffers.add(b);
-    }
+   
 }
 
 /**

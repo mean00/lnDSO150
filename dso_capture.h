@@ -55,8 +55,8 @@ public:
       DSO_VOLTAGE_5V,
       DSO_VOLTAGE_MAX=DSO_VOLTAGE_5V
     };
-    static int         oneShotCapture(int count,float *outbuffer,CaptureStats &stats) ;
-    static int         triggeredCapture(int count,float *outbuffer,CaptureStats &stats);
+    static int         oneShotCapture(int count,float *voltage,CaptureStats &stats) ;
+    static int         triggeredCapture(int count,SampleSet &set,CaptureStats &stats);
     static bool        setVoltageRange(DSO_VOLTAGE_RANGE voltRange);
     static DSO_VOLTAGE_RANGE getVoltageRange();
     static bool        setTimeBase(DSO_TIME_BASE timeBase);
@@ -64,8 +64,8 @@ public:
     static bool        prepareSampling ();
     static bool        startSampling (int count);
     static bool        startTriggerSampling (int count);
-    static SampleSet   *getSamples();
-    static void        reclaimSamples(SampleSet *set);
+    static bool        getSamples(SampleSet &set);
+    
     
     static bool        captureToDisplay(int count,float *samples,uint8_t *waveForm);
     static const char *getTimeBaseAsText();

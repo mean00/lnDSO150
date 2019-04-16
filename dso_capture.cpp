@@ -118,17 +118,9 @@ bool     DSOCapture::startTriggerSampling (int count)
  * @param count
  * @return 
  */
-SampleSet *DSOCapture::getSamples()
+bool DSOCapture::getSamples(SampleSet &set)
 {
-    return adc->getSamples();
-}
-/**
- * 
- * @param buffer
- */
-void     DSOCapture::reclaimSamples(SampleSet *set)
-{
-    adc->reclaimSamples(set);
+    return adc->getSamples(set);
 }
 
 
@@ -137,22 +129,24 @@ void     DSOCapture::reclaimSamples(SampleSet *set)
  * @param count
  * @return 
  */
-int DSOCapture::oneShotCapture(int count,float *outbuffer,CaptureStats &stats)
+int DSOCapture::oneShotCapture(int count,float *samples,CaptureStats &stats)
 {
     int available;
+    uint32_t data[256];
+    SampleSet set;
+    set.data=data;
+    
     prepareSampling();
     if(!startSampling(count)) return 0;
-    SampleSet *set=    getSamples();
+    bool r=    getSamples(set);
     
-    if(!set) return 0;
+    if(!r) return 0;
     
     int scale=vSettings[currentVoltageRange].inputGain;
     if(captureFast)
-        count=transform((int32_t *)set->data,outbuffer,set->samples,vSettings+currentVoltageRange,tSettings[currentTimeBase].expand4096,stats,1.0,DSOADC::Trigger_Both);
+        count=transform((int32_t *)set.data,samples,set.samples,vSettings+currentVoltageRange,tSettings[currentTimeBase].expand4096,stats,1.0,DSOADC::Trigger_Both);
     else
-        count=transform((int32_t *)set->data,outbuffer,set->samples,vSettings+currentVoltageRange,4096,stats,1.0,DSOADC::Trigger_Both);
-    
-    reclaimSamples(set);
+        count=transform((int32_t *)set.data,samples,set.samples,vSettings+currentVoltageRange,4096,stats,1.0,DSOADC::Trigger_Both);
     return count;
 }
 /**
@@ -195,27 +189,28 @@ int DSOCapture::voltToADCValue(float v)
  * @param count
  * @return 
  */
-int DSOCapture::triggeredCapture(int count,float *outbuffer,CaptureStats &stats)
+int DSOCapture::triggeredCapture(int count,SampleSet &set,CaptureStats &stats)
 {
     int available;
-    
+#warning FIMXE    
     DSO_CAPTURE_STATE state=DSO_STATE_RUN;
     while(1)
     {    
         prepareSampling();
         if(!startTriggerSampling(count)) return 0;
-        SampleSet *set=    getSamples();
-        if(!set) 
+        bool r=    getSamples(set);
+        if(!r) 
             return 0;
-
+#if 0
         int scale=vSettings[currentVoltageRange].inputGain;
       /*  if(captureFast)
             count=transform((int32_t *)set->data,outbuffer,set->samples,vSettings+currentVoltageRange,tSettings[currentTimeBase].expand4096,stats,1.0,DSOADC::Trigger_Both);
         else*/
             count=transform((int32_t *)set->data,outbuffer,set->samples,vSettings+currentVoltageRange,4096,stats,1.0,DSOADC::Trigger_Both);    
-        reclaimSamples(set);
+
         if(stats.trigger!=-1) 
             break;
+#endif            
     }
     return count;
 }
@@ -282,7 +277,7 @@ const char *DSOCapture::getVoltageRangeAsText()
  */
 void        DSOCapture::clearCapturedData()
 {
-    adc->clearCapturedData();
+    //adc->clearCapturedData();
 }
 
 // EOF

@@ -105,7 +105,7 @@ void testAdc2(void)
         
         count=transform((int32_t *)xsamples,samples,count,vSettings+currentVSettings,expand,stats,1.0,DSOADC::Trigger_Both);
         acquisitionTime=convTime;
-        adc->reclaimSamples(set);
+//        adc->reclaimSamples(set);
             
         tft->setCursor(240, 100);
         tft->print(currentTSettings);

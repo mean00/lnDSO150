@@ -39,8 +39,11 @@ void testOne(adc_smp_rate one, adc_prescaler two,int sc)
    
    adc->prepareDMASampling (one,two);            
    adc->startDMASampling (1024);
-   SampleSet    *set=adc->getSamples();
-   adc->reclaimSamples(set);
+   SampleSet    set;
+   uint32_t data[256];
+   set.data=data;
+   //bool r=adc->getSamples(set);
+
     
    after= micros();
    //printf("%d:%d => %d\n",(int)one,sc,after-before);

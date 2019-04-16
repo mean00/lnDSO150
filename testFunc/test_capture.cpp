@@ -31,7 +31,6 @@ extern testSignal *myTestSignal;
 //
 
 static uint8_t waveForm[256]; // take a bit more, we have rounding issues
-static float  samples[256];
 static bool voltageMode=false;
 
 
@@ -109,7 +108,7 @@ static void drawStats(CaptureStats &stats)
     AND_ONE(stats.avg,5);
     
 }
-
+static float voltageSamples[240];
 /**
  * 
  */
@@ -135,23 +134,22 @@ void testCapture(void)
     float f=DSOCapture::getTriggerValue();
     triggerLine=DSOCapture::voltageToPixel(f);
     
-    
     // 
     
     while(1)
     {        
         int lastTime=millis();
-#if 1        
+#if 0        
         int count=DSOCapture::triggeredCapture(240,samples,stats);  
 #else
-          int count=DSOCapture::oneShotCapture(240,samples,stats);  
+          int count=DSOCapture::oneShotCapture(240,voltageSamples,stats);  
 #endif
         if(!count) 
         {
             buttonManagement();
             continue;
         }
-        DSOCapture::captureToDisplay(count,samples,waveForm);  
+        DSOCapture::captureToDisplay(count,voltageSamples,waveForm);  
         // Remove trigger
         DSODisplay::drawVoltageTrigger(false,triggerLine);
         
