@@ -76,7 +76,7 @@ void mySetup()
     
     tft->fillScreen(BLACK);
     // Ok let's go, switch to FreeRTOS
-    xTaskCreate( MainTask, "MainTask", 700, NULL, DSO_MAIN_TASK_PRIORITY, NULL );
+    xTaskCreate( MainTask, "MainTask", 250, NULL, DSO_MAIN_TASK_PRIORITY, NULL );
     vTaskStartScheduler();      
 }
 

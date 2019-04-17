@@ -9,6 +9,14 @@
 #include "transform.h"
 /**
  */
+typedef struct CapturedSet
+{
+    int          samples;
+    float        data[240];
+    CaptureStats stats;
+};
+/**
+ */
 class DSOCapture
 {
 public:
@@ -64,7 +72,7 @@ public:
     static bool        prepareSampling ();
     static bool        startSampling (int count);
     static bool        startTriggerSampling (int count);
-    static bool        getSamples(SampleSet &set);
+    static bool        getSamples(CapturedSet **set);
     
     
     static bool        captureToDisplay(int count,float *samples,uint8_t *waveForm);
