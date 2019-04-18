@@ -174,7 +174,7 @@ void DSOADC::timerCapture()
     uint32_t avg=0;
     if(! validateAverageSample(avg))
         return;
-    adcInternalBuffer[currentIndex]=avg<<16;
+    adcInternalBuffer[currentIndex]=avg;
     currentIndex++;
     if(currentIndex>=requestedSamples)
     {                
@@ -188,7 +188,7 @@ void DSOADC::timerCapture()
         one.samples=requestedSamples;
         one.data=adcInternalBuffer;
         two.data=NULL;
-        captureComplete(one,two);
+        captureComplete(false,one,two);
         return;
     }
     // Ask for next set of samples

@@ -199,12 +199,11 @@ bool    DSOADC::prepareDMASampling (adc_smp_rate rate,adc_prescaler scale)
  * @param count
  * @return 
  */
-bool DSOADC::getSamples(SampleSet &set1,SampleSet &set2)
+bool DSOADC::getSamples(FullSampleSet &fullSet)
 {
     if(!dmaSemaphore->take(10000))
         return false;
-    set1=_cap1;
-    set2=_cap2;
+    fullSet=_captured;
     return true;
 }
  
@@ -277,7 +276,7 @@ void DSOADC::DMA1_CH1_Event()
     one.samples=requestedSamples;
     one.data=adcInternalBuffer;
     two.data=NULL;
-    instance->captureComplete(one,two);
+    instance->captureComplete(true,one,two);
     adc_dma_disable(ADC1);
 }
 
@@ -288,11 +287,12 @@ void DSOADC::TriggerInterrupt()
 
 /**
  */
-void DSOADC::captureComplete(SampleSet &one, SampleSet &two)
+void DSOADC::captureComplete(bool shift,SampleSet &one, SampleSet &two)
 {
     convTime=micros()-convTime;
-    _cap1=one;
-    _cap2=two;
+    _captured.set1=one;
+    _captured.set2=two;
+    _captured.shifted=shift;
     dmaSemaphore->giveFromInterrupt();
 }
 /**

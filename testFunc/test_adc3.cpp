@@ -101,15 +101,15 @@ void testAdc3(void)
         adc->prepareTimerSampling (1000);            
         adc->startTimerSampling ((240*expand)/4096);
         
-        SampleSet   s1,s2;
-        bool r=adc->getSamples(s1,s2);
-        count=s1.samples;
-        uint32_t *xsamples=s2.data;
+        FullSampleSet   s;
+        bool r=adc->getSamples(s);
+        count=s.set1.samples;
+        uint32_t *xsamples=s.set1.data;
         
         markStart=millis();
         int scale=vSettings[currentVSettings].inputGain;
         
-        count=transform((int32_t *)xsamples,samples,count,vSettings+currentVSettings,expand,stats,1.0,DSOADC::Trigger_Both);
+        count=transform(true,(int32_t *)xsamples,samples,count,vSettings+currentVSettings,expand,stats,1.0,DSOADC::Trigger_Both);
         acquisitionTime=convTime/1000;
 //        adc->reclaimSamples(set);
             

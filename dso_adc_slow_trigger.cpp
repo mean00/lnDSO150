@@ -109,18 +109,18 @@ void DSOADC::timerTriggerCapture()
         if((timerWrite%ADC_INTERNAL_BUFFER_SIZE)>(timerRead%ADC_INTERNAL_BUFFER_SIZE))
         {
             one.samples=len;
-            one.data=adcInternalBuffer+(timerRead);
+            one.data=adcInternalBuffer+(timerRead%ADC_INTERNAL_BUFFER_SIZE);
             two.samples=0;
             two.data=NULL;
         }else
         {
             int left=ADC_INTERNAL_BUFFER_SIZE-(timerRead%ADC_INTERNAL_BUFFER_SIZE);
             one.samples=len;
-            one.data=adcInternalBuffer+(timerRead);
+            one.data=adcInternalBuffer+(timerRead%ADC_INTERNAL_BUFFER_SIZE);
             two.samples=len-left;
             two.data=adcInternalBuffer;
         }
-        captureComplete(one,two);
+        captureComplete(false,one,two);
 
         return;
     }

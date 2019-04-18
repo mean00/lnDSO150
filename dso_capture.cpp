@@ -142,33 +142,54 @@ bool DSOCapture::getSamples(CapturedSet **set)
 void DSOCapture::task(void *a)
 {
     xDelay(20);
-    SampleSet set1,set2; // shallow copy
+    FullSampleSet fset; // Shallow copy
     while(1)
     {
-        if(!adc->getSamples(set1,set2))
+        int currentVolt=currentVoltageRange; // use a local copy so that it does not change in the middle
+        int currentTime=currentTimeBase;
+        if(!adc->getSamples(fset))
             continue;
 
-        if(!set1.samples)
+        if(!fset.set1.samples)
         {
             continue;
         }
-        int scale=vSettings[currentVoltageRange].inputGain;
+        int scale=vSettings[currentVolt].inputGain;
         int expand=4096;
         if(captureFast)            
         {
-            expand=tSettings[currentTimeBase].expand4096;
+            expand=tSettings[currentTime].expand4096;
         }
         CapturedSet *set=captureSet;
         float *data=set->data;
-        set->samples=transform((int32_t*)set1.data,data,set1.samples,vSettings+currentVoltageRange,expand,set->stats,1.0,DSOADC::Trigger_Both);
-        if(set2.samples)
+        //int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode)
+        set->samples=transform(
+                                        fset.shifted,
+                                (int32_t*)fset.set1.data,
+                                        data,
+                                        fset.set1.samples,
+                                        vSettings+currentVolt,
+                                        expand,
+                                        set->stats,
+                                        1.0,DSOADC::Trigger_Both);
+        if(fset.set2.samples)
         {
             CaptureStats otherStats;
-            set->samples+=transform((int32_t *)set2.data,data+set->samples,set2.samples,vSettings+currentVoltageRange,expand,otherStats,1.0,DSOADC::Trigger_Both);                
-            // merge stats
+            int sample2=transform(
+                                        fset.shifted,
+                                        (int32_t *)fset.set2.data,
+                                        data+set->samples,
+                                        fset.set2.samples,
+                                        vSettings+currentVolt,
+                                        expand,
+                                        otherStats,
+                                        1.0,DSOADC::Trigger_Both);                
+            
+            set->stats.avg= (set->stats.avg*set->samples+otherStats.avg*fset.set2.samples)/(set->samples+fset.set2.samples);
+            set->samples+=sample2;
             if(otherStats.xmax>set->stats.xmax) set->stats.xmax=otherStats.xmax;
             if(otherStats.xmin<set->stats.xmin) set->stats.xmin=otherStats.xmin;
-            // TODO update average
+            
         }
         // Data ready!
         captureSemaphore->give();
@@ -239,31 +260,27 @@ int DSOCapture::voltToADCValue(float v)
  * @param count
  * @return 
  */
-int DSOCapture::triggeredCapture(int count,SampleSet &set,CaptureStats &stats)
+int DSOCapture::triggeredCapture(int count,float *volt,CaptureStats &stats)
 {
     int available;
-#warning FIMXE    
     DSO_CAPTURE_STATE state=DSO_STATE_RUN;
     while(1)
     {
-        xDelay(50);
-        return 0;
-#if 0        
         prepareSampling();
         if(!startTriggerSampling(count)) return 0;
-        bool r=    getSamples(set);
+        
+        CapturedSet *set;
+        bool r=    getSamples(&set);
         if(!r) 
             return 0;
+        int toCopy=set->samples;
+         if(toCopy>count) toCopy=count;
 
-        int scale=vSettings[currentVoltageRange].inputGain;
-      /*  if(captureFast)
-            count=transform((int32_t *)set->data,outbuffer,set->samples,vSettings+currentVoltageRange,tSettings[currentTimeBase].expand4096,stats,1.0,DSOADC::Trigger_Both);
-        else*/
-            count=transform((int32_t *)set->data,outbuffer,set->samples,vSettings+currentVoltageRange,4096,stats,1.0,DSOADC::Trigger_Both);    
-
-        if(stats.trigger!=-1) 
-            break;
-#endif            
+         memcpy(volt,set->data,toCopy*sizeof(float));
+         stats=set->stats;
+         xDelay(10);
+         return toCopy;
+       
     }
     return count;
 }

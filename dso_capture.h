@@ -64,7 +64,7 @@ public:
       DSO_VOLTAGE_MAX=DSO_VOLTAGE_5V
     };
     static int         oneShotCapture(int count,float *voltage,CaptureStats &stats) ;
-    static int         triggeredCapture(int count,SampleSet &set,CaptureStats &stats);
+    static int         triggeredCapture(int count,float *voltage,CaptureStats &stats);
     static bool        setVoltageRange(DSO_VOLTAGE_RANGE voltRange);
     static DSO_VOLTAGE_RANGE getVoltageRange();
     static bool        setTimeBase(DSO_TIME_BASE timeBase);

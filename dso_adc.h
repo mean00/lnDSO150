@@ -39,8 +39,15 @@ typedef struct SampleSet
 };
 
 static bool triggered=false;
-
-
+/**
+ */
+typedef struct FullSampleSet
+{
+  bool      shifted;
+  SampleSet set1;
+  SampleSet set2;
+  
+};
 
 
 /**
@@ -63,7 +70,7 @@ public:
             bool    setTimeScale(adc_smp_rate one, adc_prescaler two);
             bool    prepareDMASampling (adc_smp_rate rate,adc_prescaler scale);
             bool    prepareTimerSampling (int fq);
-            bool    getSamples(SampleSet &set1,SampleSet &set2)           ;
+            bool    getSamples(FullSampleSet &fullSet)           ;
             bool     setSlowMode(int fqInHz);
             bool     readCalibrationValue();
     static  uint32_t getVCCmv();
@@ -81,7 +88,7 @@ protected:
     static  void adc_dma_disable(const adc_dev * dev) ;            
     static  void adc_dma_enable(const adc_dev * dev) ;    
     static  void DMA1_CH1_Event();
-            void captureComplete(SampleSet &one, SampleSet &two);
+            void captureComplete(bool shift,SampleSet &one, SampleSet &two);
     static  void Timer2_Event();
     static  void Timer2Trigger_Event();
 
@@ -98,7 +105,7 @@ protected:
 protected:
   
             int             _sampled;
-            SampleSet       _cap1,_cap2;
+            FullSampleSet   _captured;
  
 static      uint32_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];            
 };
