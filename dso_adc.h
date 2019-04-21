@@ -69,6 +69,7 @@ public:
                     DSOADC();
             bool    setTimeScale(adc_smp_rate one, adc_prescaler two);
             bool    prepareDMASampling (adc_smp_rate rate,adc_prescaler scale);
+            
             bool    prepareTimerSampling (int fq);
             bool    getSamples(FullSampleSet &fullSet)           ;
             bool     setSlowMode(int fqInHz);
@@ -80,6 +81,7 @@ public:
             
 
             bool startDMASampling (int count);
+            bool startDMATriggeredSampling (int count);
             bool startTimerSampling (int count);
             bool startTriggeredTimerSampling (int count,uint32_t triggerADC);
             void clearCapturedData();
@@ -88,6 +90,7 @@ protected:
     static  void adc_dma_disable(const adc_dev * dev) ;            
     static  void adc_dma_enable(const adc_dev * dev) ;    
     static  void DMA1_CH1_Event();
+    static  void DMA1_CH1_TriggerEvent() ;
             void captureComplete(bool shift,SampleSet &one, SampleSet &two);
     static  void Timer2_Event();
     static  void Timer2Trigger_Event();

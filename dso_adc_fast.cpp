@@ -122,7 +122,7 @@ void DSOADC::setADCs ()
   //  adc_reg_map *regs = dev->regs;
   adc_set_reg_seqlen(ADC1, 1);
   ADC1->regs->SQR3 = pinMapADCin;
-  ADC1->regs->CR2 |= ADC_CR2_CONT; // | ADC_CR2_DMA; // Set continuous mode and DMA
+  ADC1->regs->CR2 &= ~ADC_CR2_CONT; // | ADC_CR2_DMA; // Set continuous mode and DMA  
   ADC1->regs->CR1 |= ADC_CR1_FASTINT; // Interleaved mode
   ADC1->regs->CR2 |= ADC_CR2_SWSTART;
 
@@ -191,6 +191,7 @@ void DSOADC::setADCs ()
   */
 bool    DSOADC::prepareDMASampling (adc_smp_rate rate,adc_prescaler scale)
 {    
+    ADC1->regs->CR2 &= ~ADC_CR2_CONT; // | ADC_CR2_DMA; // Set continuous mode and DMA  
     setTimeScale(rate,scale);
     return true;
 }
@@ -225,7 +226,7 @@ bool DSOADC::startDMASampling (int count)
 
   if(count>ADC_INTERNAL_BUFFER_SIZE/2)
         count=ADC_INTERNAL_BUFFER_SIZE/2;
-    
+  ADC1->regs->CR2 &= ~ADC_CR2_CONT; // | ADC_CR2_DMA; // Set continuous mode and DMA  
   requestedSamples=count;  
   convTime=micros();
   dma_init(DMA1);
@@ -313,3 +314,5 @@ void Oopps()
         
     };
 }
+
+#include "dso_adc_fast_trigger.cpp"
