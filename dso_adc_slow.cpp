@@ -116,7 +116,7 @@ bool DSOADC::startTimerSampling (int count)
     captureState=Capture_armed;
     startInternalDmaSampling();   
     
-    Timer2.setCompare(CAPTURE_TIMER_CHANNEL, 16);    
+    Timer2.setCompare(CAPTURE_TIMER_CHANNEL, 1);    
     Timer2.setMode(CAPTURE_TIMER_CHANNEL, TIMER_OUTPUTCOMPARE); // start timer
     Timer2.refresh();
     Timer2.resume();
