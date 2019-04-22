@@ -36,7 +36,7 @@ bool DSOADC::startDMATriggeredSampling (int count)
     
   requestedSamples=count;  
   convTime=micros();
-  ADC1->regs->CR2 |= ADC_CR2_CONT; // | ADC_CR2_DMA; // Set continuous mode and DMA  
+
   dma_init(DMA1);
   dma_attach_interrupt(DMA1, DMA_CH1, DMA1_CH1_TriggerEvent);
 
@@ -46,6 +46,7 @@ bool DSOADC::startDMATriggeredSampling (int count)
   // Continuous sampling  
   adc_dma_enable(ADC1);
   dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
+  startADC();
   return true;
 }
 /**

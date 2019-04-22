@@ -121,13 +121,17 @@ void DSOADC::setADCs ()
    
   //  adc_reg_map *regs = dev->regs;
   adc_set_reg_seqlen(ADC1, 1);
-  ADC1->regs->SQR3 = pinMapADCin;
-  ADC1->regs->CR2 &= ~ADC_CR2_CONT; // | ADC_CR2_DMA; // Set continuous mode and DMA  
-  ADC1->regs->CR1 |= ADC_CR1_FASTINT; // Interleaved mode
-  ADC1->regs->CR2 |= ADC_CR2_SWSTART;
+  
+  adc_Register->CR2 |= ADC_CR2_CONT; // | ADC_CR2_DMA; // Set continuous mode and DMA
+  adc_Register->CR1 |= ADC_CR1_FASTINT; // Interleaved mode
+  adc_Register->CR2 |= ADC_CR2_SWSTART;
 
-  ADC2->regs->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
-  ADC2->regs->SQR3 = pinMapADCin;
+  adc_Register->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
+  
+  
+  ADC1->regs->SQR3 = pinMapADCin;  
+  ADC1->regs->CR1 |= ADC_CR1_FASTINT; // Interleaved mode
+
   
   pinMode(triggerPin,INPUT);
     
@@ -191,7 +195,7 @@ void DSOADC::setADCs ()
   */
 bool    DSOADC::prepareDMASampling (adc_smp_rate rate,adc_prescaler scale)
 {    
-    ADC1->regs->CR2 &= ~ADC_CR2_CONT; // | ADC_CR2_DMA; // Set continuous mode and DMA  
+
     setTimeScale(rate,scale);
     return true;
 }
@@ -208,6 +212,14 @@ bool DSOADC::getSamples(FullSampleSet &fullSet)
     return true;
 }
  
+/**
+ * 
+ */
+void DSOADC::startADC()
+{
+    ADC1->regs->CR2 |= ADC_CR2_CONT; 
+    ADC1->regs->CR2 |= ADC_CR2_SWSTART;
+}
 
 // Grab the samples from the ADC
 // Theoretically the ADC can not go any faster than this.
@@ -215,7 +227,6 @@ bool DSOADC::getSamples(FullSampleSet &fullSet)
 // According to specs, when using 72Mhz on the MCU main clock,the fastest ADC capture time is 1.17 uS. As we use 2 ADCs we get double the captures, so .58 uS, which is the times we get with ADC_SMPR_1_5.
 // I think we have reached the speed limit of the chip, now all we can do is improve accuracy.
 // See; http://stm32duino.com/viewtopic.php?f=19&t=107&p=1202#p1194
-
 
 
 bool DSOADC::startDMASampling (int count)
@@ -226,17 +237,19 @@ bool DSOADC::startDMASampling (int count)
 
   if(count>ADC_INTERNAL_BUFFER_SIZE/2)
         count=ADC_INTERNAL_BUFFER_SIZE/2;
-  ADC1->regs->CR2 &= ~ADC_CR2_CONT; // | ADC_CR2_DMA; // Set continuous mode and DMA  
+  
+
+  
   requestedSamples=count;  
   convTime=micros();
   dma_init(DMA1);
   dma_attach_interrupt(DMA1, DMA_CH1, DMA1_CH1_Event);
-
   
   dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, adcInternalBuffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
   dma_set_num_transfers(DMA1, DMA_CH1, requestedSamples );
   adc_dma_enable(ADC1);
   dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
+  startADC();
   return true;
 }
 /**

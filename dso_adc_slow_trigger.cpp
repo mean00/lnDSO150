@@ -43,6 +43,7 @@ bool DSOADC::startTriggeredTimerSampling (int count,uint32_t triggerADC)
     Timer2.resume();
     
     interrupts();
+    
 } 
 void DSOADC::Timer2Trigger_Event() 
 {    

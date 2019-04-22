@@ -67,6 +67,7 @@ public:
   
 public:
                     DSOADC();
+            void    startADC();
             bool    setTimeScale(adc_smp_rate one, adc_prescaler two);
             bool    prepareDMASampling (adc_smp_rate rate,adc_prescaler scale);
             
