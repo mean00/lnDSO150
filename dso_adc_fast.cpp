@@ -119,7 +119,6 @@ void DSOADC::setADCs ()
   adc_set_sample_rate(ADC2, ADC_SMPR_1_5);    // if not may get some sporadic noise. see datasheet.
   adc_set_prescaler(ADC_PRE_PCLK2_DIV_2);
    
-  //  adc_reg_map *regs = dev->regs;
   adc_set_reg_seqlen(ADC1, 1);
   
   adc_Register->SQR3 = pinMapADCin;
@@ -127,13 +126,8 @@ void DSOADC::setADCs ()
   adc_Register->CR1 |= ADC_CR1_FASTINT; // Interleaved mode
   adc_Register->CR2 |= ADC_CR2_SWSTART;
   
-  
-  
   ADC2->regs->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
   ADC2->regs->SQR3 = pinMapADCin;
-
-  
-
   
   pinMode(triggerPin,INPUT);
     
@@ -149,17 +143,17 @@ void DSOADC::setADCs ()
  */
  bool DSOADC::setTriggerMode(TriggerMode mode)
  {
-     ExtIntTriggerMode m;
-     triggerMode=mode;
-     switch(triggerMode)
-     {
+    ExtIntTriggerMode m;
+    triggerMode=mode;
+    switch(triggerMode)
+    {
         case DSOADC::Trigger_Falling: m=FALLING;break;
         case DSOADC::Trigger_Rising:  m=RISING;break;
         case DSOADC::Trigger_Both:    m=CHANGE;break;
         default: xAssert(0);break;
-     }
-      // Hook trigger interrupt  
-   attachInterrupt(triggerPin,TriggerInterrupt,m );
+    }
+    // Hook trigger interrupt  
+    attachInterrupt(triggerPin,TriggerInterrupt,m );
  }
  /**
   * 
