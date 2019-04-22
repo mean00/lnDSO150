@@ -46,7 +46,6 @@ bool DSOADC::startDMATriggeredSampling (int count)
   // Continuous sampling  
   adc_dma_enable(ADC1);
   dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
-  startADC();
   return true;
 }
 /**

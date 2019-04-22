@@ -122,15 +122,17 @@ void DSOADC::setADCs ()
   //  adc_reg_map *regs = dev->regs;
   adc_set_reg_seqlen(ADC1, 1);
   
+  adc_Register->SQR3 = pinMapADCin;
   adc_Register->CR2 |= ADC_CR2_CONT; // | ADC_CR2_DMA; // Set continuous mode and DMA
   adc_Register->CR1 |= ADC_CR1_FASTINT; // Interleaved mode
   adc_Register->CR2 |= ADC_CR2_SWSTART;
+  
+  
+  
+  ADC2->regs->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
+  ADC2->regs->SQR3 = pinMapADCin;
 
-  adc_Register->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
   
-  
-  ADC1->regs->SQR3 = pinMapADCin;  
-  ADC1->regs->CR1 |= ADC_CR1_FASTINT; // Interleaved mode
 
   
   pinMode(triggerPin,INPUT);
@@ -212,14 +214,6 @@ bool DSOADC::getSamples(FullSampleSet &fullSet)
     return true;
 }
  
-/**
- * 
- */
-void DSOADC::startADC()
-{
-    ADC1->regs->CR2 |= ADC_CR2_CONT; 
-    ADC1->regs->CR2 |= ADC_CR2_SWSTART;
-}
 
 // Grab the samples from the ADC
 // Theoretically the ADC can not go any faster than this.
@@ -249,7 +243,6 @@ bool DSOADC::startDMASampling (int count)
   dma_set_num_transfers(DMA1, DMA_CH1, requestedSamples );
   adc_dma_enable(ADC1);
   dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
-  startADC();
   return true;
 }
 /**

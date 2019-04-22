@@ -82,7 +82,6 @@ bool DSOADC::startInternalDmaSampling ()
   dma_set_num_transfers(DMA1, DMA_CH1, DMA_OVERSAMPLING_COUNT );
   adc_dma_enable(ADC1);
   dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
-  startADC();
   return true;
 }
   /**
