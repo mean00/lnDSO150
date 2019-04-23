@@ -1,8 +1,7 @@
 /**
  
- *  This is the slow capture mode
- * i.e. we setup n Samples acquisition through DMA
- * and a timer interrupt grabs the result 
+ *  This is the slow capture mode / triggered
+ *  We'll take the capture only if the trigger happens & try to center it
  */
 
 
@@ -53,10 +52,7 @@ void DSOADC::Timer2Trigger_Event()
 
 #define NEXT_TRANSFER() \ 
     captureState=Capture_armed; \
-    dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, dmaOverSampleBuffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT)); \
-    dma_set_num_transfers(DMA1, DMA_CH1, DMA_OVERSAMPLING_COUNT ); \
-    dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
-
+    nextAdcDmaTransfer(DMA_OVERSAMPLING_COUNT,dmaOverSampleBuffer);
 
 /**
  * \fn timerCapture

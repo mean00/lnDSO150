@@ -23,7 +23,8 @@ typedef struct VoltageSettings
     int         offset;         /// Offset of sampled data , you need to substract it
 
 };
-
+/**
+ */
 typedef struct TimeSettings
 {
   const char    *name;
@@ -31,14 +32,26 @@ typedef struct TimeSettings
   adc_smp_rate   rate;
   int            expand4096;
 };
-
-typedef struct SampleSet
+/**
+ * 
+ */
+class SampleSet
 {
+public:
+            SampleSet()
+            {
+              samples=0;
+              data=NULL;
+            }
+            SampleSet(int s, uint32_t *d)
+            {
+              samples=s;
+              data=d;
+            }
   int       samples;
   uint32_t  *data;
 };
 
-static bool triggered=false;
 /**
  */
 typedef struct FullSampleSet

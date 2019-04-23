@@ -38,7 +38,7 @@ uint32_t DSOADC::adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE] __attribute__ ((ali
 
 int dmaSpuriousInterrupt=0;
 extern HardwareTimer Timer4;
-
+static bool triggered=false;
 
 /**
  */
