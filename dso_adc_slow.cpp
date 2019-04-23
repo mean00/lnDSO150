@@ -6,13 +6,14 @@
  */
 
 #include "dso_global.h"
+#include "dso_adc_priv.h"
 
 /**
  */
 
-#define CAPTURE_TIMER_CHANNEL TIMER_CH1
 
-extern HardwareTimer Timer2;
+
+extern HardwareTimer ADC_TIMER;
 extern adc_reg_map *adc_Register;
 
 enum CaptureState
@@ -50,8 +51,8 @@ extern void Oopps();
  */
 bool DSOADC::setSlowMode(int fqInHz)
 {    
-    Timer2.attachInterrupt(CAPTURE_TIMER_CHANNEL, Timer2_Event);
-    Timer2.setPeriod(1000000/(fqInHz)); // in microseconds, oversampled 16 times
+    ADC_TIMER.attachInterrupt(ADC_TIMER_CHANNEL, Timer_Event);
+    ADC_TIMER.setPeriod(1000000/(fqInHz)); // in microseconds, oversampled 16 times
     return true;
 }
 /*
@@ -108,17 +109,17 @@ bool DSOADC::startTimerSampling (int count)
     captureState=Capture_armed;
     startInternalDmaSampling();   
     
-    Timer2.setCompare(CAPTURE_TIMER_CHANNEL, 1);    
-    Timer2.setMode(CAPTURE_TIMER_CHANNEL, TIMER_OUTPUTCOMPARE); // start timer
-    Timer2.refresh();
-    Timer2.resume();
+    ADC_TIMER.setCompare(ADC_TIMER_CHANNEL, 1);    
+    ADC_TIMER.setMode(ADC_TIMER_CHANNEL, TIMER_OUTPUTCOMPARE); // start timer
+    ADC_TIMER.refresh();
+    ADC_TIMER.resume();
     
     interrupts();    
 } 
 /**
  * 
  */
-void DSOADC::Timer2_Event() 
+void DSOADC::Timer_Event() 
 {    
     nbTimer++;
     instance->timerCapture();
@@ -175,8 +176,8 @@ void DSOADC::timerCapture()
     if(currentIndex>=requestedSamples)
     {                
         dma_disable(DMA1, DMA_CH1);
-        Timer2.setMode(CAPTURE_TIMER_CHANNEL,TIMER_DISABLED);
-        Timer2.pause();
+        ADC_TIMER.setMode(ADC_TIMER_CHANNEL,TIMER_DISABLED);
+        ADC_TIMER.pause();
         captureState=Capture_complete;
         
         SampleSet one(requestedSamples,adcInternalBuffer),two(0,NULL);

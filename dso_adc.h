@@ -110,8 +110,8 @@ protected:
     static  void DMA1_CH1_Event();
     static  void DMA1_CH1_TriggerEvent() ;
             void captureComplete(bool shift,SampleSet &one, SampleSet &two);
-    static  void Timer2_Event();
-    static  void Timer2Trigger_Event();
+    static  void Timer_Event();
+    static  void Timer_Trigger_Event();
 
             void timerCapture();
             void timerTriggerCapture();

@@ -14,7 +14,7 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  * Vref is using PWM mode for Timer4/Channel 3
  * 
  */
-
+#include "dso_adc_const.h"
 /**
  */
 uint32_t DSOADC::getVCCmv()

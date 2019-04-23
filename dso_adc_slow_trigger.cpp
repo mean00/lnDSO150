@@ -32,19 +32,19 @@ bool DSOADC::startTriggeredTimerSampling (int count,uint32_t triggerADC)
     
     noInterrupts();
     timerRead=timerWrite=0;
-    Timer2.attachInterrupt(CAPTURE_TIMER_CHANNEL, Timer2Trigger_Event);
+    ADC_TIMER.attachInterrupt(ADC_TIMER_CHANNEL, Timer_Trigger_Event);
     captureState=Capture_armed;
     startInternalDmaSampling();   
     
-    Timer2.setCompare(CAPTURE_TIMER_CHANNEL, 16);    
-    Timer2.setMode(CAPTURE_TIMER_CHANNEL, TIMER_OUTPUTCOMPARE); // start timer
-    Timer2.refresh();
-    Timer2.resume();
+    ADC_TIMER.setCompare(ADC_TIMER_CHANNEL, 16);    
+    ADC_TIMER.setMode(ADC_TIMER_CHANNEL, TIMER_OUTPUTCOMPARE); // start timer
+    ADC_TIMER.refresh();
+    ADC_TIMER.resume();
     
     interrupts();
     
 } 
-void DSOADC::Timer2Trigger_Event() 
+void DSOADC::Timer_Trigger_Event() 
 {    
     nbTimer++;
     instance->timerTriggerCapture();
@@ -92,8 +92,8 @@ void DSOADC::timerTriggerCapture()
     if(slowTriggered && (timerWrite-timerRead)>=requestedSamples)
     {
         dma_disable(DMA1, DMA_CH1);
-        Timer2.setMode(CAPTURE_TIMER_CHANNEL,TIMER_DISABLED);
-        Timer2.pause();
+        ADC_TIMER.setMode(ADC_TIMER_CHANNEL,TIMER_DISABLED);
+        ADC_TIMER.pause();
         captureState=Capture_complete;
         uint32_t  *source=adcInternalBuffer+(timerRead%ADC_INTERNAL_BUFFER_SIZE);
         uint32_t  *end=adcInternalBuffer+ADC_INTERNAL_BUFFER_SIZE;
