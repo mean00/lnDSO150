@@ -36,16 +36,7 @@ bool DSOADC::startDMATriggeredSampling (int count)
     
   requestedSamples=count;  
   convTime=micros();
-
-  dma_init(DMA1);
-  dma_attach_interrupt(DMA1, DMA_CH1, DMA1_CH1_TriggerEvent);
-
-   
-  dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, adcInternalBuffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
-  dma_set_num_transfers(DMA1, DMA_CH1, requestedSamples );
-  // Continuous sampling  
-  adc_dma_enable(ADC1);
-  dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
+  setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_TriggerEvent );
   return true;
 }
 /**

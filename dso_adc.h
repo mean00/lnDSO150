@@ -102,7 +102,7 @@ protected:
             
             bool validateAverageSample(uint32_t &avg);
     static void TriggerInterrupt();
-            
+    static void setupAdcDmaTransfer(   int count,uint32_t *buffer, void (*handler)(void) );
             
 
 protected:
