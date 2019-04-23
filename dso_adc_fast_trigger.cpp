@@ -44,11 +44,7 @@ bool DSOADC::startDMATriggeredSampling (int count)
  */
 void DSOADC::DMA1_CH1_TriggerEvent() 
 {
-    SampleSet one,two;
-    two.samples=0;
-    one.samples=requestedSamples;
-    one.data=adcInternalBuffer;
-    two.data=NULL;
+    SampleSet one(requestedSamples,adcInternalBuffer),two(0,NULL);
     instance->captureComplete(true,one,two);
     adc_dma_disable(ADC1);
 }

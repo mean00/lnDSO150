@@ -179,11 +179,7 @@ void DSOADC::timerCapture()
         Timer2.pause();
         captureState=Capture_complete;
         
-        SampleSet one,two;
-        two.samples=0;
-        one.samples=requestedSamples;
-        one.data=adcInternalBuffer;
-        two.data=NULL;
+        SampleSet one(requestedSamples,adcInternalBuffer),two(0,NULL);
         captureComplete(false,one,two);
         return;
     }

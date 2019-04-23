@@ -43,10 +43,15 @@ public:
               samples=0;
               data=NULL;
             }
-            SampleSet(int s, uint32_t *d)
+            void set(int s, uint32_t *d)
             {
               samples=s;
               data=d;
+            }
+            
+            SampleSet(int s, uint32_t *d)
+            {
+              set(s,d);
             }
   int       samples;
   uint32_t  *data;
