@@ -10,8 +10,6 @@
 /**
  */
 
-#define analogInPin  PA0
-
 #define CAPTURE_TIMER_CHANNEL TIMER_CH1
 
 extern HardwareTimer Timer2;
@@ -117,6 +115,9 @@ bool DSOADC::startTimerSampling (int count)
     
     interrupts();    
 } 
+/**
+ * 
+ */
 void DSOADC::Timer2_Event() 
 {    
     nbTimer++;
@@ -188,9 +189,7 @@ void DSOADC::timerCapture()
     }
     // Ask for next set of samples
     captureState=Capture_armed;
-    dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, dmaOverSampleBuffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
-    dma_set_num_transfers(DMA1, DMA_CH1, DMA_OVERSAMPLING_COUNT );
-    dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
+    nextAdcDmaTransfer( DMA_OVERSAMPLING_COUNT,dmaOverSampleBuffer);
 }
 #include "dso_adc_slow_trigger.cpp"
 // EOF

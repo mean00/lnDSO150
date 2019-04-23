@@ -211,6 +211,14 @@ void DSOADC::setupAdcDmaTransfer(   int count,uint32_t *buffer, void (*handler)(
   dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
 
 }
+
+void DSOADC::nextAdcDmaTransfer( int count,uint32_t *buffer)
+{
+    dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, buffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
+    dma_set_num_transfers(DMA1, DMA_CH1, count );
+    dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
+}
+
 #if 0
 /**
  * 

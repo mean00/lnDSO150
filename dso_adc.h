@@ -84,7 +84,7 @@ public:
             bool startDMATriggeredSampling (int count);
             bool startTimerSampling (int count);
             bool startTriggeredTimerSampling (int count,uint32_t triggerADC);
-            void clearCapturedData();
+            
 protected:            
             void setADCs ();
     static  void adc_dma_disable(const adc_dev * dev) ;            
@@ -103,6 +103,7 @@ protected:
             bool validateAverageSample(uint32_t &avg);
     static void TriggerInterrupt();
     static void setupAdcDmaTransfer(   int count,uint32_t *buffer, void (*handler)(void) );
+    static void nextAdcDmaTransfer( int count,uint32_t *buffer);
             
 
 protected:

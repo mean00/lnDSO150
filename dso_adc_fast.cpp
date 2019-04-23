@@ -18,10 +18,6 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 #include "dso_global.h"
 #include "dso_adc_priv.h"
 
-uint32_t DSOADC::adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];
-
-int dmaSpuriousInterrupt=0;
-extern HardwareTimer Timer4;
 /**
  */
 
@@ -30,12 +26,20 @@ extern HardwareTimer Timer4;
 #define vRefPin      PB8 // Trigger reference voltage
 
 #define ADC_CR1_FASTINT 0x70000 // Fast interleave mode DUAL MODE bits 19-16
+
 uint32_t convTime;
 extern HardwareTimer Timer2;
 adc_reg_map *adc_Register;
 extern VoltageSettings vSettings[];
 extern const float inputScale[];
 DSOADC::TriggerMode triggerMode=DSOADC::Trigger_Both;
+
+uint32_t DSOADC::adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE] __attribute__ ((aligned (8)));;;
+
+int dmaSpuriousInterrupt=0;
+extern HardwareTimer Timer4;
+
+
 /**
  */
 int requestedSamples;
@@ -56,11 +60,8 @@ DSOADC::DSOADC()
   setADCs (); //Setup ADC peripherals for interleaved continuous mode.
   // Set up our sensor pin(s)
   pinMode(analogInPin, INPUT_ANALOG);
-  dmaSemaphore=new xBinarySemaphore;
-  
+  dmaSemaphore=new xBinarySemaphore;  
   adc_Register=  PIN_MAP[PA0].adc_device->regs;
-  
-
 }
  
 
@@ -121,13 +122,7 @@ void DSOADC::captureComplete(bool shift,SampleSet &one, SampleSet &two)
     _captured.shifted=shift;
     dmaSemaphore->giveFromInterrupt();
 }
-/**
- * \bried cleanup already captured stuff
- */
-void DSOADC::clearCapturedData()
-{
-   
-}
+
 
 #include "dso_adc_fast_trigger.cpp"
 #include "dso_adc_util.cpp"
