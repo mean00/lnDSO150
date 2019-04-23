@@ -43,6 +43,16 @@ extern void testTrigger(void);
 /**
  * 
  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+void vApplicationDaemonTaskStartupHook(void);
+#ifdef __cplusplus
+}
+#endif
+
+
 void mySetup() 
 {
     
@@ -75,11 +85,17 @@ void mySetup()
     adc=new DSOADC;
     
     tft->fillScreen(BLACK);
-    // Ok let's go, switch to FreeRTOS
+     // Ok let's go, switch to FreeRTOS
     xTaskCreate( MainTask, "MainTask", 250, NULL, DSO_MAIN_TASK_PRIORITY, NULL );
+   
     vTaskStartScheduler();      
 }
-
+/**
+ * 
+ */
+void vApplicationDaemonTaskStartupHook()
+{
+}
 void splash(void)
 {
         tft->fillScreen(BLACK);   
