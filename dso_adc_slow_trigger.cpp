@@ -50,9 +50,7 @@ void DSOADC::Timer2Trigger_Event()
     instance->timerTriggerCapture();
 }
 
-#define NEXT_TRANSFER() \ 
-    captureState=Capture_armed; \
-    nextAdcDmaTransfer(DMA_OVERSAMPLING_COUNT,dmaOverSampleBuffer);
+#define NEXT_TRANSFER()  {   captureState=Capture_armed;     nextAdcDmaTransfer(DMA_OVERSAMPLING_COUNT,dmaOverSampleBuffer);}
 
 /**
  * \fn timerCapture
