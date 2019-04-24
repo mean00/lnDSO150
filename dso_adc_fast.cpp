@@ -32,7 +32,7 @@ extern HardwareTimer Timer2;
 adc_reg_map *adc_Register;
 extern VoltageSettings vSettings[];
 extern const float inputScale[];
-DSOADC::TriggerMode triggerMode=DSOADC::Trigger_Both;
+
 
 uint32_t DSOADC::adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE] __attribute__ ((aligned (8)));;;
 
@@ -62,6 +62,11 @@ DSOADC::DSOADC()
   pinMode(analogInPin, INPUT_ANALOG);
   dmaSemaphore=new xBinarySemaphore;  
   adc_Register=  PIN_MAP[PA0].adc_device->regs;
+#if 1
+  _triggerMode=DSOADC::Trigger_Rising;
+#else
+  _triggerMode=DSOADC::Trigger_Falling;
+#endif
 }
  
 

@@ -73,13 +73,28 @@ void DSOADC::timerTriggerCapture()
     adcInternalBuffer[xindex]=avg2;
     timerWrite++;
 
+    if(timerWrite < requestedSamples/2) // not enough samples
+    {
+        NEXT_TRANSFER();
+        return;     
+    }
     // enough preloaded ?
-    if(!slowTriggered && timerWrite >= requestedSamples/2)
+    if(!slowTriggered )
     {
         uint32_t copy=oldTriggerValue;
         oldTriggerValue=avg2;
-        // -|_
-        if(copy>slowTriggerValue && avg2<slowTriggerValue)
+        //  Trigger match
+        bool down=false,up=false;
+        if(copy>slowTriggerValue && avg2<=slowTriggerValue)
+        {
+            down=true;
+        }
+        if(copy<slowTriggerValue && avg2>=slowTriggerValue)
+        {
+            up=true;
+        }
+        
+        if(((_triggerMode!=Trigger_Rising )&& down) || ((_triggerMode!=Trigger_Falling) && up))
         {
             slowTriggered=true;
             timerRead=timerWrite-(requestedSamples/2);            
@@ -88,35 +103,34 @@ void DSOADC::timerTriggerCapture()
         }                
     }
   
-    // do we have enough sample ?
-    if(slowTriggered && (timerWrite-timerRead)>=requestedSamples)
+    if(!slowTriggered || (timerWrite-timerRead)<requestedSamples)
     {
-        dma_disable(DMA1, DMA_CH1);
-        ADC_TIMER.setMode(ADC_TIMER_CHANNEL,TIMER_DISABLED);
-        ADC_TIMER.pause();
-        captureState=Capture_complete;
-        uint32_t  *source=adcInternalBuffer+(timerRead%ADC_INTERNAL_BUFFER_SIZE);
-        uint32_t  *end=adcInternalBuffer+ADC_INTERNAL_BUFFER_SIZE;
-        
-         
-        SampleSet one,two;
-        int len=timerWrite-timerRead;
-        if((timerWrite%ADC_INTERNAL_BUFFER_SIZE)>(timerRead%ADC_INTERNAL_BUFFER_SIZE))
-        {
-            one.set(len,adcInternalBuffer+(timerRead%ADC_INTERNAL_BUFFER_SIZE));
-            two.set(0,NULL);
-        }else
-        {
-            int left=ADC_INTERNAL_BUFFER_SIZE-(timerRead%ADC_INTERNAL_BUFFER_SIZE);
-            
-            one.set(len,adcInternalBuffer+(timerRead%ADC_INTERNAL_BUFFER_SIZE));
-            two.set(len-left,adcInternalBuffer);            
-        }
-        captureComplete(false,one,two);
-
+        NEXT_TRANSFER();
         return;
     }
-    NEXT_TRANSFER();
+
+    dma_disable(DMA1, DMA_CH1);
+    ADC_TIMER.setMode(ADC_TIMER_CHANNEL,TIMER_DISABLED);
+    ADC_TIMER.pause();
+    captureState=Capture_complete;
+    uint32_t  *source=adcInternalBuffer+(timerRead%ADC_INTERNAL_BUFFER_SIZE);
+    uint32_t  *end=adcInternalBuffer+ADC_INTERNAL_BUFFER_SIZE;
+
+
+    SampleSet one,two;
+    int len=timerWrite-timerRead;
+    if((timerWrite%ADC_INTERNAL_BUFFER_SIZE)>(timerRead%ADC_INTERNAL_BUFFER_SIZE))
+    {
+        one.set(len,adcInternalBuffer+(timerRead%ADC_INTERNAL_BUFFER_SIZE));
+        two.set(0,NULL);
+    }else
+    {
+        int left=ADC_INTERNAL_BUFFER_SIZE-(timerRead%ADC_INTERNAL_BUFFER_SIZE);
+
+        one.set(len,adcInternalBuffer+(timerRead%ADC_INTERNAL_BUFFER_SIZE));
+        two.set(len-left,adcInternalBuffer);            
+    }
+    captureComplete(false,one,two);
 }
 
 // EOF

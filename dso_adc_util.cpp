@@ -97,8 +97,9 @@ void DSOADC::setADCs ()
  bool DSOADC::setTriggerMode(TriggerMode mode)
  {
     ExtIntTriggerMode m;
-    triggerMode=mode;
-    switch(triggerMode)
+    _triggerMode=mode;
+#if 0    
+    switch(_triggerMode)
     {
         case DSOADC::Trigger_Falling: m=FALLING;break;
         case DSOADC::Trigger_Rising:  m=RISING;break;
@@ -107,6 +108,7 @@ void DSOADC::setADCs ()
     }
     // Hook trigger interrupt  
     attachInterrupt(triggerPin,TriggerInterrupt,m );
+#endif    
  }
  /**
   * 

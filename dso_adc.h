@@ -128,7 +128,7 @@ protected:
   
             int             _sampled;
             FullSampleSet   _captured;
- 
+            TriggerMode     _triggerMode;
 static      uint32_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];            
 };
 
