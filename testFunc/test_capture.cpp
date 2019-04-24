@@ -19,7 +19,7 @@
 
 #include "dso_global.h"
 #include "dso_display.h"
-
+#include "dso_adc.h"
 
 extern void splash(void);
 static void drawGrid(void);
@@ -28,6 +28,7 @@ static void drawGrid(void);
 extern Adafruit_TFTLCD_8bit_STM32 *tft;
 extern DSOControl *controlButtons;
 extern testSignal *myTestSignal;
+extern DSOADC   *adc;
 //
 
 static uint8_t waveForm[256]; // take a bit more, we have rounding issues
@@ -66,6 +67,14 @@ static void buttonManagement()
         {
             dirty=true;
             voltageMode=false;            
+        }
+        if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_TRIGGER) & EVENT_SHORT_PRESS)
+        {
+           DSOADC::TriggerMode triggerMode= adc->getTriggerMode();
+           int t=(int)triggerMode;
+           t^=1;
+           triggerMode=(DSOADC::TriggerMode)t;
+           adc->setTriggerMode(triggerMode);
         }
         
         if(inc)

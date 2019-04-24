@@ -168,8 +168,7 @@ void DSOCapture::task(void *a)
             expand=tSettings[currentTime].expand4096;
         }
         CapturedSet *set=captureSet;
-        float *data=set->data;
-        //int transform(int32_t *bfer, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode)
+        float *data=set->data;        
         set->samples=transform(
                                         fset.shifted,
                                 (int32_t*)fset.set1.data,
@@ -178,7 +177,8 @@ void DSOCapture::task(void *a)
                                         vSettings+currentVolt,
                                         expand,
                                         set->stats,
-                                        1.0,DSOADC::Trigger_Both);
+                                        triggerValueFloat,
+                                        adc->getTriggerMode());
         if(fset.set2.samples)
         {
             CaptureStats otherStats;
@@ -190,8 +190,12 @@ void DSOCapture::task(void *a)
                                         vSettings+currentVolt,
                                         expand,
                                         otherStats,
-                                        1.0,DSOADC::Trigger_Both);                
-            
+                                        triggerValueFloat,
+                                        adc->getTriggerMode());                
+            if(set->stats.trigger==-1 && otherStats.trigger!=-1) 
+            {
+                set->stats.trigger=otherStats.trigger+set->samples;
+            }            
             set->stats.avg= (set->stats.avg*set->samples+otherStats.avg*fset.set2.samples)/(set->samples+fset.set2.samples);
             set->samples+=sample2;
             if(otherStats.xmax>set->stats.xmax) set->stats.xmax=otherStats.xmax;

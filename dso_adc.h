@@ -94,6 +94,7 @@ public:
             bool     readCalibrationValue();
     static  uint32_t getVCCmv();
             bool     setTriggerMode(TriggerMode mode);
+            TriggerMode getTriggerMode() {return _triggerMode;};
             bool     getTriggerState();
             bool     setVrefPWM(int ratio); // Trigger 
             
