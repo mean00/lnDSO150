@@ -139,7 +139,7 @@ void testCapture(void)
     while(1)
     {        
         int lastTime=millis();
-#if 0        
+#if 1        
         int count=DSOCapture::triggeredCapture(240,voltageSamples,stats);  
 #else
           int count=DSOCapture::oneShotCapture(240,voltageSamples,stats);  

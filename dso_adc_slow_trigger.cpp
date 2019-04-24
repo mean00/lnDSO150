@@ -36,7 +36,7 @@ bool DSOADC::startTriggeredTimerSampling (int count,uint32_t triggerADC)
     captureState=Capture_armed;
     startInternalDmaSampling();   
     
-    ADC_TIMER.setCompare(ADC_TIMER_CHANNEL, 16);    
+    ADC_TIMER.setCompare(ADC_TIMER_CHANNEL, ADC_TIMER_COUNT);    
     ADC_TIMER.setMode(ADC_TIMER_CHANNEL, TIMER_OUTPUTCOMPARE); // start timer
     ADC_TIMER.refresh();
     ADC_TIMER.resume();

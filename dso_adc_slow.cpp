@@ -52,7 +52,7 @@ extern void Oopps();
 bool DSOADC::setSlowMode(int fqInHz)
 {    
     ADC_TIMER.attachInterrupt(ADC_TIMER_CHANNEL, Timer_Event);
-    ADC_TIMER.setPeriod(1000000/(fqInHz)); // in microseconds, oversampled 16 times
+    ADC_TIMER.setPeriod(1000000/(fqInHz*ADC_TIMER_COUNT)); // in microseconds, oversampled 16 times
     return true;
 }
 /*
@@ -109,7 +109,7 @@ bool DSOADC::startTimerSampling (int count)
     captureState=Capture_armed;
     startInternalDmaSampling();   
     
-    ADC_TIMER.setCompare(ADC_TIMER_CHANNEL, 1);    
+    ADC_TIMER.setCompare(ADC_TIMER_CHANNEL, ADC_TIMER_COUNT);    
     ADC_TIMER.setMode(ADC_TIMER_CHANNEL, TIMER_OUTPUTCOMPARE); // start timer
     ADC_TIMER.refresh();
     ADC_TIMER.resume();

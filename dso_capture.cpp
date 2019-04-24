@@ -122,7 +122,14 @@ bool     DSOCapture::startSampling (int count)
 bool     DSOCapture::startTriggerSampling (int count)
 {
     triggerValueADC=voltToADCValue(triggerValueFloat);
-    return adc->startTriggeredTimerSampling(count,triggerValueADC);
+    int ex=count;
+    if(captureFast)
+    {
+        ex=count*tSettings[currentTimeBase].expand4096;
+        return adc->startTriggeredTimerSampling(ex,triggerValueADC);
+    }
+    return adc->startTriggeredTimerSampling(ex,triggerValueADC);
+    
 }
 /**
  * 
