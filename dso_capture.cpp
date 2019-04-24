@@ -126,7 +126,8 @@ bool     DSOCapture::startTriggerSampling (int count)
     if(captureFast)
     {
         ex=count*tSettings[currentTimeBase].expand4096;
-        return adc->startTriggeredTimerSampling(ex,triggerValueADC);
+        //return adc->startTriggeredTimerSampling(ex,triggerValueADC);
+        return adc->startDMASampling(ex);
     }
     return adc->startTriggeredTimerSampling(ex,triggerValueADC);
     

@@ -49,7 +49,7 @@ static const TimeSettings tSettings[6]
 
  
 
-static float samples[256];
+extern float test_samples[256];
 static int currentVSettings=5;
 static int currentTSettings=0;
 
@@ -109,7 +109,7 @@ void testAdc3(void)
         markStart=millis();
         int scale=vSettings[currentVSettings].inputGain;
         
-        count=transform(true,(int32_t *)xsamples,samples,count,vSettings+currentVSettings,expand,stats,1.0,DSOADC::Trigger_Both);
+        count=transform(true,(int32_t *)xsamples,test_samples,count,vSettings+currentVSettings,expand,stats,1.0,DSOADC::Trigger_Both);
         acquisitionTime=convTime/1000;
 //        adc->reclaimSamples(set);
             
@@ -139,7 +139,7 @@ void testAdc3(void)
             
         for(int j=0;j<count;j++)
         {
-             waveForm[j]=fromSample(samples[j]); // in volt             
+             waveForm[j]=fromSample(test_samples[j]); // in volt             
         }
         DSODisplay::drawWaveForm(count,waveForm);
         

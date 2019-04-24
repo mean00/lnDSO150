@@ -30,7 +30,7 @@ extern DSOControl *controlButtons;
 extern testSignal *myTestSignal;
 extern DSOADC   *adc;
 //
-
+extern float test_samples[256];
 static uint8_t waveForm[256]; // take a bit more, we have rounding issues
 static bool voltageMode=false;
 
@@ -72,9 +72,12 @@ static void buttonManagement()
         {
            DSOADC::TriggerMode triggerMode= adc->getTriggerMode();
            int t=(int)triggerMode;
-           t^=1;
+           t++;
+           t%=3;
            triggerMode=(DSOADC::TriggerMode)t;
            adc->setTriggerMode(triggerMode);
+           tft->setCursor(241, 140);
+           tft->print(t);
         }
         
         if(inc)
@@ -117,7 +120,7 @@ static void drawStats(CaptureStats &stats)
     AND_ONE(stats.avg,5);
     
 }
-static float voltageSamples[240];
+
 /**
  * 
  */
@@ -149,16 +152,16 @@ void testCapture(void)
     {        
         int lastTime=millis();
 #if 1        
-        int count=DSOCapture::triggeredCapture(240,voltageSamples,stats);  
+        int count=DSOCapture::triggeredCapture(240,test_samples,stats);  
 #else
-          int count=DSOCapture::oneShotCapture(240,voltageSamples,stats);  
+          int count=DSOCapture::oneShotCapture(240,test_samples,stats);  
 #endif
         if(!count) 
         {
             buttonManagement();
             continue;
         }
-        DSOCapture::captureToDisplay(count,voltageSamples,waveForm);  
+        DSOCapture::captureToDisplay(count,test_samples,waveForm);  
         // Remove trigger
         DSODisplay::drawVoltageTrigger(false,triggerLine);
         

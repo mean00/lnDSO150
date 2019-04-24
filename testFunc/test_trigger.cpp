@@ -32,7 +32,6 @@ extern testSignal *myTestSignal;
 //
 
 static uint8_t waveForm[256]; // take a bit more, we have rounding issues
-static float  samples[256];
 static bool voltageMode=false;
 
 
