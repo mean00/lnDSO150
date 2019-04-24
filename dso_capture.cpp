@@ -23,6 +23,10 @@ static TaskHandle_t captureTaskHandle;
 
 
 CapturedSet captureSet[2];
+
+
+
+
 /**
  * 
  */
@@ -143,6 +147,8 @@ bool DSOCapture::getSamples(CapturedSet **set)
     *set=captureSet;
     return true;
 }
+
+
 /**
  * 
  * @return 
@@ -203,6 +209,8 @@ void DSOCapture::task(void *a)
             if(otherStats.xmin<set->stats.xmin) set->stats.xmin=otherStats.xmin;
             
         }
+        set->stats.frequency=computeFrequency(fset.shifted,fset.set1.samples,fset.set1.data);
+        
         // Data ready!
         captureSemaphore->give();
     }

@@ -12,7 +12,7 @@
 typedef struct CapturedSet
 {
     int          samples;
-    float        data[240];
+    float        data[240];    
     CaptureStats stats;
 };
 /**
@@ -86,6 +86,7 @@ public:
     static int         voltageToPixel(float v);
     static void        initialize();
     static void        task(void *);
+    static int         computeFrequency(bool shifted,int samples,uint32_t *data);
     
 protected:
   
