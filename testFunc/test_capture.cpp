@@ -162,6 +162,9 @@ void testCapture(void)
     triggerLine=DSOCapture::voltageToPixel(f);
     
     // 
+    int old=millis();
+    int avgFq=0;
+    int nbFq=0;
     
     while(1)
     {        
@@ -201,8 +204,17 @@ void testCapture(void)
         
         tft->setCursor(241, 120);  
         if(stats.frequency>0)
-            tft->print(fq2Text(stats.frequency));
-        
+        {
+            avgFq+=stats.frequency;
+            nbFq++;
+            if(millis()-old>1000) // refresh every sec
+            {        
+                tft->print(fq2Text(avgFq/nbFq));
+                nbFq=0;
+                avgFq=0;
+                old=millis();
+            }
+        }
         lastTime=millis()-lastTime;
         lastTime=100000/(lastTime+1);
         tft->setCursor(241, 160);
