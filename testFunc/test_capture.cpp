@@ -120,7 +120,22 @@ static void drawStats(CaptureStats &stats)
     AND_ONE(stats.avg,5);
     
 }
+/**
+ */
+const char *fq2Text(int fq)
+{
+    static char buff[16];
+    float f=fq;
+    const char *suff="";
+#define STEP(x,t)  if(f>x)     {suff=t;f/=x;}else
 
+    STEP(1000000,"M")
+    STEP(1000,"K")
+    {}
+    
+    sprintf(buff,"%3.1f%sHz",f,suff);
+    return buff;
+}
 /**
  * 
  */
@@ -151,7 +166,7 @@ void testCapture(void)
     while(1)
     {        
         int lastTime=millis();
-#if 1        
+#if 0        
         int count=DSOCapture::triggeredCapture(240,test_samples,stats);  
 #else
           int count=DSOCapture::oneShotCapture(240,test_samples,stats);  
@@ -183,7 +198,10 @@ void testCapture(void)
         if(!counter)
             drawStats(stats);
         buttonManagement();        
-
+        
+        tft->setCursor(241, 120);  
+        if(stats.frequency>0)
+            tft->print(fq2Text(stats.frequency));
         
         lastTime=millis()-lastTime;
         lastTime=100000/(lastTime+1);

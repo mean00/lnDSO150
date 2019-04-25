@@ -31,6 +31,7 @@ typedef struct TimeSettings
   adc_prescaler  prescaler;
   adc_smp_rate   rate;
   int            expand4096;
+  int            fqInHz;
 };
 /**
  * 

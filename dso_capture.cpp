@@ -157,6 +157,7 @@ void DSOCapture::task(void *a)
 {
     xDelay(20);
     FullSampleSet fset; // Shallow copy
+    int oldFqTime=millis();
     while(1)
     {
         int currentVolt=currentVoltageRange; // use a local copy so that it does not change in the middle
@@ -209,7 +210,22 @@ void DSOCapture::task(void *a)
             if(otherStats.xmin<set->stats.xmin) set->stats.xmin=otherStats.xmin;
             
         }
-        set->stats.frequency=computeFrequency(fset.shifted,fset.set1.samples,fset.set1.data);
+        set->stats.frequency=-1;
+        
+        int newFqTime=millis();
+        if(newFqTime-oldFqTime>100)
+        {
+            oldFqTime=newFqTime;
+            float f=computeFrequency(fset.shifted,fset.set1.samples,fset.set1.data);
+            if(captureFast)
+            {
+                f=(float)(tSettings[currentTimeBase].fqInHz)/f;
+            }else
+            {
+                f=((float)timerBases[currentTimeBase].fq)/f;
+            }
+            set->stats.frequency=f;
+        }
         
         // Data ready!
         captureSemaphore->give();
@@ -369,5 +385,5 @@ void        DSOCapture::clearCapturedData()
 {
     //adc->clearCapturedData();
 }
-
+#include "dso_capture2.cpp"
 // EOF
