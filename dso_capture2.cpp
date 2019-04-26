@@ -46,13 +46,12 @@ int DSOCapture::computeFrequency(bool shifted,int xsamples,uint32_t *data)
     }
     if(!nbSample)
         return 0;  
-    
-    sum=nbSample>>1;
+        
     for(int i=0;i<nbSample;i++)
     {
         sum+=fdelta[i];
     }
-    sum/=nbSample;
+    sum=(1000*sum+nbSample/2)/nbSample;
     return sum;
 }
 // EOF

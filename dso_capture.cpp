@@ -215,10 +215,10 @@ void DSOCapture::task(void *a)
         float f=computeFrequency(fset.shifted,fset.set1.samples,fset.set1.data);
         if(captureFast)
         {
-            f=(float)(tSettings[currentTimeBase].fqInHz)/f;
+            f=(float)(tSettings[currentTimeBase].fqInHz)*1000./f;
         }else
         {
-            f=((float)timerBases[currentTimeBase].fq)/f;
+            f=((float)timerBases[currentTimeBase].fq)*1000./f;
         }
         set->stats.frequency=f;
         

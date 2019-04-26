@@ -209,7 +209,7 @@ void testCapture(void)
             nbFq++;
             if(millis()-old>1000) // refresh every sec
             {        
-                tft->print(fq2Text(avgFq/nbFq));
+                tft->print(fq2Text(stats.frequency));
                 nbFq=0;
                 avgFq=0;
                 old=millis();
