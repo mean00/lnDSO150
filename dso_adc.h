@@ -124,7 +124,11 @@ protected:
     static void TriggerInterrupt();
     static void setupAdcDmaTransfer(   int count,uint32_t *buffer, void (*handler)(void) );
     static void nextAdcDmaTransfer( int count,uint32_t *buffer);
-            
+    static void enableDisableIrqSource(bool onoff, int interruptMask);
+    static void enableDisableIrq(bool onoff);
+    static void defaultAdcIrqHandler();
+    static void attachWatchdogInterrupt(voidFuncPtr handler);
+    static void setWatchdogTriggerValue(uint32_t high, uint32_t low);
 
 protected:
   

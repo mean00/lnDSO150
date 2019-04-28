@@ -36,6 +36,12 @@ bool DSOADC::startDMATriggeredSampling (int count)
     
   requestedSamples=count;  
   convTime=micros();
+  
+  setWatchdogTriggerValue(3000,0);
+  
+  enableDisableIrqSource(true,ADC_AWD);
+  enableDisableIrq(true);
+  
   setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_TriggerEvent );
   return true;
 }

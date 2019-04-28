@@ -15,6 +15,9 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  * 
  */
 #include "dso_adc_const.h"
+
+static voidFuncPtr adcIrqHandler=NULL;
+
 /**
  */
 uint32_t DSOADC::getVCCmv()
@@ -88,6 +91,12 @@ void DSOADC::setADCs ()
   pinMode(vRefPin,PWM);
   pwmWrite(vRefPin,0);
   setTriggerMode(DSOADC::Trigger_Both);
+  
+  attachWatchdogInterrupt(NULL);
+  enableDisableIrqSource(false,ADC_AWD);
+  enableDisableIrqSource(false,ADC_EOC);
+  enableDisableIrqSource(false,ADC_JEOC);
+  enableDisableIrq(false);
 }
 /**
  * 
@@ -221,17 +230,57 @@ void DSOADC::nextAdcDmaTransfer( int count,uint32_t *buffer)
     dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
 }
 
-#if 0
 /**
  * 
  * @param interruptMask
  */
-void DSOADC::adc_enable_irq_source(int interruptMask)
+void DSOADC::enableDisableIrqSource(bool onoff, int interrupt)
 {
-    dev->regs->CR1 |= (1U<<(interrupt +ADC_CR1_EOCIE_BIT));
-    nvic_irq_enable(dev->irq_num);
-    //adc_enable_irq(ADC1,ADC_AWD);
-    //        adc_attach_interrupt(ADC1, ADC_AWD, watchDog);
-    ::adc_enable_irq(ADC1,interruptMask);
+    if(onoff)
+    {
+        ADC1->regs->CR1 |= (1U<<((interrupt) +ADC_CR1_EOCIE_BIT));
+    }else
+    {
+        ADC1->regs->CR1 &= ~(1U<<((interrupt) +ADC_CR1_EOCIE_BIT));
+    }
 }
-#endif
+/**
+ * 
+ * @param onoff
+ */
+void DSOADC::enableDisableIrq(bool onoff)
+{
+    if(onoff)
+        nvic_irq_enable(ADC1->irq_num);
+    else
+        nvic_irq_disable(ADC1->irq_num);
+}
+/**
+ * 
+ */
+void DSOADC::defaultAdcIrqHandler()
+{
+    static int nbAdcIrq;
+    nbAdcIrq++;
+}
+/**
+ * 
+ * @param handler
+ */
+void DSOADC::attachWatchdogInterrupt(voidFuncPtr handler)
+{
+    adcIrqHandler=handler;
+    adc_attach_interrupt(ADC1,ADC1->irq_num,defaultAdcIrqHandler);
+}
+
+/**
+ * 
+ * @param high
+ * @param low
+ */
+void DSOADC::setWatchdogTriggerValue(uint32_t high, uint32_t low)
+{
+    ADC1->regs->HTR=high;
+    ADC1->regs->LTR=low;
+}
+//
