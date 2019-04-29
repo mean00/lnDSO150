@@ -37,7 +37,7 @@ bool DSOADC::startDMATriggeredSampling (int count)
   requestedSamples=count;  
   convTime=micros();
   
-  setWatchdogTriggerValue(3000,0);
+  setWatchdogTriggerValue(1,0);
   
   enableDisableIrqSource(true,ADC_AWD);
   enableDisableIrq(true);

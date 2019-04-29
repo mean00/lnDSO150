@@ -40,6 +40,7 @@ extern void testCalibrate(void);
 extern void testI2c( void);
 extern void testCapture(void);
 extern void testTrigger(void);
+extern void testAdcWatchdog(void);
 /**
  * 
  */
@@ -134,6 +135,7 @@ void MainTask( void *a )
    // testCalibrate();
     //testI2c();
     testCapture();
+    //testAdcWatchdog();
     //testTrigger();
     while(1)
     {};
@@ -151,6 +153,7 @@ void dummyForwardReference()
    testI2c();
    testCapture();
    testTrigger();
+   testAdcWatchdog();
 }
 
 //-

@@ -59,7 +59,7 @@ void testAdcWatchdog(void)
 {
     buffer=(uint32_t *)test_samples;
     adc_Register=  PIN_MAP[PA0].adc_device->regs;
-    DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_10MS);
+    DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_1MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
     while(1)
     {
