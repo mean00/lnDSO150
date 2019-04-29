@@ -112,10 +112,6 @@ void DSOADC::DMA1_CH1_Event()
     adc_dma_disable(ADC1);
 }
 
-void DSOADC::TriggerInterrupt()
-{
-    triggered=true;
-}
 
 /**
  */

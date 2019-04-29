@@ -101,7 +101,7 @@ public:
             
 
             bool startDMASampling (int count);
-            bool startDMATriggeredSampling (int count);
+            bool startDMATriggeredSampling (int count, int ADCTriggerValue);
             bool startTimerSampling (int count);
             bool startTriggeredTimerSampling (int count,uint32_t triggerADC);
 
@@ -124,20 +124,24 @@ protected:
             
             bool validateAverageSample(uint32_t &avg);
     static void TriggerInterrupt();
+public:        
     static void setupAdcDmaTransfer(   int count,uint32_t *buffer, void (*handler)(void) );
     static void nextAdcDmaTransfer( int count,uint32_t *buffer);
-public:    
+
     static void enableDisableIrqSource(bool onoff, int interruptMask);
     static void enableDisableIrq(bool onoff);
     static void defaultAdcIrqHandler();
     static void attachWatchdogInterrupt(voidFuncPtr handler);
     static void setWatchdogTriggerValue(uint32_t high, uint32_t low);
-
+    static void watchDogInterrupt();
+            void awdTrigger() ;                       
+            bool awdTriggered() {return _triggered;}
 protected:
   
             int             _sampled;
             FullSampleSet   _captured;
             TriggerMode     _triggerMode;
+            bool            _triggered;
 static      uint32_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];            
 };
 

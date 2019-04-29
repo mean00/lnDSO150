@@ -33,6 +33,8 @@ static int foobar;
 static int interrupt;
 extern float *test_samples;
 uint32_t *buffer;
+int nbDma=0;
+int nbAwd=0;
 /**
  * 
  */
@@ -40,18 +42,11 @@ volatile bool done=false;
 void dmaInterrupt()
 {
     done=true;
+    nbDma++;
 }
 void watchDog()
 {
-    
-    sr=adc_Register->SR;
-    if(!(sr&3)) return;
-    uint32_t val=adc_Register->DR>>16;
-    delta=micros()-mikro;
-    interrupt=adc_Register->CR1;
-    foobar=1;
-    
-    
+    nbAwd++;
 }
 
 
@@ -61,41 +56,43 @@ void testAdcWatchdog(void)
     adc_Register=  PIN_MAP[PA0].adc_device->regs;
     DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_1MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
+    tft->setTextSize(2);
+   
+#if 1    
+    DSOADC::enableDisableIrq(false);
+    uint32_t val=adc_Register->DR; // clear
+             val=adc_Register->SR; // clear
+
+            
+    DSOADC::setWatchdogTriggerValue(2000,0);            
+    DSOADC::attachWatchdogInterrupt(watchDog);
+    //DSOADC::enableDisableIrqSource(true,ADC_EOC);
+    DSOADC::enableDisableIrqSource(true,ADC_AWD);
+    DSOADC::enableDisableIrq(true);            
+
+#endif
+    done=false;
+    mikro=micros();
+
+    DSOADC::setupAdcDmaTransfer(   240,buffer, dmaInterrupt )   ;        
+    
     while(1)
     {
-          int ex=240;
-          
-          noInterrupts();
-            dma_init(DMA1);
-            dma_attach_interrupt(DMA1, DMA_CH1, dmaInterrupt);
-            dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, buffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
-            dma_set_num_transfers(DMA1, DMA_CH1, 240 );     
-            
-            
-            //
-            
-            DSOADC::enableDisableIrq(false);
-            uint32_t val=adc_Register->DR; // clear
-                     val=adc_Register->SR; // clear
-            
-            
-            DSOADC::setWatchdogTriggerValue(4096,2500);            
-            DSOADC::attachWatchdogInterrupt(watchDog);
-            DSOADC::enableDisableIrqSource(true,ADC_AWD);
-            DSOADC::enableDisableIrq(true);            
-     
-            
-            done=false;
-            mikro=micros();
-            DSOADC::adc_dma_enable(ADC1);
-            dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
-            interrupts();
-            while(done==false)
-            {
-                xDelay(5);
-            }
-            DSOADC::adc_dma_disable(ADC1);
-            
+        int ex=240;
+        while(done==false)
+        {
+            xDelay(5);
+        }
+        done=false;
+        DSOADC::adc_dma_disable(ADC1);
+        DSOADC::setupAdcDmaTransfer( 240,buffer,dmaInterrupt)  ;
+        
+        tft->fillScreen(0);
+        tft->setCursor(240, 100);
+        tft->print(nbDma);
+        tft->setCursor(240, 120);
+        tft->print(nbAwd);
+        
     }
   
 }

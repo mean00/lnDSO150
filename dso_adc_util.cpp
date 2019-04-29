@@ -242,15 +242,15 @@ void DSOADC::enableDisableIrqSource(bool onoff, int interrupt)
         if(interrupt==ADC_AWD)
         {                      
             int channel=0;
-             //ADC1->regs->CR1 |= (channel & ADC_CR1_AWDCH) | ADC_CR1_AWDSGL ;
-             ADC1->regs->CR1 |= ADC_CR1_AWDEN;
+             ADC1->regs->CR1 |= (channel & ADC_CR1_AWDCH) | 0*ADC_CR1_AWDSGL ;
+             ADC1->regs->CR1 |= ADC_CR1_AWDEN  | ADC_CR1_AWDIE;
         }
         ADC1->regs->CR1 |= (1U<<((interrupt) +ADC_CR1_EOCIE_BIT));
     }else
     {
         ADC1->regs->CR1 &= ~(1U<<((interrupt) +ADC_CR1_EOCIE_BIT));
         if(interrupt==ADC_AWD)
-             ADC1->regs->CR1 &= ~ADC_CR1_AWDEN;
+             ADC1->regs->CR1 &= ~ADC_CR1_AWDEN  | ~ ADC_CR1_AWDIE;
         
     }
 }
@@ -272,15 +272,11 @@ void DSOADC::enableDisableIrq(bool onoff)
  */
 extern void watchDog();
 void DSOADC::defaultAdcIrqHandler()
-{
-    static int nbAdcIrq;
-    nbAdcIrq++;
-    
-    uint32_t sr=adc_Register->SR;
-    if(!(sr&3)) return;
+{    
     if(adcIrqHandler)
         adcIrqHandler();
 }
+        
 /**
  * 
  * @param handler
@@ -289,9 +285,6 @@ void DSOADC::attachWatchdogInterrupt(voidFuncPtr handler)
 {
     adcIrqHandler=handler;
     adc_attach_interrupt(ADC1,ADC_AWD,defaultAdcIrqHandler);
-    
-                //adc_attach_interrupt(ADC1, ADC_AWD, watchDog);
-    
 }
 
 /**

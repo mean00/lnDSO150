@@ -1,6 +1,9 @@
 /**
  * Derived from https://github.com/pingumacpenguin/STM32-O-Scope/blob/master/STM32-O-Scope.ino
  */
+
+#include "dso_adc.h"
+
 /*.
 (c) Andrew Hull - 2015
 STM32-O-Scope - aka "The Pig Scope" or pigScope released under the GNU GENERAL PUBLIC LICENSE Version 2, June 1991
@@ -25,19 +28,19 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 
 
 
-bool DSOADC::startDMATriggeredSampling (int count)
+bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
 {
   // This loop uses dual interleaved mode to get the best performance out of the ADCs
   //
     
-
+  _triggered=false;
   if(count>ADC_INTERNAL_BUFFER_SIZE/2)
         count=ADC_INTERNAL_BUFFER_SIZE/2;
     
   requestedSamples=count;  
   convTime=micros();
-  
-  setWatchdogTriggerValue(1,0);
+  setWatchdogTriggerValue(2200,500);
+  attachWatchdogInterrupt(DSOADC::watchDogInterrupt);  
   
   enableDisableIrqSource(true,ADC_AWD);
   enableDisableIrq(true);
@@ -48,12 +51,36 @@ bool DSOADC::startDMATriggeredSampling (int count)
 /**
  * 
  */
-void DSOADC::DMA1_CH1_TriggerEvent() 
+void DSOADC::awdTrigger()
 {
-    SampleSet one(requestedSamples,adcInternalBuffer),two(0,NULL);
-    instance->captureComplete(true,one,two);
-    adc_dma_disable(ADC1);
+        _triggered=true;
+        enableDisableIrq(false); // no more IRQ please
 }
 
 
-
+/**
+ * 
+ */
+void DSOADC::watchDogInterrupt()
+{
+    instance->awdTrigger();
+}
+/**
+ * 
+ */
+void DSOADC::DMA1_CH1_TriggerEvent() 
+{
+    if(instance->awdTriggered())
+    {
+        SampleSet one(requestedSamples,adcInternalBuffer),two(0,NULL);
+        instance->captureComplete(true,one,two);
+        adc_dma_disable(ADC1);
+    }
+    else
+    {
+        //nextAdcDmaTransfer(requestedSamples,adcInternalBuffer);
+        setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_TriggerEvent );
+    }
+    
+}
+//
