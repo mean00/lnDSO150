@@ -242,7 +242,7 @@ void DSOADC::enableDisableIrqSource(bool onoff, int interrupt)
         if(interrupt==ADC_AWD)
         {                      
             int channel=0;
-             ADC1->regs->CR1 |= (channel & ADC_CR1_AWDCH) | ADC_CR1_AWDSGL ;
+             //ADC1->regs->CR1 |= (channel & ADC_CR1_AWDCH) | ADC_CR1_AWDSGL ;
              ADC1->regs->CR1 |= ADC_CR1_AWDEN;
         }
         ADC1->regs->CR1 |= (1U<<((interrupt) +ADC_CR1_EOCIE_BIT));
@@ -270,10 +270,16 @@ void DSOADC::enableDisableIrq(bool onoff)
 /**
  * 
  */
+extern void watchDog();
 void DSOADC::defaultAdcIrqHandler()
 {
     static int nbAdcIrq;
     nbAdcIrq++;
+    
+    uint32_t sr=adc_Register->SR;
+    if(!(sr&3)) return;
+    if(adcIrqHandler)
+        adcIrqHandler();
 }
 /**
  * 

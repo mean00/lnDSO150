@@ -69,16 +69,22 @@ void testAdcWatchdog(void)
             dma_init(DMA1);
             dma_attach_interrupt(DMA1, DMA_CH1, dmaInterrupt);
             dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, buffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
-            dma_set_num_transfers(DMA1, DMA_CH1, 240 );            
-            adc_Register->LTR=2500;
-            adc_Register->HTR=4096;
-            adc_Register->CR1 |= ADC_CR1_AWDEN;
+            dma_set_num_transfers(DMA1, DMA_CH1, 240 );     
+            
+            
+            //
+            
+            DSOADC::enableDisableIrq(false);
             uint32_t val=adc_Register->DR; // clear
                      val=adc_Register->SR; // clear
-            adc_enable_irq(ADC1,ADC_AWD);
-            adc_attach_interrupt(ADC1, ADC_AWD, watchDog);
             
-            nvic_irq_enable(NVIC_ADC_1_2 );
+            
+            DSOADC::setWatchdogTriggerValue(4096,2500);            
+            DSOADC::attachWatchdogInterrupt(watchDog);
+            DSOADC::enableDisableIrqSource(true,ADC_AWD);
+            DSOADC::enableDisableIrq(true);            
+     
+            
             done=false;
             mikro=micros();
             DSOADC::adc_dma_enable(ADC1);
