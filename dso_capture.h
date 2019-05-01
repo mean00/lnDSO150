@@ -65,6 +65,7 @@ public:
     };
     static int         oneShotCapture(int count,float *voltage,CaptureStats &stats) ;
     static int         triggeredCapture(int count,float *voltage,CaptureStats &stats);
+    static void        stopCapture();
     static bool        setVoltageRange(DSO_VOLTAGE_RANGE voltRange);
     static DSO_VOLTAGE_RANGE getVoltageRange();
     static bool        setTimeBase(DSO_TIME_BASE timeBase);
@@ -72,7 +73,7 @@ public:
     static bool        prepareSampling ();
     static bool        startSampling (int count);
     static bool        startTriggerSampling (int count);
-    static bool        getSamples(CapturedSet **set);
+    static bool        getSamples(CapturedSet **set,int timeoutMs);
     
     
     static bool        captureToDisplay(int count,float *samples,uint8_t *waveForm);
@@ -88,6 +89,5 @@ public:
     static void        task(void *);
     static int         computeFrequency(bool shifted,int samples,uint32_t *data);
     
-protected:
   
 };

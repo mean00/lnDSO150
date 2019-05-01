@@ -32,8 +32,18 @@ extern DSOADC   *adc;
 //
 extern float test_samples[256];
 static uint8_t waveForm[256]; // take a bit more, we have rounding issues
-static bool voltageMode=false;
 
+
+
+typedef enum              
+{
+            VOLTAGE_MODE,
+            TIME_MODE,
+            TRIGGER_MODE
+}MODE_TYPE;
+
+MODE_TYPE mode=VOLTAGE_MODE;
+ 
 
 static void redraw()
 {
@@ -46,13 +56,16 @@ static void redraw()
         tft->print(capture->getVoltageRangeAsText());
         
         tft->setCursor(241, 220);
-        if(voltageMode)
-            tft->print("VOLT");
-        else
-            tft->print("TIME");
+        switch(mode)
+        {
+            case VOLTAGE_MODE: tft->print("VOLT");break;
+            case TIME_MODE: tft->print("TIME");break;
+            case TRIGGER_MODE: tft->print("TRIGG");break;
+            default:  tft->print("xxxx");break;
+        }
       
 }
-
+#define REFRESH() DSOCapture::stopCapture()
 
 static void buttonManagement()
 {
@@ -61,51 +74,72 @@ static void buttonManagement()
         if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_VOLTAGE) & EVENT_SHORT_PRESS)
         {
             dirty=true;
-            voltageMode=true;
+            mode=VOLTAGE_MODE;
         }
         if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_TIME) & EVENT_SHORT_PRESS)
         {
             dirty=true;
-            voltageMode=false;            
+             mode=TIME_MODE;         
         }
         if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_TRIGGER) & EVENT_SHORT_PRESS)
         {
-           DSOADC::TriggerMode triggerMode= adc->getTriggerMode();
-           int t=(int)triggerMode;
-           t++;
-           t%=3;
-           triggerMode=(DSOADC::TriggerMode)t;
-           adc->setTriggerMode(triggerMode);
-           tft->setCursor(241, 140);
-           tft->print(t);
+            dirty=true;
+            mode=TRIGGER_MODE;         
         }
+
+        if(dirty)
+        {
+            redraw();
+        }
+        dirty=false;
         
         if(inc)
         {
-            if(voltageMode)
+            
+            switch(mode)
             {
-                int v=capture->getVoltageRange();
-                v+=inc;
-                if(v<0) v=0;
-                if(v>DSOCapture::DSO_VOLTAGE_MAX) v=DSOCapture::DSO_VOLTAGE_MAX;
-                capture->setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)v);                                
-            }
-            else // Timingmode
-            {
-                 int v=capture->getTimeBase();
-                 v+=inc;
-                if(v<0) v=0;
-                if(v>DSOCapture::DSO_TIME_BASE_MAX) v=DSOCapture::DSO_TIME_BASE_MAX;
-                DSOCapture::DSO_TIME_BASE  t=(DSOCapture::DSO_TIME_BASE )v;
-                DSOCapture::clearCapturedData();
-                capture->setTimeBase( t);
-                
-            }
-            // Redraw background
-            dirty=true;
-        }
+                case VOLTAGE_MODE: 
+                                    {
+                                    int v=capture->getVoltageRange();
+                                        dirty=true;
+                                    v+=inc;
+                                    if(v<0) v=0;
+                                    if(v>DSOCapture::DSO_VOLTAGE_MAX) v=DSOCapture::DSO_VOLTAGE_MAX;
+                                    capture->setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)v);                                
+                                    REFRESH();
+                                }
+                                break;
+                case TIME_MODE: 
+                                {
+                                    int v=capture->getTimeBase();
+                                        dirty=true;
+                                    v+=inc;
+                                   if(v<0) v=0;
+                                   if(v>DSOCapture::DSO_TIME_BASE_MAX) v=DSOCapture::DSO_TIME_BASE_MAX;
+                                   DSOCapture::DSO_TIME_BASE  t=(DSOCapture::DSO_TIME_BASE )v;
+                                   DSOCapture::clearCapturedData();
+                                   capture->setTimeBase( t);
+                                   REFRESH();
+                                }
+                                break;
+                case TRIGGER_MODE: 
+                                {
+                                 float v=capture->getTriggerValue();
+                                   
+                                    v+=0.1*(float)inc;
+                                   capture->setTriggerValue(v);    
+                                   dirty=true;
+                                   REFRESH();
+                                    
+                                    
+                                }
+                                break;
+                default: 
+                                break;
+            }       
         if(dirty)
             redraw();
+        }
 }
 
 static void drawStats(CaptureStats &stats)
@@ -176,7 +210,11 @@ void testCapture(void)
 #endif
         if(!count) 
         {
+            DSODisplay::drawVoltageTrigger(false,triggerLine);
             buttonManagement();
+            float f=DSOCapture::getTriggerValue();
+            triggerLine=DSOCapture::voltageToPixel(f);
+            DSODisplay::drawVoltageTrigger(true,triggerLine);
             continue;
         }
         DSOCapture::captureToDisplay(count,test_samples,waveForm);  
@@ -197,6 +235,8 @@ void testCapture(void)
             lastTrigger=stats.trigger;
             DSODisplay::drawVerticalTrigger(true,lastTrigger);
         }
+        float f=DSOCapture::getTriggerValue();
+        triggerLine=DSOCapture::voltageToPixel(f);
         DSODisplay::drawVoltageTrigger(true,triggerLine);
         if(!counter)
             drawStats(stats);
@@ -226,3 +266,4 @@ void testCapture(void)
 
 
 // EOF    
+

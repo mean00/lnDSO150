@@ -26,7 +26,10 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 // I think we have reached the speed limit of the chip, now all we can do is improve accuracy.
 // See; http://stm32duino.com/viewtopic.php?f=19&t=107&p=1202#p1194
 
-
+void DSOADC::stopDmaCapture(void)
+{
+     adc_dma_disable(ADC1);
+}
 
 bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
 {
@@ -54,7 +57,7 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
 void DSOADC::awdTrigger()
 {
         _triggered=true;
-        enableDisableIrq(false); // no more IRQ please
+        
 }
 
 
@@ -64,6 +67,7 @@ void DSOADC::awdTrigger()
 void DSOADC::watchDogInterrupt()
 {
     instance->awdTrigger();
+    enableDisableIrq(false); // no more IRQ please
 }
 /**
  * 

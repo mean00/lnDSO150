@@ -136,6 +136,8 @@ public:
     static void watchDogInterrupt();
             void awdTrigger() ;                       
             bool awdTriggered() {return _triggered;}
+            void stopDmaCapture();
+            void stopTimeCapture();
 protected:
   
             int             _sampled;

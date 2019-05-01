@@ -65,6 +65,15 @@ static void dummy_dma_interrupt_handler(void)
     captureState=Capture_dmaDone;
     nbDma++;
 }
+/**
+ * 
+ */
+void DSOADC::stopTimeCapture(void)
+{
+     ADC_TIMER.pause();
+     adc_dma_disable(ADC1);
+     ADC_TIMER.attachInterrupt(ADC_TIMER_CHANNEL, NULL);
+}
 
 /**
  * 

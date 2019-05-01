@@ -17,7 +17,7 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 #include "dso_adc_const.h"
 
 static voidFuncPtr adcIrqHandler=NULL;
-
+HardwareTimer pwmtimer(4); // Vref PWM is Timer4 Channel3
 /**
  */
 uint32_t DSOADC::getVCCmv()
@@ -87,8 +87,9 @@ void DSOADC::setADCs ()
   
   pinMode(triggerPin,INPUT);
     
-  Timer4.setPeriod(2000); // 5Khz pwm
+  pwmtimer.setPeriod(200); // 5Khz pwm
   pinMode(vRefPin,PWM);
+  
   pwmWrite(vRefPin,0);
   setTriggerMode(DSOADC::Trigger_Both);
   
@@ -127,7 +128,8 @@ void DSOADC::setADCs ()
   */
  bool DSOADC::setVrefPWM(int ratio)
  {
-     pwmWrite(vRefPin,ratio);
+     //ratio=(ratio*16384)/0xffff;
+     pwmWrite(vRefPin,(uint16)ratio);
  }
  
  /**

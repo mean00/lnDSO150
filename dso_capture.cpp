@@ -141,9 +141,9 @@ bool     DSOCapture::startTriggerSampling (int count)
  * @param count
  * @return 
  */
-bool DSOCapture::getSamples(CapturedSet **set)
+bool DSOCapture::getSamples(CapturedSet **set, int timeoutMs)
 {
-    if(!captureSemaphore->take()) return false;
+    if(!captureSemaphore->take(10)) return false;
     *set=captureSet;
     return true;
 }
@@ -239,7 +239,7 @@ int DSOCapture::oneShotCapture(int count,float *samples,CaptureStats &stats)
     prepareSampling();
     if(!startSampling(count)) return 0;
     CapturedSet *set;
-    bool r=    getSamples(&set);
+    bool r=    getSamples(&set,500);
     if(!r) return 0;
     
     int toCopy=set->samples;
@@ -286,6 +286,24 @@ int DSOCapture::voltToADCValue(float v)
     return (int)out;    
 }
 
+typedef enum InternalCaptureState
+{
+    captureStateIdle,
+    captureStateArmed
+};
+InternalCaptureState captureState=captureStateIdle;
+
+/**
+ * 
+ */
+void DSOCapture::stopCapture()
+{
+    if(captureFast)
+        adc->stopDmaCapture();
+    else
+        adc->stopTimeCapture();
+    captureState=captureStateIdle;
+}
 /**
  * 
  * @param count
@@ -293,27 +311,25 @@ int DSOCapture::voltToADCValue(float v)
  */
 int DSOCapture::triggeredCapture(int count,float *volt,CaptureStats &stats)
 {
-    int available;
-    DSO_CAPTURE_STATE state=DSO_STATE_RUN;
-    while(1)
+    if(captureState==captureStateIdle)
     {
         prepareSampling();
         if(!startTriggerSampling(count)) return 0;
-        
-        CapturedSet *set;
-        bool r=    getSamples(&set);
-        if(!r) 
-            return 0;
-        int toCopy=set->samples;
-         if(toCopy>count) toCopy=count;
-
-         memcpy(volt,set->data,toCopy*sizeof(float));
-         stats=set->stats;
-         xDelay(10);
-         return toCopy;
-       
+        captureState=captureStateArmed;
     }
-    return count;
+                   
+    CapturedSet *set;
+    bool r=    getSamples(&set,0);
+    if(!r) 
+        return 0;
+    captureState=captureStateIdle;
+    int toCopy=set->samples;
+     if(toCopy>count) toCopy=count;
+
+     memcpy(volt,set->data,toCopy*sizeof(float));
+     stats=set->stats;
+     xDelay(10);
+     return toCopy;
 }
 /**
  * 
