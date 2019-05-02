@@ -17,6 +17,7 @@
 #include "dso_control.h"
 #include "HardwareSerial.h"
 #include "dso_adc.h"
+#include "dso_global.h"
 extern void splash(void);
 
 static void drawGrid(void);
@@ -41,7 +42,7 @@ void testCalibrate(void)
          float v=0;
          for(int i=0;i<16;i++)
          {
-             v+=analogRead(PA0);;
+             v+=analogRead(analogInPin);;
              delay(1);
          }
          v/=16.;         

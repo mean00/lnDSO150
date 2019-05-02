@@ -18,6 +18,7 @@
 #include "HardwareSerial.h"
 #include "dso_adc.h"
 #include "dso_capture.h"
+#include "dso_global.h"
 extern void splash(void);
 
 static void drawGrid(void);
@@ -53,7 +54,7 @@ void watchDog()
 void testAdcWatchdog(void)
 {
     buffer=(uint32_t *)test_samples;
-    adc_Register=  PIN_MAP[PA0].adc_device->regs;
+    adc_Register=  PIN_MAP[analogInPin].adc_device->regs;
     DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_1MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
     tft->setTextSize(2);

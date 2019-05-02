@@ -16,6 +16,10 @@
 #include "dso_capture.h"
 
 
+#define analogInPin  PA0
+#define triggerPin   PA8
+#define vRefPin      PB8 // Trigger reference voltage
+
 
 #define CURRENT_HASH 0x1235
 extern uint16_t calibrationHash;

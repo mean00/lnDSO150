@@ -134,7 +134,7 @@ void MainTask( void *a )
     //testDisplay();
    // testCalibrate();
     //testI2c();
-    //testTrigger();
+    testTrigger();
       testCapture();
     //testAdcWatchdog();
     

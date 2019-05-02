@@ -21,10 +21,6 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 /**
  */
 
-#define analogInPin  PA0
-#define triggerPin   PA8
-#define vRefPin      PB8 // Trigger reference voltage
-
 #define ADC_CR1_FASTINT 0x70000 // Fast interleave mode DUAL MODE bits 19-16
 
 uint32_t convTime;
@@ -61,7 +57,7 @@ DSOADC::DSOADC()
   // Set up our sensor pin(s)
   pinMode(analogInPin, INPUT_ANALOG);
   dmaSemaphore=new xBinarySemaphore;  
-  adc_Register=  PIN_MAP[PA0].adc_device->regs;
+  adc_Register=  PIN_MAP[analogInPin].adc_device->regs;
 #if 1
   _triggerMode=DSOADC::Trigger_Rising;
 #else

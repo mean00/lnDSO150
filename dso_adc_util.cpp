@@ -80,17 +80,17 @@ void DSOADC::setADCs ()
   adc_Register->SQR3 = pinMapADCin;
   adc_Register->CR2 |= ADC_CR2_CONT; // | ADC_CR2_DMA; // Set continuous mode and DMA
   adc_Register->CR1 |= ADC_CR1_FASTINT; // Interleaved mode
-  adc_Register->CR2 |= ADC_CR2_SWSTART;
+  //adc_Register->CR2 |= ADC_CR2_SWSTART;
   
   ADC2->regs->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
   ADC2->regs->SQR3 = pinMapADCin;
   
   pinMode(triggerPin,INPUT);
     
-  pwmtimer.setPeriod(200); // 5Khz pwm
+  pwmtimer.setPeriod(2000); // 5Khz pwm
   pinMode(vRefPin,PWM);
   
-  pwmWrite(vRefPin,0);
+  pwmWrite(vRefPin,3000);
   setTriggerMode(DSOADC::Trigger_Both);
   
   
@@ -138,7 +138,7 @@ void DSOADC::setADCs ()
   */
  bool     DSOADC::getTriggerState()
  {
-     return !!digitalRead(PA8);
+     return !!digitalRead(triggerPin);
  }
 /**
  * 

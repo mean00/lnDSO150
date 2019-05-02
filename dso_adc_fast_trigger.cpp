@@ -18,7 +18,7 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  * 
  */
 
-
+static uint32_t cr1;
 // Grab the samples from the ADC
 // Theoretically the ADC can not go any faster than this.
 //
@@ -42,13 +42,16 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
     
   requestedSamples=count;  
   convTime=micros();
-  setWatchdogTriggerValue(2200,500);
+  setWatchdogTriggerValue(1*2560+0*triggerValueADC,0);
   attachWatchdogInterrupt(DSOADC::watchDogInterrupt);  
   
   enableDisableIrqSource(true,ADC_AWD);
   enableDisableIrq(true);
   
   setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_TriggerEvent );
+  
+  cr1=ADC1->regs->CR1 ;
+  
   return true;
 }
 /**
