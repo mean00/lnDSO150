@@ -76,7 +76,8 @@ int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int c
     mySquare(x,y-infos.maxHeight,glyph->xAdvance,top,bg);
 
     int bottom=-glyph->yOffset-h;
-    mySquare(x,y-bottom,glyph->xAdvance,bottom+2,bg);      
+    if(bottom>=-2)
+        mySquare(x,y-bottom,glyph->xAdvance,bottom+2,bg);      
     
 
     y+= glyph->yOffset;   // offset is <0 most of the time
