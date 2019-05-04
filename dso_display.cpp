@@ -105,6 +105,11 @@ void  DSODisplay::drawVerticalTrigger(bool drawOrErase,int column)
         tft->pushColors(((uint16_t *)bg),   240,true);
     }
 }
+/**
+ * 
+ * @param drawOrErase
+ * @param line
+ */
 void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
 {
     if(line<1) line=1;
@@ -119,6 +124,75 @@ void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
         tft->setAddrWindow(0,1+line,239,1+line);
         tft->pushColors(((uint16_t *)bg),   240,true);
     }
+}
+
+
+#define DSO_INFO_START_COLUMN (248)
+#define DSO_INFO_MAX_WIDTH  (320-4-DSO_INFO_START_COLUMN)
+
+
+/**
+ */
+static const char *fq2Text(int fq)
+{
+    static char buff[16];
+    float f=fq;
+    const char *suff=" ";
+#define STEP(x,t)  if(f>x)     {suff=t;f/=x;}else
+
+    STEP(1000000,"M")
+    STEP(1000,"K")
+    {}
+    
+    sprintf(buff,"%03.0f%sHz",f,suff);
+    return buff;
+}
+
+/**
+ * 
+ * @param stats
+ */
+void DSODisplay::drawStats(CaptureStats &stats)
+{
+    char bf[24];
+#define AND_ONE_A(x,y) { tft->setCursor(DSO_INFO_START_COLUMN+2, 6+y*20); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}        
+#define AND_ONE_T(x,y) { tft->setCursor(DSO_INFO_START_COLUMN+4, 6+y*20); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}    
+#define AND_ONE_F(x,y) { sprintf(bf,"%02.2f",x);tft->setCursor(DSO_INFO_START_COLUMN+4, 6+y*20); tft->myDrawString(bf,DSO_INFO_MAX_WIDTH);}    
+    AND_ONE_F(stats.xmin,1);
+    AND_ONE_F(stats.xmax,3);
+    AND_ONE_F(stats.avg,5);      
+    if(stats.avg>0)
+    {
+        AND_ONE_T(fq2Text(stats.frequency),7);
+    }else
+    {
+        AND_ONE_T("--",7);
+    }
+}
+/**
+ * 
+ */
+void DSODisplay::drawStatsBackGround()
+{
+    char bf[24];
+
+#define BG_COLOR GREEN    
+    for(int i=0;i<4;i++)
+    {
+        tft->drawFastHLine(DSO_INFO_START_COLUMN, 4+i*40,      DSO_INFO_START_COLUMN, BG_COLOR);
+        tft->drawFastHLine(DSO_INFO_START_COLUMN, 4+i*40+19,   DSO_INFO_START_COLUMN, BG_COLOR);
+
+        tft->drawFastVLine(DSO_INFO_START_COLUMN, 4+i*40,40,BG_COLOR);
+        tft->drawFastVLine(318, 4+i*40, 40,BG_COLOR);
+        
+    }
+
+    tft->setTextColor(BLACK,BG_COLOR);
+    AND_ONE_A("Min",0);   
+    AND_ONE_A("Max",2);   
+    AND_ONE_A("Avg",4);
+    AND_ONE_A("Frq",6);
+    tft->setTextColor(BG_COLOR,BLACK);
 }
 
 // EOF

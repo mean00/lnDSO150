@@ -17,5 +17,6 @@ public:
             static void  drawVerticalTrigger(bool drawOrErase,int column);
             static void  drawVoltageTrigger(bool drawOrErase, int line);
   
-  
+            static void  drawStats(CaptureStats &stats);
+            static void  drawStatsBackGround();
 };

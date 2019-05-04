@@ -33,6 +33,8 @@ extern DSOADC   *adc;
 extern float test_samples[256];
 static uint8_t waveForm[256]; // take a bit more, we have rounding issues
 
+uint32_t  refrshDuration=0;
+int       nbRefrsh=0;
 
 
 typedef enum              
@@ -142,18 +144,6 @@ static void buttonManagement()
         }
 }
 
-static void drawStats(CaptureStats &stats)
-{
-#define AND_ONE(x,y) {    tft->setCursor(242, y*20); tft->print(x);}    
-    
-    AND_ONE("Min",0);
-    AND_ONE(stats.xmin,1);
-    AND_ONE("Max",2);
-    AND_ONE(stats.xmax,3);
-    AND_ONE("Avg",4);
-    AND_ONE(stats.avg,5);
-    
-}
 /**
  */
 static const char *fq2Text(int fq)
@@ -194,20 +184,19 @@ void mainDSOUI(void)
     DSOCapture::setTriggerValue(3.);
     float f=DSOCapture::getTriggerValue();
     triggerLine=DSOCapture::voltageToPixel(f);
-    
+    DSODisplay::drawStatsBackGround();
     // 
     int old=millis();
     int avgFq=0;
     int nbFq=0;
     
+    uint32_t lastRefresh=millis();
+    
     while(1)
     {        
         int lastTime=millis();
-#if 1        
         int count=DSOCapture::triggeredCapture(240,test_samples,stats);  
-#else
-          int count=DSOCapture::oneShotCapture(240,test_samples,stats);  
-#endif
+        // Nothing captured, refresh screen
         if(!count) 
         {
             DSODisplay::drawVoltageTrigger(false,triggerLine);
@@ -238,23 +227,22 @@ void mainDSOUI(void)
         float f=DSOCapture::getTriggerValue();
         triggerLine=DSOCapture::voltageToPixel(f);
         DSODisplay::drawVoltageTrigger(true,triggerLine);
-        if(!counter)
-            drawStats(stats);
+        
+        uint32_t m=millis();
+        if(m<lastRefresh)
+        {
+            m=lastRefresh+101;
+        }
+        if((m-lastRefresh)>250)
+        {
+            lastRefresh=m;
+            DSODisplay::drawStats(stats);
+            refrshDuration+=(millis()-m);
+            nbRefrsh++;
+        }
         buttonManagement();        
         
-        tft->setCursor(241, 120);  
-        if(stats.frequency>0)
-        {
-            avgFq+=stats.frequency;
-            nbFq++;
-            if(millis()-old>1000) // refresh every sec
-            {        
-                tft->print(fq2Text(stats.frequency));
-                nbFq=0;
-                avgFq=0;
-                old=millis();
-            }
-        }
+      
         lastTime=millis()-lastTime;
         lastTime=100000/(lastTime+1);
         tft->setCursor(241, 160);
