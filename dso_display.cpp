@@ -127,8 +127,6 @@ void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
 }
 
 
-#define DSO_INFO_START_COLUMN (248)
-#define DSO_INFO_MAX_WIDTH  (320-4-DSO_INFO_START_COLUMN)
 
 
 /**
@@ -147,6 +145,11 @@ static const char *fq2Text(int fq)
     sprintf(buff,"%03.0f%sHz",f,suff);
     return buff;
 }
+#define DSO_CHAR_HEIGHT 20
+#define DSO_HEIGHT_OFFSET 1
+#define DSO_INFO_START_COLUMN (248)
+#define DSO_INFO_MAX_WIDTH  (320-DSO_INFO_START_COLUMN-8)
+
 
 /**
  * 
@@ -155,9 +158,10 @@ static const char *fq2Text(int fq)
 void DSODisplay::drawStats(CaptureStats &stats)
 {
     char bf[24];
-#define AND_ONE_A(x,y) { tft->setCursor(DSO_INFO_START_COLUMN+2, 6+y*20); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}        
-#define AND_ONE_T(x,y) { tft->setCursor(DSO_INFO_START_COLUMN+4, 6+y*20); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}    
-#define AND_ONE_F(x,y) { sprintf(bf,"%02.2f",x);tft->setCursor(DSO_INFO_START_COLUMN+4, 6+y*20); tft->myDrawString(bf,DSO_INFO_MAX_WIDTH);}    
+#define AND_ONE_A(x,y) { tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}        
+#define AND_ONE_T(x,y) { tft->setCursor(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}    
+#define AND_ONE_F(x,y) { sprintf(bf,"%02.2f",x);tft->setCursor(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT); tft->myDrawString(bf,DSO_INFO_MAX_WIDTH);}    
+    
     AND_ONE_F(stats.xmin,1);
     AND_ONE_F(stats.xmax,3);
     AND_ONE_F(stats.avg,5);      
@@ -177,22 +181,26 @@ void DSODisplay::drawStatsBackGround()
     char bf[24];
 
 #define BG_COLOR GREEN    
-    for(int i=0;i<4;i++)
-    {
-        tft->drawFastHLine(DSO_INFO_START_COLUMN, 4+i*40,      DSO_INFO_START_COLUMN, BG_COLOR);
-        tft->drawFastHLine(DSO_INFO_START_COLUMN, 4+i*40+19,   DSO_INFO_START_COLUMN, BG_COLOR);
-
-        tft->drawFastVLine(DSO_INFO_START_COLUMN, 4+i*40,40,BG_COLOR);
-        tft->drawFastVLine(318, 4+i*40, 40,BG_COLOR);
+        tft->drawFastVLine(DSO_INFO_START_COLUMN, 0,240,BG_COLOR);
+        tft->drawFastVLine(319, 0,240,BG_COLOR);
         
-    }
 
     tft->setTextColor(BLACK,BG_COLOR);
     AND_ONE_A("Min",0);   
     AND_ONE_A("Max",2);   
     AND_ONE_A("Avg",4);
     AND_ONE_A("Frq",6);
+    AND_ONE_A("V/D",8);
+    AND_ONE_A("T/D",10);
     tft->setTextColor(BG_COLOR,BLACK);
 }
-
+/**
+ * 
+ */
+void DSODisplay::drawVoltTime(const char *volt, const char *time)
+{
+    tft->setTextColor(BG_COLOR,BLACK);
+    AND_ONE_T(volt,9);
+    AND_ONE_T(time,11);
+}
 // EOF

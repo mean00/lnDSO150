@@ -19,4 +19,5 @@ public:
   
             static void  drawStats(CaptureStats &stats);
             static void  drawStatsBackGround();
+            static void  drawVoltTime(const char *volt, const char *time);
 };
