@@ -2,8 +2,8 @@
 import array as arr
 #
 def genArray(ar,tx):
-    out="const uint16_t "+tx+"[240]={"
-    for i in range(0,240):
+    out="const uint16_t "+tx+"[194]={"
+    for i in range(0,194):
         out+=str(ar[i])
         out+=str(",")
     out+="};\n"
@@ -15,15 +15,15 @@ patdarkgreen = arr.array('i')
 darkgreen=15*32 # Dark green
 yellow=0xFFE0
 white=0x07E0
-for i in range(0,240):
+for i in range(0,194):
     patdef.append(0)
     patyellow.append(yellow)
     patdarkgreen.append(darkgreen)
     if( (i/24)*24==i):
         patdef[i]=darkgreen
 patdef[0]=    white
-patdef[239]=    white
-patdef[120] = darkgreen
+patdef[193]=    white
+patdef[1+192/2] = darkgreen
 
 genArray(patdef,"defaultPattern")
 genArray(patyellow,"yellowPattern")

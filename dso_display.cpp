@@ -6,6 +6,9 @@
 #include "dso_global.h"
 #include "dso_display.h"
 #include "pattern.h"
+
+
+
 /**
  */
 uint8_t prevPos[256];
@@ -30,7 +33,7 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
     //tft->fillScreen(0);
     int last=data[0];
     if(!last) last=1;
-    if(last>=238) last=238;
+    if(last>DSO_WAVEFORM_HEIGHT) last=DSO_WAVEFORM_HEIGHT;
     int next;
     int start,sz;
     
@@ -42,7 +45,7 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
                 
         if(!sz)
         {
-            if(next>=237) next=237;
+            if(next>=(DSO_WAVEFORM_HEIGHT)) next=DSO_WAVEFORM_HEIGHT;
             sz=1;
         }
         if(!start)
@@ -55,9 +58,9 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
         if(!(j%24)) bg=(uint16_t *)darkGreenPattern;
 
         // cleanup prev draw
-        tft->setAddrWindow(j,prevPos[j],j,240);
+        tft->setAddrWindow(j,prevPos[j]+DSO_WAVEFORM_OFFSET,j,DSO_WAVEFORM_HEIGHT);
         tft->pushColors(((uint16_t *)bg)+prevPos[j],   prevSize[j],true);
-        tft->drawFastVLine(j,start,sz,YELLOW);
+        tft->drawFastVLine(j,start+DSO_WAVEFORM_OFFSET,sz,YELLOW);
         prevSize[j]=sz;
         prevPos[j]=start;
         last=next;
@@ -65,7 +68,8 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
 } 
 //-
 #define SCALE_STEP 24
-#define C 10
+#define C_X 10
+#define C_Y 8
 #define CENTER_CROSS 1
 /**
  * 
@@ -74,19 +78,31 @@ void DSODisplay::drawGrid(void)
 {
     uint16_t fgColor=(0xF)<<5;
     uint16_t hiLight=(0x1F)<<5;
-    for(int i=0;i<=C;i++)
+    for(int i=0;i<=C_Y;i++)
     {
-        tft->drawFastHLine(0,SCALE_STEP*i,SCALE_STEP*C,fgColor);
-        tft->drawFastVLine(SCALE_STEP*i,0,SCALE_STEP*C,fgColor);
+        tft->drawFastHLine(0,SCALE_STEP*i+DSO_WAVEFORM_OFFSET,SCALE_STEP*(C_X),fgColor);
     }
-    tft->drawFastHLine(0,239,SCALE_STEP*C,hiLight);
-    tft->drawFastHLine(0,120,SCALE_STEP*C,hiLight);
-    tft->drawFastVLine(0,0,SCALE_STEP*C,hiLight);
-    tft->drawFastVLine(240,0,SCALE_STEP*C,hiLight);
-    tft->drawFastVLine(120,0,SCALE_STEP*C,hiLight);
+    for(int i=0;i<=C_X;i++)
+    {
+
+        tft->drawFastVLine(SCALE_STEP*i,DSO_WAVEFORM_OFFSET,SCALE_STEP*C_Y,fgColor);
+    }
+
+    tft->drawFastHLine(0,DSO_WAVEFORM_OFFSET,SCALE_STEP*C_X,hiLight);    
+    tft->drawFastHLine(0,DSO_WAVEFORM_OFFSET+DSO_WAVEFORM_HEIGHT+2,SCALE_STEP*C_X,hiLight);
+    tft->drawFastHLine(0,DSO_WAVEFORM_OFFSET+DSO_WAVEFORM_HEIGHT/2,SCALE_STEP*C_X,hiLight);
     
-    tft->drawFastHLine(SCALE_STEP*(C/2-CENTER_CROSS),SCALE_STEP*5,SCALE_STEP*CENTER_CROSS*2,WHITE);
-    tft->drawFastVLine(SCALE_STEP*5,SCALE_STEP*(C/2-CENTER_CROSS),SCALE_STEP*CENTER_CROSS*2,WHITE);
+    
+    tft->drawFastVLine(0,DSO_WAVEFORM_OFFSET,SCALE_STEP*C_Y,hiLight);
+    tft->drawFastVLine(C_X*SCALE_STEP,DSO_WAVEFORM_OFFSET,SCALE_STEP*C_Y,hiLight);   
+    tft->drawFastVLine((C_X*SCALE_STEP)/2,DSO_WAVEFORM_OFFSET,SCALE_STEP*C_Y,hiLight);
+    
+    
+//    tft->drawFastHLine(SCALE_STEP*(C/2-CENTER_CROSS),SCALE_STEP*5,SCALE_STEP*CENTER_CROSS*2,WHITE);
+//    tft->drawFastVLine(SCALE_STEP*5,SCALE_STEP*(C/2-CENTER_CROSS),SCALE_STEP*CENTER_CROSS*2,WHITE);
+
+        
+
 }
 /**
  * 
@@ -95,14 +111,14 @@ void DSODisplay::drawGrid(void)
 void  DSODisplay::drawVerticalTrigger(bool drawOrErase,int column)
 {
     if(drawOrErase)
-     tft->drawFastVLine(column,1,239,RED);
+     tft->drawFastVLine(column,1,DSO_WAVEFORM_HEIGHT-1,RED);
     else
     {
         uint16_t *bg=(uint16_t *)defaultPattern;
         if(!(column%24)) 
             bg=(uint16_t *)darkGreenPattern;
-        tft->setAddrWindow(column,0,column,240);
-        tft->pushColors(((uint16_t *)bg),   240,true);
+        tft->setAddrWindow(column,0,column,DSO_WAVEFORM_HEIGHT);
+        tft->pushColors(((uint16_t *)bg),   DSO_WAVEFORM_HEIGHT,true);
     }
 }
 /**
@@ -113,16 +129,16 @@ void  DSODisplay::drawVerticalTrigger(bool drawOrErase,int column)
 void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
 {
     if(line<1) line=1;
-    if(line>238) line=238;
+    if(line>DSO_WAVEFORM_HEIGHT-1) line=DSO_WAVEFORM_HEIGHT-1;
     if(drawOrErase)
-        tft->drawFastHLine(1,1+line,238,BLUE);
+        tft->drawFastHLine(1,1+line,DSO_WAVEFORM_HEIGHT-1,BLUE);
     else
     {
         uint16_t *bg=(uint16_t *)defaultPattern;
         if(!(line%24)) 
             bg=(uint16_t *)darkGreenPattern;
-        tft->setAddrWindow(0,1+line,239,1+line);
-        tft->pushColors(((uint16_t *)bg),   240,true);
+        tft->setAddrWindow(0,1+line,DSO_WAVEFORM_HEIGHT-1,1+line);
+        tft->pushColors(((uint16_t *)bg),   DSO_WAVEFORM_HEIGHT,true);
     }
 }
 
@@ -181,8 +197,8 @@ void DSODisplay::drawStatsBackGround()
     char bf[24];
 
 #define BG_COLOR GREEN    
-        tft->drawFastVLine(DSO_INFO_START_COLUMN, 0,240,BG_COLOR);
-        tft->drawFastVLine(319, 0,240,BG_COLOR);
+        tft->drawFastVLine(DSO_INFO_START_COLUMN, 0,DSO_WAVEFORM_HEIGHT-1,BG_COLOR);
+        tft->drawFastVLine(319, 0,DSO_WAVEFORM_HEIGHT-1,BG_COLOR);
         
 
     tft->setTextColor(BLACK,BG_COLOR);

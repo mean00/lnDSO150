@@ -163,13 +163,13 @@ static void initMainUI(void)
     DSODisplay::init();
         
     tft->setTextSize(2);
-    myTestSignal->setFrequency(1000); // 1 khz
+    myTestSignal->setFrequency(200); // 1 khz
 
-    DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_1MS);
+    DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_5MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
     redraw();
     
-    DSOCapture::setTriggerValue(3.);
+    DSOCapture::setTriggerValue(1.);
     DSODisplay::drawStatsBackGround();
 }
 

@@ -344,9 +344,9 @@ bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
     for(int j=0;j<count;j++)
         {
             float v=samples[j];
-            v*=gain;
-            v=120-v;             
-            if(v>239) v=239;
+            v*=(gain*8.)/10.;
+            v=DSO_WAVEFORM_HEIGHT/2-v;             
+            if(v>DSO_WAVEFORM_HEIGHT) v=DSO_WAVEFORM_HEIGHT;
             if(v<0) v=0;           
             waveForm[j]=(uint8_t)v;
         }
