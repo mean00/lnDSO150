@@ -37,30 +37,12 @@ uint32_t  refrshDuration=0;
 int       nbRefrsh=0;
 
 
-typedef enum              
-{
-            VOLTAGE_MODE,
-            TIME_MODE,
-            TRIGGER_MODE
-}MODE_TYPE;
-
-static MODE_TYPE mode=VOLTAGE_MODE;
  
 
 static void redraw()
 {
         DSODisplay::drawGrid();
         DSODisplay::drawVoltTime(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText());
-        
-        tft->setCursor(10, 220);
-        switch(mode)
-        {
-            case VOLTAGE_MODE: tft->print("VOLT");break;
-            case TIME_MODE: tft->print("TIME");break;
-            case TRIGGER_MODE: tft->print("TRIGG");break;
-            default:  tft->print("xxxx");break;
-        }
-      
 }
 #define REFRESH() DSOCapture::stopCapture()
 
@@ -71,17 +53,17 @@ static void buttonManagement()
     if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_VOLTAGE) & EVENT_SHORT_PRESS)
     {
         dirty=true;
-        mode=VOLTAGE_MODE;
+        DSODisplay::setMode(VOLTAGE_MODE);
     }
     if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_TIME) & EVENT_SHORT_PRESS)
     {
         dirty=true;
-         mode=TIME_MODE;         
+        DSODisplay::setMode(TIME_MODE);
     }
     if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_TRIGGER) & EVENT_SHORT_PRESS)
     {
         dirty=true;
-        mode=TRIGGER_MODE;         
+        DSODisplay::setMode(TRIGGER_MODE);
     }
 
     if(dirty)
@@ -93,7 +75,7 @@ static void buttonManagement()
     if(inc)
     {
 
-        switch(mode)
+        switch(DSODisplay::getMode())
         {
             case VOLTAGE_MODE: 
                 {

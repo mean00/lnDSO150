@@ -7,7 +7,7 @@
 #include "dso_display.h"
 #include "pattern.h"
 
-
+static MODE_TYPE mode=VOLTAGE_MODE;
 
 /**
  */
@@ -58,7 +58,7 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
         if(!(j%24)) bg=(uint16_t *)darkGreenPattern;
 
         // cleanup prev draw
-        tft->setAddrWindow(j,prevPos[j]+DSO_WAVEFORM_OFFSET,j,DSO_WAVEFORM_HEIGHT);
+        tft->setAddrWindow(j,prevPos[j]+DSO_WAVEFORM_OFFSET,j,DSO_WAVEFORM_HEIGHT+DSO_WAVEFORM_OFFSET);
         tft->pushColors(((uint16_t *)bg)+prevPos[j],   prevSize[j],true);
         tft->drawFastVLine(j,start+DSO_WAVEFORM_OFFSET,sz,YELLOW);
         prevSize[j]=sz;
@@ -215,8 +215,49 @@ void DSODisplay::drawStatsBackGround()
  */
 void DSODisplay::drawVoltTime(const char *volt, const char *time)
 {
+    
+#define AND_ONE_V(x,y) { tft->setCursor(y*80, 240-18); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}            
+    
+    
+#define SELECT(md)   { if(md==mode) tft->setTextColor(BLACK,BG_COLOR); else  tft->setTextColor(BG_COLOR,BLACK);}
+    SELECT(VOLTAGE_MODE)
+    AND_ONE_V(volt,0);
+    SELECT(TIME_MODE)
+    AND_ONE_V(time,1);
     tft->setTextColor(BG_COLOR,BLACK);
-    AND_ONE_T(volt,9);
-    AND_ONE_T(time,11);
+    
+    switch(controlButtons->getCouplingState())
+    {
+        case DSOControl::DSO_COUPLING_GND:
+            AND_ONE_V("GND",3);
+            break;
+        case DSOControl::DSO_COUPLING_DC:
+            AND_ONE_V("DC",3);
+            break;
+        case DSOControl::DSO_COUPLING_AC:
+            AND_ONE_V("AC",3);
+            break;
+    }
+    
 }
+//            TRIGGER_MODE
+
+/**
+ * 
+ * @return 
+ */
+MODE_TYPE DSODisplay::getMode() 
+{
+    return mode;
+}
+/**
+ * 
+ * @param t
+ */
+void  DSODisplay::setMode(MODE_TYPE t) 
+{
+    mode=t;
+}
+
+
 // EOF
