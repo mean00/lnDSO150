@@ -42,7 +42,8 @@ int       nbRefrsh=0;
 static void redraw()
 {
         DSODisplay::drawGrid();
-        DSODisplay::drawVoltTime(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText());
+        DSODisplay::drawVoltTime(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText(),DSOCapture::getTriggerMode());
+        DSODisplay::drawTriggerValue(DSOCapture::getTriggerValue());
 }
 #define REFRESH() DSOCapture::stopCapture()
 
@@ -145,7 +146,7 @@ static void initMainUI(void)
     DSODisplay::init();
         
     tft->setTextSize(2);
-    myTestSignal->setFrequency(200); // 1 khz
+    myTestSignal->setFrequency(20000); // 10 khz
 
     DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_5MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);

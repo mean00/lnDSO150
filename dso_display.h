@@ -29,8 +29,9 @@ public:
   
             static void  drawStats(CaptureStats &stats);
             static void  drawStatsBackGround();
-            static void  drawVoltTime(const char *volt, const char *time);
+            static void  drawVoltTime(const char *volt, const char *time,DSOCapture::TriggerMode mode);
             static void  drawMode(MODE_TYPE mode);
             static MODE_TYPE getMode();
             static void  setMode(MODE_TYPE t);
+            static void  drawTriggerValue(float volt);
 };

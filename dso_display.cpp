@@ -206,24 +206,42 @@ void DSODisplay::drawStatsBackGround()
     AND_ONE_A("Max",2);   
     AND_ONE_A("Avg",4);
     AND_ONE_A("Frq",6);
-    AND_ONE_A("V/D",8);
-    AND_ONE_A("T/D",10);
+    AND_ONE_A("Trg",8);
     tft->setTextColor(BG_COLOR,BLACK);
 }
+#define AND_ONE_V(x,y) { tft->setCursor(y*80, 240-18); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}            
+/**
+ * 
+ * @param mode
+ * @param volt
+ */
+void DSODisplay::drawTriggerValue( float volt)
+{    
+    char bf[24];
+    AND_ONE_F(volt,9);      
+}
+
 /**
  * 
  */
-void DSODisplay::drawVoltTime(const char *volt, const char *time)
+void DSODisplay::drawVoltTime(const char *volt, const char *time,DSOCapture::TriggerMode mode)
 {
-    
-#define AND_ONE_V(x,y) { tft->setCursor(y*80, 240-18); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}            
-    
     
 #define SELECT(md)   { if(md==mode) tft->setTextColor(BLACK,BG_COLOR); else  tft->setTextColor(BG_COLOR,BLACK);}
     SELECT(VOLTAGE_MODE)
     AND_ONE_V(volt,0);
     SELECT(TIME_MODE)
     AND_ONE_V(time,1);
+    
+    SELECT(TRIGGER_MODE)    
+    const char *st="????";
+    switch(mode)
+    {
+        case DSOCapture::Trigger_Rising: st="_|--";break;
+        case DSOCapture::Trigger_Falling: st="--|_";break;
+        case DSOCapture::Trigger_Both: st="====";break;
+    }
+    AND_ONE_V(st,2);
     tft->setTextColor(BG_COLOR,BLACK);
     
     switch(controlButtons->getCouplingState())
@@ -237,8 +255,7 @@ void DSODisplay::drawVoltTime(const char *volt, const char *time)
         case DSOControl::DSO_COUPLING_AC:
             AND_ONE_V("AC",3);
             break;
-    }
-    
+    }    
 }
 //            TRIGGER_MODE
 

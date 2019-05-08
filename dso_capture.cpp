@@ -396,5 +396,48 @@ void        DSOCapture::clearCapturedData()
 {
     //adc->clearCapturedData();
 }
+/**
+ * 
+ * @param mode
+ */
+void        DSOCapture::setTriggerMode(TriggerMode mode)
+{
+    DSOADC::TriggerMode adcMode;
+    switch(mode)
+    {
+#define CAP2ADC(xx)         case DSOCapture::xx: adcMode=DSOADC::xx;break;
+        
+        CAP2ADC(Trigger_Rising);
+        CAP2ADC(Trigger_Falling);
+        CAP2ADC(Trigger_Both);
+        default:
+            xAssert(0);
+            break;
+    }
+    stopCapture();
+    adc->setTriggerMode(adcMode);
+}
+/**
+ * 
+ * @return 
+ */
+DSOCapture::TriggerMode DSOCapture::getTriggerMode()
+{
+    DSOADC::TriggerMode adcMode=adc->getTriggerMode();
+    DSOCapture::TriggerMode mode;
+   #define _CAP2ADC(xx)         case DSOADC::xx: mode=DSOCapture::xx;break;
+    switch(adcMode)  
+    {
+        _CAP2ADC(Trigger_Rising);
+        _CAP2ADC(Trigger_Falling);
+        _CAP2ADC(Trigger_Both);
+        default:
+            xAssert(0);
+            break;
+    }
+    return mode;
+}
+
+
 #include "dso_capture2.cpp"
 // EOF
