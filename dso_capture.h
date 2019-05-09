@@ -98,6 +98,7 @@ public:
     static void        initialize();
     static void        task(void *);
     static int         computeFrequency(bool shifted,int samples,uint32_t *data);
-    
-  
+    static void        setVoltageOffset(float volt);
+    static float       getVoltageOffset();
+
 };

@@ -84,8 +84,6 @@ static void buttonManagement()
 
         switch(DSODisplay::getMode())
         {
-            case VOLTAGE_MODE_ALT: 
-                break;
             case VOLTAGE_MODE: 
                 {
                 int v=capture->getVoltageRange();
@@ -118,6 +116,16 @@ static void buttonManagement()
                     capture->setTriggerMode((DSOCapture::TriggerMode)t);
                 }
                 break;
+            case VOLTAGE_MODE_ALT:
+            {
+                float v=capture->getVoltageOffset();
+                v+=0.1*inc;
+                capture->setVoltageOffset(v);
+                DSODisplay::drawOffset( v);
+                dirty=true;
+                REFRESH();
+                break;
+            }
             case TRIGGER_MODE_ALT: 
                 {
                  float v=capture->getTriggerValue();

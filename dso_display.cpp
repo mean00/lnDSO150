@@ -8,11 +8,11 @@
 #include "pattern.h"
 
 static MODE_TYPE mode=VOLTAGE_MODE;
-
 /**
  */
 uint8_t prevPos[256];
 uint8_t prevSize[256];
+static char textBuffer[24];
 /**
  * 
  */
@@ -175,10 +175,10 @@ static const char *fq2Text(int fq)
  */
 void DSODisplay::drawStats(CaptureStats &stats)
 {
-    char bf[24];
+    
 #define AND_ONE_A(x,y) { tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}        
 #define AND_ONE_T(x,y) { tft->setCursor(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}    
-#define AND_ONE_F(x,y) { sprintf(bf,"%02.2f",x);tft->setCursor(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT); tft->myDrawString(bf,DSO_INFO_MAX_WIDTH);}    
+#define AND_ONE_F(x,y) { sprintf(textBuffer,"%02.2f",x);tft->setCursor(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT); tft->myDrawString(textBuffer,DSO_INFO_MAX_WIDTH);}    
     
     AND_ONE_F(stats.xmin,1);
     AND_ONE_F(stats.xmax,3);
@@ -196,7 +196,7 @@ void DSODisplay::drawStats(CaptureStats &stats)
  */
 void DSODisplay::drawStatsBackGround()
 {
-    char bf[24];
+    
 
 #define BG_COLOR GREEN    
         tft->drawFastVLine(DSO_INFO_START_COLUMN, 0,DSO_WAVEFORM_HEIGHT-1,BG_COLOR);
@@ -213,6 +213,16 @@ void DSODisplay::drawStatsBackGround()
     tft->setTextColor(BG_COLOR,BLACK);
 }
 #define LOWER_BAR_PRINT(x,y) { tft->setCursor(y*60, 240-18); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}            
+
+/**
+ * 
+ * @param volt
+ */
+void  DSODisplay::drawOffset(float volt)
+{
+    AND_ONE_F(volt,11);      
+}
+
 /**
  * 
  * @param mode
@@ -220,7 +230,7 @@ void DSODisplay::drawStatsBackGround()
  */
 void DSODisplay::drawTriggerValue( float volt)
 {    
-    char bf[24];
+    
     AND_ONE_F(volt,9);      
 }
 
@@ -265,7 +275,7 @@ void DSODisplay::drawVoltTime(const char *volt, const char *time,DSOCapture::Tri
     if(mode&0x80)
     {
         tft->setTextColor(BLACK,BLUE);
-        switch(mode & 0x80)
+        switch(mode & 0x7f)
         {
             case TRIGGER_MODE:    AND_ONE_A("Trg",8);break;
             case VOLTAGE_MODE:    AND_ONE_A("Off",10);break;
@@ -294,6 +304,7 @@ void  DSODisplay::setMode(MODE_TYPE t)
     }
     mode=t;
 }
+
 
 
 // EOF

@@ -20,7 +20,7 @@ static float    triggerValueFloat=0;
 extern DSOADC   *adc;
 xBinarySemaphore *captureSemaphore;
 static TaskHandle_t captureTaskHandle;
-
+static float     voltageOffset=0;
 
 CapturedSet captureSet[2];
 
@@ -343,7 +343,7 @@ bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
     float gain=vSettings[currentVoltageRange].displayGain;
     for(int j=0;j<count;j++)
         {
-            float v=samples[j];
+            float v=samples[j]+voltageOffset;
             v*=(gain*8.)/10.;
             v=DSO_WAVEFORM_HEIGHT/2-v;             
             if(v>DSO_WAVEFORM_HEIGHT) v=DSO_WAVEFORM_HEIGHT;
@@ -439,5 +439,21 @@ DSOCapture::TriggerMode DSOCapture::getTriggerMode()
 }
 
 
+/**
+ * 
+ * @param volt
+ */
+void  DSOCapture::setVoltageOffset(float volt)
+{
+    voltageOffset=volt;
+}
+/**
+ * 
+ * @return 
+ */
+float DSOCapture::getVoltageOffset()
+{
+    return voltageOffset;
+}
 #include "dso_capture2.cpp"
 // EOF

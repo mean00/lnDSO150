@@ -40,5 +40,6 @@ public:
             static void  drawMode(MODE_TYPE mode);
             static MODE_TYPE getMode();
             static void  setMode(MODE_TYPE t);
-            static void  drawTriggerValue(float volt);            
+            static void  drawTriggerValue(float volt); 
+            static void  drawOffset(float volt); 
 };
