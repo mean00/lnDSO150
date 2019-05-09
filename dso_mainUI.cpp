@@ -51,24 +51,30 @@ static void buttonManagement()
 {
     bool dirty=false;
     int inc=controlButtons->getRotaryValue();
+    
+    MODE_TYPE newMode=INVALID_MODE;
+    
     if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_VOLTAGE) & EVENT_SHORT_PRESS)
     {
         dirty=true;
-        DSODisplay::setMode(VOLTAGE_MODE);
+        newMode=VOLTAGE_MODE;        
     }
     if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_TIME) & EVENT_SHORT_PRESS)
     {
         dirty=true;
-        DSODisplay::setMode(TIME_MODE);
+        newMode=TIME_MODE;
     }
     if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_TRIGGER) & EVENT_SHORT_PRESS)
     {
         dirty=true;
-        DSODisplay::setMode(TRIGGER_MODE);
+        newMode=TRIGGER_MODE;
     }
 
     if(dirty)
     {
+        if((DSODisplay::getMode()&0x7f)==newMode) // switch between normal & alternate
+            newMode=(MODE_TYPE)(DSODisplay::getMode()^0x80);
+        DSODisplay::setMode(newMode);
         redraw();
     }
     dirty=false;
@@ -78,6 +84,8 @@ static void buttonManagement()
 
         switch(DSODisplay::getMode())
         {
+            case VOLTAGE_MODE_ALT: 
+                break;
             case VOLTAGE_MODE: 
                 {
                 int v=capture->getVoltageRange();
@@ -103,6 +111,14 @@ static void buttonManagement()
                 }
                 break;
             case TRIGGER_MODE: 
+                {
+                    int t=capture->getTriggerMode();
+                    t+=inc;
+                    t&=3;
+                    capture->setTriggerMode((DSOCapture::TriggerMode)t);
+                }
+                break;
+            case TRIGGER_MODE_ALT: 
                 {
                  float v=capture->getTriggerValue();
 

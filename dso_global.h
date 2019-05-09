@@ -21,6 +21,7 @@
 #define vRefPin      PB8 // Trigger reference voltage
 
 #define DSO_WAVEFORM_HEIGHT 192
+#define DSO_WAVEFORM_WIDTH  240
 #define DSO_WAVEFORM_OFFSET ((240-DSO_WAVEFORM_HEIGHT-2)/2)
 
 #define CURRENT_HASH 0x1235

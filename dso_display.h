@@ -6,12 +6,17 @@
 
 #pragma once
 
-
+/**
+ */
 typedef enum              
 {
-            VOLTAGE_MODE,
-            TIME_MODE,
-            TRIGGER_MODE
+            INVALID_MODE=0,
+            VOLTAGE_MODE=1,
+            TIME_MODE=2,
+            TRIGGER_MODE=3,
+            VOLTAGE_MODE_ALT=VOLTAGE_MODE+0x80,
+            TIME_MODE_ALT=TIME_MODE+0x80,
+            TRIGGER_MODE_ALT=TRIGGER_MODE+0x80,
 }MODE_TYPE;
 
 
@@ -20,6 +25,8 @@ typedef enum
  */
 class DSODisplay
 {
+public:
+            
 public:
             static void  init();
             static void  drawWaveForm(int count,const uint8_t *data);
@@ -33,5 +40,5 @@ public:
             static void  drawMode(MODE_TYPE mode);
             static MODE_TYPE getMode();
             static void  setMode(MODE_TYPE t);
-            static void  drawTriggerValue(float volt);
+            static void  drawTriggerValue(float volt);            
 };

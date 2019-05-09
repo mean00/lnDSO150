@@ -22,9 +22,9 @@ class DSOCapture
 public:
    enum TriggerMode
     {
-        Trigger_Rising,
-        Trigger_Falling,
-        Trigger_Both,
+        Trigger_Rising=0,
+        Trigger_Falling=1,
+        Trigger_Both=2,
     };
     enum DSO_CAPTURE_STATE
     {

@@ -24,6 +24,8 @@ void DSODisplay::init()
         prevSize[i]=1;
     }
 }
+
+
 /**
  * 
  * @param data
@@ -131,14 +133,14 @@ void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
     if(line<1) line=1;
     if(line>DSO_WAVEFORM_HEIGHT-1) line=DSO_WAVEFORM_HEIGHT-1;
     if(drawOrErase)
-        tft->drawFastHLine(1,1+line,DSO_WAVEFORM_HEIGHT-1,BLUE);
+        tft->drawFastHLine(1,1+line,DSO_WAVEFORM_WIDTH-1,BLUE);
     else
     {
         uint16_t *bg=(uint16_t *)defaultPattern;
         if(!(line%24)) 
             bg=(uint16_t *)darkGreenPattern;
-        tft->setAddrWindow(0,1+line,DSO_WAVEFORM_HEIGHT-1,1+line);
-        tft->pushColors(((uint16_t *)bg),   DSO_WAVEFORM_HEIGHT,true);
+        tft->setAddrWindow(0,1+line,DSO_WAVEFORM_WIDTH-1,1+line);
+        tft->pushColors(((uint16_t *)bg),   DSO_WAVEFORM_WIDTH,true);
     }
 }
 
@@ -202,14 +204,15 @@ void DSODisplay::drawStatsBackGround()
         
 
     tft->setTextColor(BLACK,BG_COLOR);
-    AND_ONE_A("Min",0);   
-    AND_ONE_A("Max",2);   
-    AND_ONE_A("Avg",4);
-    AND_ONE_A("Frq",6);
-    AND_ONE_A("Trg",8);
+    AND_ONE_A("Mini",0);   
+    AND_ONE_A("Maxi",2);   
+    AND_ONE_A("Avrg",4);
+    AND_ONE_A("Freq",6);
+    AND_ONE_A("Trgg",8);
+    AND_ONE_A("Offs",10);
     tft->setTextColor(BG_COLOR,BLACK);
 }
-#define AND_ONE_V(x,y) { tft->setCursor(y*80, 240-18); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}            
+#define LOWER_BAR_PRINT(x,y) { tft->setCursor(y*60, 240-18); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}            
 /**
  * 
  * @param mode
@@ -224,41 +227,53 @@ void DSODisplay::drawTriggerValue( float volt)
 /**
  * 
  */
-void DSODisplay::drawVoltTime(const char *volt, const char *time,DSOCapture::TriggerMode mode)
+void DSODisplay::drawVoltTime(const char *volt, const char *time,DSOCapture::TriggerMode tmode)
 {
-    
-#define SELECT(md)   { if(md==mode) tft->setTextColor(BLACK,BG_COLOR); else  tft->setTextColor(BG_COLOR,BLACK);}
-    SELECT(VOLTAGE_MODE)
-    AND_ONE_V(volt,0);
-    SELECT(TIME_MODE)
-    AND_ONE_V(time,1);
-    
-    SELECT(TRIGGER_MODE)    
     const char *st="????";
-    switch(mode)
+    switch(tmode)
     {
-        case DSOCapture::Trigger_Rising: st="_|--";break;
-        case DSOCapture::Trigger_Falling: st="--|_";break;
-        case DSOCapture::Trigger_Both: st="====";break;
+        case DSOCapture::Trigger_Rising: st="UP";break;
+        case DSOCapture::Trigger_Falling: st="DOWN";break;
+        case DSOCapture::Trigger_Both: st="BOTH";break;
+        default:
+            xAssert(0);
+            break;
     }
-    AND_ONE_V(st,2);
-    tft->setTextColor(BG_COLOR,BLACK);
-    
-    switch(controlButtons->getCouplingState())
+    const char *coupling="??";
+     switch(controlButtons->getCouplingState())
     {
         case DSOControl::DSO_COUPLING_GND:
-            AND_ONE_V("GND",3);
+            coupling="GND";
             break;
         case DSOControl::DSO_COUPLING_DC:
-            AND_ONE_V("DC",3);
+            coupling="DC";
             break;
         case DSOControl::DSO_COUPLING_AC:
-            AND_ONE_V("AC",3);
+            coupling="AC";
             break;
     }    
+    
+#define SELECT(md)   { if(md==mode) tft->setTextColor(BLACK,BG_COLOR); else  tft->setTextColor(BG_COLOR,BLACK);}
+#define LOWER_BAR(mode,st,column) {SELECT(mode);    LOWER_BAR_PRINT(st,column);}
+    
+    LOWER_BAR(VOLTAGE_MODE,volt,0);
+    LOWER_BAR(TIME_MODE,time,1);
+    LOWER_BAR(TRIGGER_MODE,st,2);
+    tft->setTextColor(BG_COLOR,BLACK);
+    LOWER_BAR_PRINT(coupling,3);
+    
+    if(mode&0x80)
+    {
+        tft->setTextColor(BLACK,BLUE);
+        switch(mode & 0x80)
+        {
+            case TRIGGER_MODE:    AND_ONE_A("Trg",8);break;
+            case VOLTAGE_MODE:    AND_ONE_A("Off",10);break;
+        }
+        tft->setTextColor(BG_COLOR,BLACK);
+    }
+        
 }
-//            TRIGGER_MODE
-
 /**
  * 
  * @return 
@@ -273,6 +288,10 @@ MODE_TYPE DSODisplay::getMode()
  */
 void  DSODisplay::setMode(MODE_TYPE t) 
 {
+    if((mode&0x80) ^ !(t&0x80)) // leaving or entering alt
+    {
+        drawStatsBackGround();
+    }
     mode=t;
 }
 
