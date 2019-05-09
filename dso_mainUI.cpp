@@ -45,7 +45,7 @@ static void redraw()
         DSODisplay::drawVoltTime(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText(),DSOCapture::getTriggerMode());
         DSODisplay::drawTriggerValue(DSOCapture::getTriggerValue());
 }
-#define REFRESH() DSOCapture::stopCapture()
+#define STOP_CAPTURE() DSOCapture::stopCapture()
 
 static void buttonManagement()
 {
@@ -92,7 +92,7 @@ static void buttonManagement()
                 if(v<0) v=0;
                 if(v>DSOCapture::DSO_VOLTAGE_MAX) v=DSOCapture::DSO_VOLTAGE_MAX;
                 capture->setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)v);                                
-                REFRESH();
+                STOP_CAPTURE();
                 }
                 break;
             case TIME_MODE: 
@@ -105,15 +105,17 @@ static void buttonManagement()
                    DSOCapture::DSO_TIME_BASE  t=(DSOCapture::DSO_TIME_BASE )v;
                    DSOCapture::clearCapturedData();
                    capture->setTimeBase( t);
-                   REFRESH();
+                   STOP_CAPTURE();
                 }
                 break;
             case TRIGGER_MODE: 
                 {
                     int t=capture->getTriggerMode();
                     t+=inc;
-                    t&=3;
+                    while(t<0) t+=3;
+                    t%=3;
                     capture->setTriggerMode((DSOCapture::TriggerMode)t);
+                    dirty=true;
                 }
                 break;
             case VOLTAGE_MODE_ALT:
@@ -123,7 +125,7 @@ static void buttonManagement()
                 capture->setVoltageOffset(v);
                 DSODisplay::drawOffset( v);
                 dirty=true;
-                REFRESH();
+                STOP_CAPTURE();
                 break;
             }
             case TRIGGER_MODE_ALT: 
@@ -133,9 +135,7 @@ static void buttonManagement()
                     v+=0.1*(float)inc;
                    capture->setTriggerValue(v);    
                    dirty=true;
-                   REFRESH();
-
-
+                   STOP_CAPTURE();
                 }
                 break;
             default: 
@@ -147,22 +147,6 @@ static void buttonManagement()
 }
 
 /**
- */
-static const char *fq2Text(int fq)
-{
-    static char buff[16];
-    float f=fq;
-    const char *suff="";
-#define STEP(x,t)  if(f>x)     {suff=t;f/=x;}else
-
-    STEP(1000000,"M")
-    STEP(1000,"K")
-    {}
-    
-    sprintf(buff,"%3.1f%sHz",f,suff);
-    return buff;
-}
-/**
  * 
  */
 static void initMainUI(void)
@@ -170,7 +154,7 @@ static void initMainUI(void)
     DSODisplay::init();
         
     tft->setTextSize(2);
-    myTestSignal->setFrequency(20000); // 10 khz
+    myTestSignal->setFrequency(200); // 10 khz
 
     DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_5MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);

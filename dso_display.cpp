@@ -13,6 +13,25 @@ static MODE_TYPE mode=VOLTAGE_MODE;
 uint8_t prevPos[256];
 uint8_t prevSize[256];
 static char textBuffer[24];
+
+
+
+/**
+ */
+static const char *fq2Text(int fq)
+{
+    static char buff[16];
+    float f=fq;
+    const char *suff="";
+#define STEP(x,t)  if(f>x)     {suff=t;f/=x;}else
+
+    STEP(1000000,"M")
+    STEP(1000,"K")
+    {}
+    
+    sprintf(buff,"%3.1f%sH",f,suff);
+    return buff;
+}
 /**
  * 
  */
@@ -146,23 +165,6 @@ void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
 
 
 
-
-/**
- */
-static const char *fq2Text(int fq)
-{
-    static char buff[16];
-    float f=fq;
-    const char *suff=" ";
-#define STEP(x,t)  if(f>x)     {suff=t;f/=x;}else
-
-    STEP(1000000,"M")
-    STEP(1000,"K")
-    {}
-    
-    sprintf(buff,"%03.0f%sHz",f,suff);
-    return buff;
-}
 #define DSO_CHAR_HEIGHT 20
 #define DSO_HEIGHT_OFFSET 1
 #define DSO_INFO_START_COLUMN (248)
@@ -208,11 +210,11 @@ void DSODisplay::drawStatsBackGround()
     AND_ONE_A("Maxi",2);   
     AND_ONE_A("Avrg",4);
     AND_ONE_A("Freq",6);
-    AND_ONE_A("Trgg",8);
-    AND_ONE_A("Offs",10);
+    AND_ONE_A("Trigg",8);
+    AND_ONE_A("Offst",10);
     tft->setTextColor(BG_COLOR,BLACK);
 }
-#define LOWER_BAR_PRINT(x,y) { tft->setCursor(y*60, 240-18); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}            
+#define LOWER_BAR_PRINT(x,y) { tft->setCursor(y*64, 240-18); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}            
 
 /**
  * 
@@ -277,8 +279,8 @@ void DSODisplay::drawVoltTime(const char *volt, const char *time,DSOCapture::Tri
         tft->setTextColor(BLACK,BLUE);
         switch(mode & 0x7f)
         {
-            case TRIGGER_MODE:    AND_ONE_A("Trg",8);break;
-            case VOLTAGE_MODE:    AND_ONE_A("Off",10);break;
+            case TRIGGER_MODE:    AND_ONE_A("Trigg",8);break;
+            case VOLTAGE_MODE:    AND_ONE_A("Offst",10);break;
         }
         tft->setTextColor(BG_COLOR,BLACK);
     }
