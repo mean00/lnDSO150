@@ -11,6 +11,7 @@
 #include "HardwareSerial.h"
 #include "dso_eeprom.h"
 #include "DSO_config.h"
+#include "gfx/dso_small_compressed.h"
 static void MainTask( void *a );
 void splash(void);
 //--
@@ -75,7 +76,7 @@ void mySetup()
     tft->fillScreen(BLACK);
     
     splash();
-    delay(500);
+    delay(1500);
     myTestSignal=new testSignal(  PA7,PB12, 3,TIMER_CH2);
     myTestSignal->setFrequency(1000); // 1Khz
     myTestSignal->setAmplitute(true);
@@ -103,7 +104,8 @@ void splash(void)
         tft->fillScreen(BLACK);   
         tft->setCursor(45, 10);
         tft->setTextColor(WHITE,BLACK);
-        tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::SmallFont);
+        tft->drawRLEBitmap(dso_small_width,dso_small_height,64,64,WHITE,BLACK,dso_small);
+        tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::SmallFont);        
         tft->myDrawString("    DSO-STM32duino");        
 }
 
