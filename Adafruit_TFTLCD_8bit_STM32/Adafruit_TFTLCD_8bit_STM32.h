@@ -127,7 +127,7 @@ public:
     void  setFontSize(FontSize size);
     //
     void drawBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);
-    void drawRLEBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);    
+    void drawRLEBitmap(int widthInPixel, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);   // width is in bytes  
     virtual void pushColors(uint16_t *data, int len, boolean first);
     virtual void push2Colors(uint8_t *data, int len, boolean first,uint16_t fg, uint16_t bg) {};
 };

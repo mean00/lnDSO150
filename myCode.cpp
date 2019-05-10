@@ -11,7 +11,7 @@
 #include "HardwareSerial.h"
 #include "dso_eeprom.h"
 #include "DSO_config.h"
-#include "gfx/dso_small_compressed.h"
+
 static void MainTask( void *a );
 void splash(void);
 //--
@@ -99,16 +99,6 @@ void mySetup()
 void vApplicationDaemonTaskStartupHook()
 {
 }
-void splash(void)
-{
-        tft->fillScreen(BLACK);   
-        tft->setCursor(45, 10);
-        tft->setTextColor(WHITE,BLACK);
-        tft->drawRLEBitmap(dso_small_width,dso_small_height,64,64,WHITE,BLACK,dso_small);
-        tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::SmallFont);        
-        tft->myDrawString("    DSO-STM32duino");        
-}
-
 
 /**
  * 

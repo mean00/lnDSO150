@@ -131,18 +131,18 @@ void Adafruit_TFTLCD_8bit_STM32::drawBitmap(int width, int height, int wx, int w
 
 /**
  */
-void Adafruit_TFTLCD_8bit_STM32::drawRLEBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data)
+void Adafruit_TFTLCD_8bit_STM32::drawRLEBitmap(int widthInPixel, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data)
 {
     uint8_t *p=(uint8_t *)data;    
     uint16_t line[320];
+    bool first=true;
     
-    
-    width>>=3;
+    int widthInByte=(widthInPixel>>3); // pixel -> bytes
     for(int y=0;y<height;y++)
     {
         uint16_t *o=line;
-        setAddrWindow(wx, wy+y, wx+width*8-1, wy+y-1);
-        for(int x=0;x<width;) // in bytes
+        setAddrWindow(wx, wy+y, wx+widthInPixel, wy+y);
+        for(int x=0;x<widthInByte;) // in bytes
         {
             int val=*p++;
             int count=1;
@@ -167,7 +167,8 @@ void Adafruit_TFTLCD_8bit_STM32::drawRLEBitmap(int width, int height, int wx, in
             }
             x+=count;
         }    
-        pushColors(line,width*8,0);
+        pushColors(line,widthInPixel,first);
+        //first=false;
     }   
 }
 

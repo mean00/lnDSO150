@@ -20,6 +20,8 @@
 #include "dso_global.h"
 #include "dso_display.h"
 #include "dso_adc.h"
+#include "gfx/dso_small_compressed.h"
+#include "DSO_config.h"
 
 extern void splash(void);
 static void drawGrid(void);
@@ -36,6 +38,30 @@ static uint8_t waveForm[256]; // take a bit more, we have rounding issues
 uint32_t  refrshDuration=0;
 int       nbRefrsh=0;
 
+
+/**
+ * 
+ */
+void splash(void)
+{
+        tft->fillScreen(BLACK);   
+        tft->drawRLEBitmap(dso_small_width,dso_small_height,20,64,WHITE,BLACK,dso_small);
+        tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::SmallFont);        
+        
+        tft->setTextColor(WHITE,BLACK);        
+        tft->setCursor(140, 64);
+        tft->myDrawString("DSO-STM32duino");              
+        tft->setCursor(140, 84);
+#ifdef USE_RXTX_PIN_FOR_ROTARY        
+        tft->myDrawString("USB  Version");              
+#else
+        tft->myDrawString("RXTX Version");              
+#endif
+        char bf[20];
+        sprintf(bf,"%d.%02d",DSO_VERSION_MAJOR,DSO_VERSION_MINOR);
+        tft->setCursor(140, 64+20*2);
+        tft->myDrawString(bf);              
+}
 
  
 
@@ -153,6 +179,11 @@ static void initMainUI(void)
 {
     DSODisplay::init();
         
+    splash();
+    xDelay(1500);
+    tft->fillScreen(BLACK);   
+    
+    
     tft->setTextSize(2);
     myTestSignal->setFrequency(200); // 10 khz
 
