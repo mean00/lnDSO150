@@ -49,31 +49,30 @@ void header(int color,const char *txt,DSOControl::DSOCoupling target)
 void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupling target)
 {
     header(color,txt,target); 
-#if 0    
-    
-    SampleSet set;
+
+    FullSampleSet fset;    
     uint32_t data [256];
-    
-    set.data=data;
     
     for(int range=0;range<14;range++)
     {
         controlButtons->setInputGain(range);        
 
-        adc->prepareDMASampling(ADC_SMPR_55_5,ADC_PRE_PCLK2_DIV_2);
-        adc->startDMASampling(64);
-        
-        adc->getSamples(set);
-        uint32_t *xsamples=set.data;
+        while(1)
+        {
+            adc->prepareDMASampling(ADC_SMPR_55_5,ADC_PRE_PCLK2_DIV_2);
+            adc->startDMASampling(64);
+
+            if(adc->getSamples(fset)) break;
+        }
+        uint32_t *xsamples=fset.set1.data;
         int sum=0;
-        for(int i=0;i<set.samples;i++)
+        for(int i=0;i<fset.set1.samples;i++)
         {
             sum+= xsamples[i]>>16;
         }
-        sum/=set.samples;
+        sum/=fset.set1.samples;
         array[range]=sum;
     }
-#endif    
 }
 
 /**

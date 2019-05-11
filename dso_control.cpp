@@ -206,7 +206,7 @@ static void _myInterruptRE(void *a)
  */
 static DSOControl::DSOCoupling couplingFromAdc(int v)
 {
-    if(v>4000)      return DSOControl::DSO_COUPLING_AC;
+    if(v>3500)      return DSOControl::DSO_COUPLING_AC;
     if(v<500)       return DSOControl::DSO_COUPLING_GND;
                     return DSOControl::DSO_COUPLING_DC;
 }

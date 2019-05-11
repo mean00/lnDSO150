@@ -27,6 +27,13 @@ extern int ints;
 void testButtons(void)
 {
     int reCounter=0;
+    tft->setCursor(200, 5);
+    tft->print("Rotary");
+    tft->setCursor(200, 1200);
+    tft->print("Ints");    
+    tft->setCursor(200, 190);
+    tft->print("Coupling");    
+
     while(1)
     {        
         //splash();
@@ -45,13 +52,13 @@ void testButtons(void)
             if(evt & EVENT_LONG_PRESS)
             {
                 tft->print(" LONG");
+                xDelay(1000);
                 Serial.println("Long");
             }
         }
         reCounter+=controlButtons->getRotaryValue();
         tft->setCursor(200, 30);
         tft->print(reCounter);
-        tft->setCursor(200, 90);
         tft->setCursor(200, 160);
         tft->print(ints);
         

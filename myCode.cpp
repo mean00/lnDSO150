@@ -114,21 +114,23 @@ void MainTask( void *a )
   
   
     
+  
+   
+   // testTestSignal();
+    //testButtons();   
     if(!DSOEeprom::read())
     {
          DSOCalibrate::calibrate();
          DSOEeprom::write();         
     }
-   
+    //testAdc();   
+    //testAdc2();   //fast
+    //  testAdc3();   // slow
+    //testDisplay();
+    // testCalibrate();
     adc->readCalibrationValue(); // re-read calibration value
     DSOCapture::initialize();
-   // testTestSignal();
-     //testButtons();   
-      //testAdc();   
-    //testAdc2();   //fast
-   //  testAdc3();   // slow
-    //testDisplay();
-   // testCalibrate();
+
     //testI2c();
     mainDSOUI();
     testTrigger();

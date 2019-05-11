@@ -1,5 +1,5 @@
 #pragma once
-#define USE_RXTX_PIN_FOR_ROTARY 1
+//#define USE_RXTX_PIN_FOR_ROTARY 1
 #define DSO_VERSION_MAJOR  1
 #define DSO_VERSION_MINOR  0
 
