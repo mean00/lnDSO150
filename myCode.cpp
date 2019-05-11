@@ -63,31 +63,7 @@ void mySetup()
     Serial.begin(115200);
     Serial.println("Init"); 
     
-    identifier = tft->readID();
-    if(!identifier) identifier=0x7789;
-    tft=Adafruit_TFTLCD_8bit_STM32::spawn(0x7789);   
-    if(!tft)
-    {
-        while(1) {};
-    }
-    tft->begin();
-    tft->setRotation(1);
-    tft->setFontFamily(&Waree9pt7b, &Waree9pt7b, &Waree12pt7b);  
-    tft->fillScreen(BLACK);
     
-    splash();
-    delay(1500);
-    myTestSignal=new testSignal(  PA7,PB12, 3,TIMER_CH2);
-    myTestSignal->setFrequency(1000); // 1Khz
-    myTestSignal->setAmplitute(true);
-    
-    controlButtons=new DSOControl ;
-    
-    controlButtons->setup();
-    
-    adc=new DSOADC;
-    
-    tft->fillScreen(BLACK);
      // Ok let's go, switch to FreeRTOS
     xTaskCreate( MainTask, "MainTask", 250, NULL, DSO_MAIN_TASK_PRIORITY, NULL );
    
@@ -106,7 +82,34 @@ void vApplicationDaemonTaskStartupHook()
  */
 void MainTask( void *a )
 {
+    identifier = tft->readID();
+    if(!identifier) identifier=0x7789;
+    tft=Adafruit_TFTLCD_8bit_STM32::spawn(identifier);   
+    if(!tft)
+    {
+        while(1) {};
+    }
     interrupts();
+    tft->begin();
+    tft->setRotation(1);
+    tft->setFontFamily(&Waree9pt7b, &Waree9pt7b, &Waree12pt7b);  
+    tft->fillScreen(BLACK);
+    
+    splash();
+    delay(1500);
+    myTestSignal=new testSignal(  PA7,PB12, 3,TIMER_CH2);
+    myTestSignal->setFrequency(1000); // 1Khz
+    myTestSignal->setAmplitute(true);
+    
+    controlButtons=new DSOControl ;
+    
+    controlButtons->setup();
+    
+    adc=new DSOADC;
+    
+    tft->fillScreen(BLACK);
+    
+    
     tft->setTextSize(3);
   
   
