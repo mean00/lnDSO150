@@ -328,7 +328,7 @@ int DSOCapture::triggeredCapture(int count,float *volt,CaptureStats &stats)
 
      memcpy(volt,set->data,toCopy*sizeof(float));
      stats=set->stats;
-     xDelay(10);
+     //xDelay(10);
      return toCopy;
 }
 /**

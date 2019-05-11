@@ -120,7 +120,7 @@ void MainTask( void *a )
     adc->readCalibrationValue(); // re-read calibration value
     DSOCapture::initialize();
    // testTestSignal();
-   //  testButtons();   
+     //testButtons();   
       //testAdc();   
     //testAdc2();   //fast
    //  testAdc3();   // slow

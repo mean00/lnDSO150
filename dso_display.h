@@ -6,6 +6,14 @@
 
 #pragma once
 
+
+
+
+/**
+ */
+class DSODisplay
+{
+public:  
 /**
  */
 typedef enum              
@@ -19,12 +27,6 @@ typedef enum
             TRIGGER_MODE_ALT=TRIGGER_MODE+0x80,
 }MODE_TYPE;
 
-
-
-/**
- */
-class DSODisplay
-{
 public:
             
 public:
@@ -36,10 +38,10 @@ public:
   
             static void  drawStats(CaptureStats &stats);
             static void  drawStatsBackGround();
-            static void  drawVoltTime(const char *volt, const char *time,DSOCapture::TriggerMode mode);
+            static void  printVoltTimeTriggerMode(const char *volt, const char *time,DSOCapture::TriggerMode mode);
             static void  drawMode(MODE_TYPE mode);
             static MODE_TYPE getMode();
             static void  setMode(MODE_TYPE t);
-            static void  drawTriggerValue(float volt); 
-            static void  drawOffset(float volt); 
+            static void  printTriggerValue(float volt); 
+            static void  printOffset(float volt); 
 };

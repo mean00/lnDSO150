@@ -103,12 +103,12 @@ void DSOADC::timerTriggerCapture()
         }                
     }
   
-    if(!slowTriggered || (timerWrite-timerRead)<requestedSamples)
+    if(!slowTriggered || ((timerWrite-timerRead)<requestedSamples))
     {
         NEXT_TRANSFER();
         return;
     }
-
+    // Ok, triggered + got enough samples, we can stop here
     dma_disable(DMA1, DMA_CH1);
     ADC_TIMER.setMode(ADC_TIMER_CHANNEL,TIMER_DISABLED);
     ADC_TIMER.pause();

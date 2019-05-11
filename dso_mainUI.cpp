@@ -68,8 +68,9 @@ void splash(void)
 static void redraw()
 {
         DSODisplay::drawGrid();
-        DSODisplay::drawVoltTime(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText(),DSOCapture::getTriggerMode());
-        DSODisplay::drawTriggerValue(DSOCapture::getTriggerValue());
+        DSODisplay::printVoltTimeTriggerMode(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText(),DSOCapture::getTriggerMode());
+        DSODisplay::printTriggerValue(DSOCapture::getTriggerValue());
+        DSODisplay::printOffset(capture->getVoltageOffset());
 }
 #define STOP_CAPTURE() DSOCapture::stopCapture()
 
@@ -78,28 +79,28 @@ static void buttonManagement()
     bool dirty=false;
     int inc=controlButtons->getRotaryValue();
     
-    MODE_TYPE newMode=INVALID_MODE;
+    DSODisplay::MODE_TYPE newMode=DSODisplay::INVALID_MODE;
     
     if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_VOLTAGE) & EVENT_SHORT_PRESS)
     {
         dirty=true;
-        newMode=VOLTAGE_MODE;        
+        newMode=DSODisplay::VOLTAGE_MODE;        
     }
     if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_TIME) & EVENT_SHORT_PRESS)
     {
         dirty=true;
-        newMode=TIME_MODE;
+        newMode=DSODisplay::TIME_MODE;
     }
     if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_TRIGGER) & EVENT_SHORT_PRESS)
     {
         dirty=true;
-        newMode=TRIGGER_MODE;
+        newMode=DSODisplay::TRIGGER_MODE;
     }
 
     if(dirty)
     {
         if((DSODisplay::getMode()&0x7f)==newMode) // switch between normal & alternate
-            newMode=(MODE_TYPE)(DSODisplay::getMode()^0x80);
+            newMode=(DSODisplay::MODE_TYPE)(DSODisplay::getMode()^0x80);
         DSODisplay::setMode(newMode);
         redraw();
     }
@@ -110,7 +111,7 @@ static void buttonManagement()
 
         switch(DSODisplay::getMode())
         {
-            case VOLTAGE_MODE: 
+            case DSODisplay::VOLTAGE_MODE: 
                 {
                 int v=capture->getVoltageRange();
                     dirty=true;
@@ -121,7 +122,7 @@ static void buttonManagement()
                 STOP_CAPTURE();
                 }
                 break;
-            case TIME_MODE: 
+            case DSODisplay::TIME_MODE: 
                 {
                     int v=capture->getTimeBase();
                         dirty=true;
@@ -134,7 +135,7 @@ static void buttonManagement()
                    STOP_CAPTURE();
                 }
                 break;
-            case TRIGGER_MODE: 
+            case DSODisplay::TRIGGER_MODE: 
                 {
                     int t=capture->getTriggerMode();
                     t+=inc;
@@ -144,17 +145,16 @@ static void buttonManagement()
                     dirty=true;
                 }
                 break;
-            case VOLTAGE_MODE_ALT:
+            case DSODisplay::VOLTAGE_MODE_ALT:
             {
                 float v=capture->getVoltageOffset();
                 v+=0.1*inc;
-                capture->setVoltageOffset(v);
-                DSODisplay::drawOffset( v);
+                capture->setVoltageOffset(v);                
                 dirty=true;
                 STOP_CAPTURE();
                 break;
             }
-            case TRIGGER_MODE_ALT: 
+            case DSODisplay::TRIGGER_MODE_ALT: 
                 {
                  float v=capture->getTriggerValue();
 
@@ -180,12 +180,13 @@ static void initMainUI(void)
     DSODisplay::init();
         
     splash();
-    xDelay(1500);
+    xDelay(500);
     tft->fillScreen(BLACK);   
     
     
     tft->setTextSize(2);
-    myTestSignal->setFrequency(200); // 10 khz
+    myTestSignal->setFrequency(100); // 10 khz
+    myTestSignal->setFrequency(100); // 10 khz
 
     DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_5MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
@@ -219,7 +220,7 @@ void mainDSOUI(void)
         {
             DSODisplay::drawVoltageTrigger(false,triggerLine);
             buttonManagement();
-            float f=DSOCapture::getTriggerValue();
+            float f=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();
             triggerLine=DSOCapture::voltageToPixel(f);
             DSODisplay::drawVoltageTrigger(true,triggerLine);
             continue;
@@ -242,7 +243,7 @@ void mainDSOUI(void)
             lastTrigger=stats.trigger;
             DSODisplay::drawVerticalTrigger(true,lastTrigger);
         }
-        float f=DSOCapture::getTriggerValue();
+        float f=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();
         triggerLine=DSOCapture::voltageToPixel(f);
         DSODisplay::drawVoltageTrigger(true,triggerLine);
         

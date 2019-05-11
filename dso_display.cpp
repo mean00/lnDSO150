@@ -7,7 +7,7 @@
 #include "dso_display.h"
 #include "pattern.h"
 
-static MODE_TYPE mode=VOLTAGE_MODE;
+static DSODisplay::MODE_TYPE mode=DSODisplay::VOLTAGE_MODE;
 /**
  */
 uint8_t prevPos[256];
@@ -220,7 +220,7 @@ void DSODisplay::drawStatsBackGround()
  * 
  * @param volt
  */
-void  DSODisplay::drawOffset(float volt)
+void  DSODisplay::printOffset(float volt)
 {
     AND_ONE_F(volt,11);      
 }
@@ -230,7 +230,7 @@ void  DSODisplay::drawOffset(float volt)
  * @param mode
  * @param volt
  */
-void DSODisplay::drawTriggerValue( float volt)
+void DSODisplay::printTriggerValue( float volt)
 {    
     
     AND_ONE_F(volt,9);      
@@ -239,7 +239,7 @@ void DSODisplay::drawTriggerValue( float volt)
 /**
  * 
  */
-void DSODisplay::drawVoltTime(const char *volt, const char *time,DSOCapture::TriggerMode tmode)
+void DSODisplay::printVoltTimeTriggerMode(const char *volt, const char *time,DSOCapture::TriggerMode tmode)
 {
     const char *st="????";
     switch(tmode)
@@ -290,7 +290,7 @@ void DSODisplay::drawVoltTime(const char *volt, const char *time,DSOCapture::Tri
  * 
  * @return 
  */
-MODE_TYPE DSODisplay::getMode() 
+DSODisplay::MODE_TYPE DSODisplay::getMode() 
 {
     return mode;
 }

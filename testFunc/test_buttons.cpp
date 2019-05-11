@@ -29,7 +29,7 @@ void testButtons(void)
     int reCounter=0;
     while(1)
     {        
-        splash();
+        //splash();
         for(int i=0;i<8;i++)
         {
             int evt=controlButtons->getButtonEvents((DSOControl::DSOButton)i);
