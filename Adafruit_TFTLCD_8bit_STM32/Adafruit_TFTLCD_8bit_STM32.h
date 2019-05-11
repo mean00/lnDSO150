@@ -3,7 +3,7 @@
 
 #ifndef _ADAFRUIT_TFTLCD_8BIT_STM32_H_
 #define _ADAFRUIT_TFTLCD_8BIT_STM32_H_
-
+#include "DSO_config.h"
 #include <Adafruit_GFX.h>
 
 #include <libmaple/gpio.h>
@@ -34,14 +34,19 @@ typedef enum LCD_CHIP_ID
 #define Color565 color565
 
 /*****************************************************************************/
-#define	BLACK   0x0000
-#define	BLUE    0x001F
-#define	RED     0xF800
-#define	GREEN   0x07E0
-#define CYAN    0x07FF
-#define MAGENTA 0xF81F
-#define YELLOW  0xFFE0
-#define WHITE   0xFFFF
+#ifdef USE_RXTX_PIN_FOR_ROTARY
+    #define MK_COLOR(a,b,c) ((a<<11)+(b<<6)+(c))
+#else
+    #define MK_COLOR(a,b,c) ((c<<11)+(b<<6)+(a))
+#endif
+#define	BLACK   MK_COLOR(0,0,0)
+#define	BLUE    MK_COLOR(0,0,0x1F)
+#define	RED     MK_COLOR(0x1F,0,0)
+#define	GREEN   MK_COLOR(0,0x3f,0)
+#define CYAN    MK_COLOR(0,0x3f,0x1f)
+#define MAGENTA MK_COLOR(0x1f,0,0x1f)
+#define YELLOW  MK_COLOR(0x1f,0x3f,0)
+#define WHITE   MK_COLOR(0x1f,0x3f,0x1f)
 
 /*****************************************************************************/
 

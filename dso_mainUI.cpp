@@ -179,8 +179,6 @@ static void initMainUI(void)
 {
     DSODisplay::init();
         
-    splash();
-    xDelay(500);
     tft->fillScreen(BLACK);   
     
     
