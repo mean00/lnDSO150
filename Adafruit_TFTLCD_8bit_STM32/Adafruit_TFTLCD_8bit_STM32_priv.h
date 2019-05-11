@@ -45,7 +45,9 @@ extern xMutex PortAMutex;
 
 #ifndef USE_RXTX_PIN_FOR_ROTARY
 
-#define CS_ACTIVE  { intReg = EXTI_BASE->IMR;\
+#define CS_ACTIVE  { \
+                    PortAMutex.lock(); \
+                    intReg = EXTI_BASE->IMR;\
                     opReg = GPIOB->regs->ODR;\
                     EXTI_BASE->IMR = 0 ; \
                     GPIOB->regs->CRL = 0x33333333 ;\
@@ -54,7 +56,9 @@ extern xMutex PortAMutex;
 #define CS_IDLE    { GPIOB->regs->ODR = opReg;\
                     GPIOB->regs->CRL = 0x88888888; \
                     GPIOC->regs->BSRR = TFT_CS_MASK ; \
-                    EXTI_BASE->IMR = intReg; }
+                    EXTI_BASE->IMR = intReg;  \
+                    PortAMutex.unlock(); \
+                    }
 
 
 #else // when RX/TX pins are used for rotary encoder, no need to mask interrupts

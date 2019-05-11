@@ -109,23 +109,19 @@ inline void writeCommand(uint16_t c)
 /*****************************************************************************/
 uint16_t Adafruit_TFTLCD_8bit_STM32::readID(void)
 {  
-    reset();
-  uint32_t displayId=(readReg(0xdb)<<16)+readReg(0xda);
-  uint32_t lowId=readReg32(0x04) ;
+  reset();
+#if 0
+  static uint32_t regs[256];
+  for(int i=0;i<0xff;i++)
+      regs[i]=readReg32(i) ;
+#endif
   
-  if(lowId==0xff858552) // st7789 , really not sure it's the right way to do it
-  {
-     return 0x7789;
-  }  
+  uint32_t regD3=readReg32(0xd3)&0xffff ;
+  uint32_t reg04=readReg32(0x04)&0xffff ;
   
-    
-  uint16_t id = readReg32(0xD3);
-  if (id != 0x9341 && id != 0x9338) 
-  {
-    id = readReg(0);
-  }
-	//Serial.print("ID: "); Serial.println(id,HEX);
-  return id;
+  if(regD3==0x9341) return 0x9341;
+  if(reg04==0x8552) return 0x7789; // is it really a 7789 ?
+  return 0; // unknown
 }
 
 /*****************************************************************************/
