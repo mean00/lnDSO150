@@ -35,9 +35,9 @@ typedef enum LCD_CHIP_ID
 
 /*****************************************************************************/
 #ifdef USE_RXTX_PIN_FOR_ROTARY
-    #define MK_COLOR(a,b,c) ((a<<11)+(b<<6)+(c))
+    #define MK_COLOR(a,b,c) ((a<<11)+(b<<5)+(c))
 #else
-    #define MK_COLOR(a,b,c) ((c<<11)+(b<<6)+(a))
+    #define MK_COLOR(a,b,c) ((c<<11)+(b<<5)+(a))
 #endif
 #define	BLACK   MK_COLOR(0,0,0)
 #define	BLUE    MK_COLOR(0,0,0x1F)
@@ -46,7 +46,7 @@ typedef enum LCD_CHIP_ID
 #define CYAN    MK_COLOR(0,0x3f,0x1f)
 #define MAGENTA MK_COLOR(0x1f,0,0x1f)
 #define YELLOW  MK_COLOR(0x1f,0x3f,0)
-#define WHITE   MK_COLOR(0x1f,0x3f,0x1f)
+#define WHITE   0xffff
 
 /*****************************************************************************/
 

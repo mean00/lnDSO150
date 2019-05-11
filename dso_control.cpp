@@ -349,10 +349,7 @@ void DSOControl::interruptRE(int a)
 {   
 #ifdef USE_RXTX_PIN_FOR_ROTARY    
   int pinstate= ((( GPIOA->regs->IDR))>>9)&3;
-#else
-  int pinstate =  ( GPIOB->regs->IDR)&3;
-#endif  
-  // Determine new state from the pins and state table.
+   // Determine new state from the pins and state table.
   state = ttable[state & 0xf][pinstate];
   // Return emit bits, ie the generated event.
   switch(state&DIR_MASK)
@@ -366,7 +363,23 @@ void DSOControl::interruptRE(int a)
     default: 
             break;
   }
-  
+#else
+  int pinstate =  ( GPIOB->regs->IDR)&3;
+  // Determine new state from the pins and state table.
+  state = ttable[state & 0xf][pinstate];
+  // Return emit bits, ie the generated event.
+  switch(state&DIR_MASK)
+  {
+    case DIR_CW:
+            counter--;
+            break;
+    case DIR_CCW: 
+            counter++;
+            break;
+    default: 
+            break;
+  }
+#endif  
 }
 /**
  * 
