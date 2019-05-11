@@ -19,7 +19,7 @@ Adafruit_TFTLCD_8bit_STM32 *tft;
 testSignal *myTestSignal;
 DSOControl *controlButtons;
 DSOADC    *adc;
-static uint16_t identifier=0;
+uint16_t displayIdentifier=0;
 
 
 // Globals
@@ -82,9 +82,9 @@ void vApplicationDaemonTaskStartupHook()
  */
 void MainTask( void *a )
 {
-    identifier = tft->readID();
-    if(!identifier) identifier=0x7789;
-    tft=Adafruit_TFTLCD_8bit_STM32::spawn(identifier);   
+    displayIdentifier = tft->readID();
+    if(!displayIdentifier) displayIdentifier=0x7789;
+    tft=Adafruit_TFTLCD_8bit_STM32::spawn(displayIdentifier);   
     if(!tft)
     {
         while(1) {};

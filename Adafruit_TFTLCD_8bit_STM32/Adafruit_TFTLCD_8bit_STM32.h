@@ -8,6 +8,8 @@
 
 #include <libmaple/gpio.h>
 
+extern uint16_t displayIdentifier;
+
 /*****************************************************************************/
 // LCD controller chip identifiers
 typedef enum LCD_CHIP_ID
@@ -34,17 +36,14 @@ typedef enum LCD_CHIP_ID
 #define Color565 color565
 
 /*****************************************************************************/
-#ifdef USE_RXTX_PIN_FOR_ROTARY
-    #define MK_COLOR(a,b,c) ((a<<11)+(b<<5)+(c))
-#else
-    #define MK_COLOR(a,b,c) ((c<<11)+(b<<5)+(a))
-#endif
-#define	BLACK   MK_COLOR(0,0,0)
+
+#define MK_COLOR(a,b,c) (displayIdentifier==0x7789) ? ((a<<11)+(b<<5)+(c)) : ((c<<11)+(b<<5)+(a))
+#define	BLACK   0
 #define	BLUE    MK_COLOR(0,0,0x1F)
 #define	RED     MK_COLOR(0x1F,0,0)
-#define	GREEN   MK_COLOR(0,0x3f,0)
+#define	GREEN   (0x3f<<5)
 #define CYAN    MK_COLOR(0,0x3f,0x1f)
-#define MAGENTA MK_COLOR(0x1f,0,0x1f)
+#define MAGENTA (0x1f<<11)+(0x1f)
 #define YELLOW  MK_COLOR(0x1f,0x3f,0)
 #define WHITE   0xffff
 
