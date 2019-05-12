@@ -6,7 +6,3 @@
 	path = cmake
 	url = https://github.com/mean00/arduino-cmake-stm32.git
 	branch = master
-[submodule "Adafruit-GFX-Library"]
-	path = Adafruit-GFX-Library
-	url = https://github.com/adafruit/Adafruit-GFX-Library.git
-	branch = master
