@@ -1,9 +1,0 @@
-[submodule "cmake"]
-	path = cmake
-    url = https://github.com/mean00/arduino-cmake-stm32.git
-[submodule "Adafruit_GFX"]
-	path = Adafruit_GFX
-	url = https://github.com/adafruit/Adafruit-GFX-Library.git
-[submodule "MapleFreeRTOS1000"]
-	path = MapleFreeRTOS1000
-	url = https://github.com/mean00/MapleFreeRTOS1000.git
