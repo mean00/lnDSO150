@@ -111,11 +111,10 @@ void MainTask( void *a )
     
     
     tft->setTextSize(3);
-  
-  
-    
-  
    
+    //DSOCalibrate::calibrate();
+    
+    //xAssert(0);
    // testTestSignal();
     //testButtons();   
     if(!DSOEeprom::read())
