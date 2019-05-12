@@ -20,3 +20,7 @@ What does NOT work :
 * Tons of bugs
 
 ![screenshot](gfx/front.jpg?raw=true "front")
+
+
+The code is using parts derived from pigg-o-scope and other projects for the ADC management
+Open DSO150 was used as documentation for the circuit.
