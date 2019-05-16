@@ -85,7 +85,7 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
         prevSize[j]=sz;
         prevPos[j]=start;
         last=next;
-    }
+    }    
 } 
 //-
 #define SCALE_STEP 24
@@ -156,7 +156,7 @@ void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
     else
     {
         uint16_t *bg=(uint16_t *)defaultPattern;
-        if(!(line%24)) 
+        if(!(line%SCALE_STEP)) 
             bg=(uint16_t *)darkGreenPattern;
         tft->setAddrWindow(0,1+line,DSO_WAVEFORM_WIDTH-1,1+line);
         tft->pushColors(((uint16_t *)bg),   DSO_WAVEFORM_WIDTH,true);
