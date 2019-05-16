@@ -31,8 +31,10 @@ MESSAGE(STATUS "Starting dso-stm32")
 
 OPTION(USE_VANILLA_HW "Use vanilla DSO HW" FALSE)
 IF(USE_VANILLA_HW)    
+    SET(EXTENSION "_vanilla")
 ELSE(USE_VANILLA_HW)    
     ADD_DEFINITIONS("-DUSE_RXTX_PIN_FOR_ROTARY")
+    SET(EXTENSION "_usb")
 ENDIF(USE_VANILLA_HW)
   
   
@@ -77,7 +79,7 @@ SET(libPrefix ${ARDUINO_DEFAULT_BOARD}_)
 #ADD_DEFINITIONS("-ffunction-sections -fdata-sections ")
 #SET(MCP23017_FREERTOS ${CMAKE_CURRENT_SOURCE_DIR}/mcp23017/example/FreeRtos)
 #include_directories(${MCP23017_FREERTOS})
-generate_arduino_firmware(Dso150 
+generate_arduino_firmware(Dso150${EXTENSION} 
                 SKETCH dso150.ino
                 #SRCS   ${ILI}/ILI9341_exi2cPowerSupplytended.cpp ${ILI}/ILI9341_extended_glyph.cpp myCode.cpp  simplerMCP4725/simplerMCP4725.cpp ${MCP23017_FREERTOS}/MCP23017_rtos.cpp  myAdc/myAdc.cpp
                 SRCS    myCode.cpp  testSignal.cpp dso_control.cpp testFunc/test_testSignal.cpp testFunc/test_buttons.cpp testFunc/test_adc.cpp dso_adc_fast.cpp dso_adc_slow.cpp  testFunc/test_adc2.cpp testFunc/test_display.cpp transform.cpp  testFunc/test_calibrate.cpp testFunc/test_i2c.cpp AH_24Cxx.cpp dso_eeprom.cpp dso_calibrate.cpp dso_display.cpp testFunc/test_adc3.cpp dso_capture.cpp testFunc/test_capture.cpp testFunc/test_trigger.cpp testFunc/test_watchdog.cpp dso_mainUI.cpp
