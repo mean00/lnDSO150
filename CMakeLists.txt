@@ -1,20 +1,43 @@
+
 # Select platform and installation for extra arduino files AND toolchain (compiler...)
 SET(PLATFORM_ARCHITECTURE "STM32F1")
 # Must be named arduino
 #  else the cmake code will look for ARDUINO
 # while the name will be the name of the folder
-SET(PLATFORM_PATH "/home/fx/Arduino/hardware/arduino/")
-#SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/.arduino15/./packages/arduino/tools/arm-none-eabi-gcc/4.8.3-2014q1/bin")
-SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/.arduino15/packages/arduino/tools/arm-none-eabi-gcc/4.8.3-2014q1/bin/")
-#"/home/fx/.arduino15/packages/STM32/tools/arm-none-eabi-gcc/6-2017-q2-update/bin")
+IF(NOT PLATFORM_PATH)
+    SET(PLATFORM_PATH "/home/fx/Arduino/hardware/arduino/")
+    MESSAGE(STATUS "Using default value for PLATFORM_PATH ${PLATFORM_PATH}")
+ENDIF(NOT PLATFORM_PATH)
+IF(NOT PLATFORM_TOOLCHAIN_PATH)
+    SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/.arduino15/packages/arduino/tools/arm-none-eabi-gcc/4.8.3-2014q1/bin/")
+    MESSAGE(STATUS "Using default value for PLATFORM_TOOLCHAIN_PATH ${PLATFORM_TOOLCHAIN_PATH}")
+ENDIF(NOT PLATFORM_TOOLCHAIN_PATH)
+IF(NOT CUSTOM_LIB_DIR)
+    # Where you store your downloaded libs or manually installed
+    SET(CUSTOM_LIB_DIR /home/fx/Arduino/libraries)
+    MESSAGE(STATUS "Using default value for CUSTOM_LIB_DIR ${CUSTOM_LIB_DIR}")
+ENDIF(NOT CUSTOM_LIB_DIR)
+
+
 # and here we go
 SET(CMAKE_TOOLCHAIN_FILE cmake/ArduinoToolchain.cmake)
-MESSAGE(STATUS "Starting hello-stm32")
+
 
 cmake_minimum_required(VERSION 2.8)
-Project("Hello_stm32" C CXX ASM)
+Project("dso_stm32" C CXX ASM)
 
-print_board_list()
+MESSAGE(STATUS "Starting dso-stm32")
+
+
+OPTION(USE_VANILLA_HW "Use vanilla DSO HW" FALSE)
+IF(USE_VANILLA_HW)    
+ELSE(USE_VANILLA_HW)    
+    ADD_DEFINITIONS("-DUSE_RXTX_PIN_FOR_ROTARY")
+ENDIF(USE_VANILLA_HW)
+  
+  
+
+#print_board_list()
 #ADD_DEFINITIONS("-O1")
 
 set(ARDUINO_DEFAULT_BOARD genericSTM32F103C)        # Default Board ID, when not specified
@@ -25,10 +48,8 @@ SET(ARDUINO_UPLOAD_METHOD DFUUpload)
 
 # this is needed for the nano, it should be set automatically, maybe something changed with sdk 1.8.x ?
 set(ARDUINO_CPUMENU .menu.cpu.${ARDUINO_CPU})
-PRINT_SETTINGS(${ARDUINO_DEFAULT_BOARD})
+#PRINT_SETTINGS(${ARDUINO_DEFAULT_BOARD})
 
-# Where you store your downloaded libs or manually installed
-SET(CUSTOM_LIB_DIR /home/fx/Arduino/libraries)
 SET(MapleFreeRTOS1000_RECURSE True)
 
 link_directories( ${CUSTOM_LIB_DIR})
