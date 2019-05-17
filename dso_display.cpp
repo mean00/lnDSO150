@@ -2,6 +2,11 @@
  STM32 duino based firmware for DSO SHELL/150
  *  * GPL v2
  * (c) mean 2019 fixounet@free.fr
+ * 
+ * /!\ All related to waveform (waveform + trigger) are automatically centered,
+ * you dont need to apply offset
+ * 
+ * 
  ****************************************************/
 #include "dso_global.h"
 #include "dso_display.h"
@@ -14,6 +19,19 @@ uint8_t prevPos[256];
 uint8_t prevSize[256];
 static char textBuffer[24];
 
+//-
+#define SCALE_STEP 24
+#define C_X 10
+#define C_Y 8
+#define CENTER_CROSS 1
+
+static const uint16_t *getBackGround(int line)
+{
+    const uint16_t *bg=(uint16_t *)defaultPattern;
+    if(!(line%SCALE_STEP)) 
+            bg=(uint16_t *)darkGreenPattern;
+    return bg;
+}
 
 
 /**
@@ -74,10 +92,7 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
             start=1;
         }
 
-
-        uint16_t *bg=(uint16_t *)defaultPattern;
-        if(!(j%24)) bg=(uint16_t *)darkGreenPattern;
-
+        const uint16_t *bg=getBackGround(j);
         // cleanup prev draw
         tft->setAddrWindow(j,prevPos[j]+DSO_WAVEFORM_OFFSET,j,DSO_WAVEFORM_HEIGHT+DSO_WAVEFORM_OFFSET);
         tft->pushColors(((uint16_t *)bg)+prevPos[j],   prevSize[j],true);
@@ -87,11 +102,6 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
         last=next;
     }    
 } 
-//-
-#define SCALE_STEP 24
-#define C_X 10
-#define C_Y 8
-#define CENTER_CROSS 1
 /**
  * 
  */
@@ -132,13 +142,11 @@ void DSODisplay::drawGrid(void)
 void  DSODisplay::drawVerticalTrigger(bool drawOrErase,int column)
 {
     if(drawOrErase)
-     tft->drawFastVLine(column,1,DSO_WAVEFORM_HEIGHT-1,RED);
+     tft->drawFastVLine(column,DSO_WAVEFORM_OFFSET+1,DSO_WAVEFORM_HEIGHT-1,RED);
     else
     {
-        uint16_t *bg=(uint16_t *)defaultPattern;
-        if(!(column%24)) 
-            bg=(uint16_t *)darkGreenPattern;
-        tft->setAddrWindow(column,0,column,DSO_WAVEFORM_HEIGHT);
+        const uint16_t *bg=getBackGround(column);
+        tft->setAddrWindow(column,1+DSO_WAVEFORM_OFFSET,column,DSO_WAVEFORM_HEIGHT+DSO_WAVEFORM_OFFSET-1);
         tft->pushColors(((uint16_t *)bg),   DSO_WAVEFORM_HEIGHT,true);
     }
 }
@@ -151,14 +159,14 @@ void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
 {
     if(line<1) line=1;
     if(line>DSO_WAVEFORM_HEIGHT-1) line=DSO_WAVEFORM_HEIGHT-1;
+    
     if(drawOrErase)
-        tft->drawFastHLine(1,1+line,DSO_WAVEFORM_WIDTH-1,BLUE);
+        tft->drawFastHLine(1,1+line,DSO_WAVEFORM_WIDTH-2,BLUE);
     else
     {
-        uint16_t *bg=(uint16_t *)defaultPattern;
-        if(!(line%SCALE_STEP)) 
-            bg=(uint16_t *)darkGreenPattern;
-        tft->setAddrWindow(0,1+line,DSO_WAVEFORM_WIDTH-1,1+line);
+        const uint16_t *bg=getBackGround(line);
+        tft->setAddrWindow( 0,                  1+line,
+                            DSO_WAVEFORM_WIDTH, 1+line);
         tft->pushColors(((uint16_t *)bg),   DSO_WAVEFORM_WIDTH,true);
     }
 }

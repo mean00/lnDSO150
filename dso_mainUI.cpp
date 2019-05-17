@@ -38,6 +38,7 @@ static uint8_t waveForm[256]; // take a bit more, we have rounding issues
 uint32_t  refrshDuration=0;
 int       nbRefrsh=0;
 
+static    int lastTrigger=-1;
 
 /**
  * 
@@ -188,10 +189,19 @@ static void initMainUI(void)
 
     DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_5MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
-    redraw();
-    
     DSOCapture::setTriggerValue(1.);
+    float f=DSOCapture::getTriggerValue();
+    
+    DSODisplay::drawGrid();
     DSODisplay::drawStatsBackGround();
+    DSODisplay::printVoltTimeTriggerMode(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText(),DSOCapture::getTriggerMode());
+    DSODisplay::printTriggerValue(DSOCapture::getTriggerValue());
+    DSODisplay::printOffset(capture->getVoltageOffset());
+    DSODisplay::printTriggerValue(f);
+    
+    lastTrigger=DSOCapture::voltageToPixel(f);
+    DSODisplay::drawVoltageTrigger(true,lastTrigger);
+    
 }
 
 /**
@@ -200,15 +210,16 @@ static void initMainUI(void)
 void mainDSOUI(void)
 {
     CaptureStats stats;    
-    int lastTrigger=-1;
+
     int triggerLine;
     
-    float f=DSOCapture::getTriggerValue();
-    triggerLine=DSOCapture::voltageToPixel(f);
 
     initMainUI();
    
     uint32_t lastRefresh=millis();
+
+    float f=DSOCapture::getTriggerValue();
+    triggerLine=DSOCapture::voltageToPixel(f);
     
     while(1)
     {        
