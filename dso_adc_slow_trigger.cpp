@@ -75,6 +75,7 @@ void DSOADC::timerTriggerCapture()
 
     if(timerWrite < requestedSamples/2) // not enough samples
     {
+        oldTriggerValue=avg2;
         NEXT_TRANSFER();
         return;     
     }
