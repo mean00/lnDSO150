@@ -76,7 +76,8 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
     int next;
     int start,sz;
     
-    for(int j=1;j<count;j++)
+    if(count<3) return;
+    for(int j=1;j<count-1;j++)
     {
         int next=data[j]; // in pixel
         sz=abs(next-last);        
@@ -209,8 +210,8 @@ void DSODisplay::drawStatsBackGround()
     
 
 #define BG_COLOR GREEN    
-        tft->drawFastVLine(DSO_INFO_START_COLUMN, 0,DSO_WAVEFORM_HEIGHT-1,BG_COLOR);
-        tft->drawFastVLine(319, 0,DSO_WAVEFORM_HEIGHT-1,BG_COLOR);
+        tft->drawFastVLine(DSO_INFO_START_COLUMN, 0,240,BG_COLOR);
+        tft->drawFastVLine(319, 0,240,BG_COLOR);
         
 
     tft->setTextColor(BLACK,BG_COLOR);
@@ -222,7 +223,8 @@ void DSODisplay::drawStatsBackGround()
     AND_ONE_A("Offst",10);
     tft->setTextColor(BG_COLOR,BLACK);
 }
-#define LOWER_BAR_PRINT(x,y) { tft->setCursor(y*64, 240-18); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}            
+#define LOWER_BAR_PRINT(x,y) { tft->setCursor(y*64, 240-18); tft->myDrawString(x);}            
+#define LOWER_BAR_PRINT_NCHARS(x,y,n) { tft->setCursor(y*64, 240-18); tft->myDrawString(x,n*18);}            
 
 /**
  * 
@@ -280,7 +282,7 @@ void DSODisplay::printVoltTimeTriggerMode(const char *volt, const char *time,DSO
     LOWER_BAR(TIME_MODE,time,1);
     LOWER_BAR(TRIGGER_MODE,st,2);
     tft->setTextColor(BG_COLOR,BLACK);
-    LOWER_BAR_PRINT(coupling,3);
+    LOWER_BAR_PRINT_NCHARS(coupling,3,3);
     
     if(mode&0x80)
     {
