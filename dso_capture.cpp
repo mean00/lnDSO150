@@ -157,7 +157,7 @@ void DSOCapture::task(void *a)
 {
     xDelay(20);
     FullSampleSet fset; // Shallow copy
-    
+    int16_t *p;
     while(1)
     {
         int currentVolt=currentVoltageRange; // use a local copy so that it does not change in the middle
@@ -176,10 +176,14 @@ void DSOCapture::task(void *a)
             expand=tSettings[currentTime].expand4096;
         }
         CapturedSet *set=captureSet;
-        float *data=set->data;        
+        float *data=set->data;    
+        if(fset.shifted)
+            p=((int16_t *)fset.set1.data)+1;
+        else
+            p=((int16_t *)fset.set1.data);
+
         set->samples=transform(
-                                        fset.shifted,
-                                (int32_t*)fset.set1.data,
+                                        p,
                                         data,
                                         fset.set1.samples,
                                         vSettings+currentVolt,
@@ -190,9 +194,12 @@ void DSOCapture::task(void *a)
         if(fset.set2.samples)
         {
             CaptureStats otherStats;
+            if(fset.shifted)
+                p=((int16_t *)fset.set2.data)+1;
+            else
+                p=((int16_t *)fset.set2.data);
             int sample2=transform(
-                                        fset.shifted,
-                                        (int32_t *)fset.set2.data,
+                                        p,
                                         data+set->samples,
                                         fset.set2.samples,
                                         vSettings+currentVolt,

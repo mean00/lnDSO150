@@ -10,4 +10,4 @@ typedef struct
   int   frequency; //  0 or -1= unknown
 }CaptureStats;
 
-int transform(bool shift, int32_t *bfer, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode);
+int transform( int16_t *bfer, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode);

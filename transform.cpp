@@ -24,7 +24,7 @@
  * @return 
  */
 int maxOcountSeeen=0;
-int transform(bool shift, int32_t *bfer, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode)
+int transform(int16_t *in, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode)
 {
    if(!count) return false;
    stats.xmin=200;
@@ -42,7 +42,7 @@ int transform(bool shift, int32_t *bfer, float *out,int count, VoltageSettings *
    // First
    float f;
    {
-       f=bfer[0/4096]>>(16*shift);       
+       f=(float)in[0]; 
        f-=set->offset;
        f*=set->multiplier;       
        if(f>stats.xmax) stats.xmax=f;
@@ -58,7 +58,7 @@ int transform(bool shift, int32_t *bfer, float *out,int count, VoltageSettings *
    for(int i=1;i<ocount;i++)
    {
      
-       f=bfer[dex/4096]>>(16*shift);
+       f=*(in+2*(dex/4096));
        f-=set->offset;
        f*=set->multiplier;
        if(f>stats.xmax) stats.xmax=f;
