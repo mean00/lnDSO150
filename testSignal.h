@@ -8,7 +8,7 @@ class testSignal
 public:
                  testSignal(int pin,int pinAmp,int timer, int channel);
             bool setFrequency(int fq);
-            bool setAmplitute(bool large);
+            bool setAmplitude(bool large);
             
 protected:
             HardwareTimer *pwmtimer;

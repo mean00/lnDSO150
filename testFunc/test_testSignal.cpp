@@ -30,7 +30,7 @@ void setTestSignal(int fq,bool high)
             
         splash();
         myTestSignal->setFrequency(fq);
-        myTestSignal->setAmplitute(high);
+        myTestSignal->setAmplitude(high);
         tft->setCursor(20, 30);
         tft->println(fq);
         tft->setCursor(200, 30);

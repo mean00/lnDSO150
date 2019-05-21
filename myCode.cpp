@@ -98,8 +98,9 @@ void MainTask( void *a )
     splash();
     delay(1500);
     myTestSignal=new testSignal(  PA7,PB12, 3,TIMER_CH2);
-    myTestSignal->setFrequency(1000); // 1Khz
-    myTestSignal->setAmplitute(true);
+    myTestSignal->setAmplitude(true);
+        
+    myTestSignal->setFrequency(5000); // 1Khz
     
     controlButtons=new DSOControl ;
     

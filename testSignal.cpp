@@ -15,7 +15,7 @@ testSignal::testSignal(int pin,int pinAmp,int timer, int channel)
     pwmtimer=new HardwareTimer(timer);
     digitalWrite(pin,1);
     pinMode(pin,PWM); 
-    setAmplitute(true);
+    setAmplitude(true);
     setFrequency(1000);
 }
 /**
@@ -43,7 +43,7 @@ testSignal::testSignal(int pin,int pinAmp,int timer, int channel)
   * 
   * 
   */
- bool testSignal::setAmplitute(bool  large)
+ bool testSignal::setAmplitude(bool  large)
  {
      if(large)
      {

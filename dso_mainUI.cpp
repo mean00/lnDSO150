@@ -184,8 +184,6 @@ static void initMainUI(void)
     
     
     tft->setTextSize(2);
-    myTestSignal->setFrequency(100); // 10 khz
-    myTestSignal->setFrequency(100); // 10 khz
 
     DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_5MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
