@@ -24,11 +24,14 @@ int DSOCapture::computeFrequency(bool shifted,int xsamples,uint32_t *data)
     int sum=0,xmin;
     static int t;
     t=micros();
-    
-    int32_t old=    (int32_t)(data[1]>>(16*shifted))-(int32_t)(data[0]>>(16*shifted));        
+    int16_t *ptr=(int16_t *)data;
+    if(shifted) ptr++;
+    int32_t old=    (int32_t)(ptr[2])-(int32_t)(ptr[0]);        
+    ptr+=2;
     for(int i=1;i<samples;i++)
     {
-        int32_t xnew=    (int32_t)(data[i+1]>>(16*shifted))-(int32_t)(data[i]>>(16*shifted));  
+        int32_t xnew=    (int32_t)(ptr[2])-(int32_t)(ptr[0]);  
+        ptr+=2;
         if(xnew<=0 && old>0 ) 
         {
             if(pos>0 && neg>0 && (i-pos)>2)
