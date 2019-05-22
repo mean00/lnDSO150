@@ -44,13 +44,11 @@ public:
     void runLoop();
     int  setInputGain(int val); // This drives SENSEL... Warning the mapping is not straightforward !
     DSOCoupling   getCouplingState();
+    
+    void          updateCouplingState();
 protected:
     adc_dev *couplingDevice;
-    uint8    couplingChannel;
-    
-    
-    void        couplingStart() ;
-    int         couplingRestart(); 
+    uint8    couplingChannel;           
     int         couplingValue;
     DSOCoupling couplingState;
 };

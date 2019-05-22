@@ -112,6 +112,7 @@ bool     DSOCapture::prepareSampling ()
  */
 bool     DSOCapture::startSampling (int count)
 {
+    controlButtons->updateCouplingState();
     if(captureFast)
     {
         int ex=count*tSettings[currentTimeBase].expand4096;
@@ -310,6 +311,7 @@ void DSOCapture::stopCapture()
     else
         adc->stopTimeCapture();
     captureState=captureStateIdle;
+    controlButtons->updateCouplingState();
 }
 /**
  * 

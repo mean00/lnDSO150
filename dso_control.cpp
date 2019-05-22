@@ -241,7 +241,7 @@ DSOControl::DSOControl()
     couplingDevice= PIN_MAP[COUPLING_PIN].adc_device;
     couplingChannel=PIN_MAP[COUPLING_PIN].adc_channel;
     couplingState=couplingFromAdc(analogRead(COUPLING_PIN));
-    couplingStart();
+    
 }
 
 
@@ -252,40 +252,16 @@ static void trampoline(void *a)
 }
 
 /**
- * 
- * @param dev
- * @param channel
- * @return 
+ *  Use the ADC to sample coupling pin
+ *  No need to hurry, it is a single sample done whenever the ADC is free
+ *  So analogRead is fine
  */
-void DSOControl::couplingStart() 
+void          DSOControl::updateCouplingState()
 {
-    adc_reg_map *regs = couplingDevice->regs;
-
-    adc_set_reg_seqlen(couplingDevice, 1);
-
-    regs->SQR3 = couplingChannel;
-    regs->CR2 |= ADC_CR2_SWSTART;
+    uint32_t sqr3=regs->SQR3;
+    couplingState=couplingFromAdc(analogRead(COUPLING_PIN));
+    regs->SQR3=sqr3;
 }
-/**
- * \brief this is called every 10ms or so
- * We read the previous ADC scan and start the next one
- * no need to wait for it to complete, it will be done in background
- * @return 
- */
-int DSOControl::couplingRestart() 
-{
-   
-    adc_reg_map *regs = couplingDevice->regs;
-    int r= (regs->DR & ADC_DR_DATA);
-  
-    regs->SQR3 = couplingChannel;
-    regs->CR2 |= ADC_CR2_SWSTART;
-    while (!(regs->SR & ADC_SR_EOC))
-        ;
-    
-    return r;
-}
-
 /**
  * 
  * @return 
@@ -304,8 +280,6 @@ void DSOControl::runLoop()
     while(1)
     {
         xDelay(TICK);
-        couplingValue=couplingRestart(); // We let the ADC work in background...
-        couplingState=couplingFromAdc(couplingValue);
         PortAMutex.lock(); // make sure we have control over GPIOB
         uint32_t val= GPIOB->regs->IDR;     
         PortAMutex.unlock();
