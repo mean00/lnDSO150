@@ -154,7 +154,7 @@ bool DSOCapture::getSamples(CapturedSet **set, int timeoutMs)
  * 
  * @param set
  */
-void DSOCapture::refineCapture(FullSampleSet &set)
+bool DSOCapture::refineCapture(FullSampleSet &set)
 {
          // Try to find the trigger, we have ADC_INTERNAL_BUFFER_SIZE samples coming in, we want requestSample out..
         uint16_t *p=(uint16_t *)set.set1.data;
@@ -167,7 +167,7 @@ void DSOCapture::refineCapture(FullSampleSet &set)
         
         switch(adc->getTriggerMode())
         {
-            case Trigger_Falling :
+            case Trigger_Rising:
                 for(int i=start;i<end;i++)
                 {
                     if(p[2*i]<triggerValueADC && p[2*i+2]>=triggerValueADC) 
@@ -177,7 +177,7 @@ void DSOCapture::refineCapture(FullSampleSet &set)
                     }
                 }
                 break;
-            case Trigger_Rising:
+            case Trigger_Falling :
                 for(int i=start;i<end;i++)
                 {
                     if(p[2*i]>triggerValueADC && p[2*i+2]<=triggerValueADC) 
@@ -207,10 +207,11 @@ void DSOCapture::refineCapture(FullSampleSet &set)
         if(found==-1)
         {
             set.set1.samples=lastRequested;
-            return;
+            return false;
         }
         set.set1.data+=found-lastRequested/2;
-        set.set1.samples=lastRequested;
+        set.set1.samples=lastRequested;        
+        return true;
 }
 /**
  * 
@@ -225,12 +226,20 @@ void DSOCapture::task(void *a)
     {
         int currentVolt=currentVoltageRange; // use a local copy so that it does not change in the middle
         int currentTime=currentTimeBase;
+        bool findTrigger=false;
         if(!adc->getSamples(fset))
             continue;
         
-        if(captureFast)        
-            refineCapture(fset);
+        CapturedSet *set=captureSet;
+        set->stats.trigger=-1;
+
         
+        if(captureFast)   
+        {
+            findTrigger=refineCapture(fset);
+            if(findTrigger)
+                set->stats.trigger=120; // right in the middle
+        }
     
         
         if(!fset.set1.samples)
@@ -243,7 +252,6 @@ void DSOCapture::task(void *a)
         {
             expand=tSettings[currentTime].expand4096;
         }
-        CapturedSet *set=captureSet;
         float *data=set->data;    
         if(fset.shifted)
             p=((int16_t *)fset.set1.data)+1;

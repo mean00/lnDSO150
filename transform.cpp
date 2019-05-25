@@ -53,30 +53,30 @@ int transform(int16_t *in, float *out,int count, VoltageSettings *set,int expand
    }
    
    // med
-   stats.trigger=-1;
-   
-   for(int i=1;i<ocount;i++)
-   {
-     
-       f=*(in+2*(dex/4096));
-       f-=set->offset;
-       f*=set->multiplier;
-       if(f>stats.xmax) stats.xmax=f;
-       if(f<stats.xmin) stats.xmin=f;       
-       out[i]=f; // Unit is now in volt
-       
-       if(stats.trigger==-1)
-       {
-            if(mode!=DSOADC::Trigger_Rising)
-                if(out[i-1]<triggerValue&&out[i]>=triggerValue) stats.trigger=i;
-            if(mode!=DSOADC::Trigger_Falling)
-                if(out[i-1]>triggerValue&&out[i]<=triggerValue) stats.trigger=i;
-       }
-       
-       stats.avg+=f;
-       dex+=expand;
-   }   
-   
+   //if(stats.trigger==-1)
+   {   
+    for(int i=1;i<ocount;i++)
+    {
+
+        f=*(in+2*(dex/4096));
+        f-=set->offset;
+        f*=set->multiplier;
+        if(f>stats.xmax) stats.xmax=f;
+        if(f<stats.xmin) stats.xmin=f;       
+        out[i]=f; // Unit is now in volt
+
+        if(stats.trigger==-1)
+        {
+             if(mode!=DSOADC::Trigger_Rising)
+                 if(out[i-1]<triggerValue&&out[i]>=triggerValue) stats.trigger=i;
+             if(mode!=DSOADC::Trigger_Falling)
+                 if(out[i-1]>triggerValue&&out[i]<=triggerValue) stats.trigger=i;
+        }
+
+        stats.avg+=f;
+        dex+=expand;
+    }   
+   }
    stats.avg/=count;
    return ocount;
 }

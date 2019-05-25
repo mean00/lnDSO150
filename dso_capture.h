@@ -100,6 +100,6 @@ public:
     static int         computeFrequency(bool shifted,int samples,uint32_t *data);
     static void        setVoltageOffset(float volt);
     static float       getVoltageOffset();
-    static void        refineCapture(FullSampleSet &set);
+    static bool        refineCapture(FullSampleSet &set);
 
 };
