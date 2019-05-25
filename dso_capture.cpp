@@ -13,6 +13,7 @@
 static int      canary1=0xabcde01234;
 static int      currentTimeBase=DSOCapture::DSO_TIME_BASE_10MS;
 static int      currentVoltageRange=0;
+static int      lastRequested=0;
 static bool     captureFast=true;
 static int      canary2=0xabcde01234;
 static int      triggerValueADC=0;
@@ -131,6 +132,7 @@ bool     DSOCapture::startTriggerSampling (int count)
     if(captureFast)
     {
         ex=count*tSettings[currentTimeBase].expand4096;
+        lastRequested=ex/4096;
         //return adc->startTriggeredTimerSampling(ex,triggerValueADC);
         return adc->startDMATriggeredSampling(ex,triggerValueADC);
     }
@@ -148,8 +150,68 @@ bool DSOCapture::getSamples(CapturedSet **set, int timeoutMs)
     *set=captureSet;
     return true;
 }
-
-
+/**
+ * 
+ * @param set
+ */
+void DSOCapture::refineCapture(FullSampleSet &set)
+{
+         // Try to find the trigger, we have ADC_INTERNAL_BUFFER_SIZE samples coming in, we want requestSample out..
+        uint16_t *p=(uint16_t *)set.set1.data;
+        int count=set.set1.samples;
+        
+        int found=-1;
+        int asked=240;
+        int start=lastRequested/2;
+        int end=count-lastRequested/2;
+        
+        switch(adc->getTriggerMode())
+        {
+            case Trigger_Falling :
+                for(int i=start;i<end;i++)
+                {
+                    if(p[2*i]<triggerValueADC && p[2*i+2]>=triggerValueADC) 
+                    {
+                        found=i;
+                        break;
+                    }
+                }
+                break;
+            case Trigger_Rising:
+                for(int i=start;i<end;i++)
+                {
+                    if(p[2*i]>triggerValueADC && p[2*i+2]<=triggerValueADC) 
+                    {
+                        found=i;
+                        break;
+                    }
+                }
+                 break;
+            case Trigger_Both:
+                // Tricky !
+                for(int i=start;i<end;i++)
+                {
+                    if(p[2*i]>triggerValueADC && p[2*i+2]<=triggerValueADC) 
+                    {
+                        found=i;
+                        break;
+                    }
+                    if(p[2*i]<triggerValueADC && p[2*i+2]>=triggerValueADC) 
+                    {
+                        found=i;
+                        break;
+                    }
+                }
+                break;
+        }
+        if(found==-1)
+        {
+            set.set1.samples=lastRequested;
+            return;
+        }
+        set.set1.data+=found-lastRequested/2;
+        set.set1.samples=lastRequested;
+}
 /**
  * 
  * @return 
@@ -165,7 +227,12 @@ void DSOCapture::task(void *a)
         int currentTime=currentTimeBase;
         if(!adc->getSamples(fset))
             continue;
-
+        
+        if(captureFast)        
+            refineCapture(fset);
+        
+    
+        
         if(!fset.set1.samples)
         {
             continue;

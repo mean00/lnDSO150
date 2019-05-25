@@ -39,7 +39,7 @@ uint32_t  refrshDuration=0;
 int       nbRefrsh=0;
 
 static    int lastTrigger=-1;
-
+static    DSOControl::DSOCoupling oldCoupling;
 /**
  * 
  */
@@ -78,6 +78,14 @@ static void redraw()
 static void buttonManagement()
 {
     bool dirty=false;
+        
+    DSOControl::DSOCoupling coupling=controlButtons->getCouplingState();
+    if(coupling!=oldCoupling)
+    {
+        oldCoupling=coupling;
+        dirty=true;
+    }
+    
     int inc=controlButtons->getRotaryValue();
     
     DSODisplay::MODE_TYPE newMode=DSODisplay::INVALID_MODE;
@@ -218,7 +226,7 @@ void mainDSOUI(void)
 
     float f=DSOCapture::getTriggerValue();
     triggerLine=DSOCapture::voltageToPixel(f);
-    
+    DSOControl::DSOCoupling oldCoupling=controlButtons->getCouplingState();
     while(1)
     {        
         int count=DSOCapture::triggeredCapture(240,test_samples,stats);  

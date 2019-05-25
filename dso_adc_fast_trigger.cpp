@@ -17,6 +17,7 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  * Vref is using PWM mode for Timer4/Channel 3
  * 
  */
+#define ADC_MAX 0xfff // 12 bits
 
 static uint32_t cr1;
 // Grab the samples from the ADC
@@ -40,15 +41,56 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
   if(count>ADC_INTERNAL_BUFFER_SIZE/2)
         count=ADC_INTERNAL_BUFFER_SIZE/2;
     
+  int currentValue=analogRead(analogInPin);
+  
   requestedSamples=count;  
   convTime=micros();
-  setWatchdogTriggerValue(1*2560+0*triggerValueADC,0);
+  _triggerValueADC=triggerValueADC;
+  switch(_triggerMode)
+  {
+    case Trigger_Rising:  
+                        if(currentValue<triggerValueADC) 
+                        {
+                            _triggerState=Trigger_Armed;
+                            setWatchdogTriggerValue(triggerValueADC,0);
+                        }else
+                        {
+                            _triggerState=Trigger_Preparing;
+                            setWatchdogTriggerValue(ADC_MAX,triggerValueADC);
+                        }
+                        break;
+    case Trigger_Falling: 
+                        if(currentValue>triggerValueADC) 
+                        {
+                            _triggerState=Trigger_Armed;
+                            setWatchdogTriggerValue(ADC_MAX,triggerValueADC);
+                        }else
+                        {
+                            _triggerState=Trigger_Preparing;
+                            setWatchdogTriggerValue(triggerValueADC,0);
+                        }
+                        break;
+    
+    
+    case Trigger_Both:    
+                        _triggerState=Trigger_Armed;
+                        if(currentValue>triggerValueADC) 
+                        {
+                            setWatchdogTriggerValue(ADC_MAX,triggerValueADC);
+                        }else
+                        {
+                            setWatchdogTriggerValue(triggerValueADC,0);
+                        }
+                        break;
+                        
+    default: break;
+  }  
   attachWatchdogInterrupt(DSOADC::watchDogInterrupt);  
   
   enableDisableIrqSource(true,ADC_AWD);
   enableDisableIrq(true);
   
-  setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_TriggerEvent );
+  setupAdcDmaTransfer( ADC_INTERNAL_BUFFER_SIZE,adcInternalBuffer, DMA1_CH1_TriggerEvent );
   
   cr1=ADC1->regs->CR1 ;
   
@@ -59,8 +101,27 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
  */
 void DSOADC::awdTrigger()
 {
-        _triggered=true;
-        
+     if(_triggerState==Trigger_Preparing)
+     {
+         _triggerState=Trigger_Armed;
+         switch(_triggerMode)
+         {
+            case Trigger_Rising:
+                setWatchdogTriggerValue(_triggerValueADC,0);
+                break;
+            case Trigger_Falling:
+                setWatchdogTriggerValue(ADC_MAX,_triggerValueADC);
+                 break;
+            case Trigger_Both:
+                // Tricky !
+                setWatchdogTriggerValue(ADC_MAX,_triggerValueADC); // FIXME!
+                 break;
+         }
+     }else
+     {
+        _triggered=true;   
+        enableDisableIrqSource(false,ADC_AWD);
+     }
 }
 
 
@@ -70,7 +131,7 @@ void DSOADC::awdTrigger()
 void DSOADC::watchDogInterrupt()
 {
     instance->awdTrigger();
-    enableDisableIrq(false); // no more IRQ please
+    
 }
 /**
  * 
@@ -79,9 +140,10 @@ void DSOADC::DMA1_CH1_TriggerEvent()
 {
     if(instance->awdTriggered())
     {
-        SampleSet one(requestedSamples,adcInternalBuffer),two(0,NULL);
+        enableDisableIrq(false);
+        adc_dma_disable(ADC1);       
+        SampleSet one(ADC_INTERNAL_BUFFER_SIZE,adcInternalBuffer),two(0,NULL);
         instance->captureComplete(true,one,two);
-        adc_dma_disable(ADC1);
     }
     else
     {
@@ -91,3 +153,5 @@ void DSOADC::DMA1_CH1_TriggerEvent()
     
 }
 //
+
+  

@@ -82,7 +82,11 @@ public:
     Trigger_Falling,
     Trigger_Both,
   };
-  
+   enum TriggerState
+  {
+    Trigger_Preparing,
+    Trigger_Armed
+  };
   
 public:
                     DSOADC();
@@ -144,6 +148,8 @@ protected:
             FullSampleSet   _captured;
             TriggerMode     _triggerMode;
             bool            _triggered;
+            TriggerState    _triggerState;
+            int             _triggerValueADC;
 static      uint32_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];            
 };
 

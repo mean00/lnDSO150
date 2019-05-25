@@ -16,7 +16,6 @@ Status so far:
 
 What does NOT work :
 * Trigger in dma mode (with speed faster than 5ms / div)
-* Rising trigger in time mode (speed slower than 5ms)
 * Tons of bugs
 
 ![screenshot](gfx/front.jpg?raw=true "front")

@@ -170,7 +170,7 @@ bool    DSOADC::prepareDMASampling (adc_smp_rate rate,adc_prescaler scale)
 bool DSOADC::getSamples(FullSampleSet &fullSet)
 {
     if(!dmaSemaphore->take(10000))
-        return false;
+        return false;    
     fullSet=_captured;
     return true;
 }
