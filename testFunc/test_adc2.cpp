@@ -100,11 +100,11 @@ void testAdc2(void)
         FullSampleSet  s;
         bool r=adc->getSamples(s);
         count=s.set1.samples;
-        uint32_t *xsamples=s.set1.data;
+        int16_t *xsamples=(int16_t* )s.set1.data;
         markStart=millis();
         int scale=vSettings[currentVSettings].inputGain;
         
-        count=transform(true,(int32_t *)xsamples,test_samples,count,vSettings+currentVSettings,expand,stats,1.0,DSOADC::Trigger_Both);
+        count=transform(xsamples,(float *)test_samples,count,vSettings+currentVSettings,expand,stats,1.0,DSOADC::Trigger_Both);
         acquisitionTime=convTime;
 //        adc->reclaimSamples(set);
             

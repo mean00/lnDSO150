@@ -6,7 +6,7 @@ typedef struct
     bool                        (*prepareSampling)(void);
     const char *                (*getTimeBaseAsText)();
     bool                        (*startCapture) (int count);
-    
+    bool                        (*tasklet)();
 }CaptureFunctionTable;
 
 const CaptureFunctionTable TimerTableTrigger=
@@ -16,6 +16,7 @@ const CaptureFunctionTable TimerTableTrigger=
     DSOCapture::prepareSamplingTimer,
     DSOCapture::getTimeBaseAsTextTimer,
     DSOCapture::startCaptureTimerTrigger,
+    DSOCapture::taskletTimer,
 };
 const CaptureFunctionTable DmaTableTrigger=
 {
@@ -24,6 +25,7 @@ const CaptureFunctionTable DmaTableTrigger=
     DSOCapture::prepareSamplingDma,
     DSOCapture::getTimeBaseAsTextDma,
     DSOCapture::startCaptureDmaTrigger,
+    DSOCapture::taskletDma,
 };
 
 const CaptureFunctionTable TimerTableRunning=
@@ -32,7 +34,8 @@ const CaptureFunctionTable TimerTableRunning=
     DSOCapture::getTimeBaseTimer,
     DSOCapture::prepareSamplingTimer,
     DSOCapture::getTimeBaseAsTextTimer,
-    DSOCapture::startCaptureDma,
+    DSOCapture::startCaptureTimer,
+    DSOCapture::taskletTimer,
 };
 const CaptureFunctionTable DmaTableRunning=
 {
@@ -41,10 +44,13 @@ const CaptureFunctionTable DmaTableRunning=
     DSOCapture::prepareSamplingDma,
     DSOCapture::getTimeBaseAsTextDma,
     DSOCapture::startCaptureTimer,
+    DSOCapture::taskletDma,
 };
 
 const CaptureFunctionTable *currentTable=&TimerTableTrigger;
 
+#include "dso_capture_ind_dma.h"
+#include "dso_capture_ind_timer.h"
 
 /**
  * 
@@ -55,25 +61,6 @@ bool     DSOCapture::prepareSampling ()
 {
   return currentTable->prepareSampling();
 }
-/**
- * 
- * @return 
- */
-bool DSOCapture::prepareSamplingDma()
-{
-  //     
-    const TimeSettings *set= tSettings+currentTimeBase;
-    return adc->prepareDMASampling(set->rate,set->prescaler);
-}
-/**
- * 
- * @return 
- */
-bool DSOCapture::prepareSamplingTimer()
-{
-    return adc->prepareTimerSampling(timerBases[currentTimeBase].fq);
-}
-
 /**
  * 
  * @param timeBase
@@ -99,40 +86,12 @@ bool     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE timeBase)
         currentTimeBase=timeBase-DSO_TIME_BASE::DSO_TIME_BASE_5MS;
     }
 }
-/**
- * 
- * @return 
- */
-DSOCapture::DSO_TIME_BASE DSOCapture::getTimeBaseTimer()
-{
-    return (DSOCapture::DSO_TIME_BASE)(currentTimeBase+DSO_TIME_BASE::DSO_TIME_BASE_5MS);
-}
-DSOCapture::DSO_TIME_BASE DSOCapture::getTimeBaseDma()
-{
-    return (DSOCapture::DSO_TIME_BASE)currentTimeBase;
-}
 DSOCapture::DSO_TIME_BASE DSOCapture::getTimeBase()
 {
     return currentTable->getTimeBase();        
 }
 
 
-/**
- * 
- */
-void DSOCapture::stopCaptureDma()
-{
-    
-    adc->stopDmaCapture();
-    
-}
-/**
- * 
- */
-void DSOCapture::stopCaptureTimer()
-{
-    adc->stopTimeCapture();     
-}
 
 
 /**
@@ -144,15 +103,6 @@ const char *DSOCapture::getTimeBaseAsText()
    return currentTable->getTimeBaseAsText();        
 }
 
-//--
-const char *DSOCapture::getTimeBaseAsTextDma()
-{
-   return tSettings[currentTimeBase].name;
-}
-const char *DSOCapture::getTimeBaseAsTextTimer()
-{
-    return timerBases[currentTimeBase].name;
-}
 
 //------------------------------------------------------
 
@@ -164,42 +114,4 @@ bool       DSOCapture:: startCapture (int count)
   return currentTable->startCapture(count);
 }
 
-/**
- * 
- * @param count
- * @return 
- */
-bool       DSOCapture:: startCaptureDma (int count)
-{
-    int ex=count*tSettings[currentTimeBase].expand4096;
-    return adc->startDMASampling(ex);
-}
-/**
- * 
- * @param count
- * @return 
- */
-bool       DSOCapture:: startCaptureDmaTrigger (int count)
-{
-    
-    int ex=count;
-    ex=count*tSettings[currentTimeBase].expand4096;
-    lastRequested=ex/4096;
-    return adc->startDMATriggeredSampling(ex,triggerValueADC);
-}
-/**
- * 
- * @param count
- * @return 
- */
-bool       DSOCapture:: startCaptureTimer (int count)
-{    
-    return adc->startTimerSampling(count);
-}
-/**
-  * 
- */
-bool       DSOCapture:: startCaptureTimerTrigger (int count)
-{
-    return adc->startTriggeredTimerSampling(count,triggerValueADC);
-}
+// EOF

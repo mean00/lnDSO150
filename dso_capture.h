@@ -111,6 +111,8 @@ public:
     static int         voltageToPixel(float v);
     static void        initialize();
     static void        task(void *);
+    static bool        taskletDma();
+    static bool        taskletTimer();
     static int         computeFrequency(bool shifted,int samples,uint32_t *data);
     static void        setVoltageOffset(float volt);
     static float       getVoltageOffset();

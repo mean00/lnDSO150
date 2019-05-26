@@ -142,6 +142,7 @@ void DSOCapture::task(void *a)
     int16_t *p;
     while(1)
     {
+        //currentTable->tasklet();
         int currentVolt=currentVoltageRange; // use a local copy so that it does not change in the middle
         int currentTime=currentTimeBase;
         bool findTrigger=false;

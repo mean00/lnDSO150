@@ -109,7 +109,7 @@ void testAdc3(void)
         markStart=millis();
         int scale=vSettings[currentVSettings].inputGain;
         
-        count=transform(true,(int32_t *)xsamples,test_samples,count,vSettings+currentVSettings,expand,stats,1.0,DSOADC::Trigger_Both);
+        count=transform((int16_t *)xsamples,test_samples,count,vSettings+currentVSettings,expand,stats,1.0,DSOADC::Trigger_Both);
         acquisitionTime=convTime/1000;
 //        adc->reclaimSamples(set);
             
