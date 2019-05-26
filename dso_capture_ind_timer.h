@@ -110,8 +110,7 @@ bool       DSOCapture:: startCaptureTimerTrigger (int count)
 /**
  */
 bool DSOCapture::taskletTimer()
-{
-    xDelay(20);
+{    
     FullSampleSet fset; // Shallow copy
     int16_t *p;
 
