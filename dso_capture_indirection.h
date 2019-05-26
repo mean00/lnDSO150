@@ -1,4 +1,5 @@
-
+/**
+ */
 typedef struct 
 {
     void                        (*stopCapture)(void);
@@ -8,7 +9,8 @@ typedef struct
     bool                        (*startCapture) (int count);
     bool                        (*tasklet)();
 }CaptureFunctionTable;
-
+/**
+ */
 const CaptureFunctionTable TimerTableTrigger=
 {
     DSOCapture::stopCaptureTimer,
@@ -18,6 +20,8 @@ const CaptureFunctionTable TimerTableTrigger=
     DSOCapture::startCaptureTimerTrigger,
     DSOCapture::taskletTimer,
 };
+/**
+ */
 const CaptureFunctionTable DmaTableTrigger=
 {
     DSOCapture::stopCaptureDma,
@@ -27,7 +31,8 @@ const CaptureFunctionTable DmaTableTrigger=
     DSOCapture::startCaptureDmaTrigger,
     DSOCapture::taskletDma,
 };
-
+/**
+ */
 const CaptureFunctionTable TimerTableRunning=
 {
     DSOCapture::stopCaptureTimer,
@@ -37,6 +42,8 @@ const CaptureFunctionTable TimerTableRunning=
     DSOCapture::startCaptureTimer,
     DSOCapture::taskletTimer,
 };
+/**
+ */
 const CaptureFunctionTable DmaTableRunning=
 {
     DSOCapture::stopCaptureDma,
@@ -46,7 +53,8 @@ const CaptureFunctionTable DmaTableRunning=
     DSOCapture::startCaptureTimer,
     DSOCapture::taskletDma,
 };
-
+/**
+ */
 const CaptureFunctionTable *currentTable=&TimerTableTrigger;
 
 #include "dso_capture_ind_dma.h"
@@ -86,13 +94,14 @@ bool     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE timeBase)
         currentTimeBase=timeBase-DSO_TIME_BASE::DSO_TIME_BASE_5MS;
     }
 }
+/**
+ * 
+ * @return 
+ */
 DSOCapture::DSO_TIME_BASE DSOCapture::getTimeBase()
 {
     return currentTable->getTimeBase();        
 }
-
-
-
 
 /**
  * 
@@ -102,11 +111,11 @@ const char *DSOCapture::getTimeBaseAsText()
 {
    return currentTable->getTimeBaseAsText();        
 }
-
-
-//------------------------------------------------------
-
-
+/**
+ * 
+ * @param count
+ * @return 
+ */
 bool       DSOCapture:: startCapture (int count)
 {
   triggerValueADC=voltToADCValue(triggerValueFloat);
