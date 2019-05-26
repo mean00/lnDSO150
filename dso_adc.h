@@ -64,8 +64,7 @@ typedef struct FullSampleSet
 {
   bool      shifted;
   SampleSet set1;
-  SampleSet set2;
-  
+  SampleSet set2;  
 };
 
 

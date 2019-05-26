@@ -1,4 +1,61 @@
 
+
+static int transformDma(int16_t *in, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode)
+{
+   if(!count) return false;
+   stats.xmin=200;
+   stats.xmax=-200;
+   stats.avg=0;
+   int ocount=(count*4096)/expand;
+   if(ocount>240)
+   {
+       ocount=240;
+   }
+   ocount&=0xffe;
+   int dex=0;
+   
+   // First
+   float f;
+   {
+       f=(float)in[0]; 
+       f-=set->offset;
+       f*=set->multiplier;       
+       if(f>stats.xmax) stats.xmax=f;
+       if(f<stats.xmin) stats.xmin=f;       
+       out[0]=f; // Unit is now in volt
+       stats.avg+=f;
+       dex+=expand;
+   }
+   
+   // med
+   //if(stats.trigger==-1)
+   {   
+    for(int i=1;i<ocount;i++)
+    {
+
+        f=*(in+2*(dex/4096));
+        f-=set->offset;
+        f*=set->multiplier;
+        if(f>stats.xmax) stats.xmax=f;
+        if(f<stats.xmin) stats.xmin=f;       
+        out[i]=f; // Unit is now in volt
+
+        if(stats.trigger==-1)
+        {
+             if(mode!=DSOADC::Trigger_Rising)
+                 if(out[i-1]<triggerValue&&out[i]>=triggerValue) stats.trigger=i;
+             if(mode!=DSOADC::Trigger_Falling)
+                 if(out[i-1]>triggerValue&&out[i]<=triggerValue) stats.trigger=i;
+        }
+
+        stats.avg+=f;
+        dex+=expand;
+    }   
+   }
+   stats.avg/=count;
+   return ocount;
+}
+
 /**
  * 
  * @return 
@@ -9,6 +66,10 @@ bool DSOCapture::prepareSamplingDma()
     const TimeSettings *set= tSettings+currentTimeBase;
     return adc->prepareDMASampling(set->rate,set->prescaler);
 }
+/**
+ * 
+ * @return 
+ */
 DSOCapture::DSO_TIME_BASE DSOCapture::getTimeBaseDma()
 {
     return (DSOCapture::DSO_TIME_BASE)currentTimeBase;
@@ -64,93 +125,58 @@ bool       DSOCapture:: startCaptureDmaTrigger (int count)
  */
 bool DSOCapture::taskletDma()
 {
-    xDelay(20);
+    
     FullSampleSet fset; // Shallow copy
     int16_t *p;
-    while(1)
-    {
-        int currentVolt=currentVoltageRange; // use a local copy so that it does not change in the middle
-        int currentTime=currentTimeBase;
-        bool findTrigger=false;
-        if(!adc->getSamples(fset))
-            continue;
-        
-        CapturedSet *set=captureSet;
-        set->stats.trigger=-1;
-
-        
-        if(captureFast)   
-        {
-            findTrigger=refineCapture(fset);
-            if(findTrigger)
-                set->stats.trigger=120; // right in the middle
-        }
     
-        
-        if(!fset.set1.samples)
-        {
-            continue;
-        }
-        int scale=vSettings[currentVolt].inputGain;
-        int expand=4096;
-        if(captureFast)            
-        {
-            expand=tSettings[currentTime].expand4096;
-        }
-        float *data=set->data;    
-        if(fset.shifted)
-            p=((int16_t *)fset.set1.data)+1;
-        else
-            p=((int16_t *)fset.set1.data);
+    int currentVolt=currentVoltageRange; // use a local copy so that it does not change in the middle
+    int currentTime=currentTimeBase;
 
-        set->samples=transform(
-                                        p,
-                                        data,
-                                        fset.set1.samples,
-                                        vSettings+currentVolt,
-                                        expand,
-                                        set->stats,
-                                        triggerValueFloat,
-                                        adc->getTriggerMode());
-        if(fset.set2.samples)
-        {
-            CaptureStats otherStats;
-            if(fset.shifted)
-                p=((int16_t *)fset.set2.data)+1;
-            else
-                p=((int16_t *)fset.set2.data);
-            int sample2=transform(
-                                        p,
-                                        data+set->samples,
-                                        fset.set2.samples,
-                                        vSettings+currentVolt,
-                                        expand,
-                                        otherStats,
-                                        triggerValueFloat,
-                                        adc->getTriggerMode());                
-            if(set->stats.trigger==-1 && otherStats.trigger!=-1) 
-            {
-                set->stats.trigger=otherStats.trigger+set->samples;
-            }            
-            set->stats.avg= (set->stats.avg*set->samples+otherStats.avg*fset.set2.samples)/(set->samples+fset.set2.samples);
-            set->samples+=sample2;
-            if(otherStats.xmax>set->stats.xmax) set->stats.xmax=otherStats.xmax;
-            if(otherStats.xmin<set->stats.xmin) set->stats.xmin=otherStats.xmin;
-            
-        }
-        set->stats.frequency=-1;
+    if(!adc->getSamples(fset))
+          return false;
         
-        float f=computeFrequency(fset.shifted,fset.set1.samples,fset.set1.data);
-        if(captureFast)
-        {
-            f=(float)(tSettings[currentTimeBase].fqInHz)*1000./f;
-        }else
-        {
-            f=((float)timerBases[currentTimeBase].fq)*1000./f;
-        }
-        set->stats.frequency=f;
-        
-        // Data ready!
-        captureSemaphore->give();
+    
+    
+    if(!fset.set1.samples)
+    {
+        return false;
     }
+
+    CapturedSet *set=captureSet;
+    
+    set->stats.trigger=-1;     
+    set->stats.frequency=-1;
+    
+    bool triggerFound=refineCapture(fset);
+    if(!triggerFound)
+      return false;
+    set->stats.trigger=120; // right in the middle
+    
+    int     scale=vSettings[currentVolt].inputGain;
+    int    expand=tSettings[currentTime].expand4096;
+    
+    float *data=set->data;    
+    if(fset.shifted)
+        p=((int16_t *)fset.set1.data)+1;
+    else
+        p=((int16_t *)fset.set1.data);
+
+    set->samples=transformDma(
+                                    p,
+                                    data,
+                                    fset.set1.samples,
+                                    vSettings+currentVolt,
+                                    expand,
+                                    set->stats,
+                                    triggerValueFloat,
+                                    adc->getTriggerMode());      
+        
+        
+    float f=computeFrequency(fset.shifted,fset.set1.samples,fset.set1.data);       
+    f=(float)(tSettings[currentTimeBase].fqInHz)*1000./f;
+    set->stats.frequency=f;
+
+    // Data ready!
+    captureSemaphore->give();
+    return true;
 }

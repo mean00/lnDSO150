@@ -19,7 +19,7 @@
 #include "dso_adc.h"
 #include "dso_global.h"
 #include "dso_display.h"
-#include "transform.h"
+
 extern void splash(void);
 
 
@@ -79,6 +79,7 @@ static int expand;
 static bool first=true;
 void testAdc3(void)
 {
+#if 0
     DSODisplay::init();
     DSODisplay::drawGrid();
     int reCounter=0;
@@ -175,6 +176,7 @@ void testAdc3(void)
             }
         
     }
+#endif
 } 
 
 void updateTimeScale()

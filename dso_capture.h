@@ -6,7 +6,15 @@
 #pragma once
 /**
  */
-#include "transform.h"
+typedef struct
+{
+  float xmin;
+  float xmax;
+  float avg;
+  int   trigger;   // -1 = no trigger; else offset
+  int   frequency; //  0 or -1= unknown
+}CaptureStats;
+
 /**
  */
 typedef struct CapturedSet

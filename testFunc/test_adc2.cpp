@@ -19,7 +19,7 @@
 #include "dso_adc.h"
 #include "dso_global.h"
 #include "dso_display.h"
-#include "transform.h"
+
 extern void splash(void);
 
 static void drawGrid(void);
@@ -76,6 +76,7 @@ int expand;
 bool first=true;
 void testAdc2(void)
 {
+#if 0
     DSODisplay::init();
     DSODisplay::drawGrid();
     int reCounter=0;
@@ -104,7 +105,7 @@ void testAdc2(void)
         markStart=millis();
         int scale=vSettings[currentVSettings].inputGain;
         
-        count=transform(xsamples,(float *)test_samples,count,vSettings+currentVSettings,expand,stats,1.0,DSOADC::Trigger_Both);
+        count=transformTimer(xsamples,(float *)test_samples,count,vSettings+currentVSettings,expand,stats,1.0,DSOADC::Trigger_Both);
         acquisitionTime=convTime;
 //        adc->reclaimSamples(set);
             
@@ -169,6 +170,7 @@ void testAdc2(void)
             }
          
     }
+#endif
 } 
 
 void updateTimeScale()
