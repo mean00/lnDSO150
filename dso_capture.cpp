@@ -10,6 +10,7 @@
 #include "transform.h"
 #include "DSO_config.h"
 
+
 static int      canary1=0xabcde01234;
 static int      currentTimeBase=DSOCapture::DSO_TIME_BASE_10MS;
 static int      currentVoltageRange=0;
@@ -25,8 +26,7 @@ static float     voltageOffset=0;
 
 CapturedSet captureSet[2];
 
-
-
+#include "dso_capture_indirection.h"
 
 /**
  * 
@@ -35,16 +35,6 @@ void DSOCapture::initialize()
 {
     captureSemaphore=new xBinarySemaphore;
     xTaskCreate( (TaskFunction_t)DSOCapture::task, "Capture", 200, NULL, DSO_CAPTURE_TASK_PRIORITY, &captureTaskHandle );    
-}
-/**
- * 
- * @return 
- */
-DSOCapture::DSO_TIME_BASE DSOCapture::getTimeBase()
-{
-    if(captureFast) 
-        return (DSOCapture::DSO_TIME_BASE)currentTimeBase;
-    return (DSOCapture::DSO_TIME_BASE)(currentTimeBase+DSO_TIME_BASE::DSO_TIME_BASE_5MS);
 }
 /**
  * 
@@ -67,78 +57,6 @@ DSOCapture::DSO_VOLTAGE_RANGE DSOCapture::getVoltageRange()
 }
 
 
-/**
- * 
- * @param timeBase
- * @return 
- */
-
-bool     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE timeBase)
-{
-    if(timeBase>DSO_TIME_BASE_MAX)
-    {
-        xAssert(0);
-    }
-    if(timeBase<DSO_TIME_BASE::DSO_TIME_BASE_5MS) // fast mode
-    {
-        captureFast   =true;
-        currentTimeBase=timeBase;
-        
-    }else
-    {
-        captureFast=false;
-        currentTimeBase=timeBase-DSO_TIME_BASE::DSO_TIME_BASE_5MS;
-    }
-}
-/**
- * 
- * @param count
- * @return 
- */
-bool     DSOCapture::prepareSampling ()
-{
-    if(captureFast)
-    {
-        //     
-        const TimeSettings *set= tSettings+currentTimeBase;
-        return adc->prepareDMASampling(set->rate,set->prescaler);
-    }else
-    {
-        return adc->prepareTimerSampling(timerBases[currentTimeBase].fq);
-    }
-}
-/**
- * 
- * @return 
- */
-bool     DSOCapture::startSampling (int count)
-{
-    controlButtons->updateCouplingState();
-    if(captureFast)
-    {
-        int ex=count*tSettings[currentTimeBase].expand4096;
-        return adc->startDMASampling(ex);
-    }
-    return adc->startTimerSampling(count);
-}
-/**
- * 
- * @return 
- */
-bool     DSOCapture::startTriggerSampling (int count)
-{
-    triggerValueADC=voltToADCValue(triggerValueFloat);
-    int ex=count;
-    if(captureFast)
-    {
-        ex=count*tSettings[currentTimeBase].expand4096;
-        lastRequested=ex/4096;
-        //return adc->startTriggeredTimerSampling(ex,triggerValueADC);
-        return adc->startDMATriggeredSampling(ex,triggerValueADC);
-    }
-    return adc->startTriggeredTimerSampling(ex,triggerValueADC);
-    
-}
 /**
  * 
  * @param count
@@ -320,7 +238,7 @@ void DSOCapture::task(void *a)
 int DSOCapture::oneShotCapture(int count,float *samples,CaptureStats &stats)
 {
     prepareSampling();
-    if(!startSampling(count)) return 0;
+    if(!startCapture(count)) return 0;
     CapturedSet *set;
     bool r=    getSamples(&set,500);
     if(!r) return 0;
@@ -376,18 +294,16 @@ typedef enum InternalCaptureState
 };
 InternalCaptureState captureState=captureStateIdle;
 
-/**
- * 
- */
-void DSOCapture::stopCapture()
+
+void        DSOCapture::stopCapture()
 {
-    if(captureFast)
-        adc->stopDmaCapture();
-    else
-        adc->stopTimeCapture();
+    currentTable->stopCapture();
     captureState=captureStateIdle;
     controlButtons->updateCouplingState();
+
 }
+
+
 /**
  * 
  * @param count
@@ -398,7 +314,7 @@ int DSOCapture::triggeredCapture(int count,float *volt,CaptureStats &stats)
     if(captureState==captureStateIdle)
     {
         prepareSampling();
-        if(!startTriggerSampling(count)) return 0;
+        if(!startCapture(count)) return 0;
         captureState=captureStateArmed;
     }
                    
@@ -452,18 +368,6 @@ int DSOCapture::voltageToPixel(float v)
     if(v>239) v=239;
     if(v<0) v=0;           
     return (int)v;
-}
-/**
- * 
- * @return 
- */
-const char *DSOCapture::getTimeBaseAsText()
-{
-    if(captureFast)
-    {
-        return tSettings[currentTimeBase].name;
-    }
-    return timerBases[currentTimeBase].name;
 }
 /**
  * 
@@ -539,5 +443,10 @@ float DSOCapture::getVoltageOffset()
 {
     return voltageOffset;
 }
+
+
+
 #include "dso_capture2.cpp"
 // EOF
+
+

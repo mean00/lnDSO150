@@ -69,7 +69,10 @@ public:
       DSO_VOLTAGE_5V,
       DSO_VOLTAGE_MAX=DSO_VOLTAGE_5V
     };
-    
+    // Table indirection
+    static void        stopCaptureDma();
+    static void        stopCaptureTimer();
+    //
     static int         oneShotCapture(int count,float *voltage,CaptureStats &stats) ;
     static int         triggeredCapture(int count,float *voltage,CaptureStats &stats);
     static void        stopCapture();
@@ -77,14 +80,25 @@ public:
     static DSO_VOLTAGE_RANGE getVoltageRange();
     static bool        setTimeBase(DSO_TIME_BASE timeBase);
     static DSO_TIME_BASE getTimeBase();
+    static DSO_TIME_BASE getTimeBaseDma();
+    static DSO_TIME_BASE getTimeBaseTimer();
     static bool        prepareSampling ();
-    static bool        startSampling (int count);
-    static bool        startTriggerSampling (int count);
+    static bool        prepareSamplingDma ();
+    static bool        prepareSamplingTimer ();
+    
+    static bool        startCapture (int count);
+    static bool        startCaptureDma (int count);
+    static bool        startCaptureDmaTrigger (int count);
+    static bool        startCaptureTimer (int count);
+    static bool        startCaptureTimerTrigger (int count);
+    
     static bool        getSamples(CapturedSet **set,int timeoutMs);
     
     
     static bool        captureToDisplay(int count,float *samples,uint8_t *waveForm);
     static const char *getTimeBaseAsText();
+    static const char *getTimeBaseAsTextDma();
+    static const char *getTimeBaseAsTextTimer();
     static const char *getVoltageRangeAsText();
     static void        clearCapturedData();
     static int         voltToADCValue(float v);
@@ -103,3 +117,4 @@ public:
     static bool        refineCapture(FullSampleSet &set);
 
 };
+
