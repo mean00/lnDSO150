@@ -138,8 +138,6 @@ bool DSOCapture::refineCapture(FullSampleSet &set)
 void DSOCapture::task(void *a)
 {
     xDelay(20);
-    FullSampleSet fset; // Shallow copy
-    int16_t *p;
     while(1)
     {
         currentTable->tasklet();
