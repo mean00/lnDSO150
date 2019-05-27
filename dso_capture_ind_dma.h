@@ -60,7 +60,7 @@ static int transformDma(int16_t *in, float *out,int count, VoltageSettings *set,
  * 
  * @return 
  */
-bool DSOCapture::prepareSamplingDma()
+bool DSOCapturePriv::prepareSamplingDma()
 {
   //     
     const TimeSettings *set= tSettings+currentTimeBase;
@@ -70,7 +70,7 @@ bool DSOCapture::prepareSamplingDma()
  * 
  * @return 
  */
-DSOCapture::DSO_TIME_BASE DSOCapture::getTimeBaseDma()
+DSOCapture::DSO_TIME_BASE DSOCapturePriv::getTimeBaseDma()
 {
     return (DSOCapture::DSO_TIME_BASE)currentTimeBase;
 }
@@ -79,7 +79,7 @@ DSOCapture::DSO_TIME_BASE DSOCapture::getTimeBaseDma()
 /**
  * 
  */
-void DSOCapture::stopCaptureDma()
+void DSOCapturePriv::stopCaptureDma()
 {
     
     adc->stopDmaCapture();
@@ -89,7 +89,7 @@ void DSOCapture::stopCaptureDma()
  * 
  * @return 
  */
-const char *DSOCapture::getTimeBaseAsTextDma()
+const char *DSOCapturePriv::getTimeBaseAsTextDma()
 {
    return tSettings[currentTimeBase].name;
 }
@@ -100,7 +100,7 @@ const char *DSOCapture::getTimeBaseAsTextDma()
  * @param count
  * @return 
  */
-bool       DSOCapture:: startCaptureDma (int count)
+bool       DSOCapturePriv:: startCaptureDma (int count)
 {
     int ex=count*tSettings[currentTimeBase].expand4096;
     return adc->startDMASampling(ex);
@@ -110,7 +110,7 @@ bool       DSOCapture:: startCaptureDma (int count)
  * @param count
  * @return 
  */
-bool       DSOCapture:: startCaptureDmaTrigger (int count)
+bool       DSOCapturePriv:: startCaptureDmaTrigger (int count)
 {
     
     int ex=count;
@@ -123,7 +123,7 @@ bool       DSOCapture:: startCaptureDmaTrigger (int count)
  * 
  * @return 
  */
-bool DSOCapture::taskletDma()
+bool DSOCapturePriv::taskletDma()
 {
     
     FullSampleSet fset; // Shallow copy

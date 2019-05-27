@@ -34,7 +34,7 @@ CapturedSet captureSet[2];
 void DSOCapture::initialize()
 {
     captureSemaphore=new xBinarySemaphore;
-    xTaskCreate( (TaskFunction_t)DSOCapture::task, "Capture", 200, NULL, DSO_CAPTURE_TASK_PRIORITY, &captureTaskHandle );    
+    xTaskCreate( (TaskFunction_t)DSOCapturePriv::task, "Capture", 200, NULL, DSO_CAPTURE_TASK_PRIORITY, &captureTaskHandle );    
 }
 /**
  * 
@@ -72,7 +72,7 @@ bool DSOCapture::getSamples(CapturedSet **set, int timeoutMs)
  * 
  * @param set
  */
-bool DSOCapture::refineCapture(FullSampleSet &set)
+bool DSOCapturePriv::refineCapture(FullSampleSet &set)
 {
          // Try to find the trigger, we have ADC_INTERNAL_BUFFER_SIZE samples coming in, we want requestSample out..
         uint16_t *p=(uint16_t *)set.set1.data;
@@ -135,7 +135,7 @@ bool DSOCapture::refineCapture(FullSampleSet &set)
  * 
  * @return 
  */
-void DSOCapture::task(void *a)
+void DSOCapturePriv::task(void *a)
 {
     xDelay(20);
     while(1)
@@ -153,7 +153,7 @@ void DSOCapture::task(void *a)
  */
 int DSOCapture::oneShotCapture(int count,float *samples,CaptureStats &stats)
 {
-    prepareSampling();
+    DSOCapturePriv::prepareSampling();
     if(!startCapture(count)) return 0;
     CapturedSet *set;
     bool r=    getSamples(&set,500);
@@ -175,7 +175,7 @@ int DSOCapture::oneShotCapture(int count,float *samples,CaptureStats &stats)
 void        DSOCapture::setTriggerValue(float volt)
 {
         triggerValueFloat=volt;
-        triggerValueADC=voltToADCValue(triggerValueFloat);
+        triggerValueADC=DSOCapturePriv::voltToADCValue(triggerValueFloat);
 }
 /**
  * 
@@ -195,7 +195,7 @@ float       DSOCapture::getTriggerValue(void)
  * @param set
  * @return 
  */
-int DSOCapture::voltToADCValue(float v)
+int DSOCapturePriv::voltToADCValue(float v)
 {
     VoltageSettings *set=&(vSettings[currentVoltageRange]);
     float out=v/set->multiplier;
@@ -229,7 +229,7 @@ int DSOCapture::triggeredCapture(int count,float *volt,CaptureStats &stats)
 {
     if(captureState==captureStateIdle)
     {
-        prepareSampling();
+        DSOCapturePriv::prepareSampling();
         if(!startCapture(count)) return 0;
         captureState=captureStateArmed;
     }

@@ -56,7 +56,7 @@ static int transformTimer(int16_t *in, float *out,int count, VoltageSettings *se
  * 
  * @return 
  */
-bool DSOCapture::prepareSamplingTimer()
+bool DSOCapturePriv::prepareSamplingTimer()
 {
     return adc->prepareTimerSampling(timerBases[currentTimeBase].fq);
 }
@@ -65,7 +65,7 @@ bool DSOCapture::prepareSamplingTimer()
  * 
  * @return 
  */
-DSOCapture::DSO_TIME_BASE DSOCapture::getTimeBaseTimer()
+DSOCapture::DSO_TIME_BASE DSOCapturePriv::getTimeBaseTimer()
 {
     return (DSOCapture::DSO_TIME_BASE)(currentTimeBase+DSO_TIME_BASE::DSO_TIME_BASE_5MS);
 }
@@ -75,7 +75,7 @@ DSOCapture::DSO_TIME_BASE DSOCapture::getTimeBaseTimer()
 /**
  * 
  */
-void DSOCapture::stopCaptureTimer()
+void DSOCapturePriv::stopCaptureTimer()
 {
     adc->stopTimeCapture();     
 }
@@ -86,7 +86,7 @@ void DSOCapture::stopCaptureTimer()
  * @return 
  */
 
-const char *DSOCapture::getTimeBaseAsTextTimer()
+const char *DSOCapturePriv::getTimeBaseAsTextTimer()
 {
     return timerBases[currentTimeBase].name;
 }
@@ -96,20 +96,20 @@ const char *DSOCapture::getTimeBaseAsTextTimer()
  * @param count
  * @return 
  */
-bool       DSOCapture:: startCaptureTimer (int count)
+bool       DSOCapturePriv:: startCaptureTimer (int count)
 {    
     return adc->startTimerSampling(count);
 }
 /**
   * 
  */
-bool       DSOCapture:: startCaptureTimerTrigger (int count)
+bool       DSOCapturePriv:: startCaptureTimerTrigger (int count)
 {
     return adc->startTriggeredTimerSampling(count,triggerValueADC);
 }
 /**
  */
-bool DSOCapture::taskletTimer()
+bool DSOCapturePriv::taskletTimer()
 {    
     FullSampleSet fset; // Shallow copy
     int16_t *p;

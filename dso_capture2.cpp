@@ -15,7 +15,7 @@ static int dex=0;
  * @param data
  * @return 
  */
-int DSOCapture::computeFrequency(bool shifted,int xsamples,uint32_t *data)
+int DSOCapturePriv::computeFrequency(bool shifted,int xsamples,uint32_t *data)
 {
     // This is done after transform, we can scatch input
     int samples=xsamples-1;

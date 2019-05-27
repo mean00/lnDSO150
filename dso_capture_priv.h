@@ -60,3 +60,30 @@ static const TimerTimeBase timerBases[]
     { DSOCapture::DSO_TIME_BASE_500MS,  "500ms",48},
     { DSOCapture::DSO_TIME_BASE_1S,     "1s",   24}    
 };
+
+/**
+ */
+class DSOCapturePriv : public  DSOCapture
+{
+public:
+    static const char *getTimeBaseAsTextDma();
+    static const char *getTimeBaseAsTextTimer();
+    static bool        taskletDma();
+    static bool        taskletTimer();
+    static void        task(void *);
+    static bool        startCaptureDma (int count);
+    static bool        startCaptureDmaTrigger (int count);
+    static bool        startCaptureTimer (int count);
+    static bool        startCaptureTimerTrigger (int count);
+    static DSO_TIME_BASE getTimeBaseDma();
+    static DSO_TIME_BASE getTimeBaseTimer();
+    static bool        prepareSamplingDma ();
+    static bool        prepareSamplingTimer ();
+    static int         voltToADCValue(float v);
+    static int         computeFrequency(bool shifted,int samples,uint32_t *data);
+    static void        stopCaptureDma();
+    static void        stopCaptureTimer();
+    static bool        refineCapture(FullSampleSet &set);
+    static bool        prepareSampling ();    
+
+};

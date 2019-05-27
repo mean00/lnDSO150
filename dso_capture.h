@@ -78,53 +78,43 @@ public:
       DSO_VOLTAGE_MAX=DSO_VOLTAGE_5V
     };
     // Table indirection
-    static void        stopCaptureDma();
-    static void        stopCaptureTimer();
-    //
     static int         oneShotCapture(int count,float *voltage,CaptureStats &stats) ;
-    static int         triggeredCapture(int count,float *voltage,CaptureStats &stats);
-    static void        stopCapture();
+    static int         triggeredCapture(int count,float *voltage,CaptureStats &stats);    
+    
+    
+    // Voltage Range    
     static bool        setVoltageRange(DSO_VOLTAGE_RANGE voltRange);
     static DSO_VOLTAGE_RANGE getVoltageRange();
+    static const char *getVoltageRangeAsText();
+    // Time Range
     static bool        setTimeBase(DSO_TIME_BASE timeBase);
     static DSO_TIME_BASE getTimeBase();
-    static DSO_TIME_BASE getTimeBaseDma();
-    static DSO_TIME_BASE getTimeBaseTimer();
-    static bool        prepareSampling ();
-    static bool        prepareSamplingDma ();
-    static bool        prepareSamplingTimer ();
-    
-    static bool        startCapture (int count);
-    static bool        startCaptureDma (int count);
-    static bool        startCaptureDmaTrigger (int count);
-    static bool        startCaptureTimer (int count);
-    static bool        startCaptureTimerTrigger (int count);
-    
-    static bool        getSamples(CapturedSet **set,int timeoutMs);
-    
-    
-    static bool        captureToDisplay(int count,float *samples,uint8_t *waveForm);
     static const char *getTimeBaseAsText();
-    static const char *getTimeBaseAsTextDma();
-    static const char *getTimeBaseAsTextTimer();
-    static const char *getVoltageRangeAsText();
-    static void        clearCapturedData();
-    static int         voltToADCValue(float v);
+    
+    // Trigger
     static void        updateTriggersValue();
     static void        setTriggerValue(float volt);
     static float       getTriggerValue();
     static void        setTriggerMode(TriggerMode mode);
     static TriggerMode getTriggerMode();
 
-    static int         voltageToPixel(float v);
-    static void        initialize();
-    static void        task(void *);
-    static bool        taskletDma();
-    static bool        taskletTimer();
-    static int         computeFrequency(bool shifted,int samples,uint32_t *data);
+    
+    // Capture    
+    static bool        startCapture (int count);    
+    static void        stopCapture();
+    static bool        getSamples(CapturedSet **set,int timeoutMs);
+    
+    // Voltage Offset
     static void        setVoltageOffset(float volt);
     static float       getVoltageOffset();
-    static bool        refineCapture(FullSampleSet &set);
+
+    // Misc
+    static bool        captureToDisplay(int count,float *samples,uint8_t *waveForm);
+    static void        clearCapturedData();
+    static int         voltageToPixel(float v);
+    static void        initialize();
+        
+   
 
 };
 

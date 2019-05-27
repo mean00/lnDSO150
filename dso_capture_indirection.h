@@ -13,45 +13,45 @@ typedef struct
  */
 const CaptureFunctionTable TimerTableTrigger=
 {
-    DSOCapture::stopCaptureTimer,
-    DSOCapture::getTimeBaseTimer,
-    DSOCapture::prepareSamplingTimer,
-    DSOCapture::getTimeBaseAsTextTimer,
-    DSOCapture::startCaptureTimerTrigger,
-    DSOCapture::taskletTimer,
+    DSOCapturePriv::stopCaptureTimer,
+    DSOCapturePriv::getTimeBaseTimer,
+    DSOCapturePriv::prepareSamplingTimer,
+    DSOCapturePriv::getTimeBaseAsTextTimer,
+    DSOCapturePriv::startCaptureTimerTrigger,
+    DSOCapturePriv::taskletTimer,
 };
 /**
  */
 const CaptureFunctionTable DmaTableTrigger=
 {
-    DSOCapture::stopCaptureDma,
-    DSOCapture::getTimeBaseDma,
-    DSOCapture::prepareSamplingDma,
-    DSOCapture::getTimeBaseAsTextDma,
-    DSOCapture::startCaptureDmaTrigger,
-    DSOCapture::taskletDma,
+    DSOCapturePriv::stopCaptureDma,
+    DSOCapturePriv::getTimeBaseDma,
+    DSOCapturePriv::prepareSamplingDma,
+    DSOCapturePriv::getTimeBaseAsTextDma,
+    DSOCapturePriv::startCaptureDmaTrigger,
+    DSOCapturePriv::taskletDma,
 };
 /**
  */
 const CaptureFunctionTable TimerTableRunning=
 {
-    DSOCapture::stopCaptureTimer,
-    DSOCapture::getTimeBaseTimer,
-    DSOCapture::prepareSamplingTimer,
-    DSOCapture::getTimeBaseAsTextTimer,
-    DSOCapture::startCaptureTimer,
-    DSOCapture::taskletTimer,
+    DSOCapturePriv::stopCaptureTimer,
+    DSOCapturePriv::getTimeBaseTimer,
+    DSOCapturePriv::prepareSamplingTimer,
+    DSOCapturePriv::getTimeBaseAsTextTimer,
+    DSOCapturePriv::startCaptureTimer,
+    DSOCapturePriv::taskletTimer,
 };
 /**
  */
 const CaptureFunctionTable DmaTableRunning=
 {
-    DSOCapture::stopCaptureDma,
-    DSOCapture::getTimeBaseDma,
-    DSOCapture::prepareSamplingDma,
-    DSOCapture::getTimeBaseAsTextDma,
-    DSOCapture::startCaptureTimer,
-    DSOCapture::taskletDma,
+    DSOCapturePriv::stopCaptureDma,
+    DSOCapturePriv::getTimeBaseDma,
+    DSOCapturePriv::prepareSamplingDma,
+    DSOCapturePriv::getTimeBaseAsTextDma,
+    DSOCapturePriv::startCaptureTimer,
+    DSOCapturePriv::taskletDma,
 };
 /**
  */
@@ -65,7 +65,7 @@ const CaptureFunctionTable *currentTable=&TimerTableTrigger;
  * @param count
  * @return 
  */
-bool     DSOCapture::prepareSampling ()
+bool     DSOCapturePriv::prepareSampling ()
 {
   return currentTable->prepareSampling();
 }
@@ -118,7 +118,7 @@ const char *DSOCapture::getTimeBaseAsText()
  */
 bool       DSOCapture:: startCapture (int count)
 {
-  triggerValueADC=voltToADCValue(triggerValueFloat);
+  triggerValueADC=DSOCapturePriv::voltToADCValue(triggerValueFloat);
   controlButtons->updateCouplingState();
   return currentTable->startCapture(count);
 }
