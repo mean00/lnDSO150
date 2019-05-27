@@ -57,7 +57,7 @@ const CaptureFunctionTable DmaTableRunning=
  */
 const CaptureFunctionTable *currentTable=&TimerTableTrigger;
 
-#include "dso_capture_ind_dma.h"
+//#include "dso_capture_ind_dma.h"
 #include "dso_capture_ind_timer.h"
 
 /**
@@ -83,15 +83,13 @@ bool     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE timeBase)
     }
     if(timeBase<DSO_TIME_BASE::DSO_TIME_BASE_5MS) // fast mode
     {
-        captureFast   =true;
-        currentTimeBase=timeBase;
+        DSOCapturePriv::currentTimeBase=timeBase;
         currentTable=&DmaTableTrigger;
         
     }else
     {
-        captureFast=false;
         currentTable=&TimerTableTrigger;
-        currentTimeBase=timeBase-DSO_TIME_BASE::DSO_TIME_BASE_5MS;
+        DSOCapturePriv::currentTimeBase=timeBase-DSO_TIME_BASE::DSO_TIME_BASE_5MS;
     }
 }
 /**
@@ -118,7 +116,7 @@ const char *DSOCapture::getTimeBaseAsText()
  */
 bool       DSOCapture:: startCapture (int count)
 {
-  triggerValueADC=DSOCapturePriv::voltToADCValue(triggerValueFloat);
+  DSOCapturePriv::triggerValueADC=DSOCapturePriv::voltToADCValue(DSOCapturePriv::triggerValueFloat);
   controlButtons->updateCouplingState();
   return currentTable->startCapture(count);
 }

@@ -3,7 +3,19 @@
  *  * GPL v2
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
+#pragma once
+/*
+ * These helps when dealing with "slow" mode, i.e. when capture is controlled
+ * by a timer interrupt
+ */
+typedef struct TimerTimeBase
+{
+  DSOCapture::DSO_TIME_BASE timeBase;
+  const char    *name;
+  int           fq;  
+};
 
+#ifdef CAPTURE_DECLARE_TABLE
 /*
  * Partially filled global gain array
  * Remaining columns will be filled at runtime
@@ -39,19 +51,9 @@ const TimeSettings tSettings[6]
     {"1ms",     ADC_PRE_PCLK2_DIV_6,ADC_SMPR_239_5, 8127,   47619}
 };
 
-/*
- * These helps when dealing with "slow" mode, i.e. when capture is controlled
- * by a timer interrupt
- */
-typedef struct TimerTimeBase
-{
-  DSOCapture::DSO_TIME_BASE timeBase;
-  const char    *name;
-  int           fq;  
-};
 /**
  */
-static const TimerTimeBase timerBases[]
+const TimerTimeBase timerBases[]
 {
     { DSOCapture::DSO_TIME_BASE_5MS,    "5ms",  4800},
     { DSOCapture::DSO_TIME_BASE_10MS,   "10ms", 2400},
@@ -60,7 +62,11 @@ static const TimerTimeBase timerBases[]
     { DSOCapture::DSO_TIME_BASE_500MS,  "500ms",48},
     { DSOCapture::DSO_TIME_BASE_1S,     "1s",   24}    
 };
-
+#else
+extern const TimerTimeBase timerBases[];
+extern const TimeSettings tSettings[];
+extern VoltageSettings vSettings[];
+#endif
 /**
  */
 class DSOCapturePriv : public  DSOCapture
@@ -86,4 +92,20 @@ public:
     static bool        refineCapture(FullSampleSet &set);
     static bool        prepareSampling ();    
 
+public:
+    
+    static int      currentTimeBase;
+    static int      currentVoltageRange;
+    static int      lastRequested;
+    static int      triggerValueADC;
+    static float    triggerValueFloat;
+    static float     voltageOffset;
+    static CapturedSet captureSet[2];
+    
 };
+/**
+ */
+extern xBinarySemaphore *captureSemaphore;
+extern DSOADC   *adc;
+
+// EOF

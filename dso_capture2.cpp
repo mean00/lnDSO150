@@ -3,6 +3,12 @@
  *  * GPL v2
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
+#include "dso_global.h"
+#include "dso_adc.h"
+#include "dso_capture.h"
+#include "dso_capture_priv.h"
+
+#include "DSO_config.h"
 #define DEFAULT_VALUE  0x400*0x10000
 static int fdelta[16];
 static int dex=0;

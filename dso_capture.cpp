@@ -6,25 +6,25 @@
 #include "dso_global.h"
 #include "dso_adc.h"
 #include "dso_capture.h"
+
+#define CAPTURE_DECLARE_TABLE 1
+
 #include "dso_capture_priv.h"
 
 #include "DSO_config.h"
 
 
-static int      canary1=0xabcde01234;
-static int      currentTimeBase=DSOCapture::DSO_TIME_BASE_10MS;
-static int      currentVoltageRange=0;
-static int      lastRequested=0;
-static bool     captureFast=true;
-static int      canary2=0xabcde01234;
-static int      triggerValueADC=0;
-static float    triggerValueFloat=0;
-extern DSOADC   *adc;
-xBinarySemaphore *captureSemaphore;
+int      DSOCapturePriv::currentTimeBase=DSOCapture::DSO_TIME_BASE_10MS;
+int      DSOCapturePriv::currentVoltageRange=0;
+int      DSOCapturePriv::lastRequested=0;
+int      DSOCapturePriv::triggerValueADC=0;
+float    DSOCapturePriv::triggerValueFloat=0;
+float     DSOCapturePriv::voltageOffset=0;
+xBinarySemaphore *captureSemaphore=NULL;
 static TaskHandle_t captureTaskHandle;
-static float     voltageOffset=0;
+ 
 
-CapturedSet captureSet[2];
+CapturedSet DSOCapturePriv::captureSet[2];
 
 #include "dso_capture_indirection.h"
 
@@ -43,8 +43,8 @@ void DSOCapture::initialize()
  */
 bool     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange)
 {
-    currentVoltageRange=voltRange;
-    controlButtons->setInputGain(vSettings[currentVoltageRange].inputGain);
+    DSOCapturePriv::currentVoltageRange=voltRange;
+    controlButtons->setInputGain(vSettings[DSOCapturePriv::currentVoltageRange].inputGain);
     return true;
 }
 /**
@@ -53,7 +53,7 @@ bool     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange)
  */
 DSOCapture::DSO_VOLTAGE_RANGE DSOCapture::getVoltageRange()
 {
-     return (DSOCapture::DSO_VOLTAGE_RANGE )currentVoltageRange;
+     return (DSOCapture::DSO_VOLTAGE_RANGE )DSOCapturePriv::currentVoltageRange;
 }
 
 
@@ -65,7 +65,7 @@ DSOCapture::DSO_VOLTAGE_RANGE DSOCapture::getVoltageRange()
 bool DSOCapture::getSamples(CapturedSet **set, int timeoutMs)
 {
     if(!captureSemaphore->take(10)) return false;
-    *set=captureSet;
+    *set=DSOCapturePriv::captureSet;
     return true;
 }
 /**
@@ -174,8 +174,8 @@ int DSOCapture::oneShotCapture(int count,float *samples,CaptureStats &stats)
  */
 void        DSOCapture::setTriggerValue(float volt)
 {
-        triggerValueFloat=volt;
-        triggerValueADC=DSOCapturePriv::voltToADCValue(triggerValueFloat);
+        DSOCapturePriv::triggerValueFloat=volt;
+        DSOCapturePriv::triggerValueADC=DSOCapturePriv::voltToADCValue(DSOCapturePriv::triggerValueFloat);
 }
 /**
  * 
@@ -184,7 +184,7 @@ void        DSOCapture::setTriggerValue(float volt)
  */
 float       DSOCapture::getTriggerValue(void)
 {
-    return triggerValueFloat;
+    return DSOCapturePriv::triggerValueFloat;
 }
 
 
@@ -256,10 +256,10 @@ int DSOCapture::triggeredCapture(int count,float *volt,CaptureStats &stats)
  */
 bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
 {    
-    float gain=vSettings[currentVoltageRange].displayGain;
+    float gain=vSettings[DSOCapturePriv::currentVoltageRange].displayGain;
     for(int j=0;j<count;j++)
         {
-            float v=samples[j]+voltageOffset;
+            float v=samples[j]+DSOCapturePriv::voltageOffset;
             v*=(gain*8.)/10.;
             v=DSO_WAVEFORM_HEIGHT/2-v;             
             if(v>DSO_WAVEFORM_HEIGHT) v=DSO_WAVEFORM_HEIGHT;
@@ -278,7 +278,7 @@ bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
  */
 int DSOCapture::voltageToPixel(float v)
 {    
-    float gain=vSettings[currentVoltageRange].displayGain;
+    float gain=vSettings[DSOCapturePriv::currentVoltageRange].displayGain;
     v*=gain;
     v=120-v;             
     if(v>239) v=239;
@@ -291,7 +291,7 @@ int DSOCapture::voltageToPixel(float v)
  */
 const char *DSOCapture::getVoltageRangeAsText()
 {
-    return vSettings[currentVoltageRange].name;
+    return vSettings[DSOCapturePriv::currentVoltageRange].name;
 }
 /**
  * 
@@ -349,7 +349,7 @@ DSOCapture::TriggerMode DSOCapture::getTriggerMode()
  */
 void  DSOCapture::setVoltageOffset(float volt)
 {
-    voltageOffset=volt;
+    DSOCapturePriv::voltageOffset=volt;
 }
 /**
  * 
@@ -357,12 +357,9 @@ void  DSOCapture::setVoltageOffset(float volt)
  */
 float DSOCapture::getVoltageOffset()
 {
-    return voltageOffset;
+    return DSOCapturePriv::voltageOffset;
 }
 
-
-
-#include "dso_capture2.cpp"
 // EOF
 
 
