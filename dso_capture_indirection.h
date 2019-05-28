@@ -57,9 +57,6 @@ const CaptureFunctionTable DmaTableRunning=
  */
 const CaptureFunctionTable *currentTable=&TimerTableTrigger;
 
-//#include "dso_capture_ind_dma.h"
-#include "dso_capture_ind_timer.h"
-
 /**
  * 
  * @param count

@@ -63,9 +63,9 @@ const TimerTimeBase timerBases[]
     { DSOCapture::DSO_TIME_BASE_1S,     "1s",   24}    
 };
 #else
-extern const TimerTimeBase timerBases[];
-extern const TimeSettings tSettings[];
-extern VoltageSettings vSettings[];
+extern const TimerTimeBase  *timerBases;
+extern const TimeSettings   tSettings[6];
+extern VoltageSettings      vSettings[11];
 #endif
 /**
  */
