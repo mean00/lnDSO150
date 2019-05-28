@@ -6,9 +6,6 @@
 #include "dso_global.h"
 #include "dso_adc.h"
 #include "dso_capture.h"
-
-#define CAPTURE_DECLARE_TABLE 1
-
 #include "dso_capture_priv.h"
 
 #include "DSO_config.h"
@@ -25,8 +22,6 @@ static TaskHandle_t captureTaskHandle;
  
 
 CapturedSet DSOCapturePriv::captureSet[2];
-
-#include "dso_capture_indirection.h"
 
 /**
  * 

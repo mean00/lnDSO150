@@ -1,14 +1,14 @@
-/**
- */
-typedef struct 
-{
-    void                        (*stopCapture)(void);
-    DSOCapture::DSO_TIME_BASE   (*getTimeBase)(void);
-    bool                        (*prepareSampling)(void);
-    const char *                (*getTimeBaseAsText)();
-    bool                        (*startCapture) (int count);
-    bool                        (*tasklet)();
-}CaptureFunctionTable;
+/***************************************************
+ STM32 duino based firmware for DSO SHELL/150
+ *  * GPL v2
+ * (c) mean 2019 fixounet@free.fr
+ ****************************************************/
+#include "dso_global.h"
+#include "dso_adc.h"
+#include "dso_capture.h"
+#include "dso_capture_priv.h"
+
+#include "DSO_config.h"
 /**
  */
 const CaptureFunctionTable TimerTableTrigger=
