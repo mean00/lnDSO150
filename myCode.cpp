@@ -7,10 +7,8 @@
 #include "dso_global.h"
 #include "Fonts/waree9.h"
 #include "Fonts/waree12.h"
-#include "testSignal.h"
-#include "HardwareSerial.h"
+#include "dso_test_signal.h"
 #include "dso_eeprom.h"
-#include "DSO_config.h"
 
 static void MainTask( void *a );
 void splash(void);

@@ -5,7 +5,7 @@
 
 #include <Wire.h>
 #include "SPI.h"
-#include "testSignal.h"
+#include "dso_test_signal.h"
 /**
  */
 testSignal::testSignal(int pin,int pinAmp,int timer, int channel)

@@ -3,25 +3,14 @@
  *  * GPL v2
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
-
-#include <Wire.h>
-#include "SPI.h"
-#include "Adafruit_GFX.h"
-#include "Adafruit_TFTLCD_8bit_STM32.h"
+#include "dso_includes.h"
 #include "Fonts/Targ56.h"
 #include "Fonts/digitLcd56.h"
 #include "Fonts/FreeSansBold12pt7b.h"
-#include "MapleFreeRTOS1000.h"
-#include "MapleFreeRTOS1000_pp.h"
-#include "testSignal.h"
-#include "dso_control.h"
-#include "HardwareSerial.h"
-
-#include "dso_global.h"
-#include "dso_display.h"
-#include "dso_adc.h"
 #include "gfx/dso_small_compressed.h"
-#include "DSO_config.h"
+
+
+extern void  menuManagement(void);
 
 extern void splash(void);
 static void drawGrid(void);
@@ -86,6 +75,13 @@ static void buttonManagement()
         dirty=true;
     }
     
+    if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_OK) & EVENT_LONG_PRESS)    
+    {
+        capture->stopCapture();       
+        menuManagement();
+        capture->startCapture(240);
+        return;
+    }
     int inc=controlButtons->getRotaryValue();
     
     DSODisplay::MODE_TYPE newMode=DSODisplay::INVALID_MODE;

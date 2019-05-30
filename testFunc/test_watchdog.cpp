@@ -4,21 +4,8 @@
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
 
-#include <Wire.h>
-#include "SPI.h"
-#include "Adafruit_GFX.h"
-#include "Adafruit_TFTLCD_8bit_STM32.h"
-#include "Fonts/Targ56.h"
-#include "Fonts/digitLcd56.h"
-#include "Fonts/FreeSansBold12pt7b.h"
-#include "MapleFreeRTOS1000.h"
-#include "MapleFreeRTOS1000_pp.h"
-#include "testSignal.h"
-#include "dso_control.h"
-#include "HardwareSerial.h"
-#include "dso_adc.h"
-#include "dso_capture.h"
-#include "dso_global.h"
+#include "dso_includes.h"
+#include "dso_test_signal.h"
 extern void splash(void);
 
 static void drawGrid(void);
