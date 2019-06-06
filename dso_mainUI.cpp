@@ -29,6 +29,8 @@ int       nbRefrsh=0;
 
 static    int lastTrigger=-1;
 static    DSOControl::DSOCoupling oldCoupling;
+
+static void initMainUI(void);
 /**
  * 
  */
@@ -79,7 +81,9 @@ static void buttonManagement()
     {
         capture->stopCapture();       
         menuManagement();
+        initMainUI();
         capture->startCapture(240);
+        
         return;
     }
     int inc=controlButtons->getRotaryValue();
@@ -180,9 +184,9 @@ static void buttonManagement()
 /**
  * 
  */
-static void initMainUI(void)
+void initMainUI(void)
 {
-    DSODisplay::init();
+    
         
     tft->fillScreen(BLACK);   
     
@@ -215,7 +219,7 @@ void mainDSOUI(void)
 
     int triggerLine;
     
-
+    DSODisplay::init();
     initMainUI();
    
     uint32_t lastRefresh=millis();
