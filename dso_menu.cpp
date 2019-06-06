@@ -55,7 +55,7 @@ MenuManager::~MenuManager()
 void MenuManager::printMenuEntry(bool onoff, int line,const char *text)
 {
     #define BG_COLOR GREEN    
-    tft->setCursor(100,100+20*line);
+    tft->setCursor(100,40+24*line);
     if(onoff)
         tft->setTextColor(BLACK,BG_COLOR); 
     else  
@@ -68,7 +68,7 @@ void MenuManager::printMenuEntry(bool onoff, int line,const char *text)
 void MenuManager::run(void)
 {
      tft->fillScreen(BLACK);
-     
+     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::BigFont);
      int n=0;
      {
         const MenuItem  *top=_menu;
