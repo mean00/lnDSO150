@@ -80,6 +80,9 @@ bool DSOCapturePriv::refineCapture(FullSampleSet &set)
         
         switch(adc->getTriggerMode())
         {
+            case Trigger_Run:
+                found=0;
+                break;
             case Trigger_Rising:
                 for(int i=start;i<end;i++)
                 {
@@ -309,6 +312,7 @@ void        DSOCapture::setTriggerMode(TriggerMode mode)
         CAP2ADC(Trigger_Rising);
         CAP2ADC(Trigger_Falling);
         CAP2ADC(Trigger_Both);
+        CAP2ADC(Trigger_Run);
         default:
             xAssert(0);
             break;
@@ -330,6 +334,7 @@ DSOCapture::TriggerMode DSOCapture::getTriggerMode()
         _CAP2ADC(Trigger_Rising);
         _CAP2ADC(Trigger_Falling);
         _CAP2ADC(Trigger_Both);
+        _CAP2ADC(Trigger_Run);
         default:
             xAssert(0);
             break;

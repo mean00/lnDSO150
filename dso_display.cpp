@@ -254,9 +254,10 @@ void DSODisplay::printVoltTimeTriggerMode(const char *volt, const char *time,DSO
     const char *st="????";
     switch(tmode)
     {
-        case DSOCapture::Trigger_Rising: st="UP";break;
+        case DSOCapture::Trigger_Rising: st="UP  ";break;
         case DSOCapture::Trigger_Falling: st="DOWN";break;
         case DSOCapture::Trigger_Both: st="BOTH";break;
+        case DSOCapture::Trigger_Run: st="RUN ";break;
         default:
             xAssert(0);
             break;
@@ -277,10 +278,10 @@ void DSODisplay::printVoltTimeTriggerMode(const char *volt, const char *time,DSO
     
 #define SELECT(md)   { if(md==mode) tft->setTextColor(BLACK,BG_COLOR); else  tft->setTextColor(BG_COLOR,BLACK);}
 #define LOWER_BAR(mode,st,column) {SELECT(mode);    LOWER_BAR_PRINT(st,column);}
-    
+#define LOWER_BAR_NCHAR(mode,st,column) {SELECT(mode);    LOWER_BAR_PRINT_NCHARS(st,column,4);}    
     LOWER_BAR(VOLTAGE_MODE,volt,0);
     LOWER_BAR(TIME_MODE,time,1);
-    LOWER_BAR(TRIGGER_MODE,st,2);
+    LOWER_BAR_NCHAR(TRIGGER_MODE,st,2);
     tft->setTextColor(BG_COLOR,BLACK);
     LOWER_BAR_PRINT_NCHARS(coupling,3,3);
     

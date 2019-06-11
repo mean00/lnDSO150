@@ -148,9 +148,10 @@ static void buttonManagement()
                 {
                     int t=capture->getTriggerMode();
                     t+=inc;
-                    while(t<0) t+=3;
-                    t%=3;
-                    capture->setTriggerMode((DSOCapture::TriggerMode)t);
+                    while(t<0) t+=4;
+                    t%=4;
+                    capture->setTriggerMode((DSOCapture::TriggerMode)t);                   
+                    capture->setTimeBase( capture->getTimeBase()); // this will refresh the internal indirection table
                     dirty=true;
                 }
                 break;
@@ -229,7 +230,10 @@ void mainDSOUI(void)
     DSOControl::DSOCoupling oldCoupling=controlButtons->getCouplingState();
     while(1)
     {        
-        int count=DSOCapture::triggeredCapture(240,test_samples,stats);  
+        int count;  
+        
+        count=DSOCapture::triggeredCapture(240,test_samples,stats);  
+        
         // Nothing captured, refresh screen
         if(!count) 
         {

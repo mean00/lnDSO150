@@ -80,6 +80,7 @@ public:
     Trigger_Rising,
     Trigger_Falling,
     Trigger_Both,
+    Trigger_Run
   };
    enum TriggerState
   {

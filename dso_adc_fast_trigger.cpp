@@ -82,6 +82,8 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
                             setWatchdogTriggerValue(triggerValueADC,0);
                         }
                         break;
+    case Trigger_Run:
+                        break;
                         
     default: break;
   }  
@@ -115,6 +117,10 @@ void DSOADC::awdTrigger()
             case Trigger_Both:
                 // Tricky !
                 setWatchdogTriggerValue(ADC_MAX,_triggerValueADC); // FIXME!
+                 break;
+            case Trigger_Run:
+                _triggered=true;   
+                 enableDisableIrqSource(false,ADC_AWD);
                  break;
          }
      }else

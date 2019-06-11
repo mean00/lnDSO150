@@ -33,6 +33,7 @@ public:
         Trigger_Rising=0,
         Trigger_Falling=1,
         Trigger_Both=2,
+        Trigger_Run=3
     };
     enum DSO_CAPTURE_STATE
     {
