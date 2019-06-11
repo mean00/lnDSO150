@@ -82,7 +82,7 @@ SET(libPrefix ${ARDUINO_DEFAULT_BOARD}_)
 generate_arduino_firmware(Dso150${EXTENSION} 
                 SKETCH dso150.ino
                 #SRCS   ${ILI}/ILI9341_exi2cPowerSupplytended.cpp ${ILI}/ILI9341_extended_glyph.cpp myCode.cpp  simplerMCP4725/simplerMCP4725.cpp ${MCP23017_FREERTOS}/MCP23017_rtos.cpp  myAdc/myAdc.cpp
-                SRCS    myCode.cpp  dso_test_signal.cpp dso_control.cpp testFunc/test_testSignal.cpp testFunc/test_buttons.cpp testFunc/test_adc.cpp dso_adc_fast.cpp dso_adc_slow.cpp  testFunc/test_adc2.cpp testFunc/test_display.cpp  testFunc/test_calibrate.cpp testFunc/test_i2c.cpp AH_24Cxx.cpp dso_eeprom.cpp dso_calibrate.cpp dso_display.cpp testFunc/test_adc3.cpp 
+                SRCS    myCode.cpp  dso_test_signal.cpp dso_control.cpp testFunc/test_testSignal.cpp testFunc/test_buttons.cpp testFunc/test_adc.cpp dso_adc_fast.cpp dso_adc_slow.cpp  testFunc/test_adc2.cpp testFunc/test_display.cpp  testFunc/test_calibrate.cpp testFunc/test_i2c.cpp  dso_eeprom.cpp dso_calibrate.cpp dso_display.cpp testFunc/test_adc3.cpp 
                 dso_frequency.cpp dso_capture_dma.cpp dso_capture_timer.cpp dso_capture.cpp  dso_capture_modes.cpp dso_capture_const.cpp dso_menu.cpp
                 testFunc/test_capture.cpp testFunc/test_trigger.cpp testFunc/test_watchdog.cpp dso_mainUI.cpp
                 PORT ${ARDUINO_DEFAULT_PORT}
