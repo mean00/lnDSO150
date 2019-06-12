@@ -41,6 +41,8 @@ public:
     static const char *getTimeBaseAsTextTimer();
     static bool        taskletDma();
     static bool        taskletDmaRunning();
+    static bool        taskletDmaCommon(const bool trigger);
+    
     static bool        taskletTimer();
     static void        task(void *);
     static bool        startCaptureDma (int count);
