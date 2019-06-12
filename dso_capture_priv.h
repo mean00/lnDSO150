@@ -40,6 +40,7 @@ public:
     static const char *getTimeBaseAsTextDma();
     static const char *getTimeBaseAsTextTimer();
     static bool        taskletDma();
+    static bool        taskletDmaRunning();
     static bool        taskletTimer();
     static void        task(void *);
     static bool        startCaptureDma (int count);

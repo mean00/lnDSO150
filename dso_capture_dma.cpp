@@ -190,3 +190,61 @@ bool DSOCapturePriv::taskletDma()
     captureSemaphore->give();
     return true;
 }
+//--
+
+/**
+ * 
+ * @return 
+ */
+bool DSOCapturePriv::taskletDmaRunning()
+{
+    
+    FullSampleSet fset; // Shallow copy
+    int16_t *p;
+    
+    int currentVolt=currentVoltageRange; // use a local copy so that it does not change in the middle
+    int currentTime=currentTimeBase;
+
+    if(!adc->getSamples(fset))
+          return false;
+    
+    if(!fset.set1.samples)
+    {
+        return false;
+    }
+
+    CapturedSet *set=captureSet;
+    
+    set->stats.trigger=-1;     
+    set->stats.frequency=-1;
+
+    set->stats.trigger=120; // right in the middle
+    
+    int     scale=vSettings[currentVolt].inputGain;
+    int    expand=tSettings[currentTime].expand4096;
+    
+    float *data=set->data;    
+    if(fset.shifted)
+        p=((int16_t *)fset.set1.data)+1;
+    else
+        p=((int16_t *)fset.set1.data);
+
+    set->samples=transformDma(
+                                    p,
+                                    data,
+                                    fset.set1.samples,
+                                    vSettings+currentVolt,
+                                    expand,
+                                    set->stats,
+                                    triggerValueFloat,
+                                    adc->getTriggerMode());      
+        
+        
+    float f=computeFrequency(fset.shifted,fset.set1.samples,fset.set1.data);       
+    f=(float)(tSettings[currentTimeBase].fqInHz)*1000./f;
+    set->stats.frequency=f;
+
+    // Data ready!
+    captureSemaphore->give();
+    return true;
+}

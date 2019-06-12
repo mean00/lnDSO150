@@ -59,7 +59,10 @@ DSOCapture::DSO_VOLTAGE_RANGE DSOCapture::getVoltageRange()
  */
 bool DSOCapture::getSamples(CapturedSet **set, int timeoutMs)
 {
-    if(!captureSemaphore->take(10)) return false;
+    if(!captureSemaphore->take(10)) 
+    {
+        return false;
+    }
     *set=DSOCapturePriv::captureSet;
     return true;
 }

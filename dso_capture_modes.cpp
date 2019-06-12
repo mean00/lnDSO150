@@ -50,8 +50,8 @@ const CaptureFunctionTable DmaTableRunning=
     DSOCapturePriv::getTimeBaseDma,
     DSOCapturePriv::prepareSamplingDma,
     DSOCapturePriv::getTimeBaseAsTextDma,
-    DSOCapturePriv::startCaptureTimer,
-    DSOCapturePriv::taskletDma,
+    DSOCapturePriv::startCaptureDma,
+    DSOCapturePriv::taskletDmaRunning,
 };
 /**
  */
