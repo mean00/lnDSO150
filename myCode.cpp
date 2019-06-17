@@ -40,6 +40,7 @@ extern void testI2c( void);
 extern void testCapture(void);
 extern void testTrigger(void);
 extern void testAdcWatchdog(void);
+extern void testButtonCoupling(void);
 extern void mainDSOUI(void);
 /**
  * 
@@ -115,7 +116,8 @@ void MainTask( void *a )
     
     //xAssert(0);
    // testTestSignal();
-    testButtons();   
+    testButtonCoupling();
+    //testButtons();   
     if(!DSOEeprom::read())
     {
          DSOCalibrate::calibrate();

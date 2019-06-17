@@ -216,6 +216,7 @@ int DSOControl::getRawCoupling()
  */
 static DSOControl::DSOCoupling couplingFromAdc()
 {
+    pinMode(COUPLING_PIN,INPUT_ANALOG);
     adc_reg_map *regs=  PIN_MAP[COUPLING_PIN].adc_device->regs; //PIN_MAP[COUPLING_PIN].adc_device.regs;
     uint32_t sqr3=regs->SQR3;
     rawCoupling=analogRead(COUPLING_PIN);
@@ -274,10 +275,7 @@ static void trampoline(void *a)
  */
 void          DSOControl::updateCouplingState()
 {
-    adc_reg_map *regs=  PIN_MAP[COUPLING_PIN].adc_device->regs; //PIN_MAP[COUPLING_PIN].adc_device.regs;
-    uint32_t sqr3=regs->SQR3;
     couplingState=couplingFromAdc();
-    regs->SQR3=sqr3;
 }
 
 /**

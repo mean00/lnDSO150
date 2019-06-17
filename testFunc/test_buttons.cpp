@@ -19,10 +19,8 @@ void testButtons(void)
     int reCounter=0;
     tft->setCursor(200, 5);
     tft->print("Rotary");
-    tft->setCursor(200, 1200);
-    tft->print("Ints");    
-    tft->setCursor(200, 190);
-    tft->print("Coupling");    
+    tft->setCursor(200, 120);
+    tft->print("Coupl");    
 
     while(1)
     {       
@@ -50,10 +48,10 @@ void testButtons(void)
         reCounter+=controlButtons->getRotaryValue();
         tft->setCursor(200, 30);
         tft->print(reCounter);
-        tft->setCursor(200, 90);
-        tft->print(ints);
+        tft->setCursor(200, 60);
+        tft->print(ints);        
         
-        tft->setCursor(200, 120);
+        tft->setCursor(200, 180);        
         tft->print(        controlButtons->geCouplingStateAsText());
         int raw=controlButtons->getRawCoupling();
         tft->setCursor(200, 150);
@@ -62,4 +60,20 @@ void testButtons(void)
         //xDelay(30);         
     }
 }
+#define COUPLING_PIN PA5
+//--
+void testButtonCoupling(void)
+{
+  
+    pinMode(COUPLING_PIN,INPUT_ANALOG);
+    while(1)
+    {   
+            int rawCoupling= adc_read(&adc2, 5);            
+            tft->setCursor(200, 150);
+            tft->print( rawCoupling);
+            xDelay(30);      
+            tft->fillScreen(0);
+    }
+}
+
 //-
