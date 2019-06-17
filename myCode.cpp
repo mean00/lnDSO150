@@ -115,7 +115,7 @@ void MainTask( void *a )
     
     //xAssert(0);
    // testTestSignal();
-    //testButtons();   
+    testButtons();   
     if(!DSOEeprom::read())
     {
          DSOCalibrate::calibrate();

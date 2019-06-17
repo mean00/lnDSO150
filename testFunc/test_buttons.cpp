@@ -25,7 +25,8 @@ void testButtons(void)
     tft->print("Coupling");    
 
     while(1)
-    {        
+    {       
+        controlButtons->updateCouplingState();
         //splash();
         for(int i=0;i<8;i++)
         {
@@ -49,11 +50,14 @@ void testButtons(void)
         reCounter+=controlButtons->getRotaryValue();
         tft->setCursor(200, 30);
         tft->print(reCounter);
-        tft->setCursor(200, 160);
+        tft->setCursor(200, 90);
         tft->print(ints);
         
-        tft->setCursor(200, 210);
-        tft->print(        controlButtons->getCouplingState());
+        tft->setCursor(200, 120);
+        tft->print(        controlButtons->geCouplingStateAsText());
+        int raw=controlButtons->getRawCoupling();
+        tft->setCursor(200, 150);
+        tft->print( raw);
         
         //xDelay(30);         
     }

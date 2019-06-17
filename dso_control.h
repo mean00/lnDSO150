@@ -44,8 +44,9 @@ public:
     void runLoop();
     int  setInputGain(int val); // This drives SENSEL... Warning the mapping is not straightforward !
     DSOCoupling   getCouplingState();
-    
+    const char    *geCouplingStateAsText();
     void          updateCouplingState();
+    int           getRawCoupling();
 protected:
     adc_dev *couplingDevice;
     uint8    couplingChannel;           

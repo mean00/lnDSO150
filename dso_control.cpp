@@ -43,6 +43,8 @@
 #define COUNT_MAX             3
 
 
+int debugUp=0;
+int debugDown=0;
 
 int ampMapping[16]=
 {
@@ -86,7 +88,7 @@ int ampMapping[16]=
 #define SENSEL_PIN PA1 //(1..4)
   
 extern xMutex PortAMutex; // lock against LCD  
-  
+static int rawCoupling;  
 /**
  */
 class singleButton
@@ -201,14 +203,28 @@ static void _myInterruptRE(void *a)
 
 /**
  * 
+ * @return 
+ */
+int DSOControl::getRawCoupling()
+{
+    return rawCoupling;
+}
+/**
+ * 
  * @param v
  * @return 
  */
-static DSOControl::DSOCoupling couplingFromAdc(int v)
+static DSOControl::DSOCoupling couplingFromAdc()
 {
-    if(v>3500)      return DSOControl::DSO_COUPLING_AC;
-    if(v<500)       return DSOControl::DSO_COUPLING_GND;
-                    return DSOControl::DSO_COUPLING_DC;
+    adc_reg_map *regs=  PIN_MAP[COUPLING_PIN].adc_device->regs; //PIN_MAP[COUPLING_PIN].adc_device.regs;
+    uint32_t sqr3=regs->SQR3;
+    rawCoupling=analogRead(COUPLING_PIN);
+    regs->SQR3=sqr3;
+    if(rawCoupling>3500)      
+        return DSOControl::DSO_COUPLING_AC;
+    if(rawCoupling<500)       
+        return DSOControl::DSO_COUPLING_GND;
+    return DSOControl::DSO_COUPLING_DC;
 }
 
 /**
@@ -240,7 +256,7 @@ DSOControl::DSOControl()
     pinMode(COUPLING_PIN,INPUT_ANALOG);
     couplingDevice= PIN_MAP[COUPLING_PIN].adc_device;
     couplingChannel=PIN_MAP[COUPLING_PIN].adc_channel;
-    couplingState=couplingFromAdc(analogRead(COUPLING_PIN));
+    couplingState=couplingFromAdc();
     
 }
 
@@ -260,8 +276,24 @@ void          DSOControl::updateCouplingState()
 {
     adc_reg_map *regs=  PIN_MAP[COUPLING_PIN].adc_device->regs; //PIN_MAP[COUPLING_PIN].adc_device.regs;
     uint32_t sqr3=regs->SQR3;
-    couplingState=couplingFromAdc(analogRead(COUPLING_PIN));
+    couplingState=couplingFromAdc();
     regs->SQR3=sqr3;
+}
+
+/**
+ * 
+ * @return 
+ */
+const char    *DSOControl::geCouplingStateAsText()
+{
+    switch(couplingState)
+    {
+        case   DSO_COUPLING_GND: return "GND";break;
+        case   DSO_COUPLING_DC: return "DC ";break;
+        case   DSO_COUPLING_AC: return "AC ";break;
+        default: xAssert(0);break;
+    }
+    return "???";
 }
 /**
  * 
@@ -330,9 +362,11 @@ void DSOControl::interruptRE(int a)
   switch(state&DIR_MASK)
   {
     case DIR_CW:
+            debugUp++;
             counter++;
             break;
     case DIR_CCW: 
+            debugDown++;
             counter--;
             break;
     default: 

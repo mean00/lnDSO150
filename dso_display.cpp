@@ -156,6 +156,7 @@ void  DSODisplay::drawVerticalTrigger(bool drawOrErase,int column)
  * @param drawOrErase
  * @param line
  */
+extern int debugUp, debugDown;
 void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
 {
     if(line<1) line=1;
@@ -170,8 +171,10 @@ void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
                             DSO_WAVEFORM_WIDTH, 1+line);
         tft->pushColors(((uint16_t *)bg),   DSO_WAVEFORM_WIDTH,true);
     }
+     tft->setCursor(240,16);tft->print(debugUp);
+     tft->setCursor(240,36);tft->print(debugDown);
+      
 }
-
 
 
 #define DSO_CHAR_HEIGHT 20
