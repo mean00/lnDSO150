@@ -116,7 +116,7 @@ void MainTask( void *a )
     
     //xAssert(0);
    // testTestSignal();
-    testButtonCoupling();
+    //testButtonCoupling();
     //testButtons();   
     if(!DSOEeprom::read())
     {
