@@ -53,7 +53,7 @@ DSOADC::DSOADC()
   instance=this;
   adc_calibrate(ADC1);
   adc_calibrate(ADC2);
-  setADCs (); //Setup ADC peripherals for interleaved continuous mode.
+ 
   // Set up our sensor pin(s)
   pinMode(analogInPin, INPUT_ANALOG);
   dmaSemaphore=new xBinarySemaphore;  

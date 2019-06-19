@@ -112,9 +112,9 @@ public:
     static  void adc_dma_disable(const adc_dev * dev) ;            
     static  void adc_dma_enable(const adc_dev * dev) ;    
 
-            
+            void setupADCs ();
 protected:            
-            void setADCs ();
+            
     static  void DMA1_CH1_Event();
     static  void DMA1_CH1_TriggerEvent() ;
             void captureComplete(bool shift,SampleSet &one, SampleSet &two);

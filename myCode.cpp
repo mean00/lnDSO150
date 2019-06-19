@@ -95,7 +95,7 @@ void MainTask( void *a )
     tft->fillScreen(BLACK);
     
     splash();
-    delay(1500);
+    delay(500);
     myTestSignal=new testSignal(  PA7,PB12, 3,TIMER_CH2);
     myTestSignal->setAmplitude(true);
         
@@ -129,6 +129,7 @@ void MainTask( void *a )
     //testDisplay();
     // testCalibrate();
     adc->readCalibrationValue(); // re-read calibration value
+    adc->setupADCs ();
     DSOCapture::initialize();
 
     //testI2c();

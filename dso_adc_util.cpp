@@ -61,7 +61,7 @@ bool DSOADC::readCalibrationValue()
 /**
  * 
  */
-void DSOADC::setADCs ()
+void DSOADC::setupADCs ()
 {
  // 1 - Read VCC
    adc_Register = ADC1->regs;
@@ -78,10 +78,16 @@ void DSOADC::setADCs ()
   adc_set_reg_seqlen(ADC1, 1);
   
   adc_Register->SQR3 = pinMapADCin;
-  adc_Register->CR2 |= ADC_CR2_CONT; // | ADC_CR2_DMA; // Set continuous mode and DMA
-  adc_Register->CR1 |= ADC_CR1_FASTINT; // Interleaved mode
-  //adc_Register->CR2 |= ADC_CR2_SWSTART;
   
+  static volatile uint32_t cr2=adc_Register->CR2;
+  //cr2=ADC_CR2_SWSTART++ADC_CR2_CONT+ADC_CR2_DMA+ADC_CR2_DMA+ADC_CR2_CAL+ADC_CR2_RSTCAL;
+  // Original 
+  cr2=ADC_CR2_ADON+ADC_CR2_EXTSEL+ADC_CR2_TSVREFE+ADC_CR2_EXTTRIG+ADC_CR2_CONT;
+  // mine
+    //cr2=           ADC_CR2_ADON+ADC_CR2_EXTSEL_SWSTART+ ADC_CR2_EXTTRIG;
+    adc_Register->CR2=cr2;
+  
+  adc_Register->CR1 |= (ADC_CR1_FASTINT); // Interleaved mode    
   ADC2->regs->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
   ADC2->regs->SQR3 = pinMapADCin;
   
@@ -91,7 +97,7 @@ void DSOADC::setADCs ()
   pinMode(vRefPin,PWM);
   
   pwmWrite(vRefPin,3000);
-  setTriggerMode(DSOADC::Trigger_Both);
+  setTriggerMode(DSOADC::Trigger_Run);
   
   
   enableDisableIrqSource(false,ADC_AWD);
