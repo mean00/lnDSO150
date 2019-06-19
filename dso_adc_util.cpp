@@ -79,7 +79,7 @@ void DSOADC::setupADCs ()
   
   adc_Register->SQR3 = pinMapADCin;
   
-  static volatile uint32_t cr2=adc_Register->CR2;
+  static volatile uint32_t cr2=adc_Register->CR2,cr1=adc_Register->CR1;
 #if 0
   cr2=ADC_CR2_ADON+ADC_CR2_EXTSEL+ADC_CR2_TSVREFE+ADC_CR2_EXTTRIG+ADC_CR2_CONT;
   adc_Register->CR2=cr2;
@@ -87,27 +87,15 @@ void DSOADC::setupADCs ()
   ADC2->regs->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
   ADC2->regs->SQR3 = pinMapADCin;
 #else
-  cr2=ADC_CR2_ADON+ADC_CR2_EXTSEL_SWSTART+ADC_CR2_EXTTRIG+ADC_CR2_CONT;
+  cr2=ADC_CR2_ADON+ADC_CR2_EXTSEL_SWSTART+ADC_CR2_EXTTRIG+ADC_CR2_CONT+ADC_CR2_DMA;
+  cr1=1*ADC_CR1_FASTINT;
   adc_Register->CR2=cr2;  
-  adc_Register->CR1 |= (ADC_CR1_FASTINT); // Interleaved mode    
+  adc_Register->CR1 =cr1;
   ADC2->regs->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
   ADC2->regs->SQR3 = pinMapADCin;
 
 #endif  
-  pinMode(triggerPin,INPUT);
-    
-  pwmtimer.setPeriod(2000); // 5Khz pwm
-  pinMode(vRefPin,PWM);
   
-  pwmWrite(vRefPin,3000);
-  setTriggerMode(DSOADC::Trigger_Run);
-  
-  
-  enableDisableIrqSource(false,ADC_AWD);
-  enableDisableIrqSource(false,ADC_EOC);
-  enableDisableIrqSource(false,ADC_JEOC);
-  enableDisableIrq(false);
-  attachWatchdogInterrupt(NULL);
 }
 /**
  * 

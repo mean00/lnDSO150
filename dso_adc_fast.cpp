@@ -58,11 +58,15 @@ DSOADC::DSOADC()
   pinMode(analogInPin, INPUT_ANALOG);
   dmaSemaphore=new xBinarySemaphore;  
   adc_Register=  PIN_MAP[analogInPin].adc_device->regs;
-#if 1
-  _triggerMode=DSOADC::Trigger_Rising;
-#else
-  _triggerMode=DSOADC::Trigger_Falling;
-#endif
+  
+  setTriggerMode(DSOADC::Trigger_Run);
+  
+  
+  enableDisableIrqSource(false,ADC_AWD);
+  enableDisableIrqSource(false,ADC_EOC);
+  enableDisableIrqSource(false,ADC_JEOC);
+  enableDisableIrq(false);
+  attachWatchdogInterrupt(NULL);
 }
  
 
