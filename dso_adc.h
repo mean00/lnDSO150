@@ -44,25 +44,24 @@ public:
               samples=0;
               data=NULL;
             }
-            void set(int s, uint32_t *d)
+            void set(int s, uint16_t *d)
             {
               samples=s;
               data=d;
             }
             
-            SampleSet(int s, uint32_t *d)
+            SampleSet(int s, uint16_t *d)
             {
               set(s,d);
             }
   int       samples;
-  uint32_t  *data;
+  uint16_t  *data;
 };
 
 /**
  */
 typedef struct FullSampleSet
 {
-  bool      shifted;
   SampleSet set1;
   SampleSet set2;  
 };
@@ -117,7 +116,7 @@ protected:
             
     static  void DMA1_CH1_Event();
     static  void DMA1_CH1_TriggerEvent() ;
-            void captureComplete(bool shift,SampleSet &one, SampleSet &two);
+            void captureComplete(SampleSet &one, SampleSet &two);
     static  void Timer_Event();
     static  void Timer_Trigger_Event();
 
@@ -129,8 +128,8 @@ protected:
             bool validateAverageSample(uint32_t &avg);
     static void TriggerInterrupt();
 public:        
-    static void setupAdcDmaTransfer(   int count,uint32_t *buffer, void (*handler)(void) );
-    static void nextAdcDmaTransfer( int count,uint32_t *buffer);
+    static void setupAdcDmaTransfer(   int count,uint16_t *buffer, void (*handler)(void) );
+    static void nextAdcDmaTransfer( int count,uint16_t *buffer);
 
     static void enableDisableIrqSource(bool onoff, int interruptMask);
     static void enableDisableIrq(bool onoff);
@@ -150,7 +149,7 @@ protected:
             bool            _triggered;
             TriggerState    _triggerState;
             int             _triggerValueADC;
-static      uint32_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];            
+static      uint16_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];            
 };
 
 // EOF

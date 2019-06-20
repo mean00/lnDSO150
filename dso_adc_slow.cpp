@@ -40,7 +40,7 @@ static int nbDma=0;
 
 
 #define DMA_OVERSAMPLING_COUNT 4
-static uint32_t dmaOverSampleBuffer[DMA_OVERSAMPLING_COUNT] __attribute__ ((aligned (8)));;
+static uint16_t dmaOverSampleBuffer[DMA_OVERSAMPLING_COUNT] __attribute__ ((aligned (8)));;
 extern void Oopps();
 
 
@@ -190,7 +190,7 @@ void DSOADC::timerCapture()
         captureState=Capture_complete;
         
         SampleSet one(requestedSamples,adcInternalBuffer),two(0,NULL);
-        captureComplete(false,one,two);
+        captureComplete(one,two);
         return;
     }
     // Ask for next set of samples

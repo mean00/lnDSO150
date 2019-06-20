@@ -92,7 +92,7 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
   enableDisableIrqSource(true,ADC_AWD);
   enableDisableIrq(true);
   
-  setupAdcDmaTransfer( ADC_INTERNAL_BUFFER_SIZE,adcInternalBuffer, DMA1_CH1_TriggerEvent );
+  setupAdcDmaTransfer( ADC_INTERNAL_BUFFER_SIZE,(uint16_t *)adcInternalBuffer, DMA1_CH1_TriggerEvent );
   
   cr1=ADC1->regs->CR1 ;
   
@@ -149,7 +149,7 @@ void DSOADC::DMA1_CH1_TriggerEvent()
         enableDisableIrq(false);
         adc_dma_disable(ADC1);       
         SampleSet one(ADC_INTERNAL_BUFFER_SIZE,adcInternalBuffer),two(0,NULL);
-        instance->captureComplete(true,one,two);
+        instance->captureComplete(one,two);
     }
     else
     {

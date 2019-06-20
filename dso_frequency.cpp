@@ -21,7 +21,7 @@ static int dex=0;
  * @param data
  * @return 
  */
-int DSOCapturePriv::computeFrequency(bool shifted,int xsamples,uint32_t *data)
+int DSOCapturePriv::computeFrequency(int xsamples,uint16_t *data)
 {
     // This is done after transform, we can scatch input
     int samples=xsamples-1;
@@ -31,7 +31,6 @@ int DSOCapturePriv::computeFrequency(bool shifted,int xsamples,uint32_t *data)
     static int t;
     t=micros();
     int16_t *ptr=(int16_t *)data;
-    if(shifted) ptr++;
     int32_t old=    (int32_t)(ptr[2])-(int32_t)(ptr[0]);        
     ptr+=2;
     for(int i=1;i<samples;i++)

@@ -30,7 +30,7 @@ extern VoltageSettings vSettings[];
 extern const float inputScale[];
 
 
-uint32_t DSOADC::adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE] __attribute__ ((aligned (8)));;;
+uint16_t DSOADC::adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE] __attribute__ ((aligned (8)));;;
 
 int dmaSpuriousInterrupt=0;
 extern HardwareTimer Timer4;
@@ -88,7 +88,7 @@ bool DSOADC::startDMASampling (int count)
   convTime=micros();  
   enableDisableIrqSource(false,ADC_AWD);
   enableDisableIrq(true);
-  setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_Event );
+  setupAdcDmaTransfer( requestedSamples/2,adcInternalBuffer, DMA1_CH1_Event );
   return true;
 }
 
@@ -109,19 +109,18 @@ void DSOADC::DMA1_CH1_Event()
     one.samples=requestedSamples;
     one.data=adcInternalBuffer;
     two.data=NULL;
-    instance->captureComplete(true,one,two);
+    instance->captureComplete(one,two);
     adc_dma_disable(ADC1);
 }
 
 
 /**
  */
-void DSOADC::captureComplete(bool shift,SampleSet &one, SampleSet &two)
+void DSOADC::captureComplete(SampleSet &one, SampleSet &two)
 {
     convTime=micros()-convTime;
     _captured.set1=one;
     _captured.set2=two;
-    _captured.shifted=shift;
     dmaSemaphore->giveFromInterrupt();
 }
 

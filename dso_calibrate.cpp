@@ -92,7 +92,7 @@ void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupl
 
             if(adc->getSamples(fset)) break;
         }
-        uint32_t *xsamples=fset.set1.data;
+        uint16_t *xsamples=fset.set1.data;
         int sum=0;
         for(int i=0;i<fset.set1.samples;i++)
         {

@@ -114,8 +114,8 @@ void DSOADC::timerTriggerCapture()
     ADC_TIMER.setMode(ADC_TIMER_CHANNEL,TIMER_DISABLED);
     ADC_TIMER.pause();
     captureState=Capture_complete;
-    uint32_t  *source=adcInternalBuffer+(timerRead%ADC_INTERNAL_BUFFER_SIZE);
-    uint32_t  *end=adcInternalBuffer+ADC_INTERNAL_BUFFER_SIZE;
+    uint16_t  *source=adcInternalBuffer+(timerRead%ADC_INTERNAL_BUFFER_SIZE);
+    uint16_t  *end=adcInternalBuffer+ADC_INTERNAL_BUFFER_SIZE;
 
 
     SampleSet one,two;
@@ -131,7 +131,7 @@ void DSOADC::timerTriggerCapture()
         one.set(len,adcInternalBuffer+(timerRead%ADC_INTERNAL_BUFFER_SIZE));
         two.set(len-left,adcInternalBuffer);            
     }
-    captureComplete(false,one,two);
+    captureComplete(one,two);
 }
 
 // EOF

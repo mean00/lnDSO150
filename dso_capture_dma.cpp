@@ -171,10 +171,8 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
     int    expand=tSettings[currentTime].expand4096;
     
     float *data=set->data;    
-    if(fset.shifted)
-        p=((int16_t *)fset.set1.data)+1;
-    else
-        p=((int16_t *)fset.set1.data);
+
+    p=((int16_t *)fset.set1.data);
 
     set->samples=transformDma(
                                     p,
@@ -187,7 +185,7 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
                                     adc->getTriggerMode());      
         
         
-    float f=computeFrequency(fset.shifted,fset.set1.samples,fset.set1.data);       
+    float f=computeFrequency(fset.set1.samples,fset.set1.data);       
     f=(float)(tSettings[currentTimeBase].fqInHz)*1000./f;
     set->stats.frequency=f;
 

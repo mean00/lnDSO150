@@ -33,30 +33,18 @@ static int transformTimer(int16_t *in, float *out,int count, VoltageSettings *se
        ocount=240;
    }
    ocount&=0xffe;
-   int dex=0;
    
-   // First
-   float f;
-       f=(float)in[0]; 
-       f-=set->offset;
-       f*=set->multiplier;       
-       if(f>stats.xmax) stats.xmax=f;
-       if(f<stats.xmin) stats.xmin=f;       
-       out[0]=f; // Unit is now in volt
-       stats.avg+=f;
-       dex+=expand;
-   
-    for(int i=1;i<ocount;i++)
+    for(int i=0;i<ocount;i++)
     {
 
-        f=*(in+2*(dex/4096));
+        float f=(float)in[i];
         f-=set->offset;
         f*=set->multiplier;
         if(f>stats.xmax) stats.xmax=f;
         if(f<stats.xmin) stats.xmin=f;       
         out[i]=f; // Unit is now in volt
         stats.avg+=f;
-        dex+=expand;
+        
     }   
    stats.avg/=count;
    return ocount;
@@ -138,11 +126,7 @@ bool DSOCapturePriv::taskletTimer()
     int expand=4096;
 
     float *data=set->data;    
-    if(fset.shifted)
-        p=((int16_t *)fset.set1.data)+1;
-    else
-        p=((int16_t *)fset.set1.data);
-
+    p=((int16_t *)fset.set1.data);
     set->samples=transformTimer(
                                     p,
                                     data,
@@ -153,10 +137,7 @@ bool DSOCapturePriv::taskletTimer()
     if(fset.set2.samples)
     {
         CaptureStats otherStats;
-        if(fset.shifted)
-            p=((int16_t *)fset.set2.data)+1;
-        else
-            p=((int16_t *)fset.set2.data);
+        p=((int16_t *)fset.set2.data);
         int sample2=transformTimer(
                                     p,
                                     data+set->samples,
@@ -172,7 +153,7 @@ bool DSOCapturePriv::taskletTimer()
     }
     set->stats.frequency=-1;
 
-    float f=computeFrequency(fset.shifted,fset.set1.samples,fset.set1.data);
+    float f=computeFrequency(fset.set1.samples,fset.set1.data);
     f=((float)timerBases[currentTimeBase].fq)*1000./f;
     set->stats.frequency=f;
     set->stats.trigger=120;

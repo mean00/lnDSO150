@@ -54,7 +54,7 @@ public:
     static bool        prepareSamplingDma ();
     static bool        prepareSamplingTimer ();
     static int         voltToADCValue(float v);
-    static int         computeFrequency(bool shifted,int samples,uint32_t *data);
+    static int         computeFrequency(int samples,uint16_t *data);
     static void        stopCaptureDma();
     static void        stopCaptureTimer();
     static bool        refineCapture(FullSampleSet &set);
