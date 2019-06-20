@@ -43,7 +43,7 @@ static int transformDma(int16_t *in, float *out,int count, VoltageSettings *set,
     for(int i=1;i<ocount;i++)
     {
 
-        f=*(in+2*(dex/4096));
+        f=*(in+(dex/4096));
         f-=set->offset;
         f*=set->multiplier;
         if(f>stats.xmax) stats.xmax=f;

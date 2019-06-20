@@ -89,7 +89,7 @@ bool DSOCapturePriv::refineCapture(FullSampleSet &set)
             case Trigger_Rising:
                 for(int i=start;i<end;i++)
                 {
-                    if(p[2*i]<triggerValueADC && p[2*i+2]>=triggerValueADC) 
+                    if(p[i]<triggerValueADC && p[i+1]>=triggerValueADC) 
                     {
                         found=i;
                         break;
@@ -99,7 +99,7 @@ bool DSOCapturePriv::refineCapture(FullSampleSet &set)
             case Trigger_Falling :
                 for(int i=start;i<end;i++)
                 {
-                    if(p[2*i]>triggerValueADC && p[2*i+2]<=triggerValueADC) 
+                    if(p[i]>triggerValueADC && p[i+1]<=triggerValueADC) 
                     {
                         found=i;
                         break;
@@ -110,12 +110,12 @@ bool DSOCapturePriv::refineCapture(FullSampleSet &set)
                 // Tricky !
                 for(int i=start;i<end;i++)
                 {
-                    if(p[2*i]>triggerValueADC && p[2*i+2]<=triggerValueADC) 
+                    if(p[i]>triggerValueADC && p[i+1]<=triggerValueADC) 
                     {
                         found=i;
                         break;
                     }
-                    if(p[2*i]<triggerValueADC && p[2*i+2]>=triggerValueADC) 
+                    if(p[i]<triggerValueADC && p[i+1]>=triggerValueADC) 
                     {
                         found=i;
                         break;

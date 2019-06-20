@@ -229,7 +229,23 @@ static DSOControl::DSOCoupling couplingFromAdc()
 #endif
     return DSOControl::DSO_COUPLING_DC;
 }
-
+/**
+ * 
+ * @return 
+ */
+ DSOControl::DSOCoupling  calibrationCoupling()
+ {
+    
+    adc_reg_map *regs=  PIN_MAP[COUPLING_PIN].adc_device->regs; //PIN_MAP[COUPLING_PIN].adc_device.regs;
+    uint32_t sqr3=regs->SQR3;
+    rawCoupling=analogRead(COUPLING_PIN);
+    regs->SQR3=sqr3;
+    if(rawCoupling>3500)      
+        return DSOControl::DSO_COUPLING_AC;
+    if(rawCoupling<500)       
+        return DSOControl::DSO_COUPLING_GND;
+    return DSOControl::DSO_COUPLING_DC;
+ }
 /**
  * 
  */

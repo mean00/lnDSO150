@@ -31,12 +31,12 @@ int DSOCapturePriv::computeFrequency(int xsamples,uint16_t *data)
     static int t;
     t=micros();
     int16_t *ptr=(int16_t *)data;
-    int32_t old=    (int32_t)(ptr[2])-(int32_t)(ptr[0]);        
+    int32_t old=    (int32_t)(ptr[1])-(int32_t)(ptr[0]);        
     ptr+=2;
     for(int i=1;i<samples;i++)
     {
-        int32_t xnew=    (int32_t)(ptr[2])-(int32_t)(ptr[0]);  
-        ptr+=2;
+        int32_t xnew=    (int32_t)(ptr[1])-(int32_t)(ptr[0]);  
+        ptr+=1;
         if(xnew<=0 && old>0 ) 
         {
             if(pos>0 && neg>0 && (i-pos)>2)

@@ -20,7 +20,7 @@ static uint32_t mikro,delta;
 static int foobar;
 static int interrupt;
 extern float *test_samples;
-uint32_t *buffer;
+uint16_t *buffer;
 int nbDma=0;
 int nbAwd=0;
 /**
@@ -40,7 +40,7 @@ void watchDog()
 
 void testAdcWatchdog(void)
 {
-    buffer=(uint32_t *)test_samples;
+    buffer=(uint16_t *)test_samples;
     adc_Register=  PIN_MAP[analogInPin].adc_device->regs;
     DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_1MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
