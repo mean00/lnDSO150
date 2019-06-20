@@ -216,6 +216,7 @@ int DSOControl::getRawCoupling()
  */
 static DSOControl::DSOCoupling couplingFromAdc()
 {
+#if 0
     pinMode(COUPLING_PIN,INPUT_ANALOG);
     adc_reg_map *regs=  PIN_MAP[COUPLING_PIN].adc_device->regs; //PIN_MAP[COUPLING_PIN].adc_device.regs;
     uint32_t sqr3=regs->SQR3;
@@ -225,6 +226,7 @@ static DSOControl::DSOCoupling couplingFromAdc()
         return DSOControl::DSO_COUPLING_AC;
     if(rawCoupling<500)       
         return DSOControl::DSO_COUPLING_GND;
+#endif
     return DSOControl::DSO_COUPLING_DC;
 }
 

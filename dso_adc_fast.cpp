@@ -88,7 +88,7 @@ bool DSOADC::startDMASampling (int count)
   convTime=micros();  
   enableDisableIrqSource(false,ADC_AWD);
   enableDisableIrq(true);
-  setupAdcDmaTransfer( requestedSamples/2,adcInternalBuffer, DMA1_CH1_Event );
+  setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_Event );
   return true;
 }
 

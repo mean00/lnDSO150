@@ -161,16 +161,16 @@ bool   DSOADC::validateAverageSample(uint32_t &avg)
     }
     
     avg=0;
-    uint16_t *ptr=((uint16_t *)dmaOverSampleBuffer)+1;
+    uint16_t *ptr=dmaOverSampleBuffer;
    
     for(int i=0;i<DMA_OVERSAMPLING_COUNT;i++)
     {        
         avg+=*ptr;
-        ptr+=2;
+        ptr++;
     }    
     avg=(avg+DMA_OVERSAMPLING_COUNT/2+1)/DMA_OVERSAMPLING_COUNT;
     return true;
-    }
+}
 /**
  * \fn timerCapture
  * \brief this is one is called by a timer interrupt
