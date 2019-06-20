@@ -88,11 +88,11 @@ void DSOADC::setupADCs ()
   ADC2->regs->SQR3 = pinMapADCin;
 #else
   cr2=ADC_CR2_ADON+ADC_CR2_EXTSEL_SWSTART+ADC_CR2_EXTTRIG+ADC_CR2_CONT+ADC_CR2_DMA;
-  cr1=1*ADC_CR1_FASTINT;
+  //cr1=1*ADC_CR1_FASTINT;
   adc_Register->CR2=cr2;  
   adc_Register->CR1 =cr1;
-  ADC2->regs->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
-  ADC2->regs->SQR3 = pinMapADCin;
+  //ADC2->regs->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
+  //ADC2->regs->SQR3 = pinMapADCin;
 
 #endif  
   
@@ -216,8 +216,8 @@ void DSOADC::setupAdcDmaTransfer(   int count,uint16_t *buffer, void (*handler)(
 {
   dma_init(DMA1);
   dma_attach_interrupt(DMA1, DMA_CH1, handler); 
-  dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, (uint32_t *)buffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
-  dma_set_num_transfers(DMA1, DMA_CH1, count/2 );
+  dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, (uint32_t *)buffer, DMA_SIZE_16BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
+  dma_set_num_transfers(DMA1, DMA_CH1, count );
   adc_dma_enable(ADC1);
   dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
 
@@ -225,8 +225,8 @@ void DSOADC::setupAdcDmaTransfer(   int count,uint16_t *buffer, void (*handler)(
 
 void DSOADC::nextAdcDmaTransfer( int count,uint16_t *buffer)
 {
-    dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, (uint32_t *)buffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
-    dma_set_num_transfers(DMA1, DMA_CH1, count/2 );
+    dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, (uint32_t *)buffer, DMA_SIZE_16BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
+    dma_set_num_transfers(DMA1, DMA_CH1, count );
     dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
 }
 
@@ -296,4 +296,20 @@ void DSOADC::setWatchdogTriggerValue(uint32_t high, uint32_t low)
     ADC1->regs->HTR=high;
     ADC1->regs->LTR=low;
 }
+/**
+ * 
+ * @param pin
+ * @return 
+ */
+ uint16_t directADC2Read(int pin)
+ {
+    adc_reg_map *regs=  ADC2->regs; //PIN_MAP[COUPLING_PIN].adc_device.regs;
+    adc_set_reg_seqlen(ADC2, 1);
+
+    regs->SQR3 = pin;
+    regs->CR2 |= ADC_CR2_SWSTART;
+    while (!(regs->SR & ADC_SR_EOC))
+        ;
+    return regs->DR&0xffff;
+ }
 //

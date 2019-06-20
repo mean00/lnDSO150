@@ -42,6 +42,7 @@
 #define HOLDOFF_THRESHOLD     (100/TICK)
 #define COUNT_MAX             3
 
+extern uint16_t directADC2Read(int pin);
 
 int debugUp=0;
 int debugDown=0;
@@ -209,43 +210,21 @@ int DSOControl::getRawCoupling()
 {
     return rawCoupling;
 }
+ 
 /**
  * 
  * @param v
  * @return 
  */
-static DSOControl::DSOCoupling couplingFromAdc()
+static DSOControl::DSOCoupling couplingFromAdc2()
 {
-#if 0
-    pinMode(COUPLING_PIN,INPUT_ANALOG);
-    adc_reg_map *regs=  PIN_MAP[COUPLING_PIN].adc_device->regs; //PIN_MAP[COUPLING_PIN].adc_device.regs;
-    uint32_t sqr3=regs->SQR3;
-    rawCoupling=analogRead(COUPLING_PIN);
-    regs->SQR3=sqr3;
-    if(rawCoupling>3500)      
+    rawCoupling= directADC2Read(COUPLING_PIN);    
+    if(rawCoupling>3200)      
         return DSOControl::DSO_COUPLING_AC;
-    if(rawCoupling<500)       
+    if(rawCoupling<1000)       
         return DSOControl::DSO_COUPLING_GND;
-#endif
     return DSOControl::DSO_COUPLING_DC;
 }
-/**
- * 
- * @return 
- */
- DSOControl::DSOCoupling  calibrationCoupling()
- {
-    
-    adc_reg_map *regs=  PIN_MAP[COUPLING_PIN].adc_device->regs; //PIN_MAP[COUPLING_PIN].adc_device.regs;
-    uint32_t sqr3=regs->SQR3;
-    rawCoupling=analogRead(COUPLING_PIN);
-    regs->SQR3=sqr3;
-    if(rawCoupling>3500)      
-        return DSOControl::DSO_COUPLING_AC;
-    if(rawCoupling<500)       
-        return DSOControl::DSO_COUPLING_GND;
-    return DSOControl::DSO_COUPLING_DC;
- }
 /**
  * 
  */
@@ -275,7 +254,7 @@ DSOControl::DSOControl()
     pinMode(COUPLING_PIN,INPUT_ANALOG);
     couplingDevice= PIN_MAP[COUPLING_PIN].adc_device;
     couplingChannel=PIN_MAP[COUPLING_PIN].adc_channel;
-    couplingState=couplingFromAdc();
+    couplingState=couplingFromAdc2();
     
 }
 
@@ -293,7 +272,7 @@ static void trampoline(void *a)
  */
 void          DSOControl::updateCouplingState()
 {
-    couplingState=couplingFromAdc();
+    couplingState=couplingFromAdc2();
 }
 
 /**

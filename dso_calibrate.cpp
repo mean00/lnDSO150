@@ -53,6 +53,7 @@ void header(int color,const char *txt,DSOControl::DSOCoupling target)
     printxy(220,40," switch /\\");
     while(1)
     {
+            controlButtons->updateCouplingState();
             DSOControl::DSOCoupling   newcpl=controlButtons->getCouplingState(); 
             if(newcpl==target) 
                 tft->setTextColor(GREEN,BLACK);
