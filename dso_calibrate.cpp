@@ -85,19 +85,16 @@ void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupl
     for(int range=0;range<14;range++)
     {
         controlButtons->setInputGain(range);        
+        adc->prepareDMASampling(ADC_SMPR_55_5,ADC_PRE_PCLK2_DIV_2);
+        adc->startDMASampling(64);
 
-        while(1)
-        {
-            adc->prepareDMASampling(ADC_SMPR_55_5,ADC_PRE_PCLK2_DIV_2);
-            adc->startDMASampling(64);
-
-            if(adc->getSamples(fset)) break;
-        }
+        xAssert(adc->getSamples(fset));
+        adc->stopDmaCapture();        
         uint16_t *xsamples=fset.set1.data;
         int sum=0;
         for(int i=0;i<fset.set1.samples;i++)
         {
-            sum+= xsamples[i]>>16;
+            sum+= xsamples[i];
         }
         sum/=fset.set1.samples;
         array[range]=sum;
@@ -115,7 +112,7 @@ bool DSOCalibrate::calibrate()
     tft->setTextColor(WHITE,BLACK);
     
     
-    
+    adc->setupADCs ();
     adc->setTimeScale(ADC_SMPR_1_5,ADC_PRE_PCLK2_DIV_2); // 10 us *1024 => 10 ms scan
     printCalibrationTemplate("Connect probe to ground","(connect the 2 crocs together)");
     waitOk();
