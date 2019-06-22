@@ -31,6 +31,7 @@ static    int lastTrigger=-1;
 static    DSOControl::DSOCoupling oldCoupling;
 
 static void initMainUI(void);
+void drawBackground();
 /**
  * 
  */
@@ -81,8 +82,7 @@ static void buttonManagement()
     {
         STOP_CAPTURE();
         menuManagement();
-        //initMainUI();
-        //capture->startCapture(240);
+        drawBackground();
         
         return;
     }
@@ -181,29 +181,30 @@ static void buttonManagement()
         redraw();
     }
 }
-
-/**
- * 
- */
-void initMainUI(void)
+void drawBackground()
 {
-    
-        
-    tft->fillScreen(BLACK);   
-    
-    
+    tft->fillScreen(BLACK);
+    tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::SmallFont);   
     tft->setTextSize(2);
-
-    DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_5MS);
-    DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
-    DSOCapture::setTriggerValue(1.);
-    float f=DSOCapture::getTriggerValue();
-    
     DSODisplay::drawGrid();
     DSODisplay::drawStatsBackGround();
     DSODisplay::printVoltTimeTriggerMode(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText(),DSOCapture::getTriggerMode());
     DSODisplay::printTriggerValue(DSOCapture::getTriggerValue());
     DSODisplay::printOffset(capture->getVoltageOffset());
+   
+
+}
+/**
+ * 
+ */
+void initMainUI(void)
+{
+    DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_5MS);
+    DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
+    DSOCapture::setTriggerValue(1.);
+    drawBackground();    
+    
+    float f=DSOCapture::getTriggerValue();
     DSODisplay::printTriggerValue(f);
     
     lastTrigger=DSOCapture::voltageToPixel(f);
