@@ -79,10 +79,10 @@ static void buttonManagement()
     
     if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_OK) & EVENT_LONG_PRESS)    
     {
-        capture->stopCapture();       
+        STOP_CAPTURE();
         menuManagement();
-        initMainUI();
-        capture->startCapture(240);
+        //initMainUI();
+        //capture->startCapture(240);
         
         return;
     }

@@ -3,7 +3,7 @@
  *  * GPL v2
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
-
+#pragma once
 class DSOCalibrate
 {
 public:
