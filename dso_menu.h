@@ -35,5 +35,6 @@ protected:
           void printMenuEntry(bool onoff, int line,const char *text);
           void printMenuTitle(const char *text);
           void redraw(const char *title, int n,const MenuItem *xtop, int current);
+          void blink(int current, const char *text);
     
 };

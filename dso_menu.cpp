@@ -14,6 +14,8 @@ void updateFrequency(int fq)
     myTestSignal->setFrequency(fq);
 }
 #define MKFQ(x,y) void fq##x() {updateFrequency(y); }
+#define USE_MENU_BUTTON DSOControl::DSO_BUTTON_ROTARY
+//#define USE_MENU_BUTTON DSOControl::DSO_BUTTON_OK
 
 MKFQ(100,100)
 MKFQ(1000,1000)
@@ -117,6 +119,18 @@ void MenuManager::redraw(const char *title, int n,const MenuItem *xtop, int curr
         printMenuEntry(current==i,i,xtop[i].menuText);
     }        
 }
+
+void MenuManager::blink(int current, const char *text)
+{
+    for(int i=0;i<5;i++)
+    {
+           printMenuEntry(false,current,text);
+           xDelay(80);
+           printMenuEntry(true,current,text);
+           xDelay(80);
+    }     
+}
+
 /**
  */
 void MenuManager::runOne( const MenuItem *xtop)
@@ -145,9 +159,9 @@ next:
         redraw(title,n,xtop,current);
         while(1)
         {
-                  if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_OK) & EVENT_LONG_PRESS)
+                  if(controlButtons->getButtonEvents(USE_MENU_BUTTON) & EVENT_LONG_PRESS)
                     return;
-                  if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_OK) & EVENT_SHORT_PRESS)
+                  if(controlButtons->getButtonEvents(USE_MENU_BUTTON) & EVENT_SHORT_PRESS)
                   {
                       switch(xtop[current].type)
                       {
@@ -164,6 +178,7 @@ next:
                             {
                                 typedef void cb(void);
                                 cb *c=(cb *)xtop[current].cookie;
+                                blink(current,xtop[current].menuText);
                                 c();
                                 goto next;
                             }
@@ -179,7 +194,7 @@ next:
                   {
                     current+=inc;
                     while(current<0) current+=n;
-                    while(current>n) current-=n;
+                    while(current>=n) current-=n;
                     break;
                   }
         }
