@@ -19,7 +19,14 @@ float    DSOCapturePriv::triggerValueFloat=0;
 float     DSOCapturePriv::voltageOffset=0;
 xBinarySemaphore *captureSemaphore=NULL;
 static TaskHandle_t captureTaskHandle;
- 
+
+
+typedef enum InternalCaptureState
+{
+    captureStateIdle,
+    captureStateArmed
+};
+InternalCaptureState captureState=captureStateIdle; 
 
 CapturedSet DSOCapturePriv::captureSet[2];
 
@@ -141,6 +148,9 @@ void DSOCapturePriv::task(void *a)
     xDelay(20);
     while(1)
     {
+#warning FIXME : Waste of time        
+        if(captureState==captureStateIdle) // 
+            xDelay(1);
         currentTable->tasklet();
     }
 
@@ -204,12 +214,6 @@ int DSOCapturePriv::voltToADCValue(float v)
     return (int)out;    
 }
 
-typedef enum InternalCaptureState
-{
-    captureStateIdle,
-    captureStateArmed
-};
-InternalCaptureState captureState=captureStateIdle;
 
 
 void        DSOCapture::stopCapture()

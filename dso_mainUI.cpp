@@ -78,7 +78,7 @@ static void buttonManagement()
         dirty=true;
     }
     
-    if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_OK) & EVENT_LONG_PRESS)    
+    if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_ROTARY) & EVENT_LONG_PRESS)    
     {
         STOP_CAPTURE();
         menuManagement();

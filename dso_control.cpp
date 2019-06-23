@@ -201,14 +201,33 @@ static void _myInterruptRE(void *a)
     ints++;
     instance->interruptRE(!!a);
 }
-
+/**
+ * 
+ * @param button
+ * @return 
+ */
+const char *DSOControl::getName(const DSOButton &button)
+{
+#define XBUT(x)    case DSO_BUTTON_##x: return #x;break;
+    switch(button)
+    {
+    XBUT(UP)
+    XBUT(DOWN)
+    XBUT(ROTARY)
+    XBUT(VOLTAGE)
+    XBUT(TIME)
+    XBUT(TRIGGER)
+    XBUT(OK)
+    }
+    return "???";    
+}
 /**
  * 
  * @return 
  */
 int DSOControl::getRawCoupling()
 {
-    return rawCoupling;
+    return rawCoupling; 
 }
  
 /**

@@ -9,6 +9,8 @@
 #include "dso_global.h"
 #include "dso_calibrate.h"
 extern testSignal *myTestSignal;
+extern void buttonTest(void);
+
 void updateFrequency(int fq)
 {
     myTestSignal->setFrequency(fq);
@@ -43,6 +45,7 @@ const MenuItem  signalMenu[]=
 const MenuItem  topMenu[]={
     {MenuItem::MENU_TITLE, "Main Menu",NULL},
     {MenuItem::MENU_SUBMENU, "Test signal",(const void *)&signalMenu},
+    {MenuItem::MENU_CALL, "Button Test",(const void *)buttonTest},
     {MenuItem::MENU_CALL, "Calibration",(const void *)DSOCalibrate::calibrate},
     {MenuItem::MENU_BACK, "Back",NULL},
     {MenuItem::MENU_END, NULL,NULL}
