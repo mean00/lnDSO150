@@ -104,9 +104,7 @@ void MenuManager::runOne( const MenuItem *xtop)
      
      // draw them 
      // 0 to N-1
-     int current=0;
-     while(1)
-     {
+     int current=0;    
 next:         
         redraw(title,n,xtop,current);
         while(1)
@@ -147,9 +145,8 @@ next:
                     current+=inc;
                     while(current<0) current+=n;
                     while(current>=n) current-=n;
-                    break;
+                    goto next;
                   }
         }
-     }
 };
 // EOF

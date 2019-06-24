@@ -29,8 +29,7 @@ bool DSOADC::startTriggeredTimerSampling (int count,uint32_t triggerADC)
 
     
     convTime=micros();
-    
-    noInterrupts();
+    FancyInterrupts::disable();
     timerRead=timerWrite=0;
     ADC_TIMER.attachInterrupt(ADC_TIMER_CHANNEL, Timer_Trigger_Event);
     captureState=Capture_armed;
@@ -41,7 +40,7 @@ bool DSOADC::startTriggeredTimerSampling (int count,uint32_t triggerADC)
     ADC_TIMER.refresh();
     ADC_TIMER.resume();
     
-    interrupts();
+    FancyInterrupts::enable();
     
 } 
 void DSOADC::Timer_Trigger_Event() 

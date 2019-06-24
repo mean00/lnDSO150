@@ -7,6 +7,7 @@
 
 #include "dso_global.h"
 #include "dso_adc_priv.h"
+#include "fancyLock.h"
 
 /**
  */
@@ -113,8 +114,7 @@ bool DSOADC::startTimerSampling (int count)
 
     currentIndex=0;
     convTime=micros();
-    
-    noInterrupts();
+    FancyInterrupts::disable();    
     captureState=Capture_armed;
     startInternalDmaSampling();   
     
@@ -122,8 +122,8 @@ bool DSOADC::startTimerSampling (int count)
     ADC_TIMER.setMode(ADC_TIMER_CHANNEL, TIMER_OUTPUTCOMPARE); // start timer
     ADC_TIMER.refresh();
     ADC_TIMER.resume();
+    FancyInterrupts::enable();
     
-    interrupts();    
 } 
 /**
  * 
