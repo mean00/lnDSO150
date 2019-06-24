@@ -4,8 +4,16 @@
  */
 FancyLock::FancyLock()
 {
+    init();
+}
+/**
+ * 
+ */
+void FancyLock::init()
+{
     max=0;
     start=0;
+    maxWait=0;
 }
 /**
  * 
@@ -13,8 +21,11 @@ FancyLock::FancyLock()
  */
 bool FancyLock::lock()
 {
-    bool r=xMutex::lock();
+    int s=micros();
+    bool r=xMutex::lock();    
     start=micros();
+    int m=start-s;
+    if(m>maxWait) maxWait=m;
     return r;
 }
 /**
@@ -25,6 +36,7 @@ bool FancyLock::unlock()
 {
     int m=micros()-start;
     if(m>max) max=m;
+   // xAssert(max<10000);
     return xMutex::unlock();
     
     
@@ -56,6 +68,7 @@ void FancyInterrupts::enable()
     {
         int c=micros()-intCurrent;
         if(c>intMax) intMax=c;
+      
     }
     nesting--;
     interrupts();

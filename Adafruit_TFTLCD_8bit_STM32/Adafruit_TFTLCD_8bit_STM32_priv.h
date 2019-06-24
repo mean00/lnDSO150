@@ -6,8 +6,9 @@
 #include <libmaple/gpio.h>
 #include "DSO_config.h"
 #include "MapleFreeRTOS1000_pp.h"
+#include "fancyLock.h"
+extern FancyLock PortAMutex;
 
-extern xMutex PortAMutex;
 
 
 /*****************************************************************************/

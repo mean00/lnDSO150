@@ -8,24 +8,15 @@ class FancyLock : public xMutex
 {
 public:
              FancyLock();
+        void init();     
         bool lock();
         bool unlock();
 protected:    
         int  max;
         int  start;
+        int  maxWait;
 };
-/**
- */
-class FancySemaphore : public xBinarySemaphore
-{
-public:
-             FancySemaphore();
-        bool take();
-        bool take(int timeoutMs);
-        bool give();
-        bool giveFromInterrupt();
-  
-};
+
 
 class FancyInterrupts
 {

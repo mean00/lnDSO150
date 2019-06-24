@@ -4,8 +4,8 @@
 #include "Adafruit_TFTLCD_8bit_STM32.h"
 #include "Adafruit_TFTLCD_8bit_STM32_priv.h"
 #include "MapleFreeRTOS1000_pp.h"
-
-xMutex PortAMutex;
+#include "fancyLock.h"
+FancyLock PortAMutex;
 
 uint32_t intReg;
 uint32_t opReg;
@@ -16,6 +16,7 @@ gpio_reg_map * dataRegs;
 Adafruit_TFTLCD_8bit_STM32 :: Adafruit_TFTLCD_8bit_STM32(void)
 : Adafruit_GFX(TFTWIDTH, TFTHEIGHT)
 {
+    PortAMutex.init();
 }
 
 
@@ -244,10 +245,23 @@ void writeRegister32(uint16_t r, uint16_t d1, uint16_t d2)
 /*****************************************************************************/
 void Adafruit_TFTLCD_8bit_STM32::flood(uint16_t color, uint32_t len)
 {
+   int l=len;
+   while(l>0) 
+   {
+       l-=flood_capped(color,l);       
+   }
+}
+#define MAX_TRANSFERT 10*19968 // about 3 ms max locking on portB
+/**
+ */
+int Adafruit_TFTLCD_8bit_STM32::flood_capped(uint16_t color, uint32_t len)
+{
   uint16_t blocks;
   uint8_t  i, hi = color >> 8,
               lo = color;
-
+  
+  if(len>MAX_TRANSFERT) len=MAX_TRANSFERT; // make sure we dont keep the portB for too long
+  int orgLen=len;
   CS_ACTIVE_CD_COMMAND;
   floodPreamble();
   
@@ -288,6 +302,7 @@ void Adafruit_TFTLCD_8bit_STM32::flood(uint16_t color, uint32_t len)
     }
   }
   CS_IDLE;
+  return orgLen;
 }
 
 

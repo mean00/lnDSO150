@@ -35,7 +35,7 @@
 #include "dso_control.h"
 #include "dso_control_internal.h"
 #include "DSO_config.h"
-
+#include "fancyLock.h"
 #define TICK                  10 // 10 ms
 #define LONG_PRESS_THRESHOLD (2000/TICK) // 1s
 #define SHORT_PRESS_THRESHOLD (3)
@@ -88,7 +88,7 @@ int ampMapping[16]=
   
 #define SENSEL_PIN PA1 //(1..4)
   
-extern xMutex PortAMutex; // lock against LCD  
+extern FancyLock PortAMutex; // lock against LCD  
 static int rawCoupling;  
 /**
  */
