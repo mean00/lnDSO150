@@ -50,16 +50,17 @@ void Adafruit_TFTLCD_8bit_STM32::fillSameBlock(uint8_t hi, int blocks)
   CS_ACTIVE_CD_COMMAND;
   floodPreamble();
   CD_DATA;
-  write8(hi);
-  write8(hi);
-  while(blocks--) 
+  
+  
+  int nb=blocks*16-1; // /64*16=> /4, 4 pix at a time, but we already sent the 1st one
+  write8(hi);WR_STROBE; WR_STROBE; WR_STROBE; // 2 bytes/pixel
+  WR_STROBE; WR_STROBE; WR_STROBE; WR_STROBE; // x 4 pixels
+
+  while(nb--) 
   {
-      int i = 16; // 64 pixels/block / 4 pixels/pass
-      do {
         WR_STROBE; WR_STROBE; WR_STROBE; WR_STROBE; // 2 bytes/pixel
         WR_STROBE; WR_STROBE; WR_STROBE; WR_STROBE; // x 4 pixels
-      } while(--i);
-    }
+  }
   CS_IDLE;
 }
 /**
@@ -70,15 +71,14 @@ void Adafruit_TFTLCD_8bit_STM32::fillDifferentBlock(uint8_t hi, uint8_t lo, int 
   floodPreamble();
   // Write first pixel normally, decrement counter by 1
   CD_DATA;
-  write8(hi);
-  write8(lo);
-  while(blocks--) 
+  write8(hi); write8(lo); write8(hi); write8(lo);
+  write8(hi); write8(lo); write8(hi); write8(lo); 
+ int nb=blocks*16-1; // /64*16=> /4, 4 pix at a time, but we already sent the 1st one
+      
+  while(nb--) 
   {
-      int i = 16; // 64 pixels/block / 4 pixels/pass
-      do {
         write8(hi); write8(lo); write8(hi); write8(lo);
         write8(hi); write8(lo); write8(hi); write8(lo);
-      } while(--i);
   }    
   CS_IDLE;
 }

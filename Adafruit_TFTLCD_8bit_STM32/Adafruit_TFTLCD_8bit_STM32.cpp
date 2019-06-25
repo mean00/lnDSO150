@@ -237,7 +237,7 @@ void writeRegister32(uint16_t r, uint16_t d1, uint16_t d2)
 */
 //Adafruit_TFTLCD_8bit_STM32 tft;
 
-#include "flood.cpp"
+#include "flood.h"
 
 /*****************************************************************************/
 void Adafruit_TFTLCD_8bit_STM32::drawFastHLine(int16_t x, int16_t y, int16_t length, uint16_t color)
