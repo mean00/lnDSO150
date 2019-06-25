@@ -243,68 +243,118 @@ void writeRegister32(uint16_t r, uint16_t d1, uint16_t d2)
 // Requires setAddrWindow() has previously been called to set the fill
 // bounds.  'len' is inclusive, MUST be >= 1.
 /*****************************************************************************/
+#define MAX_BLOCKS 10*(39*8)
 void Adafruit_TFTLCD_8bit_STM32::flood(uint16_t color, uint32_t len)
 {
    int l=len;
+   uint8_t  hi = color >> 8,  lo = color&0xff;
    while(l>0) 
    {
-       l-=flood_capped(color,l);       
+       int blocks=l/64;       
+       if(blocks)
+       {
+           if(blocks>MAX_BLOCKS) 
+           {
+               blocks=MAX_BLOCKS;
+           }
+           if(hi==lo)
+               fillSameBlock(hi,blocks);
+           else
+               fillDifferentBlock(hi,lo,blocks);
+           l-=blocks*64;
+           continue;
+       }
+       if(hi==lo)
+        floodSmallSame(hi,l);      
+       else
+        floodSmall(color,l);         
+       return;
    }
 }
-#define MAX_TRANSFERT 10*19968 // about 3 ms max locking on portB
 /**
+ * 
  */
-int Adafruit_TFTLCD_8bit_STM32::flood_capped(uint16_t color, uint32_t len)
+void Adafruit_TFTLCD_8bit_STM32::fillSameBlock(uint8_t hi, int blocks)
 {
-  uint16_t blocks;
-  uint8_t  i, hi = color >> 8,
-              lo = color;
-  
-  if(len>MAX_TRANSFERT) len=MAX_TRANSFERT; // make sure we dont keep the portB for too long
-  int orgLen=len;
   CS_ACTIVE_CD_COMMAND;
   floodPreamble();
-  
-
-  // Write first pixel normally, decrement counter by 1
   CD_DATA;
   write8(hi);
-  write8(lo);
-  len--;
-
-  blocks = (uint16_t)(len / 64); // 64 pixels/block
-  if(hi == lo) {
-    // High and low bytes are identical.  Leave prior data
-    // on the port(s) and just toggle the write strobe.
-    while(blocks--) {
-      i = 16; // 64 pixels/block / 4 pixels/pass
+  write8(hi);
+  while(blocks--) 
+  {
+      int i = 16; // 64 pixels/block / 4 pixels/pass
       do {
         WR_STROBE; WR_STROBE; WR_STROBE; WR_STROBE; // 2 bytes/pixel
         WR_STROBE; WR_STROBE; WR_STROBE; WR_STROBE; // x 4 pixels
       } while(--i);
     }
-    // Fill any remaining pixels (1 to 64)
-	i = len & 63;
-    while (i--) {
-		WR_STROBE; WR_STROBE;
-	}
-  } else {
-    while(blocks--) {
-      i = 16; // 64 pixels/block / 4 pixels/pass
+  CS_IDLE;
+}
+/**
+ */
+void Adafruit_TFTLCD_8bit_STM32::fillDifferentBlock(uint8_t hi, uint8_t lo, int blocks)
+{
+  CS_ACTIVE_CD_COMMAND;
+  floodPreamble();
+  // Write first pixel normally, decrement counter by 1
+  CD_DATA;
+  write8(hi);
+  write8(lo);
+  while(blocks--) 
+  {
+      int i = 16; // 64 pixels/block / 4 pixels/pass
       do {
         write8(hi); write8(lo); write8(hi); write8(lo);
         write8(hi); write8(lo); write8(hi); write8(lo);
       } while(--i);
-    }
-	i = len & 63;
-    while (i--) { // write here the remaining data
-      write8(hi); write8(lo);
-    }
-  }
+  }    
   CS_IDLE;
-  return orgLen;
 }
+/**
+ */
+void Adafruit_TFTLCD_8bit_STM32::floodSmall(uint16_t color, int len)
+{
+  uint16_t blocks;
+  uint8_t  i, hi = color >> 8,
+              lo = color;
+    
+  CS_ACTIVE_CD_COMMAND;
+  floodPreamble();  
+  CD_DATA;
+  write8(hi);
+  write8(lo);
+  len--;
 
+  i = len; // Less than 64 pix, no optimization
+  while (i--) 
+  { // write here the remaining data
+    write8(hi); write8(lo);
+  }
+  
+  CS_IDLE;
+}
+void Adafruit_TFTLCD_8bit_STM32::floodSmallSame(uint8_t color, int len)
+{
+  uint16_t blocks;
+  uint8_t  i, hi = color >> 8,
+              lo = color;
+    
+  CS_ACTIVE_CD_COMMAND;
+  floodPreamble();  
+  CD_DATA;
+  write8(color);
+  write8(color);
+  len--;
+
+  i = len; // Less than 64 pix, no optimization
+  while (i--) 
+  { // write here the remaining data
+    WR_STROBE; WR_STROBE;
+  }
+  
+  CS_IDLE;
+}
 
 /*****************************************************************************/
 // Fast block fill operation for fillScreen, fillRect, H/V line, etc.

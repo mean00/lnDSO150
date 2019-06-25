@@ -135,7 +135,11 @@ public:
     virtual void pushColors(uint16_t *data, int len, boolean first);
     virtual void push2Colors(uint8_t *data, int len, boolean first,uint16_t fg, uint16_t bg) {};
 protected:
-    int flood_capped(uint16_t color, uint32_t len);
+    int flood_capped(uint16_t color, int len);
+    void fillDifferentBlock(uint8_t hi, uint8_t lo, int blocks);
+    void fillSameBlock(uint8_t hi,  int blocks);
+    void floodSmall(uint16_t color, int len);
+    void floodSmallSame(uint8_t color, int len);
 };
 
 #endif
