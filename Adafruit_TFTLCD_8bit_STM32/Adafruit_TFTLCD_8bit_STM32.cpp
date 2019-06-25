@@ -5,7 +5,7 @@
 #include "Adafruit_TFTLCD_8bit_STM32_priv.h"
 #include "MapleFreeRTOS1000_pp.h"
 #include "fancyLock.h"
-FancyLock PortAMutex;
+ FancyLock PortAMutex;  ;
 
 uint32_t intReg;
 uint32_t opReg;
@@ -16,7 +16,6 @@ gpio_reg_map * dataRegs;
 Adafruit_TFTLCD_8bit_STM32 :: Adafruit_TFTLCD_8bit_STM32(void)
 : Adafruit_GFX(TFTWIDTH, TFTHEIGHT)
 {
-    PortAMutex.init();
 }
 
 
@@ -237,7 +236,103 @@ void writeRegister32(uint16_t r, uint16_t d1, uint16_t d2)
 */
 //Adafruit_TFTLCD_8bit_STM32 tft;
 
-#include "flood.h"
+
+/*****************************************************************************/
+// Fast block fill operation for fillScreen, fillRect, H/V line, etc.
+// Requires setAddrWindow() has previously been called to set the fill
+// bounds.  'len' is inclusive, MUST be >= 1.
+/*****************************************************************************/
+void Adafruit_TFTLCD_8bit_STM32::flood(uint16_t color, uint32_t len)
+{
+  uint16_t blocks;
+  uint8_t  i, hi = color >> 8,
+              lo = color;
+
+  CS_ACTIVE_CD_COMMAND;
+  floodPreamble();
+  
+
+  // Write first pixel normally, decrement counter by 1
+  CD_DATA;
+  write8(hi);
+  write8(lo);
+  len--;
+
+  blocks = (uint16_t)(len / 64); // 64 pixels/block
+  if(hi == lo) {
+    // High and low bytes are identical.  Leave prior data
+    // on the port(s) and just toggle the write strobe.
+    while(blocks--) {
+      i = 16; // 64 pixels/block / 4 pixels/pass
+      do {
+        WR_STROBE; WR_STROBE; WR_STROBE; WR_STROBE; // 2 bytes/pixel
+        WR_STROBE; WR_STROBE; WR_STROBE; WR_STROBE; // x 4 pixels
+      } while(--i);
+    }
+    // Fill any remaining pixels (1 to 64)
+	i = len & 63;
+    while (i--) {
+		WR_STROBE; WR_STROBE;
+	}
+  } else {
+    while(blocks--) {
+      i = 16; // 64 pixels/block / 4 pixels/pass
+      do {
+        write8(hi); write8(lo); write8(hi); write8(lo);
+        write8(hi); write8(lo); write8(hi); write8(lo);
+      } while(--i);
+    }
+	i = len & 63;
+    while (i--) { // write here the remaining data
+      write8(hi); write8(lo);
+    }
+  }
+  CS_IDLE;
+}
+
+
+/*****************************************************************************/
+// Fast block fill operation for fillScreen, fillRect, H/V line, etc.
+// Requires setAddrWindow() has previously been called to set the fill
+// bounds.  'len' is inclusive, MUST be >= 1.
+/*****************************************************************************/
+void Adafruit_TFTLCD_8bit_STM32::flood2(uint16_t color, uint16_t bg,uint32_t len)
+{
+  uint16_t blocks;
+  uint8_t  i, hi = color >> 8,
+              lo = color;
+
+  uint8_t hiBg=bg>>8;
+  uint8_t loBg=bg&0xff;
+  CS_ACTIVE_CD_COMMAND;
+  floodPreamble();
+  
+
+  // Write first pixel normally, decrement counter by 1
+  CD_DATA;
+  write8(hi);
+  write8(lo);
+  len--;
+
+  blocks = (uint16_t)(len / 64); // 64 pixels/block
+   {
+    while(blocks--) {
+      i = 16; // 64 pixels/block / 4 pixels/pass
+      do {
+        write8(hi); write8(lo); 
+        write8(hi); write8(lo); 
+        write8(hi); write8(lo);
+        write8(hiBg); write8(loBg);
+      } while(--i);
+    }
+	i = len & 63;
+    while (i--) { // write here the remaining data
+      write8(hi); write8(lo);
+    }
+  }
+  CS_IDLE;
+}
+
 
 /*****************************************************************************/
 void Adafruit_TFTLCD_8bit_STM32::drawFastHLine(int16_t x, int16_t y, int16_t length, uint16_t color)

@@ -138,9 +138,15 @@ void Adafruit_TFTLCD_8bit_STM32_ILI9341::setAddrWindow(int16_t x1, int16_t y1, i
 /*****************************************************************************/
 void Adafruit_TFTLCD_8bit_STM32_ILI9341::fillScreen(uint16_t color)
 {
-     
-  setAddrWindow(0, 0, _width - 1, _height - 1);  
-  flood(color, (long)TFTWIDTH * (long)TFTHEIGHT);
+  // do it in 4 steps to not keep the mutex for too long
+  for(int i=0;i<4;i++)
+  {
+      int y=(_height*i)/4;
+      setAddrWindow(0, y, _width - 1, y+_height/4-1);  
+      flood(color, ((long)TFTWIDTH * (long)TFTHEIGHT)/4);
+  }
+  //setAddrWindow(0, 0, _width - 1, _height - 1);  
+  //flood(color, (long)TFTWIDTH * (long)TFTHEIGHT);
 }
 /**
  * 
