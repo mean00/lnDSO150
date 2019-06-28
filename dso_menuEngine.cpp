@@ -110,10 +110,13 @@ next:
         while(1)
         { 
                   xDelay(10); // dont busy loop
-                  if(controlButtons->getButtonEvents(USE_MENU_BUTTON) & EVENT_LONG_PRESS)
+                  int event=controlButtons->getButtonEvents(USE_MENU_BUTTON);
+                  if( event & EVENT_LONG_PRESS)
                     return;
-                  if(controlButtons->getButtonEvents(USE_MENU_BUTTON) & EVENT_SHORT_PRESS)
+                  if(event & EVENT_SHORT_PRESS)
                   {
+                      Serial.print("Menu \n");
+                      Serial.print(xtop[current].type);
                       switch(xtop[current].type)
                       {
                       case MenuItem::MENU_BACK: return; break;
