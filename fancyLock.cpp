@@ -1,4 +1,10 @@
 #include "fancyLock.h"
+
+#if 0
+    #define CHECK_SLOW xAssert
+#else
+    #define CHECK_SLOW(...) {}
+#endif
 /**
  * 
  */
@@ -25,7 +31,7 @@ bool FancyLock::lock()
     bool r=xMutex::lock();    
     start=micros();
     int m=start-s;
-    //xAssert(m<20*1000);
+    //CHECK_SLOW(m<20*1000);
     if(m>maxWait) maxWait=m;
     return r;
 }
@@ -37,7 +43,7 @@ bool FancyLock::unlock()
 {
     int m=micros()-start;
     if(m>max) max=m;
-    xAssert(max<10*1000);
+    CHECK_SLOW(max<10*1000);
     return xMutex::unlock();
     
     
@@ -84,14 +90,14 @@ bool FancySemaphore::take()
 {
     start=millis();
     bool r=xBinarySemaphore::take();
-    xAssert((millis()-start)<150);
+    CHECK_SLOW((millis()-start)<150);
     return r;
 }
 bool FancySemaphore::take(int timeoutMs)
 {
     start=millis();
     bool r=xBinarySemaphore::take(timeoutMs);
-    xAssert((millis()-start)<150);
+    CHECK_SLOW((millis()-start)<150);
     return r;
 }
   
