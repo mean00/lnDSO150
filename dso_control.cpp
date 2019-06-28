@@ -38,7 +38,7 @@
 #include "fancyLock.h"
 #define TICK                  10 // 10 ms
 #define LONG_PRESS_THRESHOLD (2000/TICK) // 1s
-#define SHORT_PRESS_THRESHOLD (3)
+#define SHORT_PRESS_THRESHOLD (2)
 #define HOLDOFF_THRESHOLD     (100/TICK)
 #define COUNT_MAX             3
 
@@ -130,7 +130,7 @@ public:
                         {
                             if(_pinCounter) 
                             {
-                                if(_pinCounter>=COUNT_MAX) _pinCounter=COUNT_MAX-1;
+                                if(_pinCounter>COUNT_MAX) _pinCounter=COUNT_MAX;
                                 else
                                     _pinCounter--;
                             }
@@ -271,8 +271,6 @@ DSOControl::DSOControl()
         pinMode(SENSEL_PIN+i,OUTPUT); // SENSEL
     
     pinMode(COUPLING_PIN,INPUT_ANALOG);
-    couplingDevice= PIN_MAP[COUPLING_PIN].adc_device;
-    couplingChannel=PIN_MAP[COUPLING_PIN].adc_channel;
     couplingState=couplingFromAdc2();
     
 }
@@ -324,9 +322,23 @@ DSOControl::DSOCoupling  DSOControl::getCouplingState()
 void DSOControl::runLoop()
 {
     xDelay(5);
+    int base=millis()&0xffff;
     while(1)
     {
-        xDelay(TICK);
+        static int next=(base+TICK) & 0xffff;;
+        static int now=(millis()&0xffff);
+        static int wait;
+        
+        base=next&0xffff;        
+        if(next<now) next+=0x10000;
+        wait=next-now;
+        xAssert(wait<=TICK);
+        if(wait>0 ) // no wrap
+        {
+            xAssert(wait<=TICK);         
+            xDelay(wait);
+        }
+        
         PortAMutex.lock(); // make sure we have control over GPIOB
         uint32_t val= GPIOB->regs->IDR;     
         PortAMutex.unlock();
