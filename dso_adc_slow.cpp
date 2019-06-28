@@ -149,6 +149,7 @@ bool   DSOADC::validateAverageSample(uint32_t &avg)
             captureState=Capture_timerDone;
             break;
         case Capture_timerDone:
+        case Capture_idle:
             spuriousTimer++;
             //Oopps();
             return false;
