@@ -49,8 +49,6 @@ public:
     int           getRawCoupling();
     static const char *getName(const DSOButton &button);
 protected:
-    adc_dev *couplingDevice;
-    uint8    couplingChannel;           
     int         couplingValue;
     DSOCoupling couplingState;
 };
