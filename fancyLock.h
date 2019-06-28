@@ -24,3 +24,16 @@ public:
   static void disable();
   static void enable();
 };
+
+/**
+ * 
+ */
+class FancySemaphore : public xBinarySemaphore
+{
+public:
+        FancySemaphore();
+        bool take();
+        bool take(int timeoutMs);
+protected:
+        uint32_t start;
+};

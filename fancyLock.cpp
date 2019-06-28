@@ -25,6 +25,7 @@ bool FancyLock::lock()
     bool r=xMutex::lock();    
     start=micros();
     int m=start-s;
+    //xAssert(m<20*1000);
     if(m>maxWait) maxWait=m;
     return r;
 }
@@ -36,7 +37,7 @@ bool FancyLock::unlock()
 {
     int m=micros()-start;
     if(m>max) max=m;
-   // xAssert(max<10000);
+    xAssert(max<10*1000);
     return xMutex::unlock();
     
     
@@ -73,3 +74,25 @@ void FancyInterrupts::enable()
     nesting--;
     interrupts();
 }
+
+//--
+FancySemaphore::FancySemaphore()
+{
+    start=0;
+}
+bool FancySemaphore::take()
+{
+    start=millis();
+    bool r=xBinarySemaphore::take();
+    xAssert((millis()-start)<150);
+    return r;
+}
+bool FancySemaphore::take(int timeoutMs)
+{
+    start=millis();
+    bool r=xBinarySemaphore::take(timeoutMs);
+    xAssert((millis()-start)<150);
+    return r;
+}
+  
+// EOF
