@@ -166,7 +166,7 @@ bool    DSOADC::prepareDMASampling (adc_smp_rate rate,adc_prescaler scale)
  */
 bool DSOADC::getSamples(FullSampleSet &fullSet)
 {
-    if(!dmaSemaphore->take(1000))
+    if(!dmaSemaphore->take(10)) // dont busy loop
         return false;    
     fullSet=_captured;
     return true;
@@ -201,10 +201,7 @@ void DSOADC::adc_dma_disable(const adc_dev * dev)
  */
 void Oopps()
 {
-    while(1)
-    {
-        
-    };
+    xAssert(0);
 }
 /**
  * 

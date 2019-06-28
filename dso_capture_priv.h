@@ -4,7 +4,7 @@
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
 #pragma once
-
+#include "fancyLock.h"
 /**
  */
 typedef struct 
@@ -73,7 +73,7 @@ public:
 };
 /**
  */
-extern xBinarySemaphore *captureSemaphore;
+extern FancySemaphore *captureSemaphore;
 extern DSOADC   *adc;
 extern const CaptureFunctionTable *currentTable;
 

@@ -109,6 +109,7 @@ next:
         redraw(title,n,xtop,current);
         while(1)
         { 
+                  xDelay(10); // dont busy loop
                   if(controlButtons->getButtonEvents(USE_MENU_BUTTON) & EVENT_LONG_PRESS)
                     return;
                   if(controlButtons->getButtonEvents(USE_MENU_BUTTON) & EVENT_SHORT_PRESS)

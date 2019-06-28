@@ -17,7 +17,7 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 
 #include "dso_global.h"
 #include "dso_adc_priv.h"
-
+#include "fancyLock.h"
 /**
  */
 
@@ -42,7 +42,7 @@ int requestedSamples;
 uint32_t vcc; // power Supply in mv
 
 
-xBinarySemaphore  *dmaSemaphore;
+FancySemaphore      *dmaSemaphore;
 DSOADC             *instance=NULL;
 
 /**
@@ -56,7 +56,7 @@ DSOADC::DSOADC()
  
   // Set up our sensor pin(s)
   pinMode(analogInPin, INPUT_ANALOG);
-  dmaSemaphore=new xBinarySemaphore;  
+  dmaSemaphore=new FancySemaphore;  
   adc_Register=  PIN_MAP[analogInPin].adc_device->regs;
   
   setTriggerMode(DSOADC::Trigger_Run);

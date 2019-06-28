@@ -17,7 +17,7 @@ int      DSOCapturePriv::lastRequested=0;
 int      DSOCapturePriv::triggerValueADC=0;
 float    DSOCapturePriv::triggerValueFloat=0;
 float     DSOCapturePriv::voltageOffset=0;
-xBinarySemaphore *captureSemaphore=NULL;
+FancySemaphore *captureSemaphore=NULL;
 static TaskHandle_t captureTaskHandle;
 
 
@@ -35,7 +35,7 @@ CapturedSet DSOCapturePriv::captureSet[2];
  */
 void DSOCapture::initialize()
 {
-    captureSemaphore=new xBinarySemaphore;
+    captureSemaphore=new FancySemaphore;
     xTaskCreate( (TaskFunction_t)DSOCapturePriv::task, "Capture", 200, NULL, DSO_CAPTURE_TASK_PRIORITY, &captureTaskHandle );    
 }
 /**
