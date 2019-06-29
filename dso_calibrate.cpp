@@ -7,6 +7,8 @@
 #include "dso_global.h"
 #include "dso_adc.h"
 extern DSOADC                     *adc;
+
+extern uint16_t directADC2Read(int pin);
 /**
  * 
  */
@@ -85,18 +87,13 @@ void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupl
     for(int range=0;range<14;range++)
     {
         controlButtons->setInputGain(range);        
-        adc->prepareDMASampling(ADC_SMPR_55_5,ADC_PRE_PCLK2_DIV_2);
-        adc->startDMASampling(64);
-
-        xAssert(adc->getSamples(fset));
-        adc->stopDmaCapture();        
-        uint16_t *xsamples=fset.set1.data;
+        
         int sum=0;
-        for(int i=0;i<fset.set1.samples;i++)
+        for(int i=0;i<64;i++)
         {
-            sum+= xsamples[i];
+            sum+=directADC2Read(analogInPin);
         }
-        sum/=fset.set1.samples;
+        sum=(sum+31)/64;        
         array[range]=sum;
     }
 }
