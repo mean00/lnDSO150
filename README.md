@@ -12,14 +12,15 @@ Status so far:
 * Support vanilla hardware and usb+enhanced rotary encoder mod through compiliation switch
 * Support voltage change/ time change / offset change / trigger
 * Micro USB port used a serial 
-* Calibration ok
+* Calibration 
+* No Trigger  / Trigger rising / Trigger falling, Trigger both
 
 What does NOT work :
-* Trigger in dma mode (with speed faster than 5ms / div)
+* It is always acquiring, you can't do single shot
 * Tons of bugs
 
 ![screenshot](gfx/front.jpg?raw=true "front")
 
 
-The code is using parts derived from pigg-o-scope and other projects for the ADC management
+The code is using parts derived from pig-o-scope and other projects for the ADC management
 Open DSO150 was used as documentation for the circuit.
