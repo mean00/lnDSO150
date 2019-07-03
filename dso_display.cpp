@@ -171,8 +171,10 @@ void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
                             DSO_WAVEFORM_WIDTH, 1+line);
         tft->pushColors(((uint16_t *)bg),   DSO_WAVEFORM_WIDTH,true);
     }
+#if 0    
      tft->setCursor(240,16);tft->print(debugUp);
      tft->setCursor(240,36);tft->print(debugDown);
+#endif
       
 }
 
