@@ -152,11 +152,17 @@ bool DSOCapturePriv::taskletTimer()
 
     }
     set->stats.frequency=-1;
-
-    float f=computeFrequency(fset.set1.samples,fset.set1.data);
-    f=((float)timerBases[currentTimeBase].fq)*1000./f;
-    set->stats.frequency=f;
-    set->stats.trigger=120;
+    if(fset.set1.samples>100) // need a minimum set of samples
+    {
+        int fint=computeFrequency(fset.set1.samples,fset.set1.data);
+        if(fint)
+        {
+            float f=fint;
+            f=((float)timerBases[currentTimeBase].fq)*1000./f;
+            set->stats.frequency=f;
+            set->stats.trigger=120;
+        }
+    }
 
     // Data ready!
     captureSemaphore->give();

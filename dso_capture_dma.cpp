@@ -184,11 +184,14 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
                                     triggerValueFloat,
                                     adc->getTriggerMode());      
         
-        
-    float f=computeFrequency(fset.set1.samples,fset.set1.data);       
-    f=(float)(tSettings[currentTimeBase].fqInHz)*1000./f;
-    set->stats.frequency=f;
-
+    int fint=computeFrequency(fset.set1.samples,fset.set1.data);
+    if(fint)
+    {
+            float f=fint;    
+            f=(float)(tSettings[currentTimeBase].fqInHz)*1000./f;
+            set->stats.frequency=f;
+    }else
+         set->stats.frequency=0;
     // Data ready!
     captureSemaphore->give();
     return true;

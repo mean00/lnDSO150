@@ -111,9 +111,9 @@ bool DSOCalibrate::calibrate()
     
     adc->setupADCs ();
     adc->setTimeScale(ADC_SMPR_1_5,ADC_PRE_PCLK2_DIV_2); // 10 us *1024 => 10 ms scan
-    printCalibrationTemplate("Connect probe to ground","(connect the 2 crocs together)");
+    printCalibrationTemplate("Connect the 2 crocs together.","");
     waitOk();
-              
+    doCalibrate(calibrationDC,YELLOW,"Set switch to *GND*",DSOControl::DSO_COUPLING_GND);                     
     doCalibrate(calibrationDC,YELLOW,"Set switch to *DC*",DSOControl::DSO_COUPLING_DC);       
     doCalibrate(calibrationAC,GREEN, "Set switch to *AC*",DSOControl::DSO_COUPLING_AC);
     return true;        
