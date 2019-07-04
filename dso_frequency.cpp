@@ -79,7 +79,7 @@ int DSOCapturePriv::computeFrequency(int xsamples,uint16_t *data)
             }   
         old=xnew;
     }
-    if(!nbSample) return 0;
+    if(nbSample<2) return 0; // not enough points
     int sum=0;
     for(int i=0;i<nbSample;i++)
     {
