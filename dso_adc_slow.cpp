@@ -40,7 +40,7 @@ static int nbTimer=0;
 static int nbDma=0;
 
 
-#define DMA_OVERSAMPLING_COUNT 4
+#define DMA_OVERSAMPLING_COUNT 8 // 8*21us*24 = 4ms
 static uint16_t dmaOverSampleBuffer[DMA_OVERSAMPLING_COUNT] __attribute__ ((aligned (8)));;
 extern void Oopps();
 
@@ -94,7 +94,7 @@ bool DSOADC::startInternalDmaSampling ()
   */
 bool    DSOADC::prepareTimerSampling (int fq)
 {      
-    setTimeScale(ADC_SMPR_55_5,ADC_PRE_PCLK2_DIV_2);
+    setTimeScale(ADC_SMPR_239_5,ADC_PRE_PCLK2_DIV_6); // 21us
     setSlowMode(fq);        
     return true;    
 }
