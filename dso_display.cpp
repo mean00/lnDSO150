@@ -199,7 +199,7 @@ void DSODisplay::drawStats(CaptureStats &stats)
     AND_ONE_F(stats.xmin,1);
     AND_ONE_F(stats.xmax,3);
     AND_ONE_F(stats.avg,5);      
-    if(stats.avg>0)
+    if(stats.frequency>0)
     {
         AND_ONE_T(fq2Text(stats.frequency),7);
     }else
