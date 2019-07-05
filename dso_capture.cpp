@@ -151,7 +151,8 @@ void DSOCapturePriv::task(void *a)
 #warning FIXME : Waste of time        
         if(captureState==captureStateIdle) // 
             xDelay(1);
-        currentTable->tasklet();
+        else
+            currentTable->tasklet();
     }
 
 }

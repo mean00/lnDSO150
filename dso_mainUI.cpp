@@ -65,7 +65,7 @@ static void redraw()
         DSODisplay::printTriggerValue(DSOCapture::getTriggerValue());
         DSODisplay::printOffset(capture->getVoltageOffset());
 }
-#define STOP_CAPTURE() DSOCapture::stopCapture()
+#define STOP_CAPTURE() {DSOCapture::stopCapture();xDelay(20);}
 
 static void buttonManagement()
 {
@@ -123,25 +123,28 @@ static void buttonManagement()
             case DSODisplay::VOLTAGE_MODE: 
                 {
                 int v=capture->getVoltageRange();
-                    dirty=true;
+                dirty=true;
                 v+=inc;
                 if(v<0) v=0;
                 if(v>DSOCapture::DSO_VOLTAGE_MAX) v=DSOCapture::DSO_VOLTAGE_MAX;
-                capture->setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)v);                                
                 STOP_CAPTURE();
+                capture->setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)v);                                
+                
                 }
                 break;
             case DSODisplay::TIME_MODE: 
                 {
                     int v=capture->getTimeBase();
-                        dirty=true;
+                    dirty=true;
                     v+=inc;
                    if(v<0) v=0;
                    if(v>DSOCapture::DSO_TIME_BASE_MAX) v=DSOCapture::DSO_TIME_BASE_MAX;
                    DSOCapture::DSO_TIME_BASE  t=(DSOCapture::DSO_TIME_BASE )v;
                    DSOCapture::clearCapturedData();
-                   capture->setTimeBase( t);
                    STOP_CAPTURE();
+                   
+                   capture->setTimeBase( t);
+                   
                 }
                 break;
             case DSODisplay::TRIGGER_MODE: 
@@ -150,6 +153,7 @@ static void buttonManagement()
                     t+=inc;
                     while(t<0) t+=4;
                     t%=4;
+                    STOP_CAPTURE();                    
                     capture->setTriggerMode((DSOCapture::TriggerMode)t);                   
                     capture->setTimeBase( capture->getTimeBase()); // this will refresh the internal indirection table
                     dirty=true;
@@ -159,19 +163,21 @@ static void buttonManagement()
             {
                 float v=capture->getVoltageOffset();
                 v+=0.1*inc;
+                STOP_CAPTURE();
                 capture->setVoltageOffset(v);                
                 dirty=true;
-                STOP_CAPTURE();
+                
                 break;
             }
             case DSODisplay::TRIGGER_MODE_ALT: 
                 {
                  float v=capture->getTriggerValue();
 
-                    v+=0.1*(float)inc;
+                   v+=0.1*(float)inc;
+                   STOP_CAPTURE();
                    capture->setTriggerValue(v);    
                    dirty=true;
-                   STOP_CAPTURE();
+                   
                 }
                 break;
             default: 

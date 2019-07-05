@@ -29,6 +29,11 @@ static uint32_t cr1;
 
 void DSOADC::stopDmaCapture(void)
 {
+    // disable interrupts
+    enableDisableIrq(false);
+    enableDisableIrqSource(false,ADC_AWD);
+    enableDisableIrqSource(false,ADC_EOC);
+    // Stop dma
      adc_dma_disable(ADC1);
 }
 
