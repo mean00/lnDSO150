@@ -41,6 +41,7 @@ bool DSOADC::startTriggeredTimerSampling (int count,uint32_t triggerADC)
     ADC_TIMER.resume();
     
     FancyInterrupts::enable();
+    return true;
     
 } 
 void DSOADC::Timer_Trigger_Event() 

@@ -123,7 +123,7 @@ bool DSOADC::startTimerSampling (int count)
     ADC_TIMER.refresh();
     ADC_TIMER.resume();
     FancyInterrupts::enable();
-    
+    return true;
 } 
 /**
  * 

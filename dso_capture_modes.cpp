@@ -94,6 +94,7 @@ bool     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE timeBase)
             currentTable=&TimerTableRunning;                
         DSOCapturePriv::currentTimeBase=timeBase-DSO_TIME_BASE::DSO_TIME_BASE_5MS;
     }
+    return true;
 }
 /**
  * 
