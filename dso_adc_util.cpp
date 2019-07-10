@@ -116,7 +116,8 @@ void DSOADC::setupADCs ()
     }
     // Hook trigger interrupt  
     attachInterrupt(triggerPin,TriggerInterrupt,m );
-#endif    
+#endif  
+    return true;
  }
  /**
   * 
@@ -127,6 +128,7 @@ void DSOADC::setupADCs ()
  {
      //ratio=(ratio*16384)/0xffff;
      pwmWrite(vRefPin,(uint16)ratio);
+     return true;
  }
  
  /**

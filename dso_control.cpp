@@ -372,6 +372,7 @@ bool DSOControl::setup()
     attachRE(DSO_BUTTON_DOWN);
 #endif
     xTaskCreate( trampoline, "Control", 250, this, DSO_CONTROL_TASK_PRIORITY, &taskHandle );       
+    return true;
 }
 /**
  * 
