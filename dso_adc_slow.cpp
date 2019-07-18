@@ -84,6 +84,7 @@ void DSOADC::stopTimeCapture(void)
  */
 bool DSOADC::startInternalDmaSampling ()
 {
+  adcInterruptStats.start();
   setupAdcDmaTransfer( DMA_OVERSAMPLING_COUNT,dmaOverSampleBuffer, dummy_dma_interrupt_handler );
   return true;
 }

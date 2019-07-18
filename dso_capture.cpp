@@ -9,7 +9,7 @@
 #include "dso_capture_priv.h"
 
 #include "DSO_config.h"
-
+#include "stopWatch.h"
 
 int      DSOCapturePriv::currentTimeBase=DSOCapture::DSO_TIME_BASE_10MS;
 int      DSOCapturePriv::currentVoltageRange=0;
@@ -168,7 +168,7 @@ int DSOCapture::oneShotCapture(int count,float *samples,CaptureStats &stats)
     DSOCapturePriv::prepareSampling();
     if(!startCapture(count)) return 0;
     CapturedSet *set;
-    bool r=    getSamples(&set,500);
+    bool r=    getSamples(&set,10);
     if(!r) return 0;
     
     int toCopy=set->samples;
@@ -231,6 +231,7 @@ void        DSOCapture::stopCapture()
  * @param count
  * @return 
  */
+StopWatch watch;
 int DSOCapture::triggeredCapture(int count,float *volt,CaptureStats &stats)
 {
     if(captureState==captureStateIdle)
@@ -243,7 +244,15 @@ int DSOCapture::triggeredCapture(int count,float *volt,CaptureStats &stats)
     CapturedSet *set;
     bool r=    getSamples(&set,0);
     if(!r) 
+    {
+        if(watch.elapsed(400))
+            xAssert(0);
         return 0;
+    }
+    watch.ok();
+    
+    if(set->samples<200) xAssert(0);
+    
     captureState=captureStateIdle;
     int toCopy=set->samples;
      if(toCopy>count) toCopy=count;

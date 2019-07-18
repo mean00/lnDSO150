@@ -80,7 +80,7 @@ void vApplicationDaemonTaskStartupHook()
  * @param a
  */
 void MainTask( void *a )
-{
+{    
     displayIdentifier = tft->readID();
     if(!displayIdentifier) displayIdentifier=0x7789;
     tft=Adafruit_TFTLCD_8bit_STM32::spawn(displayIdentifier);   
@@ -99,7 +99,7 @@ void MainTask( void *a )
     myTestSignal=new testSignal(  PA7,PB12, 3,TIMER_CH2);
     myTestSignal->setAmplitude(true);
         
-    myTestSignal->setFrequency(5000); // 1Khz
+    myTestSignal->setFrequency(500); // 1Khz
     
     controlButtons=new DSOControl ;
     

@@ -3,6 +3,7 @@
  */
 
 #include "dso_adc.h"
+#include "dso_capture_priv.h"
 
 /*.
 (c) Andrew Hull - 2015
@@ -41,7 +42,9 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
 {
   // This loop uses dual interleaved mode to get the best performance out of the ADCs
   //
-    
+  enableDisableIrq(false);
+  adcInterruptStats.start();
+  ADC1->regs->SR=0; // Clear all pending bits  
   _triggered=false;
   if(count>ADC_INTERNAL_BUFFER_SIZE/2)
         count=ADC_INTERNAL_BUFFER_SIZE/2;
@@ -92,14 +95,17 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
                         
     default: break;
   }  
-  attachWatchdogInterrupt(DSOADC::watchDogInterrupt);  
+   
   
+  attachWatchdogInterrupt(DSOADC::watchDogInterrupt);  
+  cr1=ADC1->regs->CR1 ;
+  ADC1->regs->SR=0;
   enableDisableIrqSource(true,ADC_AWD);
+  enableDisableIrqSource(false,ADC_EOC); // we dont need interrupt, it is done through DMA
+  cr1=ADC1->regs->CR1 ;
+  setupAdcDmaTransfer( ADC_INTERNAL_BUFFER_SIZE,adcInternalBuffer, DMA1_CH1_TriggerEvent );  
   enableDisableIrq(true);
   
-  setupAdcDmaTransfer( ADC_INTERNAL_BUFFER_SIZE,adcInternalBuffer, DMA1_CH1_TriggerEvent );
-  
-  cr1=ADC1->regs->CR1 ;
   
   return true;
 }
@@ -141,6 +147,7 @@ void DSOADC::awdTrigger()
  */
 void DSOADC::watchDogInterrupt()
 {
+    adcInterruptStats.watchDog++;
     instance->awdTrigger();
     
 }
@@ -149,8 +156,11 @@ void DSOADC::watchDogInterrupt()
  */
 void DSOADC::DMA1_CH1_TriggerEvent() 
 {
+    adcInterruptStats.adcEOC++;
+    xAssert(adcInterruptStats.adcEOC<2);
     if(instance->awdTriggered())
     {
+        adcInterruptStats.eocTriggered++;
         enableDisableIrq(false);
         adc_dma_disable(ADC1);       
         SampleSet one(ADC_INTERNAL_BUFFER_SIZE,adcInternalBuffer),two(0,NULL);
@@ -158,6 +168,7 @@ void DSOADC::DMA1_CH1_TriggerEvent()
     }
     else
     {
+        adcInterruptStats.eocIgnored++;
         //nextAdcDmaTransfer(requestedSamples,adcInternalBuffer);
         setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_TriggerEvent );
     }

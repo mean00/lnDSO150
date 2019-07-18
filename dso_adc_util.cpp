@@ -237,19 +237,54 @@ void DSOADC::enableDisableIrqSource(bool onoff, int interrupt)
 {
     if(onoff)
     {
-        if(interrupt==ADC_AWD)
-        {                      
-            int channel=0;
-             ADC1->regs->CR1 |= (channel & ADC_CR1_AWDCH) | 0*ADC_CR1_AWDSGL ;
-             ADC1->regs->CR1 |= ADC_CR1_AWDEN  | ADC_CR1_AWDIE;
+        // Enable Watchdog or EndOfCapture interrupt flags
+        switch(interrupt)
+        {
+            case ADC_AWD:        
+            {
+                int channel=0;
+                uint32_t cr1=ADC1->regs->CR1;
+                cr1 &=~ 0x1f;
+                cr1|= (channel & ADC_CR1_AWDCH) | 0*ADC_CR1_AWDSGL ;
+                cr1|= ADC_CR1_AWDEN  | ADC_CR1_AWDIE;                
+                ADC1->regs->CR1=cr1;
+            }
+                break;
+            case ADC_EOC:
+                {
+                  uint32_t cr1=ADC1->regs->CR1;
+                  cr1 |= ADC_CR1_EOCIE;
+                  ADC1->regs->CR1=cr1;
+                }
+                 break;
+            default:
+                xAssert(0);
+                break;
         }
-        ADC1->regs->CR1 |= (1U<<((interrupt) +ADC_CR1_EOCIE_BIT));
-    }else
+    }else // disable
     {
-        ADC1->regs->CR1 &= ~(1U<<((interrupt) +ADC_CR1_EOCIE_BIT));
-        if(interrupt==ADC_AWD)
-             ADC1->regs->CR1 &= ~ADC_CR1_AWDEN  | ~ ADC_CR1_AWDIE;
-        
+           switch(interrupt)
+        {
+            case ADC_AWD:        
+            {
+                int channel=0;
+                uint32_t cr1=ADC1->regs->CR1;
+                cr1 &=~ 0x1f;
+                cr1&= ~(ADC_CR1_AWDEN  | ADC_CR1_AWDIE);
+                ADC1->regs->CR1=cr1;
+            }
+                break;
+            case ADC_EOC:
+                {
+                  uint32_t cr1=ADC1->regs->CR1;
+                  cr1 &= ~ADC_CR1_EOCIE;
+                  ADC1->regs->CR1=cr1;
+                }
+                 break;
+            default:
+                xAssert(0);
+                break;
+        }
     }
 }
 /**
@@ -271,6 +306,7 @@ void DSOADC::enableDisableIrq(bool onoff)
 extern void watchDog();
 void DSOADC::defaultAdcIrqHandler()
 {    
+    adcInterruptStats.rawWatchdog++;
     if(adcIrqHandler)
         adcIrqHandler();
 }
@@ -311,4 +347,5 @@ void DSOADC::setWatchdogTriggerValue(uint32_t high, uint32_t low)
         ;
     return regs->DR&0xffff;
  }
+ 
 //
