@@ -15,6 +15,9 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  * 
  */
 #include "dso_adc_const.h"
+volatile uint32_t lastCR1=0;
+
+#define SetCR1(x) {lastCR1=ADC1->regs->CR1=(x);}
 
 static voidFuncPtr adcIrqHandler=NULL;
 HardwareTimer pwmtimer(4); // Vref PWM is Timer4 Channel3
@@ -79,22 +82,10 @@ void DSOADC::setupADCs ()
   
   adc_Register->SQR3 = pinMapADCin;
   
-  static volatile uint32_t cr2=adc_Register->CR2,cr1=adc_Register->CR1;
-#if 0
-  cr2=ADC_CR2_ADON+ADC_CR2_EXTSEL+ADC_CR2_TSVREFE+ADC_CR2_EXTTRIG+ADC_CR2_CONT;
-  adc_Register->CR2=cr2;
-  adc_Register->CR1 |= (ADC_CR1_FASTINT); // Interleaved mode    
-  ADC2->regs->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
-  ADC2->regs->SQR3 = pinMapADCin;
-#else
-  cr2=ADC_CR2_ADON+ADC_CR2_EXTSEL_SWSTART+ADC_CR2_EXTTRIG+ADC_CR2_CONT+ADC_CR2_DMA;
-  //cr1=1*ADC_CR1_FASTINT;
+  uint32_t cr2=ADC_CR2_ADON+ADC_CR2_EXTSEL_SWSTART+/*ADC_CR2_EXTTRIG+*/ADC_CR2_CONT+ADC_CR2_DMA;  
   adc_Register->CR2=cr2;  
-  adc_Register->CR1 =cr1;
-  //ADC2->regs->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
-  //ADC2->regs->SQR3 = pinMapADCin;
+  
 
-#endif  
   
 }
 /**
@@ -169,11 +160,18 @@ bool    DSOADC::prepareDMASampling (adc_smp_rate rate,adc_prescaler scale)
 bool DSOADC::getSamples(FullSampleSet &fullSet)
 {
     if(!dmaSemaphore->take(10)) // dont busy loop
-        return false;    
+        return false;   
+    adcInterruptStats.nbConsumed++;
     fullSet=_captured;
     return true;
 }
- 
+/**
+ * 
+ */
+void  DSOADC::clearSemaphore()
+{
+    dmaSemaphore->reset();    
+}
 
 /**
 * @brief Enable DMA requests
@@ -247,14 +245,14 @@ void DSOADC::enableDisableIrqSource(bool onoff, int interrupt)
                 cr1 &=~ 0x1f;
                 cr1|= (channel & ADC_CR1_AWDCH) | 0*ADC_CR1_AWDSGL ;
                 cr1|= ADC_CR1_AWDEN  | ADC_CR1_AWDIE;                
-                ADC1->regs->CR1=cr1;
+                SetCR1(cr1);
             }
                 break;
             case ADC_EOC:
                 {
                   uint32_t cr1=ADC1->regs->CR1;
                   cr1 |= ADC_CR1_EOCIE;
-                  ADC1->regs->CR1=cr1;
+                  SetCR1(cr1);
                 }
                  break;
             default:
@@ -263,7 +261,7 @@ void DSOADC::enableDisableIrqSource(bool onoff, int interrupt)
         }
     }else // disable
     {
-           switch(interrupt)
+        switch(interrupt)
         {
             case ADC_AWD:        
             {
@@ -271,14 +269,14 @@ void DSOADC::enableDisableIrqSource(bool onoff, int interrupt)
                 uint32_t cr1=ADC1->regs->CR1;
                 cr1 &=~ 0x1f;
                 cr1&= ~(ADC_CR1_AWDEN  | ADC_CR1_AWDIE);
-                ADC1->regs->CR1=cr1;
+                SetCR1(cr1);
             }
                 break;
             case ADC_EOC:
                 {
                   uint32_t cr1=ADC1->regs->CR1;
                   cr1 &= ~ADC_CR1_EOCIE;
-                  ADC1->regs->CR1=cr1;
+                  SetCR1(cr1);
                 }
                  break;
             default:
@@ -338,6 +336,7 @@ void DSOADC::setWatchdogTriggerValue(uint32_t high, uint32_t low)
  */
  uint16_t directADC2Read(int pin)
  {
+#if 1
     adc_reg_map *regs=  ADC2->regs; //PIN_MAP[COUPLING_PIN].adc_device.regs;
     adc_set_reg_seqlen(ADC2, 1);
 
@@ -346,6 +345,8 @@ void DSOADC::setWatchdogTriggerValue(uint32_t high, uint32_t low)
     while (!(regs->SR & ADC_SR_EOC))
         ;
     return regs->DR&0xffff;
+#endif
+    return 0;
  }
  
 //

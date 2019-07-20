@@ -190,7 +190,7 @@ void testCapture(void)
     {        
         int lastTime=millis();
 #if 1        
-        int count=DSOCapture::triggeredCapture(240,test_samples,stats);  
+        int count=DSOCapture::capture(240,test_samples,stats);  
 #else
           int count=DSOCapture::oneShotCapture(240,test_samples,stats);  
 #endif

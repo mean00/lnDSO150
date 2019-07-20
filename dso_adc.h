@@ -94,6 +94,7 @@ public:
             
             bool    prepareTimerSampling (int fq);
             bool    getSamples(FullSampleSet &fullSet)           ;
+            void    clearSemaphore() ;
             bool     setSlowMode(int fqInHz);
             bool     readCalibrationValue();
     static  uint32_t getVCCmv();
@@ -141,7 +142,7 @@ public:
             bool awdTriggered() {return _triggered;}
             void stopDmaCapture();
             void stopTimeCapture();
-                
+    static  void getRegisters();
 protected:
   
             int             _sampled;

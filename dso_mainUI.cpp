@@ -56,7 +56,7 @@ void splash(void)
         tft->myDrawString(bf);              
 }
 
- 
+
 
 static void redraw()
 {
@@ -239,7 +239,7 @@ void mainDSOUI(void)
     {        
         int count;  
         
-        count=DSOCapture::triggeredCapture(240,test_samples,stats);  
+        count=DSOCapture::capture(240,test_samples,stats);  
         
         // Nothing captured, refresh screen
         if(!count) 

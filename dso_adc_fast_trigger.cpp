@@ -20,7 +20,7 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  */
 #define ADC_MAX 0xfff // 12 bits
 
-static uint32_t cr1;
+
 // Grab the samples from the ADC
 // Theoretically the ADC can not go any faster than this.
 //
@@ -28,12 +28,27 @@ static uint32_t cr1;
 // I think we have reached the speed limit of the chip, now all we can do is improve accuracy.
 // See; http://stm32duino.com/viewtopic.php?f=19&t=107&p=1202#p1194
 
+/**
+ * 
+ * @return 
+ */
+#define NB_REG 14
+static volatile uint32_t reg[NB_REG];
+
+void DSOADC::getRegisters(void)
+{
+    __IO uint32_t  *p=(__IO uint32_t *)ADC1->regs;
+    for(int i=0;i<NB_REG;i++)
+    {
+       reg[i]=p[i]; 
+    }
+}
+
 void DSOADC::stopDmaCapture(void)
 {
     // disable interrupts
     enableDisableIrq(false);
     enableDisableIrqSource(false,ADC_AWD);
-    enableDisableIrqSource(false,ADC_EOC);
     // Stop dma
      adc_dma_disable(ADC1);
 }
@@ -43,8 +58,7 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
   // This loop uses dual interleaved mode to get the best performance out of the ADCs
   //
   enableDisableIrq(false);
-  adcInterruptStats.start();
-  ADC1->regs->SR=0; // Clear all pending bits  
+  adcInterruptStats.start();  
   _triggered=false;
   if(count>ADC_INTERNAL_BUFFER_SIZE/2)
         count=ADC_INTERNAL_BUFFER_SIZE/2;
@@ -98,15 +112,12 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
    
   
   attachWatchdogInterrupt(DSOADC::watchDogInterrupt);  
-  cr1=ADC1->regs->CR1 ;
+  
   ADC1->regs->SR=0;
-  enableDisableIrqSource(true,ADC_AWD);
-  enableDisableIrqSource(false,ADC_EOC); // we dont need interrupt, it is done through DMA
-  cr1=ADC1->regs->CR1 ;
+  
   setupAdcDmaTransfer( ADC_INTERNAL_BUFFER_SIZE,adcInternalBuffer, DMA1_CH1_TriggerEvent );  
+  enableDisableIrqSource(true,ADC_AWD);    
   enableDisableIrq(true);
-  
-  
   return true;
 }
 /**
@@ -135,7 +146,8 @@ void DSOADC::awdTrigger()
                  break;
          }
      }else
-     {
+     {         
+        adcInterruptStats.triggeredAt=micros();
         _triggered=true;   
         enableDisableIrqSource(false,ADC_AWD);
      }
@@ -157,6 +169,7 @@ void DSOADC::watchDogInterrupt()
 void DSOADC::DMA1_CH1_TriggerEvent() 
 {
     adcInterruptStats.adcEOC++;
+    adcInterruptStats.lastEocAt=micros();
     xAssert(adcInterruptStats.adcEOC<2);
     if(instance->awdTriggered())
     {
@@ -169,9 +182,10 @@ void DSOADC::DMA1_CH1_TriggerEvent()
     else
     {
         adcInterruptStats.eocIgnored++;
-        //nextAdcDmaTransfer(requestedSamples,adcInternalBuffer);
-        setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_TriggerEvent );
+        nextAdcDmaTransfer(requestedSamples,adcInternalBuffer);
+        //setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_TriggerEvent );
     }
+    xAssert(adcInterruptStats.adcEOC==(adcInterruptStats.eocTriggered+adcInterruptStats.eocIgnored));
     
 }
 //

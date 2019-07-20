@@ -41,6 +41,13 @@ extern VoltageSettings      vSettings[11];
 class DSOCapturePriv : public  DSOCapture
 {
 public:
+    enum TaskletMode
+      {
+        Tasklet_Idle=0,
+        Tasklet_Running=1,
+        Tasklet_Parking=2,
+      };  
+public:
     static const char *getTimeBaseAsTextDma();
     static const char *getTimeBaseAsTextTimer();
     static bool        taskletDma();
@@ -63,7 +70,8 @@ public:
     static void        stopCaptureTimer();
     static bool        refineCapture(FullSampleSet &set);
     static bool        prepareSampling ();    
-
+    static int         triggeredCapture(int count,float *voltage,CaptureStats &stats);    
+    static void        reigniteDmaCommon(const bool trigger);
 public:
     
     static int      currentTimeBase;
@@ -72,6 +80,7 @@ public:
     static int      triggerValueADC;
     static float    triggerValueFloat;
     static float     voltageOffset;
+    static TaskletMode taskletMode;
     static CapturedSet captureSet[2];
     
 };

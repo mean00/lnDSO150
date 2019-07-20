@@ -128,7 +128,6 @@ bool       DSOCapturePriv:: startCaptureDmaTrigger (int count)
     lastRequested=ex/4096;
     return adc->startDMATriggeredSampling(ex,triggerValueADC);
 }
-
 /**
  * 
  * @return 
@@ -149,6 +148,7 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
     
     if(!fset.set1.samples)
     {
+        xAssert(0); // should never happen
         return false;
     }
 
@@ -160,7 +160,13 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
     {
         bool triggerFound=refineCapture(fset);
         if(!triggerFound)
-          return false;
+        {
+          if(trigger)
+          {
+                reigniteDmaCommon(trigger);
+                return false;
+          }
+        }
         set->stats.trigger=120; // right in the middle
     }else
     {
@@ -202,6 +208,7 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
  */
 bool DSOCapturePriv::taskletDma()
 {
+    
     return taskletDmaCommon(true);
 
 }
@@ -214,4 +221,13 @@ bool DSOCapturePriv::taskletDma()
 bool DSOCapturePriv::taskletDmaRunning()
 {
      return taskletDmaCommon(false);
+}
+/**
+ * 
+ * @param trigger
+ */
+void DSOCapturePriv::reigniteDmaCommon(const bool trigger)
+{
+    if(trigger)
+        xAssert(0);
 }

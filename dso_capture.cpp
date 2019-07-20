@@ -17,16 +17,11 @@ int      DSOCapturePriv::lastRequested=0;
 int      DSOCapturePriv::triggerValueADC=0;
 float    DSOCapturePriv::triggerValueFloat=0;
 float     DSOCapturePriv::voltageOffset=0;
+DSOCapturePriv::TaskletMode DSOCapturePriv::taskletMode;
 FancySemaphore *captureSemaphore=NULL;
 static TaskHandle_t captureTaskHandle;
 
 
-typedef enum InternalCaptureState
-{
-    captureStateIdle,
-    captureStateArmed
-};
-InternalCaptureState captureState=captureStateIdle; 
 
 CapturedSet DSOCapturePriv::captureSet[2];
 
@@ -35,6 +30,7 @@ CapturedSet DSOCapturePriv::captureSet[2];
  */
 void DSOCapture::initialize()
 {
+    DSOADC::getRegisters();
     captureSemaphore=new FancySemaphore;
     xTaskCreate( (TaskFunction_t)DSOCapturePriv::task, "Capture", 200, NULL, DSO_CAPTURE_TASK_PRIORITY, &captureTaskHandle );    
 }
@@ -148,16 +144,25 @@ void DSOCapturePriv::task(void *a)
     xDelay(20);
     while(1)
     {
-#warning FIXME : Waste of time        
-        if(captureState==captureStateIdle) // 
-            xDelay(1);
-        else
-            currentTable->tasklet();
+        switch(taskletMode)
+        {
+            case  Tasklet_Idle: 
+                            xDelay(5);
+                            break;
+            case  Tasklet_Running:
+                           currentTable->tasklet();
+                           break;
+            case Tasklet_Parking:
+                           taskletMode=Tasklet_Idle;
+                           break;
+            default:
+                xAssert(0);
+                break;
+        }
     }
-
 }
 
-
+#if 0
 /**
  * 
  * @param count
@@ -165,6 +170,7 @@ void DSOCapturePriv::task(void *a)
  */
 int DSOCapture::oneShotCapture(int count,float *samples,CaptureStats &stats)
 {
+    xAssert(0);
     DSOCapturePriv::prepareSampling();
     if(!startCapture(count)) return 0;
     CapturedSet *set;
@@ -180,6 +186,7 @@ int DSOCapture::oneShotCapture(int count,float *samples,CaptureStats &stats)
     return toCopy;
     
 }
+#endif
 /**
  * 
  * @param volt
@@ -215,14 +222,30 @@ int DSOCapturePriv::voltToADCValue(float v)
     return (int)out;    
 }
 
-
+void DSOCapture::InternalStopCapture()
+{
+    stopCapture();
+}
 
 void        DSOCapture::stopCapture()
-{
-    currentTable->stopCapture();
-    captureState=captureStateIdle;
+{       
     controlButtons->updateCouplingState();
 
+    // wait for the tasklet to be parked
+    if(DSOCapturePriv::Tasklet_Running==DSOCapturePriv::taskletMode)
+    {
+        DSOCapturePriv::taskletMode=DSOCapturePriv::Tasklet_Parking;
+    }        
+    while(DSOCapturePriv::taskletMode!=DSOCapturePriv::Tasklet_Idle)
+    {
+        xDelay(1);
+    }
+    // Now shutdown
+    currentTable->stopCapture();
+    // Clear interrupts
+    uint32_t dummy;
+    dummy=ADC1->regs->DR;
+    ADC1->regs->SR=0;
 }
 
 
@@ -232,13 +255,18 @@ void        DSOCapture::stopCapture()
  * @return 
  */
 StopWatch watch;
-int DSOCapture::triggeredCapture(int count,float *volt,CaptureStats &stats)
+int DSOCapture::capture(int count,float *volt,CaptureStats &stats)
 {
-    if(captureState==captureStateIdle)
+    return DSOCapturePriv::triggeredCapture(count,volt,stats);
+}
+
+int DSOCapturePriv::triggeredCapture(int count,float *volt,CaptureStats &stats)
+{
+    if(taskletMode==DSOCapturePriv::Tasklet_Idle)
     {
         DSOCapturePriv::prepareSampling();
-        if(!startCapture(count)) return 0;
-        captureState=captureStateArmed;
+        if(!startCapture(count)) 
+            return 0;
     }
                    
     CapturedSet *set;
@@ -246,20 +274,23 @@ int DSOCapture::triggeredCapture(int count,float *volt,CaptureStats &stats)
     if(!r) 
     {
         if(watch.elapsed(400))
+        {
+            DSOADC::getRegisters();
             xAssert(0);
+        }
         return 0;
     }
     watch.ok();
     
     if(set->samples<200) xAssert(0);
-    
-    captureState=captureStateIdle;
+    InternalStopCapture();
     int toCopy=set->samples;
      if(toCopy>count) toCopy=count;
 
      memcpy(volt,set->data,toCopy*sizeof(float));
      stats=set->stats;
      //xDelay(10);
+     
      return toCopy;
 }
 /**
@@ -334,7 +365,7 @@ void        DSOCapture::setTriggerMode(TriggerMode mode)
             xAssert(0);
             break;
     }
-    stopCapture();
+    InternalStopCapture();
     adc->setTriggerMode(adcMode);
 }
 /**

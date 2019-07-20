@@ -28,24 +28,14 @@ typedef struct CapturedSet
 class DSOCapture
 {
 public:
+  
    enum TriggerMode
     {
         Trigger_Rising=0,
         Trigger_Falling=1,
         Trigger_Both=2,
         Trigger_Run=3
-    };
-    enum DSO_CAPTURE_STATE
-    {
-      DSO_STATE_RUN=0,
-      DSO_STATE_TRIGGERED=1
-    };
-    enum 
-    {
-      DSO_MODE_CONTINOUS,
-      DSO_MODE_TRIGGERED_SINGLE,
-      DSO_MODE_TRIGGERED_CONTINUOUS,
-    };
+    };       
     enum DSO_TIME_BASE 
     {
       DSO_TIME_BASE_10US,
@@ -79,8 +69,8 @@ public:
       DSO_VOLTAGE_MAX=DSO_VOLTAGE_5V
     };
     // Table indirection
-    static int         oneShotCapture(int count,float *voltage,CaptureStats &stats) ;
-    static int         triggeredCapture(int count,float *voltage,CaptureStats &stats);    
+    static int         capture(int count,float *voltage,CaptureStats &stats);    
+    
     
     
     // Voltage Range    
@@ -115,7 +105,8 @@ public:
     static int         voltageToPixel(float v);
     static void        initialize();
         
-   
+protected:
+    static void        InternalStopCapture();
 
 };
 

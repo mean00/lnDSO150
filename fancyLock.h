@@ -34,6 +34,14 @@ public:
         FancySemaphore();
         bool take();
         bool take(int timeoutMs);
+        bool giveFromInterrupt();
+        bool give();
+        bool reset();
 protected:
         uint32_t start;
+        int produced;
+        int consumed;
+        int nbReset;
+        uint32_t lastTaken;
+        uint32_t lastGiven;
 };

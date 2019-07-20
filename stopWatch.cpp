@@ -14,7 +14,7 @@ bool StopWatch::elapsed(int threshold)
         mil=millis()&0xffff;
         return false;
     }
-    uint32_t newMil=millis();
+    newMil=millis();
     if(mil<newMil)
     {
         return threshold<(newMil-mil);

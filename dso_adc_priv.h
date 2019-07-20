@@ -16,9 +16,14 @@ public:
   int       adcEOC;
   int       spurious;
   uint32_t  startAt;
+  uint32_t  triggeredAt;
+  uint32_t  lastEocAt;
   int       round;
   int       eocTriggered;
   int       eocIgnored;
+  int       nbCaptured;
+  int       nbConsumed;
+  
   
   InterruptStats()
   {
@@ -29,6 +34,10 @@ public:
     rawWatchdog=0;
     eocIgnored=0;
     eocTriggered=0;
+    triggeredAt=0;
+    lastEocAt=0;
+    nbCaptured=0;
+    nbConsumed=0;
 
   }
   void start()

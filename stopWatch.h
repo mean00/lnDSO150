@@ -14,4 +14,5 @@ public:
 protected:
     bool armed;
     uint32_t mil;
+    uint32_t newMil;
 };

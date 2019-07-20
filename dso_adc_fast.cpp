@@ -21,7 +21,7 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 /**
  */
 
-#define ADC_CR1_FASTINT 0x70000 // Fast interleave mode DUAL MODE bits 19-16
+
 InterruptStats adcInterruptStats;
 uint32_t convTime;
 extern HardwareTimer Timer2;
@@ -61,11 +61,10 @@ DSOADC::DSOADC()
   
   setTriggerMode(DSOADC::Trigger_Run);
   
-  
-  enableDisableIrqSource(false,ADC_AWD);
-  enableDisableIrqSource(false,ADC_EOC);
-  //enableDisableIrqSource(false,ADC_JEOC);
   enableDisableIrq(false);
+  enableDisableIrqSource(false,ADC_AWD);
+  enableDisableIrqSource(false,ADC_EOC);  
+  
   attachWatchdogInterrupt(NULL);
 }
  
@@ -87,7 +86,6 @@ bool DSOADC::startDMASampling (int count)
   requestedSamples=count;  
   convTime=micros();  
   enableDisableIrqSource(false,ADC_AWD);
-  enableDisableIrqSource(false,ADC_EOC); // done through DMA, no need for EOC
   enableDisableIrq(true);
   setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_Event );
   return true;
@@ -107,6 +105,9 @@ void DSOADC::DMA1_CH1_Event()
 {
     SampleSet one,two;
     adcInterruptStats.adcEOC++;
+    adcInterruptStats.eocTriggered++;
+    adcInterruptStats.eocIgnored=0;
+    
     two.samples=0;
     one.samples=requestedSamples;
     one.data=adcInternalBuffer;
@@ -123,6 +124,7 @@ void DSOADC::captureComplete(SampleSet &one, SampleSet &two)
     convTime=micros()-convTime;
     _captured.set1=one;
     _captured.set2=two;
+    adcInterruptStats.nbCaptured++;
     dmaSemaphore->giveFromInterrupt();
 }
 
