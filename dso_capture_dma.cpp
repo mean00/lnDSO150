@@ -132,6 +132,16 @@ bool       DSOCapturePriv:: startCaptureDmaTrigger (int count)
  * 
  * @return 
  */
+bool DSOCapturePriv::nextCapture()
+{
+    adc->resetStats();    
+    currentTable->nextCapture(lastRequested);
+    return true;        
+}
+/**
+ * 
+ * @return 
+ */
 bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
 {
     
@@ -148,7 +158,7 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
     
     if(!fset.set1.samples)
     {
-        xAssert(0); // should never happen
+        nextCapture();
         return false;
     }
 
@@ -163,7 +173,7 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
         {
           if(trigger)
           {
-                reigniteDmaCommon(trigger);
+                nextCapture();                
                 return false;
           }
         }
@@ -213,6 +223,14 @@ bool DSOCapturePriv::taskletDma()
 
 }
 //--
+bool        DSOCapturePriv::nextCaptureDmaTrigger(int count)
+{
+    return startCaptureDmaTrigger(count);
+}
+bool        DSOCapturePriv::nextCaptureDma(int count)
+{
+    return startCaptureDma(count);
+}
 
 /**
  * 
@@ -222,12 +240,14 @@ bool DSOCapturePriv::taskletDmaRunning()
 {
      return taskletDmaCommon(false);
 }
+#if 0
 /**
  * 
  * @param trigger
  */
 void DSOCapturePriv::reigniteDmaCommon(const bool trigger)
 {
-    if(trigger)
-        xAssert(0);
+    adc->restartDmaTriggerCapture();
 }
+#endif
+// EOF

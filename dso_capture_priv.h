@@ -13,12 +13,13 @@
  */
 typedef struct 
 {
-    void                        (*stopCapture)(void);
+    void                        (*stopCapture)(void);    
     DSOCapture::DSO_TIME_BASE   (*getTimeBase)(void);
     bool                        (*prepareSampling)(void);
     const char *                (*getTimeBaseAsText)();
     bool                        (*startCapture) (int count);
     bool                        (*tasklet)();
+    bool                        (*nextCapture)(int count);
 }CaptureFunctionTable;
 
 /*
@@ -70,8 +71,13 @@ public:
     static void        stopCaptureTimer();
     static bool        refineCapture(FullSampleSet &set);
     static bool        prepareSampling ();    
-    static int         triggeredCapture(int count,float *voltage,CaptureStats &stats);    
-    static void        reigniteDmaCommon(const bool trigger);
+    static int         triggeredCapture(int count,float *voltage,CaptureStats &stats);        
+    
+    static bool        nextCaptureDma(int count);
+    static bool        nextCaptureDmaTrigger(int count);
+    static bool        nextCaptureTimer(int count);
+    static bool        nextCaptureTimerTrigger(int count);
+    static bool        nextCapture(void);
 public:
     
     static int      currentTimeBase;

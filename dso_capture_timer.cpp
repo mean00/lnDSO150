@@ -89,6 +89,15 @@ const char *DSOCapturePriv::getTimeBaseAsTextTimer()
     return timerBases[currentTimeBase].name;
 }
 
+//--
+bool        DSOCapturePriv::nextCaptureTimer(int count)
+{
+    return startCaptureTimer(count);
+}
+bool        DSOCapturePriv::nextCaptureTimerTrigger(int count)
+{
+    return startCaptureTimerTrigger(count);
+}
 /**
  * 
  * @param count

@@ -21,7 +21,7 @@ DSOCapturePriv::TaskletMode DSOCapturePriv::taskletMode;
 FancySemaphore *captureSemaphore=NULL;
 static TaskHandle_t captureTaskHandle;
 
-
+extern StopWatch watch;
 
 CapturedSet DSOCapturePriv::captureSet[2];
 
@@ -41,6 +41,7 @@ void DSOCapture::initialize()
  */
 bool     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange)
 {
+    watch.ok();
     DSOCapturePriv::currentVoltageRange=voltRange;
     controlButtons->setInputGain(vSettings[DSOCapturePriv::currentVoltageRange].inputGain);
     return true;
@@ -193,6 +194,7 @@ int DSOCapture::oneShotCapture(int count,float *samples,CaptureStats &stats)
  */
 void        DSOCapture::setTriggerValue(float volt)
 {
+        watch.ok();
         DSOCapturePriv::triggerValueFloat=volt;
         DSOCapturePriv::triggerValueADC=DSOCapturePriv::voltToADCValue(DSOCapturePriv::triggerValueFloat);
 }
@@ -276,13 +278,17 @@ int DSOCapturePriv::triggeredCapture(int count,float *volt,CaptureStats &stats)
         if(watch.elapsed(400))
         {
             DSOADC::getRegisters();
-            xAssert(0);
+         //   xAssert(0);
         }
         return 0;
     }
     watch.ok();
     
-    if(set->samples<200) xAssert(0);
+    if(set->samples<200)
+    {
+        currentTable->nextCapture(lastRequested);
+        return 0;
+    }
     InternalStopCapture();
     int toCopy=set->samples;
      if(toCopy>count) toCopy=count;
@@ -352,6 +358,7 @@ void        DSOCapture::clearCapturedData()
  */
 void        DSOCapture::setTriggerMode(TriggerMode mode)
 {
+    watch.ok();
     DSOADC::TriggerMode adcMode;
     switch(mode)
     {
@@ -397,6 +404,7 @@ DSOCapture::TriggerMode DSOCapture::getTriggerMode()
  */
 void  DSOCapture::setVoltageOffset(float volt)
 {
+    watch.ok();
     DSOCapturePriv::voltageOffset=volt;
 }
 /**

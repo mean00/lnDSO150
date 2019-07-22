@@ -1,6 +1,7 @@
 // this is 1/Gain for each range
 // i.e. attenuation
 //
+#pragma once
 
 #define ADC_TIMER Timer2
 #define ADC_TIMER_CHANNEL TIMER_CH1
@@ -23,6 +24,7 @@ public:
   int       eocIgnored;
   int       nbCaptured;
   int       nbConsumed;
+  int       invalidCapture;
   
   
   InterruptStats()
@@ -38,6 +40,7 @@ public:
     lastEocAt=0;
     nbCaptured=0;
     nbConsumed=0;
+    invalidCapture=0;
 
   }
   void start()

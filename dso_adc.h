@@ -143,6 +143,8 @@ public:
             void stopDmaCapture();
             void stopTimeCapture();
     static  void getRegisters();
+            void resetStats();
+            //void restartDmaTriggerCapture() ;
 protected:
   
             int             _sampled;

@@ -4,6 +4,7 @@
 
 #include "dso_adc.h"
 #include "dso_capture_priv.h"
+#include "dso_adc_priv.h"
 
 /*.
 (c) Andrew Hull - 2015
@@ -34,6 +35,15 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  */
 #define NB_REG 14
 static volatile uint32_t reg[NB_REG];
+
+
+void DSOADC::resetStats()
+{
+    adcInterruptStats.invalidCapture++;
+    adcInterruptStats.adcEOC=0;   
+    adcInterruptStats.eocIgnored=0;   
+    adcInterruptStats.eocTriggered=0;   
+}
 
 void DSOADC::getRegisters(void)
 {
@@ -170,7 +180,7 @@ void DSOADC::DMA1_CH1_TriggerEvent()
 {
     adcInterruptStats.adcEOC++;
     adcInterruptStats.lastEocAt=micros();
-    xAssert(adcInterruptStats.adcEOC<2);
+
     if(instance->awdTriggered())
     {
         adcInterruptStats.eocTriggered++;
@@ -188,6 +198,22 @@ void DSOADC::DMA1_CH1_TriggerEvent()
     xAssert(adcInterruptStats.adcEOC==(adcInterruptStats.eocTriggered+adcInterruptStats.eocIgnored));
     
 }
+#if 0
+/**
+ * 
+ */
+void DSOADC::restartDmaTriggerCapture() 
+{   
+    // Re-enable AWD interupt
+    adcInterruptStats.adcEOC=0;
+    adcInterruptStats.eocTriggered=0;
+    adcInterruptStats.eocIgnored=0;
+    enableDisableIrq(false);
+    enableDisableIrqSource(true,ADC_AWD);    
+    setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_TriggerEvent );    
+    enableDisableIrq(true);
+}
+#endif
 //
 
   

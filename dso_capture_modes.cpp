@@ -9,6 +9,8 @@
 #include "dso_capture_priv.h"
 
 #include "DSO_config.h"
+#include "stopWatch.h"
+extern StopWatch watch;
 /**
  */
 const CaptureFunctionTable TimerTableTrigger=
@@ -19,6 +21,7 @@ const CaptureFunctionTable TimerTableTrigger=
     DSOCapturePriv::getTimeBaseAsTextTimer,
     DSOCapturePriv::startCaptureTimerTrigger,
     DSOCapturePriv::taskletTimer,
+    DSOCapturePriv::nextCaptureTimerTrigger,
 };
 /**
  */
@@ -30,6 +33,7 @@ const CaptureFunctionTable DmaTableTrigger=
     DSOCapturePriv::getTimeBaseAsTextDma,
     DSOCapturePriv::startCaptureDmaTrigger,
     DSOCapturePriv::taskletDma,
+    DSOCapturePriv::nextCaptureDmaTrigger,
 };
 /**
  */
@@ -41,6 +45,7 @@ const CaptureFunctionTable TimerTableRunning=
     DSOCapturePriv::getTimeBaseAsTextTimer,
     DSOCapturePriv::startCaptureTimer,
     DSOCapturePriv::taskletTimer,
+    DSOCapturePriv::nextCaptureTimer,
 };
 /**
  */
@@ -52,6 +57,7 @@ const CaptureFunctionTable DmaTableRunning=
     DSOCapturePriv::getTimeBaseAsTextDma,
     DSOCapturePriv::startCaptureDma,
     DSOCapturePriv::taskletDmaRunning,
+    DSOCapturePriv::nextCaptureDma,
 };
 /**
  */
@@ -74,6 +80,7 @@ bool     DSOCapturePriv::prepareSampling ()
 
 bool     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE timeBase)
 {
+    watch.ok();
     if(timeBase>DSO_TIME_BASE_MAX)
     {
         xAssert(0);
