@@ -37,7 +37,7 @@
 #include "DSO_config.h"
 #include "fancyLock.h"
 #define TICK                  10 // 10 ms
-#define LONG_PRESS_THRESHOLD (2000/TICK) // 1s
+#define LONG_PRESS_THRESHOLD (1000/TICK) // 1s
 #define SHORT_PRESS_THRESHOLD (2)
 #define HOLDOFF_THRESHOLD     (100/TICK)
 #define COUNT_MAX             3
