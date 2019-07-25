@@ -102,6 +102,10 @@ public:
     static void        initialize();    
     
     static int          voltToADCValue(float v);
+    
+    // needed by autoSetup
+    static float        getMaxVoltageValue();
+    static float        getMinVoltageValue();
 
 };
 

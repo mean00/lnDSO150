@@ -48,23 +48,23 @@ bool autoSetupVoltage()
         if(!n)
             continue;
         
-        int  xmin= DSOCapture::voltToADCValue(stats.xmin)-2048;
-        int  xmax= DSOCapture::voltToADCValue(stats.xmax)-2048;
+        float  xmin= stats.xmin;
+        float  xmax= stats.xmax;
         
-        xmin=abs(xmin);
-        xmax=abs(xmax);
+        xmin=fabs(xmin);
+        xmax=fabs(xmax);
         if(xmin>xmax) 
             xmax=xmin;
         clock.ok();
         
-        
-        if(xmax>1900 && voltage<DSOCapture::DSO_VOLTAGE_MAX) // saturation            
+        // Are we over the max ?
+        if(xmax>DSOCapture::getMaxVoltageValue() && voltage<DSOCapture::DSO_VOLTAGE_MAX) // saturation            
         {
-            voltage=voltage+1;
+            voltage=voltage+1; // yes, use higher scale
             DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)voltage);
             continue;
         }
-        if(xmax<1000 && voltage>0) // too small
+        if(xmax<DSOCapture::getMinVoltageValue() && voltage>0) // too small
         {
             voltage=voltage-1;
             DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)voltage);

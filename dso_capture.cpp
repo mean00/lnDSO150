@@ -423,6 +423,28 @@ int DSOCapture::voltToADCValue(float v)
 {
     return DSOCapturePriv::voltToADCValue(v);
 }
+/**
+ * \fn getMaxVoltageValue
+ * \brief return the max absolute voltage for the current selected voltage range
+ * It the actual value is higher than max it means either ADC saturates or we can't display it
+ * @return 
+ */
+float        DSOCapture::getMaxVoltageValue()
+{
+     // we want to have less than 80% pixels= 100 (i.e. half screen), else it means saturation
+   
+    float gain=vSettings[DSOCapturePriv::currentVoltageRange].displayGain;
+    float v=100./gain;
+    return v;
+}
+float        DSOCapture::getMinVoltageValue()
+{
+    // Same but for 2 blocks i.e. 2*24=48 pixel
+   
+    float gain=vSettings[DSOCapturePriv::currentVoltageRange].displayGain;
+    float v=48./gain;
+    return v;
+}
 
 // EOF
 
