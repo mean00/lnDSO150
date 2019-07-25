@@ -4,7 +4,12 @@
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
 #include "dso_includes.h"
+#include "stopWatch.h"
 extern float test_samples[256];
+
+static bool autoSetupVoltage();
+
+
 /**
  * 
  */
@@ -15,13 +20,29 @@ void        autoSetup()
     DSOCapture::setTriggerMode(DSOCapture::Trigger_Run);
     
     DSOCapture::DSO_TIME_BASE timeBase=DSOCapture::DSO_TIME_BASE_5MS;
-    int voltage=DSOCapture::DSO_VOLTAGE_5V;
-    
     DSOCapture::setTimeBase(timeBase);
+    
+    // voltage range
+    
+    if(!autoSetupVoltage()) return; // failed
+    
+    // frequency
+   
+}
+
+/**
+ * 
+ * @return 
+ */
+bool autoSetupVoltage()
+{
+    int voltage=DSOCapture::DSO_VOLTAGE_5V;
     DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)voltage);
     
     CaptureStats stats;
-    while(1)
+    StopWatch clock;
+    clock.ok();
+    while(!clock.elapsed(1000))
     {
         int n=DSOCapture::capture(240,test_samples,stats);
         if(!n)
@@ -32,7 +53,10 @@ void        autoSetup()
         
         xmin=abs(xmin);
         xmax=abs(xmax);
-        if(xmin>xmax) xmax=xmin;
+        if(xmin>xmax) 
+            xmax=xmin;
+        clock.ok();
+        
         
         if(xmax>1900 && voltage<DSOCapture::DSO_VOLTAGE_MAX) // saturation            
         {
@@ -45,8 +69,8 @@ void        autoSetup()
             voltage=voltage-1;
             DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)voltage);
             continue;
-        }
-        break;        
-    }
-    DSOCapture::stopCapture();    
+        }    
+        return true;
+    } 
+    return false;
 }
