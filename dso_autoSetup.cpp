@@ -23,9 +23,13 @@ void        autoSetup()
     DSOCapture::setTimeBase(timeBase);
     // voltage range
     
-    if(!autoSetupVoltage()) return; // failed
-    autoSetupFrequency();
-    // frequency
+    if(!autoSetupVoltage()) goto end; // failed    
+    if(!autoSetupFrequency()) goto end;
+    // redo voltage in case it was wrong the 1st time due to too high/too low fq
+    if(!autoSetupVoltage()) goto end; // failed
+end:    
+    DSOCapture::stopCapture();
+    return;
    
 }
 
@@ -41,7 +45,8 @@ bool autoSetupVoltage()
     CaptureStats stats;
     StopWatch clock;
     clock.ok();
-    while(!clock.elapsed(1000))
+    int tries=20;
+    while(!clock.elapsed(2000))
     {
         int n=DSOCapture::capture(240,test_samples,stats);
         if(!n)
@@ -56,6 +61,7 @@ bool autoSetupVoltage()
             xmax=xmin;
         clock.ok();
         
+        if(tries--<0) return true; // did not converge ?
         // Are we over the max ?
         if(xmax>DSOCapture::getMaxVoltageValue() && voltage<DSOCapture::DSO_VOLTAGE_MAX) // saturation            
         {
@@ -87,12 +93,19 @@ bool autoSetupFrequency()
     CaptureStats stats;
     StopWatch clock;
     clock.ok();
-    while(!clock.elapsed(1000) && timeBase<=DSOCapture::DSO_TIME_BASE_MAX)
+    int tries=20;
+    while(1)
     {
+        if(clock.elapsed(2000) || timeBase>DSOCapture::DSO_TIME_BASE_MAX)
+        {
+            break;
+        }
+    
         int n=DSOCapture::capture(240,test_samples,stats);
         if(!n)
             continue;
-        if(stats.frequency>50)
+        if(tries--<0) return true; // did not converge ?
+        if(stats.frequency>30)
         {
             // Readjust trigger
             float trigger=(stats.xmax+stats.xmin)/2.;
@@ -100,8 +113,9 @@ bool autoSetupFrequency()
             return true;
         }
         timeBase++;
+        if(timeBase>DSOCapture::DSO_TIME_BASE_MAX) break;
         DSOCapture::setTimeBase((DSOCapture::DSO_TIME_BASE)timeBase);
     } 
-     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_1MS);
+    DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_1MS);
     return false;
 }
