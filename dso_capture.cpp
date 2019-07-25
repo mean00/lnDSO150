@@ -61,7 +61,7 @@ DSOCapture::DSO_VOLTAGE_RANGE DSOCapture::getVoltageRange()
  * @param count
  * @return 
  */
-bool DSOCapture::getSamples(CapturedSet **set, int timeoutMs)
+bool DSOCapturePriv::getSamples(CapturedSet **set, int timeoutMs)
 {
     if(!captureSemaphore->take(10)) 
     {
@@ -224,14 +224,14 @@ int DSOCapturePriv::voltToADCValue(float v)
     return (int)out;    
 }
 
-void DSOCapture::InternalStopCapture()
+void DSOCapturePriv::InternalStopCapture()
 {
     stopCapture();
 }
 
 void        DSOCapture::stopCapture()
 {       
-    controlButtons->updateCouplingState();
+    
 
     // wait for the tasklet to be parked
     if(DSOCapturePriv::Tasklet_Running==DSOCapturePriv::taskletMode)
@@ -248,6 +248,9 @@ void        DSOCapture::stopCapture()
     uint32_t dummy;
     dummy=ADC1->regs->DR;
     ADC1->regs->SR=0;
+    
+    controlButtons->updateCouplingState();
+    
 }
 
 
@@ -372,7 +375,7 @@ void        DSOCapture::setTriggerMode(TriggerMode mode)
             xAssert(0);
             break;
     }
-    InternalStopCapture();
+    DSOCapturePriv::InternalStopCapture();
     adc->setTriggerMode(adcMode);
 }
 /**
@@ -414,6 +417,11 @@ void  DSOCapture::setVoltageOffset(float volt)
 float DSOCapture::getVoltageOffset()
 {
     return DSOCapturePriv::voltageOffset;
+}
+
+int DSOCapture::voltToADCValue(float v)
+{
+    return DSOCapturePriv::voltToADCValue(v);
 }
 
 // EOF

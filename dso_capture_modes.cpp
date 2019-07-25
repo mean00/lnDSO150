@@ -125,7 +125,7 @@ const char *DSOCapture::getTimeBaseAsText()
  * @param count
  * @return 
  */
-bool       DSOCapture:: startCapture (int count)
+bool       DSOCapturePriv:: startCapture (int count)
 {
   DSOCapturePriv::triggerValueADC=DSOCapturePriv::voltToADCValue(DSOCapturePriv::triggerValueFloat);
   controlButtons->updateCouplingState();

@@ -55,7 +55,7 @@ public:
     
     enum DSO_VOLTAGE_RANGE
     {
-      DSO_VOLTAGE_1MV,
+      DSO_VOLTAGE_1MV, // 0
       DSO_VOLTAGE_5MV,
       DSO_VOLTAGE_10MV,
       DSO_VOLTAGE_20MV,
@@ -65,12 +65,12 @@ public:
       DSO_VOLTAGE_500MV,
       DSO_VOLTAGE_1V,
       DSO_VOLTAGE_2V,
-      DSO_VOLTAGE_5V,
+      DSO_VOLTAGE_5V, // 10
       DSO_VOLTAGE_MAX=DSO_VOLTAGE_5V
     };
-    // Table indirection
+    // capture
     static int         capture(int count,float *voltage,CaptureStats &stats);    
-    
+    static void       stopCapture();    
     
     
     // Voltage Range    
@@ -88,12 +88,8 @@ public:
     static float       getTriggerValue();
     static void        setTriggerMode(TriggerMode mode);
     static TriggerMode getTriggerMode();
-
     
-    // Capture    
-    static bool        startCapture (int count);    
-    static void        stopCapture();
-    static bool        getSamples(CapturedSet **set,int timeoutMs);
+   
     
     // Voltage Offset
     static void        setVoltageOffset(float volt);
@@ -103,10 +99,9 @@ public:
     static bool        captureToDisplay(int count,float *samples,uint8_t *waveForm);
     static void        clearCapturedData();
     static int         voltageToPixel(float v);
-    static void        initialize();
-        
-protected:
-    static void        InternalStopCapture();
+    static void        initialize();    
+    
+    static int          voltToADCValue(float v);
 
 };
 

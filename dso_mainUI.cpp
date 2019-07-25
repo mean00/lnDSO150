@@ -9,7 +9,7 @@
 #include "Fonts/FreeSansBold12pt7b.h"
 #include "gfx/dso_small_compressed.h"
 
-
+extern void  autoSetup();
 extern void  menuManagement(void);
 
 extern void splash(void);
@@ -82,6 +82,14 @@ static void buttonManagement()
     {
         STOP_CAPTURE();
         menuManagement();
+        drawBackground();
+        
+        return;
+    }
+      if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_OK) & EVENT_LONG_PRESS)    
+    {
+        STOP_CAPTURE();
+        autoSetup();
         drawBackground();
         
         return;
@@ -205,7 +213,7 @@ void drawBackground()
  */
 void initMainUI(void)
 {
-    DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_5MS);
+    DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_100US);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
     DSOCapture::setTriggerValue(1.);
     drawBackground();    

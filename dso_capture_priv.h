@@ -78,6 +78,11 @@ public:
     static bool        nextCaptureTimer(int count);
     static bool        nextCaptureTimerTrigger(int count);
     static bool        nextCapture(void);
+    static bool        startCapture (int count);    
+    static void        InternalStopCapture();
+    static bool        getSamples(CapturedSet **set,int timeoutMs);
+protected:
+    
 public:
     
     static int      currentTimeBase;
