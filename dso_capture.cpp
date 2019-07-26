@@ -434,7 +434,7 @@ float        DSOCapture::getMaxVoltageValue()
      // we want to have less than 80% pixels= 100 (i.e. half screen), else it means saturation
    
     float gain=vSettings[DSOCapturePriv::currentVoltageRange].displayGain;
-    float v=110./gain;
+    float v=116./gain;
     return v;
 }
 float        DSOCapture::getMinVoltageValue()
@@ -442,7 +442,7 @@ float        DSOCapture::getMinVoltageValue()
     // Same but for 2 blocks i.e. 2*24=48 pixel
    
     float gain=vSettings[DSOCapturePriv::currentVoltageRange].displayGain;
-    float v=48./gain;
+    float v=40./gain;
     return v;
 }
 

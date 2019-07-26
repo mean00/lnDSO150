@@ -1,5 +1,7 @@
 /***************************************************
  STM32 duino based firmware for DSO SHELL/150
+ * Try to auto set voltage range & frequency
+ * Could be better, but that will do for now
  *  * GPL v2
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
@@ -15,6 +17,7 @@ static bool autoSetupFrequency();
  */
 void        autoSetup()
 {
+    DSODisplay::drawAutoSetup();
     // swith to free running mode
     DSOCapture::stopCapture();
     DSOCapture::setTriggerMode(DSOCapture::Trigger_Run);
@@ -23,10 +26,16 @@ void        autoSetup()
     DSOCapture::setTimeBase(timeBase);
     // voltage range
     
-    if(!autoSetupVoltage()) goto end; // failed    
-    if(!autoSetupFrequency()) goto end;
+    if(!autoSetupVoltage())         
+        goto end; // failed 
+    DSODisplay::drawAutoSetupStep(1);    
+    if(!autoSetupFrequency()) 
+        goto end;
+    DSODisplay::drawAutoSetupStep(2);    
     // redo voltage in case it was wrong the 1st time due to too high/too low fq
-    if(!autoSetupVoltage()) goto end; // failed
+    if(!autoSetupVoltage()) 
+        goto end; // failed
+    DSODisplay::drawAutoSetupStep(3);    
 end:    
     DSOCapture::stopCapture();
     return;

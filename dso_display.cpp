@@ -323,6 +323,26 @@ void  DSODisplay::setMode(MODE_TYPE t)
     mode=t;
 }
 
+#define AUTOCAL_BOX_WIDTH   200
+#define AUTOCAL_BOX_HEIGHT  80
+#define AUTOCAL_BORDER      10
+#define AUTOCAL_COLOR       WHITE
 
-
+ void DSODisplay::drawAutoSetup(void )
+ {
+     tft->fillRoundRect(320/2-AUTOCAL_BOX_WIDTH/2,
+                         240/2-AUTOCAL_BOX_HEIGHT/2, 
+                         AUTOCAL_BOX_WIDTH,AUTOCAL_BOX_HEIGHT,
+                         4,AUTOCAL_COLOR);      
+ }
+void DSODisplay::drawAutoSetupStep(int i )
+ {
+    int pg=((AUTOCAL_BOX_WIDTH-AUTOCAL_BORDER*2)*i)/3;
+     tft-> fillRoundRect(320/2-AUTOCAL_BOX_WIDTH/2+AUTOCAL_BORDER,
+                         240/2-AUTOCAL_BOX_HEIGHT/2+AUTOCAL_BORDER, 
+                         pg,
+                         AUTOCAL_BOX_HEIGHT-AUTOCAL_BORDER*2,
+                         4,
+                         0);      
+ }
 // EOF

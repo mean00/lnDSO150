@@ -44,4 +44,7 @@ public:
             static void  setMode(MODE_TYPE t);
             static void  printTriggerValue(float volt); 
             static void  printOffset(float volt); 
+            
+            static void  drawAutoSetup();
+            static void  drawAutoSetupStep(int x);
 };
