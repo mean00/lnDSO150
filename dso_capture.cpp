@@ -14,6 +14,7 @@
 int      DSOCapturePriv::currentTimeBase=DSOCapture::DSO_TIME_BASE_10MS;
 int      DSOCapturePriv::currentVoltageRange=0;
 int      DSOCapturePriv::lastRequested=0;
+int      DSOCapturePriv::lastAskedSampleCount=0;
 int      DSOCapturePriv::triggerValueADC=0;
 float    DSOCapturePriv::triggerValueFloat=0;
 float     DSOCapturePriv::voltageOffset=0;
@@ -22,7 +23,6 @@ FancySemaphore *captureSemaphore=NULL;
 static TaskHandle_t captureTaskHandle;
 
 extern StopWatch watch;
-
 CapturedSet DSOCapturePriv::captureSet[2];
 
 /**

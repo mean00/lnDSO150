@@ -88,6 +88,7 @@ public:
     static int      currentTimeBase;
     static int      currentVoltageRange;
     static int      lastRequested;
+    static int      lastAskedSampleCount;
     static int      triggerValueADC;
     static float    triggerValueFloat;
     static float     voltageOffset;

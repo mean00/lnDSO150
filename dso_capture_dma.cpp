@@ -9,7 +9,6 @@
 #include "dso_capture_priv.h"
 
 #include "DSO_config.h"
-
 static int transformDma(int16_t *in, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode)
 {
    if(!count) return false;
@@ -126,6 +125,9 @@ bool       DSOCapturePriv:: startCaptureDmaTrigger (int count)
     int ex=count;
     ex=count*tSettings[currentTimeBase].expand4096;
     lastRequested=ex/4096;
+    lastAskedSampleCount=count;
+    xAssert(lastRequested>0);
+    xAssert(lastRequested<2048);
     return adc->startDMATriggeredSampling(ex,triggerValueADC);
 }
 /**
@@ -135,7 +137,7 @@ bool       DSOCapturePriv:: startCaptureDmaTrigger (int count)
 bool DSOCapturePriv::nextCapture()
 {
     adc->resetStats();    
-    currentTable->nextCapture(lastRequested);
+    currentTable->nextCapture(lastAskedSampleCount);
     return true;        
 }
 /**
