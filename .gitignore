@@ -6,5 +6,6 @@ build
 *.back
 */bin
 build*
-
+*.bin
+.vscode
 
