@@ -120,8 +120,7 @@ void MainTask( void *a )
     //testButtons();   
     if(!DSOEeprom::read())
     {
-         DSOCalibrate::calibrate();
-         DSOEeprom::write();         
+         DSOCalibrate::calibrate();         
     }
     //testAdc();   
     //testAdc2();   //fast

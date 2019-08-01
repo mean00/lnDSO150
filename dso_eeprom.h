@@ -3,12 +3,11 @@
  *  * GPL v2
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
-#include "EEPROM.h"
-
+#pragma once
 class DSOEeprom
 {
 public:
         static bool read();
         static bool write();
-  
+        static bool wipe();  
 };

@@ -6,6 +6,7 @@
 
 #include "dso_global.h"
 #include "dso_adc.h"
+#include "dso_eeprom.h"
 extern DSOADC                     *adc;
 
 extern uint16_t directADC2Read(int pin);
@@ -116,5 +117,16 @@ bool DSOCalibrate::calibrate()
     doCalibrate(calibrationDC,YELLOW,"Set switch to *GND*",DSOControl::DSO_COUPLING_GND);                     
     doCalibrate(calibrationDC,YELLOW,"Set switch to *DC*",DSOControl::DSO_COUPLING_DC);       
     doCalibrate(calibrationAC,GREEN, "Set switch to *AC*",DSOControl::DSO_COUPLING_AC);
+    DSOEeprom::write();         
+    tft->fillScreen(0);
+    return true;        
+}
+/**
+ * 
+ * @return 
+ */
+bool DSOCalibrate::decalibrate()
+{    
+    DSOEeprom::wipe();
     return true;        
 }

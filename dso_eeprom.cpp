@@ -49,4 +49,16 @@ bool  DSOEeprom::write()
     
     return true;
 }
+/**
+ * 
+ * @return 
+ */
+bool  DSOEeprom::wipe()
+{
+    EEPROMClass e2;
+    e2.init();
+    e2.format();
+    e2.write(0,0);
+    return true;
+}
 

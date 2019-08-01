@@ -42,11 +42,19 @@ const MenuItem  signalMenu[]=
     {MenuItem::MENU_BACK, "Back",NULL},
     {MenuItem::MENU_END, NULL,NULL}
 };
+const MenuItem  calibrationMenu[]=
+{
+    {MenuItem::MENU_TITLE, "Calbration",NULL},
+    {MenuItem::MENU_CALL, "Calibrate",(const void *)DSOCalibrate::calibrate},
+    {MenuItem::MENU_CALL, "Wipe",(const void *)DSOCalibrate::decalibrate},
+    {MenuItem::MENU_BACK, "Back",NULL},
+    {MenuItem::MENU_END, NULL,NULL}
+};
 const MenuItem  topMenu[]={
     {MenuItem::MENU_TITLE, "Main Menu",NULL},
     {MenuItem::MENU_SUBMENU, "Test signal",(const void *)&signalMenu},
     {MenuItem::MENU_CALL, "Button Test",(const void *)buttonTest},
-    {MenuItem::MENU_CALL, "Calibration",(const void *)DSOCalibrate::calibrate},
+    {MenuItem::MENU_SUBMENU, "Calibration",(const void *)&calibrationMenu},
     {MenuItem::MENU_BACK, "Back",NULL},
     {MenuItem::MENU_END, NULL,NULL}
 };
