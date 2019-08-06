@@ -59,8 +59,10 @@ void mySetup()
 {
     
     afio_cfg_debug_ports( AFIO_DEBUG_SW_ONLY); // Unlock PB3 & PB4
+#ifdef     USE_RXTX_PIN_FOR_ROTARY // Use Serial only if we have USB
     Serial.begin(115200);
     Serial.println("Init"); 
+#endif
     
     
      // Ok let's go, switch to FreeRTOS

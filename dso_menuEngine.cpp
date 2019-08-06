@@ -115,8 +115,8 @@ next:
                     return;
                   if(event & EVENT_SHORT_PRESS)
                   {
-                      Serial.print("Menu \n");
-                      Serial.print(xtop[current].type);
+                   //   Serial.print("Menu \n");
+                   //   Serial.print(xtop[current].type);
                       switch(xtop[current].type)
                       {
                       case MenuItem::MENU_BACK: return; break;
