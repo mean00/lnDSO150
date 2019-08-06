@@ -14,6 +14,8 @@ Status so far:
 * Micro USB port used a serial 
 * Calibration 
 * No Trigger  / Trigger rising / Trigger falling, Trigger both
+* Auto setup : Press "OK" for 3 seconds 
+* Settable test signal. Press the rotary encoder for 3 sec to enter the menu.
 
 What does NOT work :
 * It is always acquiring, you can't do single shot
