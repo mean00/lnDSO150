@@ -44,19 +44,19 @@
  *
  * See http://www.freertos.org/a00110.html
  *----------------------------------------------------------*/
-#define configUSE_DAEMON_TASK_STARTUP_HOOK 1
-#define configUSE_PREEMPTION		1
+#define configUSE_DAEMON_TASK_STARTUP_HOOK      0
+#define configUSE_PREEMPTION                    1
 #define configUSE_IDLE_HOOK			0
 #define configUSE_TICK_HOOK			0 // MEANX
 #define configCPU_CLOCK_HZ			( ( unsigned long ) F_CPU) // WAS :72000000 )	
 #define configTICK_RATE_HZ			( ( TickType_t ) 1000 )
-#define configMAX_PRIORITIES		( 5 )
-#define configMINIMAL_STACK_SIZE	( ( unsigned short ) 128 )
-#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 4 * 1024 ) ) // WAS : 8
-#define configMAX_TASK_NAME_LEN		( 16 )
-#define configUSE_TRACE_FACILITY	0
-#define configUSE_16_BIT_TICKS		0
-#define configIDLE_SHOULD_YIELD		1
+#define configMAX_PRIORITIES                    ( 31 )
+#define configMINIMAL_STACK_SIZE                ( ( unsigned short ) 128 )
+#define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 4 * 1024 ) ) // WAS : 8
+#define configMAX_TASK_NAME_LEN                 ( 16 )
+#define configUSE_TRACE_FACILITY                0
+#define configUSE_16_BIT_TICKS                  0
+#define configIDLE_SHOULD_YIELD                 1
 #define configUSE_MUTEXES			1
 
 /* Co-routine definitions. */
@@ -90,13 +90,15 @@ NVIC value of 255. */
 
 
 
-#define configUSE_MUTEXES				1
-#define configUSE_COUNTING_SEMAPHORES 	1
+#define configUSE_MUTEXES			1
+#define configUSE_COUNTING_SEMAPHORES           1
 #define configUSE_ALTERNATIVE_API 		0
-#define configCHECK_FOR_STACK_OVERFLOW	2
+#define configUSE_TIME_SLICING                  0
+#define configCHECK_FOR_STACK_OVERFLOW          2
 #define configUSE_RECURSIVE_MUTEXES		1
 #define configQUEUE_REGISTRY_SIZE		0
-#define configGENERATE_RUN_TIME_STATS	0
+#define configGENERATE_RUN_TIME_STATS           0
+#define configUSE_TIMERS                        0
 #if 0 // MEANX Needed ?
 #define configCOM0_RX_BUFFER_LENGTH		128
 #define configCOM0_TX_BUFFER_LENGTH		128
