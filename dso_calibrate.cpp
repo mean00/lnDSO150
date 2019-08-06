@@ -75,26 +75,24 @@ void header(int color,const char *txt,DSOControl::DSOCoupling target)
             }
     }
 }
-
+#define NB_SAMPLES 64
 void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupling target)
 {
     
     printCalibrationTemplate("Connect probe to ground","(connect the 2 crocs together)");
     header(color,txt,target); 
-
-    FullSampleSet fset;    
-    uint32_t data [256];
     
     for(int range=0;range<14;range++)
     {
         controlButtons->setInputGain(range);        
-        
+        xDelay(10);
         int sum=0;
-        for(int i=0;i<64;i++)
+        for(int i=0;i<NB_SAMPLES;i++)
         {
             sum+=directADC2Read(analogInPin);
+            xDelay(2);
         }
-        sum=(sum+31)/64;        
+        sum=(sum+(NB_SAMPLES/2)-1)/NB_SAMPLES;
         array[range]=sum;
     }
 }
