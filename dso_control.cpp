@@ -38,9 +38,9 @@
 #include "fancyLock.h"
 #define TICK                  10 // 10 ms
 #define LONG_PRESS_THRESHOLD (1000/TICK) // 1s
-#define SHORT_PRESS_THRESHOLD (2)
+#define SHORT_PRESS_THRESHOLD (3) // 20 ms
 #define HOLDOFF_THRESHOLD     (100/TICK)
-#define COUNT_MAX             3
+#define COUNT_MAX             4
 
 extern uint16_t directADC2Read(int pin);
 
