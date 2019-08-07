@@ -47,4 +47,5 @@ public:
             
             static void  drawAutoSetup();
             static void  drawAutoSetupStep(int x);
+            static void  triggered(bool gotIt);
 };

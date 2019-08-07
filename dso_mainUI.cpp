@@ -252,6 +252,7 @@ void mainDSOUI(void)
         // Nothing captured, refresh screen
         if(!count) 
         {
+            DSODisplay::triggered(false);
             DSODisplay::drawVoltageTrigger(false,triggerLine);
             buttonManagement();
             float f=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();
@@ -259,6 +260,7 @@ void mainDSOUI(void)
             DSODisplay::drawVoltageTrigger(true,triggerLine);
             continue;
         }
+        DSODisplay::triggered(true);
         DSOCapture::captureToDisplay(count,test_samples,waveForm);  
         // Remove trigger
         DSODisplay::drawVoltageTrigger(false,triggerLine);

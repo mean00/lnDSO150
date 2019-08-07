@@ -15,6 +15,21 @@ bool StopWatch::elapsed(int threshold)
         mil=millis()&0xffff;
         return false;
     }
+    
+    
+    int delta=msSinceOk();
+    if (threshold<delta)
+    {
+        return true;
+    }
+    return false;
+}
+/**
+ * 
+ * @return 
+ */
+int  StopWatch::msSinceOk()
+{
     newMil=millis()&0xffff;
     int delta;
     if(mil<=newMil)
@@ -24,14 +39,8 @@ bool StopWatch::elapsed(int threshold)
     {
         delta=(0x10000+mil)-newMil;
     }
-    if (threshold<delta)
-    {
-      //  tag();
-        return true;
-    }
-    return false;
+    return delta;
 }
-
 void StopWatch::ok()
 {
     mil=millis()&0xffff;

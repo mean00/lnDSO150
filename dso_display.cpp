@@ -11,7 +11,10 @@
 #include "dso_global.h"
 #include "dso_display.h"
 #include "pattern.h"
+#include "stopWatch.h"
 
+StopWatch triggerWatch;
+#define TRIGGER_STEP 128 // 50 ms step
 static DSODisplay::MODE_TYPE mode=DSODisplay::VOLTAGE_MODE;
 /**
  */
@@ -60,6 +63,7 @@ void DSODisplay::init()
         prevPos[i]=120;
         prevSize[i]=1;
     }
+    triggerWatch.elapsed(0);
 }
 
 
@@ -133,7 +137,8 @@ void DSODisplay::drawGrid(void)
 //    tft->drawFastHLine(SCALE_STEP*(C/2-CENTER_CROSS),SCALE_STEP*5,SCALE_STEP*CENTER_CROSS*2,WHITE);
 //    tft->drawFastVLine(SCALE_STEP*5,SCALE_STEP*(C/2-CENTER_CROSS),SCALE_STEP*CENTER_CROSS*2,WHITE);
 
-        
+    tft-> drawCircle(2+10, 2+10, 10, GREEN);
+    tft->setCursor(24, 2); tft->myDrawString("Triggered"); 
 
 }
 /**
@@ -345,4 +350,23 @@ void DSODisplay::drawAutoSetupStep(int i )
                          4,
                          0);      
  }
+
+static void drawLed(int color)
+{
+    tft->fillRect(2+4,2+4,12,12,color);
+}
+
+void  DSODisplay::triggered(bool gotIt)
+{
+    if(gotIt)
+    {
+        triggerWatch.ok();
+        drawLed(GREEN);
+        return;
+    }
+    int d=triggerWatch.msSinceOk()/TRIGGER_STEP;
+    int color=0x3f>>d;
+    drawLed(color<<5);
+}
+
 // EOF

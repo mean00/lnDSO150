@@ -10,7 +10,7 @@ public:
     }
     void ok();
     bool elapsed(int threshold);
-  
+    int  msSinceOk();
 protected:
     bool armed;
     uint32_t mil;
