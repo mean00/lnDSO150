@@ -70,7 +70,7 @@ public:
     };
     // capture
     static int         capture(int count,float *voltage,CaptureStats &stats);    
-    static void       stopCapture();    
+    static void        stopCapture();    
     
     
     // Voltage Range    

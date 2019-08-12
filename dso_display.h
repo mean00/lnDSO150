@@ -7,6 +7,13 @@
 #pragma once
 
 
+typedef enum DSO_ArmingMode
+{
+    DSO_CAPTURE_SINGLE_ARMED,
+    DSO_CAPTURE_SINGLE_CAPTURED,
+    DSO_CAPTURE_MULTI,
+    DSO_CAPTURE_MODE_INVALIDE
+};
 
 
 /**
@@ -48,4 +55,5 @@ public:
             static void  drawAutoSetup();
             static void  drawAutoSetupStep(int x);
             static void  triggered(bool gotIt);
+            static void  drawArmingMode(DSO_ArmingMode mode);
 };

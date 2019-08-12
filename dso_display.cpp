@@ -368,5 +368,28 @@ void  DSODisplay::triggered(bool gotIt)
     int color=0x3f>>d;
     drawLed(color<<5);
 }
-
+/**
+ * 
+ * @param mode
+ */
+void  DSODisplay::drawArmingMode(DSO_ArmingMode mode)
+{
+    static DSO_ArmingMode oldMode=DSO_CAPTURE_MODE_INVALIDE;
+    if(oldMode==mode)
+        return;
+    oldMode=mode;
+#define ARM_WIDTH (4*10)
+     tft->setCursor(160,0);
+     const char *smode="??";
+     switch(mode)
+     {
+        case   DSO_CAPTURE_SINGLE_ARMED:    smode="WAIT";break;
+        case   DSO_CAPTURE_SINGLE_CAPTURED: smode="TRGD";break;
+        case   DSO_CAPTURE_MULTI :          smode="MULTI";break;
+        default:
+                xAssert(0);
+                break;
+     }
+     tft->myDrawString(smode,ARM_WIDTH);
+}
 // EOF

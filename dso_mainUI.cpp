@@ -30,6 +30,8 @@ int       nbRefrsh=0;
 static    int lastTrigger=-1;
 static    DSOControl::DSOCoupling oldCoupling;
 
+DSO_ArmingMode armingMode=DSO_CAPTURE_MULTI;
+
 static void initMainUI(void);
 void drawBackground();
 /**
@@ -114,6 +116,25 @@ static void buttonManagement()
         newMode=DSODisplay::TRIGGER_MODE;
     }
 
+    if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_ROTARY) & EVENT_SHORT_PRESS)    
+    {
+        if(armingMode==DSO_CAPTURE_SINGLE_CAPTURED)
+            armingMode=DSO_CAPTURE_SINGLE_ARMED;
+    }
+    if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_OK) & EVENT_SHORT_PRESS)    
+    {
+        switch(armingMode)
+        {
+            case DSO_CAPTURE_SINGLE_CAPTURED:
+            case DSO_CAPTURE_SINGLE_ARMED:
+                armingMode=DSO_CAPTURE_MULTI;
+                break;
+            case DSO_CAPTURE_MULTI:
+                armingMode=DSO_CAPTURE_SINGLE_ARMED;
+                break;
+        }
+    }
+    
     if(dirty)
     {
         if((DSODisplay::getMode()&0x7f)==newMode) // switch between normal & alternate
@@ -245,9 +266,10 @@ void mainDSOUI(void)
     DSOControl::DSOCoupling oldCoupling=controlButtons->getCouplingState();
     while(1)
     {        
-        int count;  
+        int count=0;  
         
-        count=DSOCapture::capture(240,test_samples,stats);  
+        if(  armingMode!= DSO_CAPTURE_SINGLE_CAPTURED)
+            count=DSOCapture::capture(240,test_samples,stats);  
         
         // Nothing captured, refresh screen
         if(!count) 
@@ -266,6 +288,10 @@ void mainDSOUI(void)
         DSODisplay::drawVoltageTrigger(false,triggerLine);
         
         DSODisplay::drawWaveForm(count,waveForm);
+        
+        if(armingMode==DSO_CAPTURE_SINGLE_ARMED )
+            armingMode=DSO_CAPTURE_SINGLE_CAPTURED;
+
         
         
         if(lastTrigger!=-1)
