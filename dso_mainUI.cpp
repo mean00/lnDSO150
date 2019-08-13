@@ -30,7 +30,7 @@ int       nbRefrsh=0;
 static    int lastTrigger=-1;
 static    DSOControl::DSOCoupling oldCoupling;
 
-DSO_ArmingMode armingMode=DSO_CAPTURE_MULTI;
+DSO_ArmingMode armingMode=DSO_CAPTURE_MULTI; // single shot or repeat capture
 
 static void initMainUI(void);
 void drawBackground();
