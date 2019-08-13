@@ -66,6 +66,7 @@ static void redraw()
         DSODisplay::printVoltTimeTriggerMode(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText(),DSOCapture::getTriggerMode());
         DSODisplay::printTriggerValue(DSOCapture::getTriggerValue());
         DSODisplay::printOffset(capture->getVoltageOffset());
+        DSODisplay::drawArmingMode(armingMode);
 }
 #define STOP_CAPTURE() {DSOCapture::stopCapture();xDelay(20);}
 
@@ -79,16 +80,25 @@ static void buttonManagement()
         oldCoupling=coupling;
         dirty=true;
     }
-    
-    if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_ROTARY) & EVENT_LONG_PRESS)    
+    int evt;
+    // OK button
+    evt=controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_OK);
+    if(evt & EVENT_SHORT_PRESS)
     {
-        STOP_CAPTURE();
-        menuManagement();
-        drawBackground();
-        
-        return;
+        dirty=true;
+        switch(armingMode)
+        {
+            case DSO_CAPTURE_SINGLE_CAPTURED:
+            case DSO_CAPTURE_SINGLE_ARMED:
+                armingMode=DSO_CAPTURE_MULTI;
+                break;
+            case DSO_CAPTURE_MULTI:
+                armingMode=DSO_CAPTURE_SINGLE_ARMED;
+                break;
+        }
     }
-      if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_OK) & EVENT_LONG_PRESS)    
+
+    if(evt & EVENT_LONG_PRESS)    
     {
         STOP_CAPTURE();
         autoSetup();
@@ -96,6 +106,22 @@ static void buttonManagement()
         
         return;
     }
+    // Rotary push
+    evt=controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_ROTARY);    
+    if(evt & EVENT_SHORT_PRESS)    
+    {
+        if(armingMode==DSO_CAPTURE_SINGLE_CAPTURED);
+            armingMode=DSO_CAPTURE_SINGLE_ARMED;
+    }
+    if(evt & EVENT_LONG_PRESS)    
+    {
+        STOP_CAPTURE();
+        menuManagement();
+        drawBackground();
+        
+        return;
+    }
+  
     int inc=controlButtons->getRotaryValue();
     
     DSODisplay::MODE_TYPE newMode=DSODisplay::INVALID_MODE;
@@ -116,24 +142,7 @@ static void buttonManagement()
         newMode=DSODisplay::TRIGGER_MODE;
     }
 
-    if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_ROTARY) & EVENT_SHORT_PRESS)    
-    {
-        if(armingMode==DSO_CAPTURE_SINGLE_CAPTURED)
-            armingMode=DSO_CAPTURE_SINGLE_ARMED;
-    }
-    if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_OK) & EVENT_SHORT_PRESS)    
-    {
-        switch(armingMode)
-        {
-            case DSO_CAPTURE_SINGLE_CAPTURED:
-            case DSO_CAPTURE_SINGLE_ARMED:
-                armingMode=DSO_CAPTURE_MULTI;
-                break;
-            case DSO_CAPTURE_MULTI:
-                armingMode=DSO_CAPTURE_SINGLE_ARMED;
-                break;
-        }
-    }
+  
     
     if(dirty)
     {
@@ -223,6 +232,7 @@ void drawBackground()
     tft->setTextSize(2);
     DSODisplay::drawGrid();
     DSODisplay::drawStatsBackGround();
+    
     DSODisplay::printVoltTimeTriggerMode(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText(),DSOCapture::getTriggerMode());
     DSODisplay::printTriggerValue(DSOCapture::getTriggerValue());
     DSODisplay::printOffset(capture->getVoltageOffset());
@@ -270,7 +280,7 @@ void mainDSOUI(void)
         
         if(  armingMode!= DSO_CAPTURE_SINGLE_CAPTURED)
             count=DSOCapture::capture(240,test_samples,stats);  
-        
+        DSODisplay::drawArmingMode(armingMode);
         // Nothing captured, refresh screen
         if(!count) 
         {

@@ -378,18 +378,19 @@ void  DSODisplay::drawArmingMode(DSO_ArmingMode mode)
     if(oldMode==mode)
         return;
     oldMode=mode;
-#define ARM_WIDTH (4*10)
-     tft->setCursor(160,0);
+#define ARM_WIDTH (6*10)
+  
      const char *smode="??";
      switch(mode)
      {
         case   DSO_CAPTURE_SINGLE_ARMED:    smode="WAIT";break;
         case   DSO_CAPTURE_SINGLE_CAPTURED: smode="TRGD";break;
-        case   DSO_CAPTURE_MULTI :          smode="MULTI";break;
+        case   DSO_CAPTURE_MULTI :          smode="AUTO";break;
         default:
                 xAssert(0);
                 break;
      }
+     tft->setCursor(120,0);
      tft->myDrawString(smode,ARM_WIDTH);
 }
 // EOF
