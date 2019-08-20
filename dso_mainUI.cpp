@@ -66,7 +66,7 @@ static void redraw()
         DSODisplay::printVoltTimeTriggerMode(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText(),DSOCapture::getTriggerMode());
         DSODisplay::printTriggerValue(DSOCapture::getTriggerValue());
         DSODisplay::printOffset(capture->getVoltageOffset());
-        DSODisplay::drawArmingMode(armingMode);
+        DSODisplay::drawArmingMode(armingMode,false);
 }
 #define STOP_CAPTURE() {DSOCapture::stopCapture();xDelay(20);}
 
@@ -102,8 +102,7 @@ static void buttonManagement()
     {
         STOP_CAPTURE();
         autoSetup();
-        drawBackground();
-        
+        drawBackground();        
         return;
     }
     // Rotary push
@@ -225,6 +224,9 @@ static void buttonManagement()
         redraw();
     }
 }
+/**
+ * 
+ */
 void drawBackground()
 {
     tft->fillScreen(BLACK);
@@ -236,7 +238,7 @@ void drawBackground()
     DSODisplay::printVoltTimeTriggerMode(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText(),DSOCapture::getTriggerMode());
     DSODisplay::printTriggerValue(DSOCapture::getTriggerValue());
     DSODisplay::printOffset(capture->getVoltageOffset());
-   
+    DSODisplay::drawArmingMode(armingMode,false);
 
 }
 /**
@@ -280,19 +282,19 @@ void mainDSOUI(void)
         
         if(  armingMode!= DSO_CAPTURE_SINGLE_CAPTURED)
             count=DSOCapture::capture(240,test_samples,stats);  
-        DSODisplay::drawArmingMode(armingMode);
+        
         // Nothing captured, refresh screen
         if(!count) 
-        {
-            DSODisplay::triggered(false);
+        {            
             DSODisplay::drawVoltageTrigger(false,triggerLine);
             buttonManagement();
+            DSODisplay::drawArmingMode(armingMode,false);
             float f=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();
             triggerLine=DSOCapture::voltageToPixel(f);
             DSODisplay::drawVoltageTrigger(true,triggerLine);
             continue;
         }
-        DSODisplay::triggered(true);
+        
         DSOCapture::captureToDisplay(count,test_samples,waveForm);  
         // Remove trigger
         DSODisplay::drawVoltageTrigger(false,triggerLine);
@@ -300,9 +302,10 @@ void mainDSOUI(void)
         DSODisplay::drawWaveForm(count,waveForm);
         
         if(armingMode==DSO_CAPTURE_SINGLE_ARMED )
+        {
             armingMode=DSO_CAPTURE_SINGLE_CAPTURED;
-
-        
+        }
+        DSODisplay::drawArmingMode(armingMode,true);
         
         if(lastTrigger!=-1)
         {

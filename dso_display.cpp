@@ -13,8 +13,19 @@
 #include "pattern.h"
 #include "stopWatch.h"
 
+
+#define AUTOCAL_BOX_WIDTH   200
+#define AUTOCAL_BOX_HEIGHT  80
+#define AUTOCAL_BORDER      10
+#define AUTOCAL_COLOR       WHITE
+#define LED_X               120
+#define LED_Y               2
+#define LED_R               10
+
+static DSO_ArmingMode oldMode=DSO_CAPTURE_MODE_INVALIDE;
+
 StopWatch triggerWatch;
-#define TRIGGER_STEP 128 // 50 ms step
+
 static DSODisplay::MODE_TYPE mode=DSODisplay::VOLTAGE_MODE;
 /**
  */
@@ -134,11 +145,8 @@ void DSODisplay::drawGrid(void)
     tft->drawFastVLine((C_X*SCALE_STEP)/2,DSO_WAVEFORM_OFFSET,SCALE_STEP*C_Y,hiLight);
     
     
-//    tft->drawFastHLine(SCALE_STEP*(C/2-CENTER_CROSS),SCALE_STEP*5,SCALE_STEP*CENTER_CROSS*2,WHITE);
-//    tft->drawFastVLine(SCALE_STEP*5,SCALE_STEP*(C/2-CENTER_CROSS),SCALE_STEP*CENTER_CROSS*2,WHITE);
+    tft->fillCircle(LED_X +LED_R, LED_Y+LED_R, LED_R, GREEN);
 
-    tft-> drawCircle(2+10, 2+10, 10, GREEN);
-    tft->setCursor(24, 2); tft->myDrawString("Triggered"); 
 
 }
 /**
@@ -232,6 +240,8 @@ void DSODisplay::drawStatsBackGround()
     AND_ONE_A("Trigg",8);
     AND_ONE_A("Offst",10);
     tft->setTextColor(BG_COLOR,BLACK);
+    oldMode=DSO_CAPTURE_MODE_INVALIDE;
+    
 }
 #define LOWER_BAR_PRINT(x,y) { tft->setCursor(y*64, 240-18); tft->myDrawString(x);}            
 #define LOWER_BAR_PRINT_NCHARS(x,y,n) { tft->setCursor(y*64, 240-18); tft->myDrawString(x,n*18);}            
@@ -328,11 +338,6 @@ void  DSODisplay::setMode(MODE_TYPE t)
     mode=t;
 }
 
-#define AUTOCAL_BOX_WIDTH   200
-#define AUTOCAL_BOX_HEIGHT  80
-#define AUTOCAL_BORDER      10
-#define AUTOCAL_COLOR       WHITE
-
  void DSODisplay::drawAutoSetup(void )
  {
      tft->fillRoundRect(320/2-AUTOCAL_BOX_WIDTH/2,
@@ -348,25 +353,36 @@ void DSODisplay::drawAutoSetupStep(int i )
                          pg,
                          AUTOCAL_BOX_HEIGHT-AUTOCAL_BORDER*2,
                          4,
-                         0);      
+                         0);    
+     
  }
 
 static void drawLed(int color)
 {
-    tft->fillRect(2+4,2+4,12,12,color);
+
+#define BORDER_WIDTH 3
+    tft->fillRect(  LED_X+BORDER_WIDTH+1,
+                    LED_Y+BORDER_WIDTH+1,
+                    LED_R*2-BORDER_WIDTH*2,
+                    LED_R*2-BORDER_WIDTH*2,color);
 }
 
 void  DSODisplay::triggered(bool gotIt)
 {
     if(gotIt)
-    {
-        triggerWatch.ok();
         drawLed(GREEN);
-        return;
-    }
-    int d=triggerWatch.msSinceOk()/TRIGGER_STEP;
-    int color=0x3f>>d;
-    drawLed(color<<5);
+    else      
+        drawLed(BLACK);
+}
+/**
+ * 
+ * @param mode
+ */
+
+void  DSODisplay::drawArmingMode(DSO_ArmingMode mode,bool triggered)
+{
+    drawArmingMode(mode);
+    drawTrigger(triggered);
 }
 /**
  * 
@@ -374,23 +390,47 @@ void  DSODisplay::triggered(bool gotIt)
  */
 void  DSODisplay::drawArmingMode(DSO_ArmingMode mode)
 {
-    static DSO_ArmingMode oldMode=DSO_CAPTURE_MODE_INVALIDE;
+    
     if(oldMode==mode)
         return;
     oldMode=mode;
-#define ARM_WIDTH (6*10)
-  
+#define ARM_WIDTH (108)
+#define TRIGGER_STEP 128 // 50 ms step
      const char *smode="??";
      switch(mode)
      {
-        case   DSO_CAPTURE_SINGLE_ARMED:    smode="WAIT";break;
-        case   DSO_CAPTURE_SINGLE_CAPTURED: smode="TRGD";break;
-        case   DSO_CAPTURE_MULTI :          smode="AUTO";break;
+        case   DSO_CAPTURE_SINGLE_ARMED:    smode="SNGL:WAIT";DSODisplay::triggered(false);break;
+        case   DSO_CAPTURE_SINGLE_CAPTURED: smode="SNGL:TRG"; DSODisplay::triggered(true);break;
+        case   DSO_CAPTURE_MULTI :  
+                                {
+                                    smode="MULTI";      
+                                    if(triggered)
+                                        triggerWatch.ok();                                    
+                                    int d=triggerWatch.msSinceOk()/TRIGGER_STEP;
+                                    int color=0x3f>>d;
+                                    drawLed(color<<5);
+                                }
+                                break;
         default:
                 xAssert(0);
                 break;
      }
-     tft->setCursor(120,0);
+     tft->setCursor(4,0);
      tft->myDrawString(smode,ARM_WIDTH);
 }
+/**
+ * 
+ * @param triggered
+ */
+
+void  DSODisplay::drawTrigger(bool triggered)
+{
+    if(oldMode!=DSO_CAPTURE_MULTI) return;
+    if(triggered)
+        triggerWatch.ok();                                    
+    int d=triggerWatch.msSinceOk()/TRIGGER_STEP;
+    int color=0x3f>>d;
+    drawLed(color<<5);
+}
+
 // EOF

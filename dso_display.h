@@ -55,5 +55,9 @@ public:
             static void  drawAutoSetup();
             static void  drawAutoSetupStep(int x);
             static void  triggered(bool gotIt);
+            static void  drawArmingMode(DSO_ArmingMode mode,bool triggered);
+            
+protected:
             static void  drawArmingMode(DSO_ArmingMode mode);
+            static void  drawTrigger(bool triggered);
 };
