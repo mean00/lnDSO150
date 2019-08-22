@@ -70,6 +70,8 @@ void header(int color,const char *txt,DSOControl::DSOCoupling target)
             }
             if(cpl==target && controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_OK)&EVENT_SHORT_PRESS)
             {
+                tft->setTextColor(BLACK,GREEN);
+                printxy(160-8*8,160,"- processing -");
                 tft->setTextColor(WHITE,BLACK);
                 return;
             }
@@ -115,6 +117,7 @@ bool DSOCalibrate::calibrate()
     doCalibrate(calibrationDC,YELLOW,"Set switch to *GND*",DSOControl::DSO_COUPLING_GND);                     
     doCalibrate(calibrationDC,YELLOW,"Set switch to *DC*",DSOControl::DSO_COUPLING_DC);       
     doCalibrate(calibrationAC,GREEN, "Set switch to *AC*",DSOControl::DSO_COUPLING_AC);
+    //while(1) {};
     DSOEeprom::write();         
     tft->fillScreen(0);
     return true;        
