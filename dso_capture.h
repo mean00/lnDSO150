@@ -81,7 +81,7 @@ public:
     static bool        setTimeBase(DSO_TIME_BASE timeBase);
     static DSO_TIME_BASE getTimeBase();
     static const char *getTimeBaseAsText();
-    
+    static int         timeBaseToFrequency(DSO_TIME_BASE timeBase);
     // Trigger
     static void        updateTriggersValue();
     static void        setTriggerValue(float volt);

@@ -116,10 +116,16 @@ bool autoSetupFrequency()
         if(tries--<0) return true; // did not converge ?
         if(stats.frequency>30)
         {
-            // Readjust trigger
-            float trigger=(stats.xmax+stats.xmin)/2.;
-            DSOCapture::setTriggerValue(trigger);
-            return true;
+            // Try to get fq = 4 square
+            int fq=DSOCapture::timeBaseToFrequency((DSOCapture::DSO_TIME_BASE)timeBase);
+            if(1 || stats.frequency<= fq*4)
+            {
+                //
+                // Readjust trigger
+                float trigger=(stats.xmax+stats.xmin)/2.;
+                DSOCapture::setTriggerValue(trigger);
+                return true;
+            }
         }
         timeBase++;
         if(timeBase>DSOCapture::DSO_TIME_BASE_MAX) break;

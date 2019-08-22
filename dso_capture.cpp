@@ -445,6 +445,33 @@ float        DSOCapture::getMinVoltageValue()
     float v=40./gain;
     return v;
 }
+/**
+ * 
+ * @param timeBase
+ * @return 
+ */
+int         DSOCapture::timeBaseToFrequency(DSOCapture::DSO_TIME_BASE timeBase)
+{
+#define CASE(x,y) case DSO_TIME_BASE_##x: return y;break;
+    
+    switch(timeBase)
+    {
+        CASE(10US,  100*1000) 
+        CASE(25US,  40*1000) 
+        CASE(50US,  20*1000) 
+        CASE(100US, 10*1000) 
+        CASE(500US, 2*1000) 
+        CASE(1MS,   1000) 
+        CASE(5MS,   200) 
+        CASE(10MS,  100) 
+        CASE(50MS,  20) 
+        CASE(100MS, 10) 
+        CASE(500MS, 2) 
+        CASE(1S,    1)     
+    }
+    xAssert(0);
+    return 0;
+}
 
 // EOF
 
