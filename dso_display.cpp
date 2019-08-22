@@ -233,8 +233,8 @@ void DSODisplay::drawStatsBackGround()
         
 
     tft->setTextColor(BLACK,BG_COLOR);
-    AND_ONE_A("Mini",0);   
-    AND_ONE_A("Maxi",2);   
+    AND_ONE_A("Min",0);   
+    AND_ONE_A("Max",2);   
     AND_ONE_A("Avrg",4);
     AND_ONE_A("Freq",6);
     AND_ONE_A("Trigg",8);
@@ -243,8 +243,6 @@ void DSODisplay::drawStatsBackGround()
     oldMode=DSO_CAPTURE_MODE_INVALIDE;
     
 }
-#define LOWER_BAR_PRINT(x,y) { tft->setCursor(y*64, 240-18); tft->myDrawString(x);}            
-#define LOWER_BAR_PRINT_NCHARS(x,y,n) { tft->setCursor(y*64, 240-18); tft->myDrawString(x,n*18);}            
 
 /**
  * 
@@ -266,6 +264,13 @@ void DSODisplay::printTriggerValue( float volt)
     AND_ONE_F(volt,9);      
 }
 
+#define LOWER_BAR_PRINT(x,y) { tft->setCursor(y*64, 240-18); tft->myDrawString(x,64);}            
+#define LOWER_BAR_PRINT_NCHARS(x,y,n) { tft->setCursor(y*64, 240-18); tft->myDrawString(x,n*18);}            
+    
+#define SELECT(md)   { if(md==mode) tft->setTextColor(BLACK,BG_COLOR); else  tft->setTextColor(BG_COLOR,BLACK);}
+#define LOWER_BAR(mode,st,column) {SELECT(mode);    LOWER_BAR_PRINT(st,column);}
+#define LOWER_BAR_NCHAR(mode,st,column) {SELECT(mode);    LOWER_BAR_PRINT_NCHARS(st,column,4);}    
+     
 /**
  * 
  */
@@ -274,31 +279,20 @@ void DSODisplay::printVoltTimeTriggerMode(const char *volt, const char *time,DSO
     const char *st="????";
     switch(tmode)
     {
-        case DSOCapture::Trigger_Rising: st="UP  ";break;
-        case DSOCapture::Trigger_Falling: st="DOWN";break;
-        case DSOCapture::Trigger_Both: st="BOTH";break;
-        case DSOCapture::Trigger_Run: st="RUN ";break;
-        default:
-            xAssert(0);
-            break;
+        case DSOCapture::Trigger_Rising:    st="UP  ";break;
+        case DSOCapture::Trigger_Falling:   st="DOWN";break;
+        case DSOCapture::Trigger_Both:      st="BOTH";break;
+        case DSOCapture::Trigger_Run:       st="RUN ";break;
+        default:            xAssert(0);            break;
     }
     const char *coupling="??";
      switch(controlButtons->getCouplingState())
     {
-        case DSOControl::DSO_COUPLING_GND:
-            coupling="GND";
-            break;
-        case DSOControl::DSO_COUPLING_DC:
-            coupling="DC";
-            break;
-        case DSOControl::DSO_COUPLING_AC:
-            coupling="AC";
-            break;
+        case DSOControl::DSO_COUPLING_GND:  coupling="GND";break;
+        case DSOControl::DSO_COUPLING_DC:   coupling=" DC"; break;
+        case DSOControl::DSO_COUPLING_AC:   coupling=" AC"; break;
+        default:            xAssert(0);            break;
     }    
-    
-#define SELECT(md)   { if(md==mode) tft->setTextColor(BLACK,BG_COLOR); else  tft->setTextColor(BG_COLOR,BLACK);}
-#define LOWER_BAR(mode,st,column) {SELECT(mode);    LOWER_BAR_PRINT(st,column);}
-#define LOWER_BAR_NCHAR(mode,st,column) {SELECT(mode);    LOWER_BAR_PRINT_NCHARS(st,column,4);}    
     LOWER_BAR(VOLTAGE_MODE,volt,0);
     LOWER_BAR(TIME_MODE,time,1);
     LOWER_BAR_NCHAR(TRIGGER_MODE,st,2);
