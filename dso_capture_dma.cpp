@@ -61,7 +61,7 @@ static int transformDma(int16_t *in, float *out,int count, VoltageSettings *set,
         dex+=expand;
     }   
    }
-   stats.avg/=count;
+   stats.avg/=(float)ocount;
    return ocount;
 }
 
