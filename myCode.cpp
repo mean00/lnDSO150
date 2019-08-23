@@ -24,7 +24,7 @@ uint16_t displayIdentifier=0;
 uint16_t calibrationHash=0;
 uint16_t calibrationDC[16];
 uint16_t calibrationAC[16];
-
+float    voltageFineTune[16];
 
 //
 // Test functions
@@ -122,7 +122,7 @@ void MainTask( void *a )
     //testButtons();   
     if(!DSOEeprom::read())
     {
-         DSOCalibrate::calibrate();         
+         DSOCalibrate::zeroCalibrate();         
     }
     //testAdc();   
     //testAdc2();   //fast

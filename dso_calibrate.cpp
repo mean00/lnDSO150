@@ -8,7 +8,7 @@
 #include "dso_adc.h"
 #include "dso_eeprom.h"
 extern DSOADC                     *adc;
-
+extern float                       voltageFineTune[16];
 extern uint16_t directADC2Read(int pin);
 /**
  * 
@@ -103,9 +103,8 @@ void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupl
  * 
  * @return 
  */
-bool DSOCalibrate::calibrate()
-{
-    
+bool DSOCalibrate::zeroCalibrate()
+{    
     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);  
     tft->setTextColor(WHITE,BLACK);
     
@@ -130,4 +129,58 @@ bool DSOCalibrate::decalibrate()
 {    
     DSOEeprom::wipe();
     return true;        
+}
+/**
+ * 
+ * @return 
+ */
+typedef struct MyCalibrationVoltage
+{
+    const char *title;
+    DSOCapture::DSO_VOLTAGE_RANGE range;    
+    int         tableOffset;            // offset in fineVoltageMultiplier table
+    float       expectedVoltage;
+};
+
+MyCalibrationVoltage myCalibrationVoltage[]=
+{
+    {"10v", DSOCapture::DSO_VOLTAGE_2V,    9,  10.0}, // 2v/div range
+    {"5.0v",DSOCapture::DSO_VOLTAGE_1V,    8,  5.0},     // 1v/div range
+    {"2.5v",DSOCapture::DSO_VOLTAGE_500MV, 7,  2.5},     // 500mv/div range
+    {"1.0v",DSOCapture::DSO_VOLTAGE_200MV, 6,  1.0},     // 200mv/div range
+    {"0.5v",DSOCapture::DSO_VOLTAGE_100MV, 5,  0.5},     // 100mv/div range
+    
+};
+
+/**
+ * 
+ * @param title
+ * @param expected
+ * @return 
+ */
+static float performVoltageCalibration(const char *title, float expected)
+{
+    return 0.0;
+}
+/**
+ * 
+ * @return 
+ */
+bool DSOCalibrate::voltageCalibrate()
+{
+    tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);  
+    tft->setTextColor(WHITE,BLACK);
+    
+    
+    adc->setupADCs ();
+    adc->setTimeScale(ADC_SMPR_1_5,ADC_PRE_PCLK2_DIV_2); // 10 us *1024 => 10 ms scan
+    for(int i=0;i<sizeof(myCalibrationVoltage)/sizeof(MyCalibrationVoltage);i++)
+    {
+        capture->setVoltageRange(myCalibrationVoltage[i].range);
+        float f=performVoltageCalibration(myCalibrationVoltage[i].title,myCalibrationVoltage[i].expectedVoltage);
+        voltageFineTune[myCalibrationVoltage[i].tableOffset]=f;
+    }    
+    DSOEeprom::write();         
+    tft->fillScreen(0);
+    return true;         
 }

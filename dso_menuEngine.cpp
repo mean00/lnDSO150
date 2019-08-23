@@ -57,8 +57,7 @@ void MenuManager::run(void)
 {
      tft->fillScreen(BLACK);
      tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::BigFont);
-     runOne(_menu);
-
+     runOne(_menu);     
 };
 /**
  */
@@ -134,6 +133,7 @@ next:
                                 cb *c=(cb *)xtop[current].cookie;
                                 blink(current,xtop[current].menuText);
                                 c();
+                                tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::BigFont);
                                 goto next;
                             }
                           break;

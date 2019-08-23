@@ -7,6 +7,7 @@
 class DSOCalibrate
 {
 public:
-  static bool calibrate();
+  static bool zeroCalibrate();
   static bool decalibrate();
+  static bool voltageCalibrate();
 };

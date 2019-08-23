@@ -10,6 +10,10 @@
 extern uint16_t calibrationHash;
 extern uint16_t calibrationDC[16];
 extern uint16_t calibrationAC[16];
+extern float    voltageFineTune[16];
+
+#define FINE_TUNE_OFFSET 64
+
 /**
  * 
  * @return 
@@ -28,7 +32,25 @@ bool  DSOEeprom::read()
         calibrationDC[i]=e2.read(2+i);
     for(int i=0;i<16;i++)
         calibrationAC[i]=e2.read(2+i+16);
+    // 15+2+16=33 so far
+    for(int i=0;i<16;i++)
+        voltageFineTune[i]=0;
+    int hasFineVoltage=e2.read(FINE_TUNE_OFFSET);
     
+    if(hasFineVoltage==CURRENT_HASH)
+    {
+        for(int i=0;i<16;i++)
+        {
+            float f;
+            uint16_t *adr=(uint16_t *)&f;
+            uint16_t high=e2.read(FINE_TUNE_OFFSET+2+i*2+0);
+            uint16_t low=e2.read(FINE_TUNE_OFFSET+2+i*2+1);
+            
+            adr[0]=high;
+            adr[1]=low;
+            voltageFineTune[i]=f;
+        }
+    }
     return true;
 }
 /**
@@ -47,6 +69,14 @@ bool  DSOEeprom::write()
     for(int i=0;i<16;i++)
         e2.write(2+i+16,calibrationAC[i]);
     
+    e2.write(FINE_TUNE_OFFSET,CURRENT_HASH);
+    for(int i=0;i<16;i++)
+    {
+            float f=voltageFineTune[i];
+            uint16_t *adr=(uint16_t *)&f;
+            e2.write(FINE_TUNE_OFFSET+2+i*2+0,adr[0]);
+            e2.write(FINE_TUNE_OFFSET+2+i*2+1,adr[1]);            
+    }
     return true;
 }
 /**
@@ -59,6 +89,7 @@ bool  DSOEeprom::wipe()
     e2.init();
     e2.format();
     e2.write(0,0);
+    e2.write(64,0);
     return true;
 }
 

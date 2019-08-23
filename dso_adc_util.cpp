@@ -15,6 +15,7 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  * 
  */
 #include "dso_adc_const.h"
+extern float    voltageFineTune[16];;
 volatile uint32_t lastCR1=0;
 
 #define SetCR1(x) {lastCR1=ADC1->regs->CR1=(x);}
@@ -56,7 +57,10 @@ bool DSOADC::readCalibrationValue()
     for(int i=0;i<11;i++)
     {
         vSettings[i].offset=calibrationDC[i+1];
-        vSettings[i].multiplier=inputScale[i+1]*fvcc/4096000.;
+        if(voltageFineTune[i])
+            vSettings[i].multiplier=voltageFineTune[i]*fvcc/4096000.;
+        else
+            vSettings[i].multiplier=inputScale[i+1]*fvcc/4096000.;
     }
     return true;
 }
