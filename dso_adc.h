@@ -97,7 +97,8 @@ public:
             void    clearSemaphore() ;
             bool     setSlowMode(int fqInHz);
             bool     readCalibrationValue();
-    static  uint32_t getVCCmv();
+    static  uint32_t getVCCmv(); // this one is cached
+    static  float    readVCCmv();    
             bool     setTriggerMode(TriggerMode mode);
             TriggerMode getTriggerMode() {return _triggerMode;};
             bool     getTriggerState();
@@ -144,6 +145,7 @@ public:
             void stopTimeCapture();
     static  void getRegisters();
             void resetStats();
+    
             //void restartDmaTriggerCapture() ;
 protected:
   

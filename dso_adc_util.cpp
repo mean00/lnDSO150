@@ -28,6 +28,26 @@ uint32_t DSOADC::getVCCmv()
 {
     return vcc;
 }
+/**
+ * 
+ * @return 
+ */
+#define NB_SAMPLE 16
+float DSOADC::readVCCmv()
+{
+   float fvcc=0;
+   adc_Register = ADC1->regs;
+   adc_Register->CR2 |= ADC_CR2_TSVREFE;    // enable VREFINT and temp sensor
+   adc_Register->SMPR1 =  ADC_SMPR1_SMP17;  // sample ra
+   for(int i=0;i<NB_SAMPLE;i++)
+   {
+       delay(10);   
+       fvcc+=  adc_read(ADC1, 17); 
+   }
+    fvcc=(1200. * 4096.*NB_SAMPLE) /fvcc;   
+    //fvcc=3380;
+    return fvcc;
+}
 
 /**
  * 
@@ -35,24 +55,8 @@ uint32_t DSOADC::getVCCmv()
  */
 bool DSOADC::readCalibrationValue()
 {
-    #define NB_SAMPLE 16
-
-   adc_Register = ADC1->regs;
-   adc_Register->CR2 |= ADC_CR2_TSVREFE;    // enable VREFINT and temp sensor
-   adc_Register->SMPR1 =  ADC_SMPR1_SMP17;  // sample ra
-
-    
-   float fvcc=0;
-   for(int i=0;i<NB_SAMPLE;i++)
-   {
-       delay(10);   
-       fvcc+=  adc_read(ADC1, 17); 
-   }
-    fvcc=(1200. * 4096.*NB_SAMPLE) /fvcc;   
-    fvcc=3380;
-    vcc=(int)fvcc;
-    
-    
+    float fvcc=readVCCmv();    
+    vcc=(int)(fvcc);
     // 1b fill up the conversion table
     for(int i=0;i<11;i++)
     {

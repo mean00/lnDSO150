@@ -124,6 +124,9 @@ void MainTask( void *a )
     {
          DSOCalibrate::zeroCalibrate();         
     }
+    
+   
+    
     //testAdc();   
     //testAdc2();   //fast
     //  testAdc3();   // slow
@@ -131,6 +134,11 @@ void MainTask( void *a )
     // testCalibrate();
     adc->readCalibrationValue(); // re-read calibration value
     adc->setupADCs ();
+    
+    // --- TEST  ---
+    //DSOCalibrate::voltageCalibrate();
+    // --- TEST  ---
+    
     DSOCapture::initialize();
 
     //testI2c();
