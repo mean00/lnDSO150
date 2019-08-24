@@ -159,10 +159,11 @@ typedef struct MyCalibrationVoltage
     int         tableOffset;            // offset in fineVoltageMultiplier table
     float       expectedVoltage;
 };
-
+/**
+ */
 MyCalibrationVoltage myCalibrationVoltage[]=
 {
-    {"10.0v",DSOCapture::DSO_VOLTAGE_2V,   9,  10.0}, // 2v/div range
+   {"10.0v",DSOCapture::DSO_VOLTAGE_2V,    9,  10.0},    // 2v/div range
     {"5.0v",DSOCapture::DSO_VOLTAGE_1V,    8,  5.0},     // 1v/div range
     {"2.5v",DSOCapture::DSO_VOLTAGE_500MV, 7,  2.5},     // 500mv/div range
     {"1.0v",DSOCapture::DSO_VOLTAGE_200MV, 6,  1.0},     // 200mv/div range
@@ -180,19 +181,20 @@ bool DSOCalibrate::voltageCalibrate()
     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);  
     tft->setTextColor(WHITE,BLACK);
     
-    adc->setupADCs ();
-    adc->setTimeScale(ADC_SMPR_1_5,ADC_PRE_PCLK2_DIV_2); // 10 us *1024 => 10 ms scan
-    for(int i=0;i<sizeof(myCalibrationVoltage)/sizeof(MyCalibrationVoltage);i++)
+    adc_set_sample_rate(ADC2, ADC_SMPR_239_5);
+    int nb=sizeof(myCalibrationVoltage)/sizeof(MyCalibrationVoltage);
+    for(int i=0;i<nb;i++)
     {                
+        int range=myCalibrationVoltage[i].tableOffset;
         capture->setVoltageRange(myCalibrationVoltage[i].range);
         float f=performVoltageCalibration(myCalibrationVoltage[i].title,
                                           myCalibrationVoltage[i].expectedVoltage,
-                                          vSettings[i].multiplier,
-                                          vSettings[i].offset);
+                                          vSettings[range].multiplier,
+                                          vSettings[range].offset);
         if(f)
-            voltageFineTune[myCalibrationVoltage[i].tableOffset]=(f*4096000.)/fvcc;
+            voltageFineTune[range]=(f*4096000.)/fvcc;
         else
-            voltageFineTune[myCalibrationVoltage[i].tableOffset]=0;
+            voltageFineTune[range]=0;
     }    
     DSOEeprom::write();         
     tft->fillScreen(0);
@@ -236,30 +238,27 @@ static void fineHeader(float expected)
  */
 float performVoltageCalibration(const char *title, float expected,float defalt,int offset)
 {
-  
-    
 #define SCALEUP 1000000    
     fineHeader(expected);
     while(1)
     {   // Raw read
-        int sum=averageADC2Read();
-        
-        sum-=offset;
-       
-        
+        int sum=averageADC2Read();        
+        sum-=offset;               
         float f=expected;
         if(!sum) f=0;
         else
                  f=expected/sum;        
                       
-         tft->setCursor(10, 90);
-         tft->print(f*SCALEUP);
-         tft->setCursor(10, 130);
-         tft->print(defalt*SCALEUP);
+        tft->setCursor(160, 90);
+        tft->print(sum);                
+        tft->setCursor(10, 90);
+        tft->print(f*SCALEUP);
+        tft->setCursor(10, 130);
+        tft->print(defalt*SCALEUP);
          
-         if( SHORT_PRESS(DSO_BUTTON_OK))
+        if( SHORT_PRESS(DSO_BUTTON_OK))
              return f;
-         if( SHORT_PRESS(DSO_BUTTON_VOLTAGE))
-             return 0;
+        if( SHORT_PRESS(DSO_BUTTON_VOLTAGE))
+             return 0.;
     }    
 }
