@@ -130,8 +130,7 @@ bool DSOCalibrate::zeroCalibrate()
     adc->setupADCs ();
     adc->setTimeScale(ADC_SMPR_1_5,ADC_PRE_PCLK2_DIV_2); // 10 us *1024 => 10 ms scan
     printCalibrationTemplate("Connect the 2 crocs together.","");
-    waitOk();
-    doCalibrate(calibrationDC,YELLOW,"Set switch to *GND*",DSOControl::DSO_COUPLING_GND);                     
+    waitOk();    
     doCalibrate(calibrationDC,YELLOW,"Set switch to *DC*",DSOControl::DSO_COUPLING_DC);       
     doCalibrate(calibrationAC,GREEN, "Set switch to *AC*",DSOControl::DSO_COUPLING_AC);
     //while(1) {};
@@ -185,6 +184,24 @@ bool DSOCalibrate::voltageCalibrate()
     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);  
     tft->setTextColor(WHITE,BLACK);
     
+    
+    tft->fillScreen(BLACK);
+    printxy(0,5,"===VOLT CALIBRATION====");
+    printxy(0,30,"Set Input to DC");
+    printxy(0,50,"and press OK");
+    
+    while(1)
+    {
+        controlButtons->updateCouplingState();
+        DSOControl::DSOCoupling   newcpl=controlButtons->getCouplingState(); 
+        if(newcpl==DSOControl::DSO_COUPLING_DC) 
+        {
+            waitOk();
+            break;
+        }
+    }
+    
+    
     adc_set_sample_rate(ADC2, ADC_SMPR_239_5);
     int nb=sizeof(myCalibrationVoltage)/sizeof(MyCalibrationVoltage);
     for(int i=0;i<nb;i++)
@@ -194,7 +211,7 @@ bool DSOCalibrate::voltageCalibrate()
         float f=performVoltageCalibration(myCalibrationVoltage[i].title,
                                           myCalibrationVoltage[i].expectedVoltage,
                                           vSettings[range].multiplier,
-                                          vSettings[range].offset);
+                                          vSettings[range].offset[0]);
         if(f)
             voltageFineTune[range]=(f*4096000.)/fvcc;
         else

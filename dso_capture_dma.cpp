@@ -9,7 +9,7 @@
 #include "dso_capture_priv.h"
 
 #include "DSO_config.h"
-static int transformDma(int16_t *in, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode)
+static int transformDma(bool dc,int16_t *in, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode)
 {
    if(!count) return false;
    stats.xmin=200;
@@ -22,12 +22,16 @@ static int transformDma(int16_t *in, float *out,int count, VoltageSettings *set,
    }
    ocount&=0xffe;
    int dex=0;
-   
+   float offset;
+   if(dc) 
+       offset=set->offset[0];
+   else 
+       offset=set->offset[1];
    // First
    float f;
    {
        f=(float)in[0]; 
-       f-=set->offset;
+       f-=offset;
        f*=set->multiplier;       
        if(f>stats.xmax) stats.xmax=f;
        if(f<stats.xmin) stats.xmin=f;       
@@ -43,7 +47,7 @@ static int transformDma(int16_t *in, float *out,int count, VoltageSettings *set,
     {
 
         f=*(in+(dex/4096));
-        f-=set->offset;
+        f-=offset;
         f*=set->multiplier;
         if(f>stats.xmax) stats.xmax=f;
         if(f<stats.xmin) stats.xmin=f;       
@@ -192,7 +196,7 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
 
     p=((int16_t *)fset.set1.data);
 
-    set->samples=transformDma(
+    set->samples=transformDma(      controlButtons->getCouplingState()==DSOControl::DSO_COUPLING_DC,
                                     p,
                                     data,
                                     fset.set1.samples,

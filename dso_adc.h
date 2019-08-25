@@ -20,7 +20,7 @@ typedef struct VoltageSettings
     int         inputGain;      /// Input gain selected 4051/4053 switch 
     float       displayGain;    /// multiply by this to get pixels from volt
     float       multiplier;     /// Gain of the internal amplifier, multiply by this to get volts
-    int         offset;         /// Offset of sampled data , you need to substract it
+    int         offset[2];         /// Offset of sampled data , you need to substract it
 
 };
 /**

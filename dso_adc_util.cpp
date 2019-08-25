@@ -49,6 +49,7 @@ float DSOADC::readVCCmv()
     return fvcc;
 }
 
+float multipliers[12];
 /**
  * 
  * @return 
@@ -60,12 +61,38 @@ bool DSOADC::readCalibrationValue()
     // 1b fill up the conversion table
     for(int i=0;i<11;i++)
     {
-        vSettings[i].offset=calibrationDC[i+1];
-        if(voltageFineTune[i])
-            vSettings[i].multiplier=voltageFineTune[i]*fvcc/4096000.;
-        else
-            vSettings[i].multiplier=inputScale[i+1]*fvcc/4096000.;
+        vSettings[i].offset[0]=calibrationDC[i+1];
+        vSettings[i].offset[1]=calibrationAC[i+1];
+      //  voltageFineTune[i]=0;
     }
+
+    float v,stat;
+    stat=G1a*G2*G4;
+    for(int i=0;i<6;i++)
+    {      
+        if(!voltageFineTune[i])
+        {
+            v=G3[i]/stat;
+        }
+        else
+            v=voltageFineTune[i];
+        multipliers[i]=v;
+    }
+    stat=G1b*G2*G4;
+    for(int i=0;i<6;i++)
+    {
+        if(!voltageFineTune[i+6])
+        {
+            v=G3[i]/stat;
+        }
+        else
+            v=voltageFineTune[i+6];
+        multipliers[i+6]=v;
+    }
+
+    float mu=fvcc/4096000.;
+    for(int i=0;i<12;i++)
+        vSettings[i].multiplier=multipliers[i]*mu;
     return true;
 }
 

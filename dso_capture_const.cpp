@@ -15,7 +15,7 @@
  * Partially filled global gain array
  * Remaining columns will be filled at runtime
  */
-VoltageSettings vSettings[11]=
+VoltageSettings vSettings[16]=
 {
     {"1mv",     1,  24000.},
     {"5mv",     2,  4800.},

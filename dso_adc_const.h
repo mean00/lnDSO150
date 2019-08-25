@@ -1,24 +1,11 @@
-// this is 1/Gain for each range
-// i.e. attenuation
-//
+// Compute default gain/attenuration depending on the scale
+// G1a/B is driven by SENSEL3
 
+const float G1a=10./11.;
+const float G1b=10./1100.;
+const float G2=2.;
+const float G4=1.+1000./130.; // 130 for new board, 150 for old boards, R14 and R15
 
-
-const float inputScale[16]={
-  /*[0] */  0, // GND
-  /*[1] */  6.11/100., // /1  *14
-  /*[2] */  12.19/100., // /2  *7
-  /*[3] */  24.39/100., // /4  *3.5
-  /*[4] */  61.64/100., // /10  *1.4
-  /*[5] */  125./100., // /20  *0.8
-  /*[6] */  243.9/100., // /40    *0.4 100 mv
-    
-  /*[7] */  6.11, // /1  /6.1   200mv
-  /*[8] */  12.19, //2      /12  500mv
-  /*[9] */  24.39,  //4     /24  1V
-  /*[a] */  61.64,  //10     /60
-  /*[b] */  125, //20     /125
-  /*[c] */  250 // 40    /250
-};
-
+// G3 is driven by SENSEL0/1/2
+const float G3[6]={1.,2.,4.,10.,20.,40.};
 

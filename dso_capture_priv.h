@@ -35,7 +35,7 @@ typedef struct TimerTimeBase
 
 extern const TimerTimeBase  timerBases[];
 extern const TimeSettings   tSettings[6];
-extern VoltageSettings      vSettings[11];
+extern VoltageSettings      vSettings[16];
 
 /**
  */

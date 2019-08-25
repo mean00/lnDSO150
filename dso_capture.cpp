@@ -220,7 +220,7 @@ int DSOCapturePriv::voltToADCValue(float v)
 {
     VoltageSettings *set=&(vSettings[currentVoltageRange]);
     float out=v/set->multiplier;
-    out+=set->offset;
+    out+=set->offset[ controlButtons->getCouplingState()==DSOControl::DSO_COUPLING_DC];
     return (int)out;    
 }
 
