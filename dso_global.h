@@ -24,10 +24,10 @@
 #define DSO_WAVEFORM_WIDTH  240
 #define DSO_WAVEFORM_OFFSET ((240-DSO_WAVEFORM_HEIGHT-2)/2)
 
-#define CURRENT_HASH 0x1235
+#define CURRENT_HASH 0x1236
 extern uint16_t calibrationHash;
-extern uint16_t calibrationDC[16];
-extern uint16_t calibrationAC[16];
+extern uint16_t calibrationDC[NB_DSO_VOLTAGE+1];
+extern uint16_t calibrationAC[NB_DSO_VOLTAGE+1];
 
 
 extern Adafruit_TFTLCD_8bit_STM32 *tft;

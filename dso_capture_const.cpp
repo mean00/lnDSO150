@@ -15,19 +15,19 @@
  * Partially filled global gain array
  * Remaining columns will be filled at runtime
  */
-VoltageSettings vSettings[16]=
-{
+VoltageSettings vSettings[NB_DSO_VOLTAGE]= {
     {"1mv",     1,  24000.},
-    {"5mv",     2,  4800.},
-    {"10mv",    3,  2400.},
-    {"20mv",    4 , 1200.},
-    {"50mv",    5,  480.},
-    {"100mv",   6,  240.},
-    {"200mv",   7,  120.},
-    {"500mv",   8,  48.},
-    {"1v",      9,  24.},
-    {"2v",      10, 12.},
-    {"5v",      11, 4.8}
+    {"2mv",     2,  24000.},
+    {"5mv",     3,  4800.},
+    {"10mv",    4,  2400.},
+    {"20mv",    5 , 1200.},
+    {"50mv",    6,  480.},
+    {"100mv",   7,  240.},
+    {"200mv",   8,  120.},
+    {"500mv",   9,  48.},
+    {"1v",      10,  24.},
+    {"2v",      11, 12.},
+    {"5v",      12, 4.8}
 };
 /**
  These the time/div settings, it is computed to maximume accuracy 

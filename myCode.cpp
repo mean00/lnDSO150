@@ -22,9 +22,9 @@ uint16_t displayIdentifier=0;
 
 // Globals
 uint16_t calibrationHash=0;
-uint16_t calibrationDC[16];
-uint16_t calibrationAC[16];
-float    voltageFineTune[16];
+uint16_t calibrationDC[NB_DSO_VOLTAGE+1];
+uint16_t calibrationAC[NB_DSO_VOLTAGE+1];
+float    voltageFineTune[NB_DSO_VOLTAGE+1];
 
 //
 // Test functions

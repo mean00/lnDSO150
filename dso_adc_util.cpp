@@ -59,11 +59,10 @@ bool DSOADC::readCalibrationValue()
     float fvcc=readVCCmv();    
     vcc=(int)(fvcc);
     // 1b fill up the conversion table
-    for(int i=0;i<11;i++)
+    for(int i=0;i<NB_DSO_VOLTAGE;i++)
     {
-        vSettings[i].offset[0]=calibrationDC[i+1];
-        vSettings[i].offset[1]=calibrationAC[i+1];
-      //  voltageFineTune[i]=0;
+        vSettings[i].offset[0]=calibrationDC[i];
+        vSettings[i].offset[1]=calibrationAC[i];
     }
 
     float v,stat;

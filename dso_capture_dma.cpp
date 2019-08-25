@@ -189,7 +189,7 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
         set->stats.trigger=120; // right in the middle
     }
     
-    int     scale=vSettings[currentVolt].inputGain;
+    int     scale=vSettings[currentVolt].inputGainIndex;
     int    expand=tSettings[currentTime].expand4096;
     
     float *data=set->data;    

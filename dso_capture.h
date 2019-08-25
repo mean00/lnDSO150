@@ -52,31 +52,36 @@ public:
       DSO_TIME_BASE_1S,
       DSO_TIME_BASE_MAX=DSO_TIME_BASE_1S
     };
-    
+#define NB_DSO_VOLTAGE 13
     enum DSO_VOLTAGE_RANGE
     {
-      DSO_VOLTAGE_1MV, // 0
+      DSO_VOLTAGE_GND, // 0
+      
+      DSO_VOLTAGE_1MV, // 1
+      DSO_VOLTAGE_2MV,
       DSO_VOLTAGE_5MV,
       DSO_VOLTAGE_10MV,
       DSO_VOLTAGE_20MV,
-      DSO_VOLTAGE_50MV,
-      DSO_VOLTAGE_100MV,
+      DSO_VOLTAGE_50MV, // 6
+      
+      DSO_VOLTAGE_100MV,    // 7  
       DSO_VOLTAGE_200MV,
       DSO_VOLTAGE_500MV,
       DSO_VOLTAGE_1V,
       DSO_VOLTAGE_2V,
-      DSO_VOLTAGE_5V, // 10
+      DSO_VOLTAGE_5V, // 12
       DSO_VOLTAGE_MAX=DSO_VOLTAGE_5V
     };
     // capture
     static int         capture(int count,float *voltage,CaptureStats &stats);    
-    static void        stopCapture();    
-    
+    static void        stopCapture();        
     
     // Voltage Range    
     static bool        setVoltageRange(DSO_VOLTAGE_RANGE voltRange);
     static DSO_VOLTAGE_RANGE getVoltageRange();
     static const char *getVoltageRangeAsText();
+    static float       getVoltageRangeAsFloat(DSO_VOLTAGE_RANGE range);
+    static int         getVoltageRangeIndex(DSO_VOLTAGE_RANGE range);
     // Time Range
     static bool        setTimeBase(DSO_TIME_BASE timeBase);
     static DSO_TIME_BASE getTimeBase();

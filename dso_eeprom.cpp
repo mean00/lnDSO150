@@ -8,9 +8,9 @@
 #include "dso_eeprom.h"
 
 extern uint16_t calibrationHash;
-extern uint16_t calibrationDC[16];
-extern uint16_t calibrationAC[16];
-extern float    voltageFineTune[16];
+extern uint16_t calibrationDC[NB_DSO_VOLTAGE+1];
+extern uint16_t calibrationAC[NB_DSO_VOLTAGE+1];
+extern float    voltageFineTune[NB_DSO_VOLTAGE+1];
 
 #define FINE_TUNE_OFFSET 64
 

@@ -109,7 +109,7 @@ void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupl
     printCalibrationTemplate("Connect probe to ground","(connect the 2 crocs together)");
     header(color,txt,target); 
     
-    for(int range=0;range<14;range++)
+    for(int range=0;range<NB_DSO_VOLTAGE;range++)
     {
         controlButtons->setInputGain(range);        
         xDelay(10);
@@ -155,23 +155,18 @@ typedef struct MyCalibrationVoltage
 {
     const char *title;
     DSOCapture::DSO_VOLTAGE_RANGE range;    
-    int         tableOffset;            // offset in fineVoltageMultiplier table
-    float       expectedVoltage;
 };
 /**
  */
 MyCalibrationVoltage myCalibrationVoltage[]=
 {
-   {"10.0v",DSOCapture::DSO_VOLTAGE_2V,    9,  10.0},    // 2v/div range
-    {"5.0v",DSOCapture::DSO_VOLTAGE_1V,    8,  5.0},     // 1v/div range
-    {"2.5v",DSOCapture::DSO_VOLTAGE_500MV, 7,  2.5},     // 500mv/div range
-    {"1.0v",DSOCapture::DSO_VOLTAGE_200MV, 6,  1.0},     // 200mv/div range
-    {"500mV",DSOCapture::DSO_VOLTAGE_100MV,5,  0.5},     // 100mv/div range
-    {"250mV",DSOCapture::DSO_VOLTAGE_50MV, 4,  .25},    // 2v/div range
-    {"100mV",DSOCapture::DSO_VOLTAGE_20MV, 3,  0.1},     // 1v/div range    
-//    {"50mV",DSOCapture::DSO_VOLTAGE_10MV,  2,  0.05},     // 500mv/div range
-//    {"25mV",DSOCapture::DSO_VOLTAGE_5MV,   1,  0.025},     // 200mv/div range
-//    {"5mv",DSOCapture::DSO_VOLTAGE_1MV,   0,   0.005},     // 100mv/div range
+   {"10.0v",DSOCapture::DSO_VOLTAGE_2V},    // 2v/div range
+    {"5.0v",DSOCapture::DSO_VOLTAGE_1V},     // 1v/div range
+    {"2.5v",DSOCapture::DSO_VOLTAGE_500MV},     // 500mv/div range
+    {"1.0v",DSOCapture::DSO_VOLTAGE_200MV},     // 200mv/div range
+    {"500mV",DSOCapture::DSO_VOLTAGE_100MV},     // 100mv/div range
+    {"250mV",DSOCapture::DSO_VOLTAGE_50MV},    // 2v/div range
+    {"100mV",DSOCapture::DSO_VOLTAGE_20MV},     // 1v/div range    
 };
 float performVoltageCalibration(const char *title, float expected,float defalt,int offset);
 /**
@@ -194,6 +189,7 @@ bool DSOCalibrate::voltageCalibrate()
     {
         controlButtons->updateCouplingState();
         DSOControl::DSOCoupling   newcpl=controlButtons->getCouplingState(); 
+        printCoupling(newcpl);
         if(newcpl==DSOControl::DSO_COUPLING_DC) 
         {
             waitOk();
@@ -206,17 +202,21 @@ bool DSOCalibrate::voltageCalibrate()
     int nb=sizeof(myCalibrationVoltage)/sizeof(MyCalibrationVoltage);
     for(int i=0;i<nb;i++)
     {                
-        int range=myCalibrationVoltage[i].tableOffset;
-        capture->setVoltageRange(myCalibrationVoltage[i].range);
+        DSOCapture::DSO_VOLTAGE_RANGE  range=myCalibrationVoltage[i].range;
+        capture->setVoltageRange(range);
+        float expected=DSOCapture::getVoltageRangeAsFloat(range)*5.0;
+        int dex=DSOCapture::getVoltageRangeIndex(range);
+        
         float f=performVoltageCalibration(myCalibrationVoltage[i].title,
-                                          myCalibrationVoltage[i].expectedVoltage,
+                                          expected,
                                           vSettings[range].multiplier,
                                           vSettings[range].offset[0]);
         if(f)
-            voltageFineTune[range]=(f*4096000.)/fvcc;
+            voltageFineTune[dex]=(f*4096000.)/fvcc;
         else
-            voltageFineTune[range]=0;
+            voltageFineTune[dex]=0;
     }    
+    // If we have both 100mv and 2v
     DSOEeprom::write();         
     tft->fillScreen(0);
     return true;         

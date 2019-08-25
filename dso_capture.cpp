@@ -43,7 +43,7 @@ bool     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange)
 {
     watch.ok();
     DSOCapturePriv::currentVoltageRange=voltRange;
-    controlButtons->setInputGain(vSettings[DSOCapturePriv::currentVoltageRange].inputGain);
+    controlButtons->setInputGain(vSettings[DSOCapturePriv::currentVoltageRange].inputGainIndex);
     return true;
 }
 /**
@@ -340,6 +340,64 @@ int DSOCapture::voltageToPixel(float v)
     if(v<0) v=0;           
     return (int)v;
 }
+/**
+ * 
+ * @param range
+ * @return 
+ */
+float       DSOCapture::getVoltageRangeAsFloat(DSO_VOLTAGE_RANGE range)
+{
+#define SW(x,y) case   DSO_VOLTAGE_##x: return y;
+        
+    switch(range)
+    {
+        SW(GND,0.00001)
+        SW(1MV,0.001)
+        SW(2MV,0.002)
+        SW(5MV,0.005)
+        SW(10MV,0.01)
+        SW(20MV,0.02)
+        SW(50MV,0.05)    
+
+        SW(100MV,0.1)
+        SW(200MV,0.2)
+        SW(500MV,0.5)        
+        SW(1V,1)
+        SW(2V,2)
+        SW(5V,5)
+    }
+    xAssert(0);
+}
+/**
+ * 
+ * @param range
+ * @return 
+ */
+int       DSOCapture::getVoltageRangeIndex(DSO_VOLTAGE_RANGE range)
+{
+#undef SW
+#define SW(x,y) case   DSO_VOLTAGE_##x: return y;
+        
+    switch(range)
+    {
+        SW(GND,0)
+        SW(1MV,1)
+        SW(2MV,2)
+        SW(5MV,3)
+        SW(10MV,4)
+        SW(20MV,5)
+        SW(50MV,6)    
+
+        SW(100MV,7)
+        SW(200MV,8)
+        SW(500MV,9)        
+        SW(1V,10)
+        SW(2V,11)
+        SW(5V,12)
+    }
+    xAssert(0);
+}
+
 /**
  * 
  * @return 

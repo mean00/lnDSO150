@@ -138,7 +138,7 @@ bool DSOCapturePriv::taskletTimer()
     }
 
     CapturedSet *set=captureSet;        
-    int scale=vSettings[currentVolt].inputGain;
+    int scale=vSettings[currentVolt].inputGainIndex;
     int expand=4096;
 
     float *data=set->data;    
