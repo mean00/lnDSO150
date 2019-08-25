@@ -202,12 +202,22 @@ void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
  * 
  * @param stats
  */
+
+static void prettyPrint(float x,int mx)
+{
+  if(x<0.8)
+      sprintf(textBuffer,"%03dm",(int)(1000.*x));
+  else
+      sprintf(textBuffer,"%02.2f",x);
+  tft->myDrawString(textBuffer,mx);   
+}
+
 void DSODisplay::drawStats(CaptureStats &stats)
 {
     
 #define AND_ONE_A(x,y) { tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}        
 #define AND_ONE_T(x,y) { tft->setCursor(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}    
-#define AND_ONE_F(x,y) { sprintf(textBuffer,"%02.2f",x);tft->setCursor(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT); tft->myDrawString(textBuffer,DSO_INFO_MAX_WIDTH);}    
+#define AND_ONE_F(x,y) { tft->setCursor(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT);prettyPrint(x,DSO_INFO_MAX_WIDTH);}    
     
     AND_ONE_F(stats.xmin,1);
     AND_ONE_F(stats.xmax,3);

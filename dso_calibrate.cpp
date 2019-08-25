@@ -167,8 +167,12 @@ MyCalibrationVoltage myCalibrationVoltage[]=
     {"5.0v",DSOCapture::DSO_VOLTAGE_1V,    8,  5.0},     // 1v/div range
     {"2.5v",DSOCapture::DSO_VOLTAGE_500MV, 7,  2.5},     // 500mv/div range
     {"1.0v",DSOCapture::DSO_VOLTAGE_200MV, 6,  1.0},     // 200mv/div range
-    {"0.5v",DSOCapture::DSO_VOLTAGE_100MV, 5,  0.5},     // 100mv/div range
-    
+    {"500mV",DSOCapture::DSO_VOLTAGE_100MV,5,  0.5},     // 100mv/div range
+    {"250mV",DSOCapture::DSO_VOLTAGE_50MV, 4,  .25},    // 2v/div range
+    {"100mV",DSOCapture::DSO_VOLTAGE_20MV, 3,  0.1},     // 1v/div range    
+//    {"50mV",DSOCapture::DSO_VOLTAGE_10MV,  2,  0.05},     // 500mv/div range
+//    {"25mV",DSOCapture::DSO_VOLTAGE_5MV,   1,  0.025},     // 200mv/div range
+//    {"5mv",DSOCapture::DSO_VOLTAGE_1MV,   0,   0.005},     // 100mv/div range
 };
 float performVoltageCalibration(const char *title, float expected,float defalt,int offset);
 /**
@@ -205,19 +209,14 @@ bool DSOCalibrate::voltageCalibrate()
  * 
  * @param expected
  */
-static void fineHeader(float expected)
-{
-      char buffer[80];
-    
+static void fineHeader(const char *title)
+{          
     tft->fillScreen(BLACK);
     printxy(0,5,"===VOLT CALIBRATION====");
     printxy(10,30,"Connect to ");
-    tft->setTextColor(RED,BLACK);
+    tft->setTextColor(GREEN,BLACK);
+    tft->myDrawString(title);
     
-    int dec=(int)((expected-floor(expected))*10.);
-    
-    sprintf(buffer," %d.%1d V ",(int)expected,(int)dec);
-    tft->myDrawString(buffer);
     tft->setTextColor(WHITE,BLACK);
     printxy(10,200,"Press ");
     tft->setTextColor(BLACK,WHITE);
@@ -239,7 +238,7 @@ static void fineHeader(float expected)
 float performVoltageCalibration(const char *title, float expected,float defalt,int offset)
 {
 #define SCALEUP 1000000    
-    fineHeader(expected);
+    fineHeader(title);
     while(1)
     {   // Raw read
         int sum=averageADC2Read();        
