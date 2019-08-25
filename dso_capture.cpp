@@ -265,6 +265,15 @@ int DSOCapture::capture(int count,float *volt,CaptureStats &stats)
     return DSOCapturePriv::triggeredCapture(count,volt,stats);
 }
 
+
+
+/**
+ * 
+ * @param count
+ * @param volt
+ * @param stats
+ * @return 
+ */
 int DSOCapturePriv::triggeredCapture(int count,float *volt,CaptureStats &stats)
 {
     if(taskletMode==DSOCapturePriv::Tasklet_Idle)

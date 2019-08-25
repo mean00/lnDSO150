@@ -120,9 +120,10 @@ void MainTask( void *a )
    // testTestSignal();
     //testButtonCoupling();
     //testButtons();   
-    if(!DSOEeprom::read())
-    {
-         DSOCalibrate::zeroCalibrate();         
+  //  if(!DSOEeprom::read())
+    {  
+        adc->setupADCs ();        
+        DSOCalibrate::zeroCalibrate();         
     }
     
    

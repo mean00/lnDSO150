@@ -90,30 +90,36 @@ void header(int color,const char *txt,DSOControl::DSOCoupling target)
  * 
  * @return 
  */
-static int averageADC2Read()
+static int averageADCRead()
 {
-    int sum=0;
-    for(int i=0;i<NB_SAMPLES;i++)
+    // Start Capture
+    adc->prepareTimerSampling(1000); // 1Khz
+    adc->startTimerSampling(200);
+    FullSampleSet fset;
+    while(!adc->getSamples(fset))
     {
-        sum+=directADC2Read(analogInPin);
-        xDelay(2);
+        
+    };
+    int nb=fset.set1.samples;
+    int sum=0;
+    for(int i=0;i<nb;i++)
+    {
+        sum+=fset.set1.data[i];
     }
-    sum=(sum+(NB_SAMPLES/2)-1)/NB_SAMPLES;
+    sum=(sum+(nb/2)-1)/nb;
     return sum;
 }
 
 
 void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupling target)
 {
-    
     printCalibrationTemplate("Connect probe to ground","(connect the 2 crocs together)");
-    header(color,txt,target); 
-    
+    header(color,txt,target);     
     for(int range=0;range<NB_DSO_VOLTAGE;range++)
     {
-        controlButtons->setInputGain(range);        
+        controlButtons->setInputGain(vSettings[range].inputGainIndex);        
         xDelay(10);
-        array[range]=averageADC2Read();
+        array[range]=averageADCRead();
     }
 }
 
@@ -125,17 +131,16 @@ bool DSOCalibrate::zeroCalibrate()
 {    
     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);  
     tft->setTextColor(WHITE,BLACK);
+          
     
-    
-    adc->setupADCs ();
     adc->setTimeScale(ADC_SMPR_1_5,ADC_PRE_PCLK2_DIV_2); // 10 us *1024 => 10 ms scan
     printCalibrationTemplate("Connect the 2 crocs together.","");
     waitOk();    
     doCalibrate(calibrationDC,YELLOW,"Set switch to *DC*",DSOControl::DSO_COUPLING_DC);       
-    doCalibrate(calibrationAC,GREEN, "Set switch to *AC*",DSOControl::DSO_COUPLING_AC);
-    //while(1) {};
+    doCalibrate(calibrationAC,GREEN, "Set switch to *AC*",DSOControl::DSO_COUPLING_AC);    
     DSOEeprom::write();         
-    tft->fillScreen(0);
+    tft->fillScreen(0);    
+    printxy(20,100,"Restart the unit.");
     return true;        
 }
 /**
@@ -258,7 +263,7 @@ float performVoltageCalibration(const char *title, float expected,float defalt,i
     fineHeader(title);
     while(1)
     {   // Raw read
-        int sum=averageADC2Read();        
+        int sum=averageADCRead();        
         sum-=offset;               
         float f=expected;
         if(!sum) f=0;
