@@ -164,6 +164,7 @@ typedef struct MyCalibrationVoltage
  */
 MyCalibrationVoltage myCalibrationVoltage[]=
 {
+   {"25.0v",DSOCapture::DSO_VOLTAGE_5V},    // 5v/div range
    {"10.0v",DSOCapture::DSO_VOLTAGE_2V},    // 2v/div range
     {"5.0v",DSOCapture::DSO_VOLTAGE_1V},     // 1v/div range
     {"2.5v",DSOCapture::DSO_VOLTAGE_500MV},     // 500mv/div range
