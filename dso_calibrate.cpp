@@ -8,13 +8,12 @@
 #include "dso_adc.h"
 #include "dso_eeprom.h"
 extern DSOADC                     *adc;
-extern float                       voltageFineTune[16];
-extern uint16_t directADC2Read(int pin);
-extern VoltageSettings vSettings[];
+
+extern VoltageSettings           vSettings[];
 static float fvcc=0;
 
 #define SHORT_PRESS(x) (controlButtons->getButtonEvents(DSOControl::x)&EVENT_SHORT_PRESS)
-
+static uint16_t directADC2Read(int pin);
 /**
  * 
  */
@@ -115,7 +114,7 @@ void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupl
 {
     printCalibrationTemplate("Connect probe to ground","(connect the 2 crocs together)");
     header(color,txt,target);     
-    for(int range=0;range<NB_DSO_VOLTAGE;range++)
+    for(int range=0;range<NB_ADC_VOLTAGE;range++)
     {
         controlButtons->setInputGain(vSettings[range].inputGainIndex);        
         xDelay(10);

@@ -8,9 +8,6 @@
 #include "dso_eeprom.h"
 
 extern uint16_t calibrationHash;
-extern uint16_t calibrationDC[NB_DSO_VOLTAGE+1];
-extern uint16_t calibrationAC[NB_DSO_VOLTAGE+1];
-extern float    voltageFineTune[NB_DSO_VOLTAGE+1];
 
 #define FINE_TUNE_OFFSET 64
 
@@ -28,18 +25,18 @@ bool  DSOEeprom::read()
         return false;
     }
     
-    for(int i=0;i<16;i++)
+    for(int i=0;i<NB_ADC_VOLTAGE;i++)
         calibrationDC[i]=e2.read(2+i);
-    for(int i=0;i<16;i++)
+    for(int i=0;i<NB_ADC_VOLTAGE;i++)
         calibrationAC[i]=e2.read(2+i+16);
     // 15+2+16=33 so far
-    for(int i=0;i<16;i++)
+    for(int i=0;i<NB_ADC_VOLTAGE;i++)
         voltageFineTune[i]=0;
     int hasFineVoltage=e2.read(FINE_TUNE_OFFSET);
     
     if(hasFineVoltage==CURRENT_HASH)
     {
-        for(int i=0;i<16;i++)
+        for(int i=0;i<NB_ADC_VOLTAGE;i++)
         {
             float f;
             uint16_t *adr=(uint16_t *)&f;
@@ -64,13 +61,13 @@ bool  DSOEeprom::write()
     e2.format();
     e2.write(0,CURRENT_HASH);
     calibrationHash=e2.read(0);
-    for(int i=0;i<16;i++)
+    for(int i=0;i<NB_ADC_VOLTAGE;i++)
         e2.write(2+i,calibrationDC[i]);
-    for(int i=0;i<16;i++)
+    for(int i=0;i<NB_ADC_VOLTAGE;i++)
         e2.write(2+i+16,calibrationAC[i]);
     
     e2.write(FINE_TUNE_OFFSET,CURRENT_HASH);
-    for(int i=0;i<16;i++)
+    for(int i=0;i<NB_ADC_VOLTAGE;i++)
     {
             float f=voltageFineTune[i];
             uint16_t *adr=(uint16_t *)&f;

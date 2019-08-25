@@ -18,7 +18,6 @@ extern DSOADC    *adc;
 extern testSignal *myTestSignal;
 //
 float voltageScale;
-extern VoltageSettings vSettings[11] ;
 static const TimeSettings tSettings[6]
 {
     {"10us",    ADC_PRE_PCLK2_DIV_2,ADC_SMPR_1_5,   4390},

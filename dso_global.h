@@ -26,9 +26,12 @@
 
 #define CURRENT_HASH 0x1236
 extern uint16_t calibrationHash;
-extern uint16_t calibrationDC[NB_DSO_VOLTAGE+1];
-extern uint16_t calibrationAC[NB_DSO_VOLTAGE+1];
+extern uint16_t calibrationDC[NB_ADC_VOLTAGE+1];
+extern uint16_t calibrationAC[NB_ADC_VOLTAGE+1];
+extern float    voltageFineTune[NB_ADC_VOLTAGE+1];
 
+
+extern VoltageSettings vSettings[NB_CAPTURE_VOLTAGE];
 
 extern Adafruit_TFTLCD_8bit_STM32 *tft;
 extern DSOControl                 *controlButtons;

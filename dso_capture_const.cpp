@@ -15,7 +15,8 @@
  * Partially filled global gain array
  * Remaining columns will be filled at runtime
  */
-VoltageSettings vSettings[NB_DSO_VOLTAGE]= {
+VoltageSettings vSettings[NB_CAPTURE_VOLTAGE]= {
+    {"GND",     0,  24000.},
     {"1mv",     1,  24000.},
     {"2mv",     2,  24000.},
     {"5mv",     3,  4800.},

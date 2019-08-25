@@ -15,7 +15,6 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  * 
  */
 #include "dso_adc_const.h"
-extern float    voltageFineTune[16];;
 volatile uint32_t lastCR1=0;
 
 #define SetCR1(x) {lastCR1=ADC1->regs->CR1=(x);}
@@ -50,6 +49,23 @@ float DSOADC::readVCCmv()
 }
 
 float multipliers[12];
+
+static void computeMultiplier(float *mul,int offset,float sta)
+{
+    float v;
+    for(int i=0;i<6;i++)
+    {      
+        if(!voltageFineTune[offset+i])
+        {
+            v=G3[i]/sta;
+        }
+        else
+        {
+            v=voltageFineTune[offset+i];
+        }
+        mul[i+offset]=v;
+    }
+}
 /**
  * 
  * @return 
@@ -59,38 +75,20 @@ bool DSOADC::readCalibrationValue()
     float fvcc=readVCCmv();    
     vcc=(int)(fvcc);
     // 1b fill up the conversion table
-    for(int i=0;i<NB_DSO_VOLTAGE;i++)
+    for(int i=0;i<NB_ADC_VOLTAGE;i++)
     {
         vSettings[i].offset[0]=calibrationDC[i];
         vSettings[i].offset[1]=calibrationAC[i];
     }
 
-    float v,stat;
-    stat=G1a*G2*G4;
-    for(int i=0;i<6;i++)
-    {      
-        if(!voltageFineTune[i])
-        {
-            v=G3[i]/stat;
-        }
-        else
-            v=voltageFineTune[i];
-        multipliers[i]=v;
-    }
-    stat=G1b*G2*G4;
-    for(int i=0;i<6;i++)
-    {
-        if(!voltageFineTune[i+6])
-        {
-            v=G3[i]/stat;
-        }
-        else
-            v=voltageFineTune[i+6];
-        multipliers[i+6]=v;
-    }
+    float stat;
+    multipliers[0]=0;
+    computeMultiplier(multipliers,1,G1a*G2*G4);
+    computeMultiplier(multipliers,1+6,G1b*G2*G4);
+    
 
     float mu=fvcc/4096000.;
-    for(int i=0;i<12;i++)
+    for(int i=0;i<NB_ADC_VOLTAGE;i++)
         vSettings[i].multiplier=multipliers[i]*mu;
     return true;
 }

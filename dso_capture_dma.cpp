@@ -7,8 +7,10 @@
 #include "dso_adc.h"
 #include "dso_capture.h"
 #include "dso_capture_priv.h"
-
 #include "DSO_config.h"
+
+extern VoltageSettings vSettings[NB_CAPTURE_VOLTAGE];
+
 static int transformDma(bool dc,int16_t *in, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode)
 {
    if(!count) return false;
