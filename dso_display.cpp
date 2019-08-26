@@ -205,10 +205,17 @@ void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
 
 static void prettyPrint(float x,int mx)
 {
-  if(x<0.8)
-      sprintf(textBuffer,"%03dm",(int)(1000.*x));
-  else
-      sprintf(textBuffer,"%02.2f",x);
+    float a=fabs(x);
+  
+    if(a<0.8)
+    {
+        if(a<0.001)
+            sprintf(textBuffer,"%03du",(int)(1000000.*x));
+        else
+            sprintf(textBuffer,"%03dm",(int)(1000.*x));
+    }
+    else
+        sprintf(textBuffer,"%02.2f",x);
   tft->myDrawString(textBuffer,mx);   
 }
 
