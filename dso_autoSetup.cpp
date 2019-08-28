@@ -54,7 +54,7 @@ bool autoSetupVoltage()
     CaptureStats stats;
     StopWatch clock;
     clock.ok();
-    int tries=20;
+    int tries=NB_CAPTURE_VOLTAGE+2;
     while(!clock.elapsed(2000))
     {
         int n=DSOCapture::capture(240,test_samples,stats);
@@ -78,7 +78,8 @@ bool autoSetupVoltage()
             DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)voltage);
             continue;
         }
-        if(xmax<DSOCapture::getMinVoltageValue() && voltage>0) // too small
+        // is it too small ?, if so take a lower (more zoom) range
+        if(xmax<DSOCapture::getMinVoltageValue() && voltage>1) // too small, voltage =0 means ground, we dont want it
         {
             voltage=voltage-1;
             DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)voltage);

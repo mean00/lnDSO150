@@ -214,8 +214,8 @@ bool DSOCalibrate::voltageCalibrate()
         
         float f=performVoltageCalibration(myCalibrationVoltage[i].title,
                                           expected,
-                                          vSettings[range].multiplier,
-                                          vSettings[range].offset[0]);
+                                          gSettings[range].multiplier,
+                                          gSettings[range].offset[0]);
         if(f)
             voltageFineTune[dex]=(f*4096000.)/fvcc;
         else

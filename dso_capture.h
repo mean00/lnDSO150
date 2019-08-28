@@ -53,25 +53,24 @@ public:
       DSO_TIME_BASE_MAX=DSO_TIME_BASE_1S
     };
 #define NB_ADC_VOLTAGE 13
-#define NB_CAPTURE_VOLTAGE (NB_ADC_VOLTAGE)     // GND does not exist
+#define NB_CAPTURE_VOLTAGE (11)     
     
     enum DSO_VOLTAGE_RANGE
     {
-      DSO_VOLTAGE_GND, // 0
+      DSO_VOLTAGE_GND,  // 0
       
-      DSO_VOLTAGE_1MV, // 1
-      DSO_VOLTAGE_2MV,
-      DSO_VOLTAGE_5MV,
-      DSO_VOLTAGE_10MV,
-      DSO_VOLTAGE_20MV,
-      DSO_VOLTAGE_50MV, // 6
+      DSO_VOLTAGE_5MV,  // 1
+      DSO_VOLTAGE_10MV, // 2
+      DSO_VOLTAGE_20MV, // 3
+      DSO_VOLTAGE_50MV, // 4
       
-      DSO_VOLTAGE_100MV,    // 7  
-      DSO_VOLTAGE_200MV,
-      DSO_VOLTAGE_500MV,
-      DSO_VOLTAGE_1V,
-      DSO_VOLTAGE_2V,
-      DSO_VOLTAGE_5V, // 12
+      DSO_VOLTAGE_100MV,    // 5  
+      DSO_VOLTAGE_200MV,// 6
+      DSO_VOLTAGE_500MV,// 7
+      DSO_VOLTAGE_1V,   // 8
+      DSO_VOLTAGE_2V,   // 9
+      DSO_VOLTAGE_5V,   // 10
+      
       DSO_VOLTAGE_MAX=DSO_VOLTAGE_5V
     };
     // capture

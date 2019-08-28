@@ -86,7 +86,7 @@ bool  DSOEeprom::wipe()
     e2.init();
     e2.format();
     e2.write(0,0);
-    e2.write(64,0);
+    e2.write(FINE_TUNE_OFFSET,0);
     return true;
 }
 

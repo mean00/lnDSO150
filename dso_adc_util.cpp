@@ -77,8 +77,8 @@ bool DSOADC::readCalibrationValue()
     // 1b fill up the conversion table
     for(int i=0;i<NB_ADC_VOLTAGE;i++)
     {
-        vSettings[i].offset[0]=calibrationDC[i];
-        vSettings[i].offset[1]=calibrationAC[i];
+        gSettings[i].offset[0]=calibrationDC[i];
+        gSettings[i].offset[1]=calibrationAC[i];
     }
 
     float stat;
@@ -89,7 +89,7 @@ bool DSOADC::readCalibrationValue()
 
     float mu=fvcc/4096000.;
     for(int i=0;i<NB_ADC_VOLTAGE;i++)
-        vSettings[i].multiplier=multipliers[i]*mu;
+        gSettings[i].multiplier=multipliers[i]*mu;
     return true;
 }
 

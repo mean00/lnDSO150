@@ -11,7 +11,7 @@
 
 extern VoltageSettings vSettings[NB_CAPTURE_VOLTAGE];
 
-static int transformDma(bool dc,int16_t *in, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode)
+static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode)
 {
    if(!count) return false;
    stats.xmin=200;
@@ -24,17 +24,15 @@ static int transformDma(bool dc,int16_t *in, float *out,int count, VoltageSettin
    }
    ocount&=0xffe;
    int dex=0;
-   float offset;
-   if(dc) 
-       offset=set->offset[0];
-   else 
-       offset=set->offset[1];
+   float offset,multiplier;   
+    offset=gSettings[set->inputGainIndex].offset[dc0_ac1];
+    multiplier=gSettings[set->inputGainIndex].multiplier;
    // First
    float f;
    {
        f=(float)in[0]; 
        f-=offset;
-       f*=set->multiplier;       
+       f*=multiplier;       
        if(f>stats.xmax) stats.xmax=f;
        if(f<stats.xmin) stats.xmin=f;       
        out[0]=f; // Unit is now in volt
@@ -50,7 +48,7 @@ static int transformDma(bool dc,int16_t *in, float *out,int count, VoltageSettin
 
         f=*(in+(dex/4096));
         f-=offset;
-        f*=set->multiplier;
+        f*=multiplier;
         if(f>stats.xmax) stats.xmax=f;
         if(f<stats.xmin) stats.xmin=f;       
         out[i]=f; // Unit is now in volt
@@ -198,7 +196,7 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
 
     p=((int16_t *)fset.set1.data);
 
-    set->samples=transformDma(      controlButtons->getCouplingState()==DSOControl::DSO_COUPLING_DC,
+    set->samples=transformDma(      INDEX_AC1_DC0(),
                                     p,
                                     data,
                                     fset.set1.samples,

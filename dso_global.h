@@ -31,7 +31,8 @@ extern uint16_t calibrationAC[NB_ADC_VOLTAGE+1];
 extern float    voltageFineTune[NB_ADC_VOLTAGE+1];
 
 
-extern VoltageSettings vSettings[NB_CAPTURE_VOLTAGE];
+extern VoltageSettings      vSettings[NB_CAPTURE_VOLTAGE];
+extern GainSettings         gSettings[NB_ADC_VOLTAGE];
 
 extern Adafruit_TFTLCD_8bit_STM32 *tft;
 extern DSOControl                 *controlButtons;

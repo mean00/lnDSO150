@@ -21,7 +21,7 @@
  * @param mode
  * @return 
  */
-static int transformTimer(bool dc,int16_t *in, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats)
+static int transformTimer(int dc0_ac1,int16_t *in, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats)
 {
    if(!count) return false;
    stats.xmin=200;
@@ -34,19 +34,16 @@ static int transformTimer(bool dc,int16_t *in, float *out,int count, VoltageSett
    }
    ocount&=0xffe;
    
-    float offset;
-   if(dc) 
-       offset=set->offset[0];
-   else 
-       offset=set->offset[1];
-
+    float offset,multiplier;   
+    offset=gSettings[set->inputGainIndex].offset[dc0_ac1];
+    multiplier=gSettings[set->inputGainIndex].multiplier;
    
     for(int i=0;i<ocount;i++)
     {
 
         float f=(float)in[i];
         f-=offset;
-        f*=set->multiplier;
+        f*=multiplier;
         if(f>stats.xmax) stats.xmax=f;
         if(f<stats.xmin) stats.xmin=f;       
         out[i]=f; // Unit is now in volt
@@ -143,7 +140,7 @@ bool DSOCapturePriv::taskletTimer()
 
     float *data=set->data;    
     p=((int16_t *)fset.set1.data);
-    set->samples=transformTimer(    controlButtons->getCouplingState()==DSOControl::DSO_COUPLING_DC,
+    set->samples=transformTimer(    INDEX_AC1_DC0(),
                                     p,
                                     data,
                                     fset.set1.samples,
@@ -154,7 +151,7 @@ bool DSOCapturePriv::taskletTimer()
     {
         CaptureStats otherStats;
         p=((int16_t *)fset.set2.data);
-        int sample2=transformTimer( controlButtons->getCouplingState()==DSOControl::DSO_COUPLING_DC,
+        int sample2=transformTimer( INDEX_AC1_DC0(),
                                     p,
                                     data+set->samples,
                                     fset.set2.samples,

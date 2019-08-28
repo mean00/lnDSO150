@@ -225,8 +225,8 @@ float       DSOCapture::getTriggerValue(void)
 int DSOCapturePriv::voltToADCValue(float v)
 {
     VoltageSettings *set=&(vSettings[currentVoltageRange]);
-    float out=v/set->multiplier;
-    out+=set->offset[ controlButtons->getCouplingState()==DSOControl::DSO_COUPLING_DC];
+    float out=v/gSettings[set->inputGainIndex].multiplier;
+    out+=gSettings[set->inputGainIndex].offset[ INDEX_AC1_DC0()];
     return (int)out;    
 }
 
@@ -367,8 +367,7 @@ float       DSOCapture::getVoltageRangeAsFloat(DSO_VOLTAGE_RANGE range)
     switch(range)
     {
         SW(GND,0.00001)
-        SW(1MV,0.001)
-        SW(2MV,0.002)
+
         SW(5MV,0.005)
         SW(10MV,0.01)
         SW(20MV,0.02)
@@ -396,8 +395,6 @@ int       DSOCapture::getVoltageRangeIndex(DSO_VOLTAGE_RANGE range)
     switch(range)
     {
         SW(GND,0)
-        SW(1MV,1)
-        SW(2MV,2)
         SW(5MV,3)
         SW(10MV,4)
         SW(20MV,5)

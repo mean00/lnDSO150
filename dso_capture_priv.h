@@ -7,7 +7,7 @@
 #include "fancyLock.h"
 
 
-
+#define INDEX_AC1_DC0() (controlButtons->getCouplingState()==DSOControl::DSO_COUPLING_AC) // 0 if DC, 1 if AC, for gnd it does not matter
 
 /**
  */
