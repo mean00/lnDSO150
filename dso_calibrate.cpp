@@ -7,6 +7,7 @@
 #include "dso_global.h"
 #include "dso_adc.h"
 #include "dso_eeprom.h"
+#include "dso_adc_gain.h"
 #include "dso_adc_gain_priv.h"
 extern DSOADC                     *adc;
 
@@ -115,9 +116,9 @@ void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupl
 {
     printCalibrationTemplate("Connect probe to ground","(connect the 2 crocs together)");
     header(color,txt,target);     
-    for(int range=0;range<NB_ADC_VOLTAGE;range++)
+    for(int range=0;range<DSO_NB_GAIN_RANGES;range++)
     {
-        controlButtons->setInputGain(gSettings[range].ampPort);
+        DSOInputGain::setGainRange((DSOInputGain::InputGainRange) range);
         xDelay(10);
         array[range]=averageADCRead();
     }
@@ -159,21 +160,26 @@ bool DSOCalibrate::decalibrate()
 typedef struct MyCalibrationVoltage
 {
     const char *title;
-    DSOCapture::DSO_VOLTAGE_RANGE range;    
+    float   expected;
+    DSOInputGain::InputGainRange range;    
 };
 /**
  */
 MyCalibrationVoltage myCalibrationVoltage[]=
 {
-   {"25.0v",DSOCapture::DSO_VOLTAGE_5V},    // 5v/div range
-   {"10.0v",DSOCapture::DSO_VOLTAGE_2V},    // 2v/div range
-    {"5.0v",DSOCapture::DSO_VOLTAGE_1V},     // 1v/div range
-    {"2.5v",DSOCapture::DSO_VOLTAGE_500MV},     // 500mv/div range
-    {"1.0v",DSOCapture::DSO_VOLTAGE_200MV},     // 200mv/div range
-    {"500mV",DSOCapture::DSO_VOLTAGE_100MV},     // 100mv/div range
-    {"250mV",DSOCapture::DSO_VOLTAGE_50MV},    // 2v/div range
-    {"100mV",DSOCapture::DSO_VOLTAGE_20MV},     // 1v/div range    
+    {"24V",24,DSOInputGain::MAX_VOLTAGE_8V},    // 5v/div range
+    {"20V",15,DSOInputGain::MAX_VOLTAGE_4V},    // 2v/div range
+    {"8V",8,DSOInputGain::MAX_VOLTAGE_2V},     // 1v/div range
+    {"3.2V",3.2,DSOInputGain::MAX_VOLTAGE_800MV},     // 500mv/div range
+    {"1.6V",1.6,DSOInputGain::MAX_VOLTAGE_400MV},     // 500mv/div range
+    {"800mV",0.8,DSOInputGain::MAX_VOLTAGE_200MV},     // 200mv/div range
+    {"320mV",0.32,DSOInputGain::MAX_VOLTAGE_80MV},     // 100mv/div range
+    {"150mV",0.15,DSOInputGain::MAX_VOLTAGE_40MV},    // 2v/div range
+    {"80mV",0.08,DSOInputGain::MAX_VOLTAGE_20MV},     // 1v/div range    
 };
+
+
+
 float performVoltageCalibration(const char *title, float expected,float defalt,int offset);
 /**
  * 
@@ -208,15 +214,15 @@ bool DSOCalibrate::voltageCalibrate()
     int nb=sizeof(myCalibrationVoltage)/sizeof(MyCalibrationVoltage);
     for(int i=0;i<nb;i++)
     {                
-        DSOCapture::DSO_VOLTAGE_RANGE  range=myCalibrationVoltage[i].range;
-        capture->setVoltageRange(range);
-        float expected=DSOCapture::getVoltageRangeAsFloat(range)*5.0;
+        DSOInputGain::InputGainRange  range=myCalibrationVoltage[i].range;
+        DSOInputGain::setGainRange(range);
+        float expected=myCalibrationVoltage[i].expected;
         int dex=(int)range;
         
         float f=performVoltageCalibration(myCalibrationVoltage[i].title,
                                           expected,
-                                          gSettings[range].multiplier,
-                                          gSettings[range].offset[0]);
+                                          DSOInputGain::getMultiplier(),
+                                          DSOInputGain::getOffset(0));
         if(f)
             voltageFineTune[dex]=(f*4096000.)/fvcc;
         else

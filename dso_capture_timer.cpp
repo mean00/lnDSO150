@@ -7,7 +7,7 @@
 #include "dso_adc.h"
 #include "dso_capture.h"
 #include "dso_capture_priv.h"
-
+#include "dso_adc_gain.h"
 #include "DSO_config.h"
 /**
  * 
@@ -35,8 +35,9 @@ static int transformTimer(int dc0_ac1,int16_t *in, float *out,int count, Voltage
    ocount&=0xffe;
    
     float offset,multiplier;   
-    offset=gSettings[set->inputGainIndex].offset[dc0_ac1];
-    multiplier=gSettings[set->inputGainIndex].multiplier;
+    offset=DSOInputGain::getOffset(dc0_ac1);
+    multiplier=DSOInputGain::getMultiplier();
+
    
     for(int i=0;i<ocount;i++)
     {
@@ -134,8 +135,7 @@ bool DSOCapturePriv::taskletTimer()
         return false;
     }
 
-    CapturedSet *set=captureSet;        
-    int scale=vSettings[currentVolt].inputGainIndex;
+    CapturedSet *set=captureSet;            
     int expand=4096;
 
     float *data=set->data;    

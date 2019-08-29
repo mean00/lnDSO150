@@ -46,7 +46,7 @@ bool     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange)
 {
     watch.ok();
     DSOCapturePriv::currentVoltageRange=voltRange;
-    controlButtons->setInputGain(gSettings[vSettings[DSOCapturePriv::currentVoltageRange].inputGainIndex].ampPort);
+    DSOInputGain::setGainRange(vSettings[DSOCapturePriv::currentVoltageRange].gain);
     return true;
 }
 /**
@@ -220,10 +220,9 @@ float       DSOCapture::getTriggerValue(void)
  * @return 
  */
 int DSOCapturePriv::voltToADCValue(float v)
-{
-    VoltageSettings *set=&(vSettings[currentVoltageRange]);
-    float out=v/gSettings[set->inputGainIndex].multiplier;
-    out+=gSettings[set->inputGainIndex].offset[ INDEX_AC1_DC0()];
+{    
+    float out=v/DSOInputGain::getMultiplier();;
+    out+=DSOInputGain::getOffset( INDEX_AC1_DC0());
     return (int)out;    
 }
 

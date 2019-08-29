@@ -5,7 +5,7 @@
  ****************************************************/
 #pragma once
 #include <Wire.h>
-
+#include "dso_adc_gain.h"
 
 // Sampling Queue
 
@@ -17,18 +17,9 @@
 typedef struct VoltageSettings
 {
     const char          *name;          /// name of the setting i.e 10 ms/div
-    int                 inputGainIndex; /// Input gain selected 4051/4053 switch 
+    DSOInputGain::InputGainRange gain;
     float               displayGain;    /// multiply by this to get pixels from volt
  
-};
-/**
- */
-typedef struct GainSettings
-{
-    const char          *maxVoltDiv;
-    float               multiplier;     /// Gain of the internal amplifier, multiply by this to get volts
-    int                 offset[2];      /// Offset of sampled data , you need to substract it [0] is DC, [1] is AC]
-    int                 ampPort;        /// Value to program to port
 };
 
 /**

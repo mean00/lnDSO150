@@ -52,7 +52,6 @@ public:
       DSO_TIME_BASE_1S,
       DSO_TIME_BASE_MAX=DSO_TIME_BASE_1S
     };
-#define NB_ADC_VOLTAGE 13
 #define NB_CAPTURE_VOLTAGE (11)     
     
     enum DSO_VOLTAGE_RANGE

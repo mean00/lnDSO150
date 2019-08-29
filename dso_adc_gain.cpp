@@ -3,7 +3,7 @@
 #include "dso_adc_gain.h"
 #include "dso_control.h"
 #include "dso_adc.h"
-
+#include "dso_adc_gain_priv.h"
 // Compute default gain/attenuration depending on the scale
 // G1a/B is driven by SENSEL3
 
@@ -117,7 +117,7 @@ bool DSOInputGain::readCalibrationValue()
     
 
     float mu=fvcc/4096000.;
-    for(int i=0;i<NB_ADC_VOLTAGE;i++)
+    for(int i=0;i<DSO_NB_GAIN_RANGES;i++)
         multipliers[i]=multipliers[i]*mu;
     return true;
 }

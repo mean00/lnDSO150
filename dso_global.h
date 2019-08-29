@@ -29,7 +29,6 @@ extern uint16_t calibrationHash;
 
 
 extern VoltageSettings      vSettings[NB_CAPTURE_VOLTAGE];
-extern GainSettings         gSettings[NB_ADC_VOLTAGE];
 
 extern Adafruit_TFTLCD_8bit_STM32 *tft;
 extern DSOControl                 *controlButtons;

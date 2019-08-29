@@ -8,10 +8,11 @@
 #include "dso_capture.h"
 #include "dso_capture_priv.h"
 #include "DSO_config.h"
+#include "dso_adc_gain.h"
 
 extern VoltageSettings vSettings[NB_CAPTURE_VOLTAGE];
 
-static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode)
+static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode)
 {
    if(!count) return false;
    stats.xmin=200;
@@ -25,8 +26,8 @@ static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, VoltageSe
    ocount&=0xffe;
    int dex=0;
    float offset,multiplier;   
-    offset=gSettings[set->inputGainIndex].offset[dc0_ac1];
-    multiplier=gSettings[set->inputGainIndex].multiplier;
+   offset=DSOInputGain::getOffset(dc0_ac1);
+   multiplier=DSOInputGain::getMultiplier();
    // First
    float f;
    {
@@ -188,9 +189,7 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
     {
         set->stats.trigger=120; // right in the middle
     }
-    
-    int     scale=vSettings[currentVolt].inputGainIndex;
-    int    expand=tSettings[currentTime].expand4096;
+    int     expand=tSettings[currentTime].expand4096;
     
     float *data=set->data;    
 
@@ -200,7 +199,6 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
                                     p,
                                     data,
                                     fset.set1.samples,
-                                    vSettings+currentVolt,
                                     expand,
                                     set->stats,
                                     triggerValueFloat,

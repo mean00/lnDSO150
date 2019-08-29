@@ -10,40 +10,24 @@
 #include "dso_capture_priv.h"
 
 #include "DSO_config.h"
-
 /*
  * Partially filled global gain array
  * Remaining columns will be filled at runtime
  */
 VoltageSettings vSettings[NB_CAPTURE_VOLTAGE]= {
-    {"GND",     0,  24000.},
-    {"5mv",     1,  4800.},
-    {"10mv",    1,  2400.},
-    {"20mv",    2 , 1200.},
-    {"50mv",    3,  480.},
-    {"100mv",   4,  240.},
-    {"200mv",   5,  120.},
-    {"500mv",   6,  48.},
-    {"1v",      7,  24.},
-    {"2v",      8, 12.},
-    {"5v",      9, 4.8}
+    {"GND",     DSOInputGain::MAX_VOLTAGE_GND,  24000.},
+    {"5mv",     DSOInputGain::MAX_VOLTAGE_20MV,  4800.},
+    {"10mv",    DSOInputGain::MAX_VOLTAGE_20MV,  2400.},
+    {"20mv",    DSOInputGain::MAX_VOLTAGE_40MV , 1200.},
+    {"50mv",    DSOInputGain::MAX_VOLTAGE_80MV,  480.},
+    {"100mv",   DSOInputGain::MAX_VOLTAGE_200MV,  240.},
+    {"200mv",   DSOInputGain::MAX_VOLTAGE_400MV,  120.},
+    {"500mv",   DSOInputGain::MAX_VOLTAGE_800MV,  48.},
+    {"1v",      DSOInputGain::MAX_VOLTAGE_2V,  24.},
+    {"2v",      DSOInputGain::MAX_VOLTAGE_4V, 12.},
+    {"5v",      DSOInputGain::MAX_VOLTAGE_8V, 4.8}
 };
-GainSettings gSettings[NB_ADC_VOLTAGE]=
-{
-    {"GND",1},
-    {"20mV",8+4}, // 1
-    {"40mV",8+6}, // 2
-    {"80mV",8+7}, // 3
-    {"200mV",8+0},// 4
-    {"400mV",8+5},// 5
-    {"800mV",8+3},// 6
-    {"2V",0+4},   // 7
-    {"4V",0+6},   // 8
-    {"8V",0+7},   // 9
-    {"20V",0+0},   //10
-    {"40V",0+5},  // 11
-    {"80V",0+3},  // 12
-};
+
 
 /**
  These the time/div settings, it is computed to maximume accuracy 
