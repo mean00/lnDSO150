@@ -9,7 +9,7 @@
 #include "Fonts/waree12.h"
 #include "dso_test_signal.h"
 #include "dso_eeprom.h"
-
+#include "dso_adc_gain.h"
 static void MainTask( void *a );
 void splash(void);
 //--
@@ -130,7 +130,7 @@ void MainTask( void *a )
     //  testAdc3();   // slow
     //testDisplay();
     // testCalibrate();
-    adc->readCalibrationValue(); // re-read calibration value
+    DSOInputGain::readCalibrationValue(); // re-read calibration value
     adc->setupADCs ();
     
     // --- TEST  ---

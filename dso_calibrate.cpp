@@ -7,6 +7,7 @@
 #include "dso_global.h"
 #include "dso_adc.h"
 #include "dso_eeprom.h"
+#include "dso_adc_gain_priv.h"
 extern DSOADC                     *adc;
 
 extern VoltageSettings           vSettings[];

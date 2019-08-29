@@ -12,10 +12,7 @@
 #include "stopWatch.h"
 
 
- uint16_t calibrationDC[NB_ADC_VOLTAGE+1];
- uint16_t calibrationAC[NB_ADC_VOLTAGE+1];
- float    voltageFineTune[NB_ADC_VOLTAGE+1];
-
+ 
 
 int      DSOCapturePriv::currentTimeBase=DSOCapture::DSO_TIME_BASE_10MS;
 int      DSOCapturePriv::currentVoltageRange=0;

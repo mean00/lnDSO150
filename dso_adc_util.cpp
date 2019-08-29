@@ -48,50 +48,7 @@ float DSOADC::readVCCmv()
     return fvcc;
 }
 
-float multipliers[12];
 
-static void computeMultiplier(float *mul,int offset,float sta)
-{
-    float v;
-    for(int i=0;i<6;i++)
-    {      
-        if(!voltageFineTune[offset+i])
-        {
-            v=G3[i]/sta;
-        }
-        else
-        {
-            v=voltageFineTune[offset+i];
-        }
-        mul[i+offset]=v;
-    }
-}
-/**
- * 
- * @return 
- */
-bool DSOADC::readCalibrationValue()
-{
-    float fvcc=readVCCmv();    
-    vcc=(int)(fvcc);
-    // 1b fill up the conversion table
-    for(int i=0;i<NB_ADC_VOLTAGE;i++)
-    {
-        gSettings[i].offset[0]=calibrationDC[i];
-        gSettings[i].offset[1]=calibrationAC[i];
-    }
-
-    float stat;
-    multipliers[0]=0;
-    computeMultiplier(multipliers,1,G1a*G2*G4);
-    computeMultiplier(multipliers,1+6,G1b*G2*G4);
-    
-
-    float mu=fvcc/4096000.;
-    for(int i=0;i<NB_ADC_VOLTAGE;i++)
-        gSettings[i].multiplier=multipliers[i]*mu;
-    return true;
-}
 
 /**
  * 

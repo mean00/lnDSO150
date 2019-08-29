@@ -6,7 +6,7 @@
 #include "EEPROM.h"
 #include "dso_global.h"
 #include "dso_eeprom.h"
-
+#include "dso_adc_gain_priv.h"
 extern uint16_t calibrationHash;
 
 #define FINE_TUNE_OFFSET 64

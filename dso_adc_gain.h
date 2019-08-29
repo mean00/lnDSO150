@@ -6,7 +6,8 @@
 #pragma once
 
 #define DSO_NB_GAIN_RANGES 13
-
+/**
+ */
 class DSOInputGain
 {
 public:
@@ -26,5 +27,9 @@ public:
       MAX_VOLTAGE_40V,     // 11
       MAX_VOLTAGE_80V=12   // 12
     };
-    static bool setGainRange(InputGainRange range);
+    static bool                         setGainRange(InputGainRange range);
+    static DSOInputGain::InputGainRange getGainRange();
+    static int                          getOffset(int dc0ac1);
+    static float                        getMultiplier();
+    static bool                         readCalibrationValue();
 };
