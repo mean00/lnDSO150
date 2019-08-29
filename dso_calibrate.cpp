@@ -116,7 +116,7 @@ void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupl
     header(color,txt,target);     
     for(int range=0;range<NB_ADC_VOLTAGE;range++)
     {
-        controlButtons->setInputGain(vSettings[range].inputGainIndex);        
+        controlButtons->setInputGain(gSettings[range].ampPort);
         xDelay(10);
         array[range]=averageADCRead();
     }
@@ -210,7 +210,7 @@ bool DSOCalibrate::voltageCalibrate()
         DSOCapture::DSO_VOLTAGE_RANGE  range=myCalibrationVoltage[i].range;
         capture->setVoltageRange(range);
         float expected=DSOCapture::getVoltageRangeAsFloat(range)*5.0;
-        int dex=DSOCapture::getVoltageRangeIndex(range);
+        int dex=(int)range;
         
         float f=performVoltageCalibration(myCalibrationVoltage[i].title,
                                           expected,

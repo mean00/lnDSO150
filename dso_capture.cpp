@@ -49,7 +49,7 @@ bool     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange)
 {
     watch.ok();
     DSOCapturePriv::currentVoltageRange=voltRange;
-    controlButtons->setInputGain(vSettings[DSOCapturePriv::currentVoltageRange].inputGainIndex);
+    controlButtons->setInputGain(gSettings[vSettings[DSOCapturePriv::currentVoltageRange].inputGainIndex].ampPort);
     return true;
 }
 /**

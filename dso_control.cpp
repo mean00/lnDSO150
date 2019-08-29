@@ -468,8 +468,7 @@ int  DSOControl::getRotaryValue()
  * @return 
  */
 int  DSOControl::setInputGain(int val)
-{
-    val=ampMapping[val]; // monotone version
+{    
     int set=val&0xf; // 4 useful bits
     int unset=(~set)&0x0f;    
     GPIOA->regs->BSRR=(set<<1);
