@@ -45,6 +45,7 @@ float DSOADC::readVCCmv()
    }
     fvcc=(1200. * 4096.*NB_SAMPLE) /fvcc;   
     //fvcc=3380;
+    vcc=fvcc;
     return fvcc;
 }
 

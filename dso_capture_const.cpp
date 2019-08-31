@@ -16,13 +16,14 @@
  */
 VoltageSettings vSettings[NB_CAPTURE_VOLTAGE]= {
     {"GND",     DSOInputGain::MAX_VOLTAGE_GND,  24000.},
-    {"5mv",     DSOInputGain::MAX_VOLTAGE_20MV,  4800.},
+    {"5mv",     DSOInputGain::MAX_VOLTAGE_20MV,  4800.}, // "Digital" zoom
     {"10mv",    DSOInputGain::MAX_VOLTAGE_20MV,  2400.},
     {"20mv",    DSOInputGain::MAX_VOLTAGE_40MV , 1200.},
     {"50mv",    DSOInputGain::MAX_VOLTAGE_80MV,  480.},
     {"100mv",   DSOInputGain::MAX_VOLTAGE_200MV,  240.},
-    {"200mv",   DSOInputGain::MAX_VOLTAGE_400MV,  120.},
-    {"500mv",   DSOInputGain::MAX_VOLTAGE_800MV,  48.},
+    {"200mv",   DSOInputGain::MAX_VOLTAGE_250MV,  120.},
+    //{"500mv",   DSOInputGain::MAX_VOLTAGE_800MV,  48.},
+    {"500mV",   DSOInputGain::MAX_VOLTAGE_2V,  48.}, // "digital" zoom
     {"1v",      DSOInputGain::MAX_VOLTAGE_2V,  24.},
     {"2v",      DSOInputGain::MAX_VOLTAGE_4V, 12.},
     {"5v",      DSOInputGain::MAX_VOLTAGE_8V, 4.8}

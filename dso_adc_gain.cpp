@@ -25,26 +25,27 @@ static const int gainMapping[16]=
 {
     1 , // GND          [0]
     
-    8+4, // x14   1mv   [1]
-    8+6, // x7           [2]
-    8+7, // x3.5        [3]
-    8+0, // x1.4        [4]
-    8+5, // x0.7        [5]
-    8+3, // x0.35       [6]
+    8+4, // x14   20mv   [1]    
+    8+6, // x7    40       [2]
+    8+7, // x3.5  80      [3]
+    8+0, // x1.4  200      [4]
+    8+5, // x0.7  400      [5]
+    8+3, // x0.35 800      [6]
     
-    4, // /7    100 mv  [7]
-    6, // /14   200 mv  [8]
-    7, // /29   500 mv  [9]
-    0, // /71   1v      [10]
-    5, // /143  2v      [11]
-    3,  // /286 5v      [12]
+    4, // /7    2   [7]
+    6, // /14   4   [8]
+    7, // /29   8 v  [9]
+    0, // /71   20      [10]
+    5, // /143  40      [11]
+    3,  // /286 80      [12]
     
     3,3,3 // Filler
 };
-uint16_t calibrationDC[DSO_NB_GAIN_RANGES+1];
-uint16_t calibrationAC[DSO_NB_GAIN_RANGES+1];
+uint16_t calibrationDC[  DSO_NB_GAIN_RANGES+1];
+uint16_t calibrationAC[  DSO_NB_GAIN_RANGES+1];
 float    voltageFineTune[DSO_NB_GAIN_RANGES+1];
-float    multipliers[DSO_NB_GAIN_RANGES+1];
+float    multipliers[    DSO_NB_GAIN_RANGES+1];
+float    raw_multipliers[    DSO_NB_GAIN_RANGES+1];
 
 /**
  */
@@ -91,14 +92,12 @@ static void computeMultiplier(float *mul,int offset,float sta)
     float v;
     for(int i=0;i<6;i++)
     {      
-        if(!voltageFineTune[offset+i])
+        v=voltageFineTune[offset+i];
+        raw_multipliers[i+offset]=G3[i]/sta;
+        if(!v)
         {
-            v=G3[i]/sta;
-        }
-        else
-        {
-            v=voltageFineTune[offset+i];
-        }
+            v=raw_multipliers[i+offset]; // default value, not fine tuned
+        }       
         mul[i+offset]=v;
     }
 }

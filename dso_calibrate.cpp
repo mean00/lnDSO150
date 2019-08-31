@@ -11,9 +11,6 @@
 #include "dso_adc_gain_priv.h"
 extern DSOADC                     *adc;
 
-extern VoltageSettings           vSettings[];
-static float fvcc=0;
-
 #define SHORT_PRESS(x) (controlButtons->getButtonEvents(DSOControl::x)&EVENT_SHORT_PRESS)
 static uint16_t directADC2Read(int pin);
 /**
@@ -166,16 +163,16 @@ typedef struct MyCalibrationVoltage
 /**
  */
 MyCalibrationVoltage myCalibrationVoltage[]=
-{
-    {"24V",24,DSOInputGain::MAX_VOLTAGE_8V},    // 5v/div range
-    {"20V",15,DSOInputGain::MAX_VOLTAGE_4V},    // 2v/div range
-    {"8V",8,DSOInputGain::MAX_VOLTAGE_2V},     // 1v/div range
-    {"3.2V",3.2,DSOInputGain::MAX_VOLTAGE_800MV},     // 500mv/div range
-    {"1.6V",1.6,DSOInputGain::MAX_VOLTAGE_400MV},     // 500mv/div range
-    {"800mV",0.8,DSOInputGain::MAX_VOLTAGE_200MV},     // 200mv/div range
-    {"320mV",0.32,DSOInputGain::MAX_VOLTAGE_80MV},     // 100mv/div range
-    {"150mV",0.15,DSOInputGain::MAX_VOLTAGE_40MV},    // 2v/div range
-    {"80mV",0.08,DSOInputGain::MAX_VOLTAGE_20MV},     // 1v/div range    
+{    
+    {"16V",     16,     DSOInputGain::MAX_VOLTAGE_4V},    // 2v/div range
+    {"8V",      8,      DSOInputGain::MAX_VOLTAGE_2V},     // 1v/div range
+    //{"3.2V",    3.2,    DSOInputGain::MAX_VOLTAGE_800MV},     // 500mv/div range => Saturates
+    //{"1.6V",    1.6,    DSOInputGain::MAX_VOLTAGE_400MV},     // 200mv/div range    => Saturates
+    {"1V",      1,      DSOInputGain::MAX_VOLTAGE_250MV},     // 1v/div range
+    {"800mV",   0.8,    DSOInputGain::MAX_VOLTAGE_200MV},     // 100mv/div range
+    {"320mV",   0.32,   DSOInputGain::MAX_VOLTAGE_80MV},     //  50mv/div range
+    {"150mV",   0.15,   DSOInputGain::MAX_VOLTAGE_40MV},    //   20mv/div range
+    {"80mV",    0.08,   DSOInputGain::MAX_VOLTAGE_20MV},     //  10mv/div range    
 };
 
 
@@ -187,7 +184,7 @@ float performVoltageCalibration(const char *title, float expected,float defalt,i
  */
 bool DSOCalibrate::voltageCalibrate()
 {
-    fvcc=DSOADC::getVCCmv();
+    float fvcc=DSOADC::getVCCmv();
     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);  
     tft->setTextColor(WHITE,BLACK);
     
@@ -216,7 +213,7 @@ bool DSOCalibrate::voltageCalibrate()
     {                
         DSOInputGain::InputGainRange  range=myCalibrationVoltage[i].range;
         DSOInputGain::setGainRange(range);
-        float expected=myCalibrationVoltage[i].expected;
+        float expected=myCalibrationVoltage[i].expected;        
         int dex=(int)range;
         
         float f=performVoltageCalibration(myCalibrationVoltage[i].title,

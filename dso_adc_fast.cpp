@@ -26,8 +26,7 @@ InterruptStats adcInterruptStats;
 uint32_t convTime;
 extern HardwareTimer Timer2;
 adc_reg_map *adc_Register;
-extern VoltageSettings vSettings[];
-extern const float inputScale[];
+
 
 
 uint16_t DSOADC::adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE] __attribute__ ((aligned (8)));;;

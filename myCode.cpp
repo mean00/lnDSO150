@@ -130,6 +130,7 @@ void MainTask( void *a )
     //  testAdc3();   // slow
     //testDisplay();
     // testCalibrate();
+    
     DSOInputGain::readCalibrationValue(); // re-read calibration value
     adc->setupADCs ();
     
