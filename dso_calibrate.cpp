@@ -164,6 +164,7 @@ typedef struct MyCalibrationVoltage
  */
 MyCalibrationVoltage myCalibrationVoltage[]=
 {    
+    {"24V",     24,     DSOInputGain::MAX_VOLTAGE_8V},    // 2v/div range
     {"16V",     16,     DSOInputGain::MAX_VOLTAGE_4V},    // 2v/div range
     {"8V",      8,      DSOInputGain::MAX_VOLTAGE_2V},     // 1v/div range
     //{"3.2V",    3.2,    DSOInputGain::MAX_VOLTAGE_800MV},     // 500mv/div range => Saturates
@@ -177,7 +178,7 @@ MyCalibrationVoltage myCalibrationVoltage[]=
 
 
 
-float performVoltageCalibration(const char *title, float expected,float defalt,int offset);
+float performVoltageCalibration(const char *title, float expected,float defalt,float previous,int offset);
 /**
  * 
  * @return 
@@ -215,10 +216,11 @@ bool DSOCalibrate::voltageCalibrate()
         DSOInputGain::setGainRange(range);
         float expected=myCalibrationVoltage[i].expected;        
         int dex=(int)range;
-        
+        float previous=(voltageFineTune[dex]*fvcc)/4096000.;
         float f=performVoltageCalibration(myCalibrationVoltage[i].title,
                                           expected,
                                           DSOInputGain::getMultiplier(),
+                                          previous,
                                           DSOInputGain::getOffset(0));
         if(f)
             voltageFineTune[dex]=(f*4096000.)/fvcc;
@@ -253,6 +255,12 @@ static void fineHeader(const char *title)
     tft->myDrawString(" Volt ");
     tft->setTextColor(WHITE,BLACK);
     tft->myDrawString(" for default");
+    tft->setTextColor(BLACK,WHITE);
+    tft->myDrawString(" Trigg ");
+    tft->setTextColor(WHITE,BLACK);
+    tft->myDrawString(" to keep current ");
+     
+    
 }
 
 /**
@@ -261,7 +269,7 @@ static void fineHeader(const char *title)
  * @param expected
  * @return 
  */
-float performVoltageCalibration(const char *title, float expected,float defalt,int offset)
+float performVoltageCalibration(const char *title, float expected,float defalt,float previous,int offset)
 {
 #define SCALEUP 1000000    
     fineHeader(title);
@@ -280,10 +288,17 @@ float performVoltageCalibration(const char *title, float expected,float defalt,i
         tft->print(f*SCALEUP);
         tft->setCursor(10, 130);
         tft->print(defalt*SCALEUP);
+         tft->setCursor(10, 160);
+        tft->print(previous*SCALEUP);
+        
          
         if( SHORT_PRESS(DSO_BUTTON_OK))
              return f;
         if( SHORT_PRESS(DSO_BUTTON_VOLTAGE))
              return 0.;
+        if( SHORT_PRESS(DSO_BUTTON_TRIGGER))
+             return previous;
+
+        
     }    
 }
