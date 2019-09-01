@@ -9,6 +9,7 @@
 #include "dso_eeprom.h"
 #include "dso_adc_gain.h"
 #include "dso_adc_gain_priv.h"
+#include "dso_gfx.h"
 extern DSOADC                     *adc;
 
 #define SHORT_PRESS(x) (controlButtons->getButtonEvents(DSOControl::x)&EVENT_SHORT_PRESS)
@@ -189,9 +190,7 @@ bool DSOCalibrate::voltageCalibrate()
     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);  
     tft->setTextColor(WHITE,BLACK);
     
-    
-    tft->fillScreen(BLACK);
-    printxy(0,5,"===VOLT CALIBRATION====");
+    DSO_GFX::newPage("VOLT CALIBRATION");
     printxy(0,30,"Set Input to DC");
     printxy(0,50,"and press OK");
     
