@@ -29,8 +29,8 @@ int       nbRefrsh=0;
 
 static    int lastTrigger=-1;
 static    DSOControl::DSOCoupling oldCoupling;
-static    bool triggered=false;
-DSO_ArmingMode armingMode=DSO_CAPTURE_MULTI; // single shot or repeat capture
+static    int triggered=0; // 0 means not trigger, else it is the # of samples in the buffer
+DSO_ArmingMode armingMode=DSO_UI_CONTINUOUS; // single shot or repeat capture
 
 static void initMainUI(void);
 void drawBackground();
@@ -103,7 +103,7 @@ static void buttonManagement()
     {
         if(armingMode==DSO_CAPTURE_SINGLE)
         {
-            triggered=false;
+            triggered=0;
         }
     }
     if(evt & EVENT_LONG_PRESS)    
@@ -160,7 +160,7 @@ static void buttonManagement()
                     if(v>DSO_ArmingMode::DSO_UI_CONTINUOUS) v=DSO_ArmingMode::DSO_UI_CONTINUOUS;
                     STOP_CAPTURE();
                     armingMode=(DSO_ArmingMode)v;
-                    triggered=false;
+                    triggered=0;
                 }
                 break;
             
@@ -280,9 +280,10 @@ void mainDSOUI(void)
    
     uint32_t lastRefresh=millis();
 
-    float f=DSOCapture::getTriggerValue();
+    float f=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();
     triggerLine=DSOCapture::voltageToPixel(f);
     DSOControl::DSOCoupling oldCoupling=controlButtons->getCouplingState();
+    float lastVoltageTrigger=-999;
     while(1)
     {        
         int count=0;  
@@ -294,12 +295,22 @@ void mainDSOUI(void)
         // Nothing captured, refresh screen
         if(!count) 
         {            
-            DSODisplay::drawVoltageTrigger(false,triggerLine);
+            float lastVoltageTrigger=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();            
             buttonManagement();
-            DSODisplay::drawTriggeredState(armingMode,triggered);
             float f=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();
-            triggerLine=DSOCapture::voltageToPixel(f);
-            DSODisplay::drawVoltageTrigger(true,triggerLine);
+            
+            if(f!=lastVoltageTrigger)
+            {
+                triggerLine=DSOCapture::voltageToPixel(lastVoltageTrigger);            
+                DSODisplay::drawVoltageTrigger(false,triggerLine);   
+                lastVoltageTrigger=f;                
+                triggerLine=DSOCapture::voltageToPixel(lastVoltageTrigger);     
+                if(triggered)
+                    DSODisplay::drawWaveForm(triggered,waveForm);
+                DSODisplay::drawVoltageTrigger(true,triggerLine);   
+            }
+            
+            DSODisplay::drawTriggeredState(armingMode,triggered);
             continue;
         }
         
@@ -311,7 +322,7 @@ void mainDSOUI(void)
         
         if(armingMode==DSO_CAPTURE_SINGLE )
         {
-            triggered=true;
+            triggered=count;
         }
         DSODisplay::drawTriggeredState(armingMode,triggered);
         
@@ -326,6 +337,8 @@ void mainDSOUI(void)
             lastTrigger=stats.trigger;
             DSODisplay::drawVerticalTrigger(true,lastTrigger);
         }
+        buttonManagement();        
+        
         float f=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();
         triggerLine=DSOCapture::voltageToPixel(f);
         DSODisplay::drawVoltageTrigger(true,triggerLine);
@@ -342,7 +355,7 @@ void mainDSOUI(void)
             refrshDuration+=(millis()-m);
             nbRefrsh++;
         }
-        buttonManagement();                
+                
       
     }
         
