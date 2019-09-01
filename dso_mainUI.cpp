@@ -29,7 +29,7 @@ int       nbRefrsh=0;
 
 static    int lastTrigger=-1;
 static    DSOControl::DSOCoupling oldCoupling;
-
+static    bool triggered=false;
 DSO_ArmingMode armingMode=DSO_CAPTURE_MULTI; // single shot or repeat capture
 
 static void initMainUI(void);
@@ -63,41 +63,33 @@ void splash(void)
 static void redraw()
 {
         DSODisplay::drawGrid();
-        DSODisplay::printVoltTimeTriggerMode(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText(),DSOCapture::getTriggerMode());
+        DSODisplay::printVoltTimeTriggerMode(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText(),DSOCapture::getTriggerMode(),armingMode);
         DSODisplay::printTriggerValue(DSOCapture::getTriggerValue());
         DSODisplay::printOffset(capture->getVoltageOffset());
-        DSODisplay::drawArmingMode(armingMode,false);
+        //DSODisplay::drawArmingMode(armingMode,false);
 }
 #define STOP_CAPTURE() {DSOCapture::stopCapture();xDelay(20);}
 
 static void buttonManagement()
 {
     bool dirty=false;
-        
+    DSODisplay::MODE_TYPE newMode=DSODisplay::INVALID_MODE;
+    
+    
     DSOControl::DSOCoupling coupling=controlButtons->getCouplingState();
     if(coupling!=oldCoupling)
     {
         oldCoupling=coupling;
         dirty=true;
     }
-    int evt;
     // OK button
-    evt=controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_OK);
+    int evt=controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_OK);
     if(evt & EVENT_SHORT_PRESS)
     {
         dirty=true;
-        switch(armingMode)
-        {
-            case DSO_CAPTURE_SINGLE_CAPTURED:
-            case DSO_CAPTURE_SINGLE_ARMED:
-                armingMode=DSO_CAPTURE_MULTI;
-                break;
-            case DSO_CAPTURE_MULTI:
-                armingMode=DSO_CAPTURE_SINGLE_ARMED;
-                break;
-        }
+        newMode=DSODisplay::ARMING_MODE;        
     }
-
+   
     if(evt & EVENT_LONG_PRESS)    
     {
         STOP_CAPTURE();
@@ -109,8 +101,10 @@ static void buttonManagement()
     evt=controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_ROTARY);    
     if(evt & EVENT_SHORT_PRESS)    
     {
-        if(armingMode==DSO_CAPTURE_SINGLE_CAPTURED);
-            armingMode=DSO_CAPTURE_SINGLE_ARMED;
+        if(armingMode==DSO_CAPTURE_SINGLE)
+        {
+            triggered=false;
+        }
     }
     if(evt & EVENT_LONG_PRESS)    
     {
@@ -123,7 +117,7 @@ static void buttonManagement()
   
     int inc=controlButtons->getRotaryValue();
     
-    DSODisplay::MODE_TYPE newMode=DSODisplay::INVALID_MODE;
+    
     
     if(controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_VOLTAGE) & EVENT_SHORT_PRESS)
     {
@@ -157,6 +151,19 @@ static void buttonManagement()
 
         switch(DSODisplay::getMode())
         {
+             case DSODisplay::ARMING_MODE: 
+                {
+                    dirty=true;
+                    int v=(int)armingMode;
+                    v+=inc;
+                    if(v<0) v=0;
+                    if(v>DSO_ArmingMode::DSO_UI_CONTINUOUS) v=DSO_ArmingMode::DSO_UI_CONTINUOUS;
+                    STOP_CAPTURE();
+                    armingMode=(DSO_ArmingMode)v;
+                    triggered=false;
+                }
+                break;
+            
             case DSODisplay::VOLTAGE_MODE: 
                 {
                 int v=capture->getVoltageRange();
@@ -235,10 +242,10 @@ void drawBackground()
     DSODisplay::drawGrid();
     DSODisplay::drawStatsBackGround();
     
-    DSODisplay::printVoltTimeTriggerMode(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText(),DSOCapture::getTriggerMode());
+    DSODisplay::printVoltTimeTriggerMode(capture->getVoltageRangeAsText(), capture->getTimeBaseAsText(),DSOCapture::getTriggerMode(),armingMode);
     DSODisplay::printTriggerValue(DSOCapture::getTriggerValue());
     DSODisplay::printOffset(capture->getVoltageOffset());
-    DSODisplay::drawArmingMode(armingMode,false);
+    //DSODisplay::drawArmingMode(armingMode,false);
 
 }
 /**
@@ -280,7 +287,8 @@ void mainDSOUI(void)
     {        
         int count=0;  
         
-        if(  armingMode!= DSO_CAPTURE_SINGLE_CAPTURED)
+        bool wait = (armingMode== DSO_CAPTURE_SINGLE) && triggered;
+        if(  !wait)
             count=DSOCapture::capture(240,test_samples,stats);  
         
         // Nothing captured, refresh screen
@@ -288,7 +296,7 @@ void mainDSOUI(void)
         {            
             DSODisplay::drawVoltageTrigger(false,triggerLine);
             buttonManagement();
-            DSODisplay::drawArmingMode(armingMode,false);
+            DSODisplay::drawTriggeredState(armingMode,triggered);
             float f=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();
             triggerLine=DSOCapture::voltageToPixel(f);
             DSODisplay::drawVoltageTrigger(true,triggerLine);
@@ -301,11 +309,11 @@ void mainDSOUI(void)
         
         DSODisplay::drawWaveForm(count,waveForm);
         
-        if(armingMode==DSO_CAPTURE_SINGLE_ARMED )
+        if(armingMode==DSO_CAPTURE_SINGLE )
         {
-            armingMode=DSO_CAPTURE_SINGLE_CAPTURED;
+            triggered=true;
         }
-        DSODisplay::drawArmingMode(armingMode,true);
+        DSODisplay::drawTriggeredState(armingMode,triggered);
         
         if(lastTrigger!=-1)
         {

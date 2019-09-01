@@ -6,12 +6,11 @@
 
 #pragma once
 
-
 typedef enum DSO_ArmingMode
 {
-    DSO_CAPTURE_SINGLE_ARMED,
-    DSO_CAPTURE_SINGLE_CAPTURED,
+    DSO_CAPTURE_SINGLE,
     DSO_CAPTURE_MULTI,
+    DSO_UI_CONTINUOUS,
     DSO_CAPTURE_MODE_INVALIDE
 };
 
@@ -29,6 +28,7 @@ typedef enum
             VOLTAGE_MODE=1,
             TIME_MODE=2,
             TRIGGER_MODE=3,
+            ARMING_MODE=4,
             VOLTAGE_MODE_ALT=VOLTAGE_MODE+0x80,
             TIME_MODE_ALT=TIME_MODE+0x80,
             TRIGGER_MODE_ALT=TRIGGER_MODE+0x80,
@@ -45,7 +45,7 @@ public:
   
             static void  drawStats(CaptureStats &stats);
             static void  drawStatsBackGround();
-            static void  printVoltTimeTriggerMode(const char *volt, const char *time,DSOCapture::TriggerMode mode);
+            static void  printVoltTimeTriggerMode(const char *volt, const char *time,DSOCapture::TriggerMode mode,DSO_ArmingMode arming);
             static void  drawMode(MODE_TYPE mode);
             static MODE_TYPE getMode();
             static void  setMode(MODE_TYPE t);
@@ -54,10 +54,6 @@ public:
             
             static void  drawAutoSetup();
             static void  drawAutoSetupStep(int x);
-            static void  triggered(bool gotIt);
-            static void  drawArmingMode(DSO_ArmingMode mode,bool triggered);
-            
-protected:
             static void  drawArmingMode(DSO_ArmingMode mode);
-            static void  drawTrigger(bool triggered);
+            static void  drawTriggeredState(DSO_ArmingMode mode,bool triggered);
 };
