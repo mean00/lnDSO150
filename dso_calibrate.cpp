@@ -38,11 +38,11 @@ static void printxy(int x, int y, const char *t)
   */
 static void printCalibrationTemplate( const char *st1, const char *st2)
 {
-    tft->fillScreen(BLACK);  
-    printxy(0,10,"======CALIBRATION========");
+    DSO_GFX::newPage("CALIBRATION");    
     printxy(40,100,st1);
     printxy(8,120,st2);
-    printxy(80,200,"and press OK");
+    
+    DSO_GFX::bottomLine("and press @OK@");    
 }
 
 /**
@@ -59,8 +59,7 @@ static void printCoupling(DSOControl::DSOCoupling cpl)
 void header(int color,const char *txt,DSOControl::DSOCoupling target)
 {
     printCalibrationTemplate(txt,"");
-    DSOControl::DSOCoupling   cpl=(DSOControl::DSOCoupling)-1;
-    printxy(220,40," switch /\\");
+    DSOControl::DSOCoupling   cpl=(DSOControl::DSOCoupling)-1;    
     while(1)
     {
             controlButtons->updateCouplingState();
@@ -188,11 +187,13 @@ bool DSOCalibrate::voltageCalibrate()
 {
     float fvcc=DSOADC::getVCCmv();
     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);  
-    tft->setTextColor(WHITE,BLACK);
     
-    DSO_GFX::newPage("VOLT CALIBRATION");
+    
+    DSO_GFX::newPage("VOLTAGE CALIBRATION");
     printxy(0,30,"Set Input to DC");
-    printxy(0,50,"and press OK");
+    DSO_GFX::bottomLine("press @OK@ when ready");
+    
+    // Set input to DC
     
     while(1)
     {
@@ -206,6 +207,7 @@ bool DSOCalibrate::voltageCalibrate()
         }
     }
     
+    // here we go
     
     adc_set_sample_rate(ADC2, ADC_SMPR_239_5);
     int nb=sizeof(myCalibrationVoltage)/sizeof(MyCalibrationVoltage);
@@ -238,26 +240,14 @@ bool DSOCalibrate::voltageCalibrate()
  */
 static void fineHeader(const char *title)
 {          
-    tft->fillScreen(BLACK);
-    printxy(0,5,"===VOLT CALIBRATION====");
-    printxy(10,30,"Connect to ");
+    
+    DSO_GFX::newPage("VOLTAGE CALIBRATION");        
+    DSO_GFX::bottomLine(" @VOLT@:Default,@TRIG@:Keep,@OK@:Set");    
+    
+    DSO_GFX::center("Set input to ",36);
     tft->setTextColor(GREEN,BLACK);
     tft->myDrawString(title);
-    
     tft->setTextColor(WHITE,BLACK);
-    printxy(10,200,"Press ");
-    tft->setTextColor(BLACK,WHITE);
-    tft->myDrawString(" OK ");
-    tft->setTextColor(WHITE,BLACK);
-    tft->myDrawString("to set,");
-    tft->setTextColor(BLACK,WHITE);
-    tft->myDrawString(" Volt ");
-    tft->setTextColor(WHITE,BLACK);
-    tft->myDrawString(" for default");
-    tft->setTextColor(BLACK,WHITE);
-    tft->myDrawString(" Trigg ");
-    tft->setTextColor(WHITE,BLACK);
-    tft->myDrawString(" to keep current ");
      
     
 }
@@ -281,13 +271,13 @@ float performVoltageCalibration(const char *title, float expected,float defalt,f
         else
                  f=expected/sum;        
                       
-        tft->setCursor(160, 90);
+        tft->setCursor(200, 90);
         tft->print(sum);                
         tft->setCursor(10, 90);
         tft->print(f*SCALEUP);
         tft->setCursor(10, 130);
         tft->print(defalt*SCALEUP);
-         tft->setCursor(10, 160);
+        tft->setCursor(10, 160);
         tft->print(previous*SCALEUP);
         
          
@@ -297,7 +287,5 @@ float performVoltageCalibration(const char *title, float expected,float defalt,f
              return 0.;
         if( SHORT_PRESS(DSO_BUTTON_TRIGGER))
              return previous;
-
-        
     }    
 }

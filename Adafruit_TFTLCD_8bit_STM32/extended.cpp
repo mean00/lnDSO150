@@ -10,22 +10,21 @@
 #define pgm_read_dword(addr) (*(const unsigned long *)(addr))
 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 #define pgm_read_pointer(addr) ((void *)pgm_read_dword(addr))
-
 /**
  * 
  * @param st
+ * @param length
+ * @param padd_up_to_n_pixels
  */
- void  Adafruit_TFTLCD_8bit_STM32::myDrawString(const char *st,int padd_up_to_n_pixels)
+void  Adafruit_TFTLCD_8bit_STM32::myDrawStringN(const char *st,int length,int padd_up_to_n_pixels)
  {
      if(!currentFont)
          return;
-     int l=strlen(st);
-   
      int lastColumn=0;
      
      int endX=cursor_x+padd_up_to_n_pixels;
      
-     for(int i=0;i<l;i++)
+     for(int i=0;i<length;i++)
      {
          int of=myDrawChar(cursor_x,cursor_y+currentFont->maxHeight,
                            st[i],
@@ -47,6 +46,18 @@
             
          }
      }
+ }
+
+/**
+ * 
+ * @param st
+ */
+ void  Adafruit_TFTLCD_8bit_STM32::myDrawString(const char *st,int padd_up_to_n_pixels)
+ {
+     if(!currentFont)
+         return;
+     int l=strlen(st);
+     myDrawStringN(st,l,padd_up_to_n_pixels);
  }
 
 /**
