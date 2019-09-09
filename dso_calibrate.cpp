@@ -39,9 +39,8 @@ static void printxy(int x, int y, const char *t)
 static void printCalibrationTemplate( const char *st1, const char *st2)
 {
     DSO_GFX::newPage("CALIBRATION");    
-    printxy(40,100,st1);
-    printxy(8,120,st2);
-    
+    DSO_GFX::center(st1,80);
+    DSO_GFX::center(st2,120);
     DSO_GFX::bottomLine("and press @OK@");    
 }
 
@@ -50,7 +49,7 @@ static void printCalibrationTemplate( const char *st1, const char *st2)
  * @param cpl
  */
 static void printCoupling(DSOControl::DSOCoupling cpl)
-{static const char *coupling[3]={"current : GND","current : DC ","current : AC "};    
+{static const char *coupling[3]={"currently : GND","currently : DC ","currently : AC "};    
     DSO_GFX::center(coupling[cpl],130);
       
 }
@@ -86,10 +85,7 @@ void header(int color,const char *txt,DSOControl::DSOCoupling target)
 {
     printCalibrationTemplate(txt,"");
     waitForCoupling(target);
-
-    tft->setTextColor(BLACK,GREEN);
-    printxy(160-8*8,160,"- processing -");
-    tft->setTextColor(WHITE,BLACK);
+    DSO_GFX::center("@- processing -@",120+60);
     return;
 }
 #define NB_SAMPLES 64
@@ -117,10 +113,15 @@ static int averageADCRead()
     return sum;
 }
 
-
+/**
+ * 
+ * @param array
+ * @param color
+ * @param txt
+ * @param target
+ */
 void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupling target)
 {
-    printCalibrationTemplate("Connect probe to ground","(connect the 2 crocs together)");
     header(color,txt,target);     
     for(int range=0;range<DSO_NB_GAIN_RANGES;range++)
     {
@@ -141,10 +142,10 @@ bool DSOCalibrate::zeroCalibrate()
           
     
     adc->setTimeScale(ADC_SMPR_1_5,ADC_PRE_PCLK2_DIV_2); // 10 us *1024 => 10 ms scan
-    printCalibrationTemplate("Connect the 2 crocs together.","");
+    printCalibrationTemplate("Connect the 2 crocs","together");
     waitOk();    
-    doCalibrate(calibrationDC,YELLOW,"Set switch to *DC*",DSOControl::DSO_COUPLING_DC);       
-    doCalibrate(calibrationAC,GREEN, "Set switch to *AC*",DSOControl::DSO_COUPLING_AC);    
+    doCalibrate(calibrationDC,YELLOW,"",DSOControl::DSO_COUPLING_DC);       
+    doCalibrate(calibrationAC,GREEN, "",DSOControl::DSO_COUPLING_AC);    
     DSOEeprom::write();         
     tft->fillScreen(0);    
     printxy(20,100,"Restart the unit.");
