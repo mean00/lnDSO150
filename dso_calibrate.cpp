@@ -50,16 +50,17 @@ static void printCalibrationTemplate( const char *st1, const char *st2)
  * @param cpl
  */
 static void printCoupling(DSOControl::DSOCoupling cpl)
-{
-    static const char *coupling[3]={"current : GND","current : DC ","current : AC "};
-    printxy(40,130,coupling[cpl]);
+{static const char *coupling[3]={"current : GND","current : DC ","current : AC "};    
+    DSO_GFX::center(coupling[cpl],130);
       
 }
 
-void header(int color,const char *txt,DSOControl::DSOCoupling target)
+static void  waitForCoupling(DSOControl::DSOCoupling target)
 {
-    printCalibrationTemplate(txt,"");
     DSOControl::DSOCoupling   cpl=(DSOControl::DSOCoupling)-1;    
+    const char *st="Set input to DC";
+    if(target==DSOControl::DSO_COUPLING_AC) st="Set input to AC";
+    DSO_GFX::center(st,100);
     while(1)
     {
             controlButtons->updateCouplingState();
@@ -75,13 +76,21 @@ void header(int color,const char *txt,DSOControl::DSOCoupling target)
                 cpl=newcpl;
             }
             if(cpl==target && SHORT_PRESS(DSO_BUTTON_OK))
-            {
-                tft->setTextColor(BLACK,GREEN);
-                printxy(160-8*8,160,"- processing -");
-                tft->setTextColor(WHITE,BLACK);
+            {               
                 return;
             }
     }
+}
+
+void header(int color,const char *txt,DSOControl::DSOCoupling target)
+{
+    printCalibrationTemplate(txt,"");
+    waitForCoupling(target);
+
+    tft->setTextColor(BLACK,GREEN);
+    printxy(160-8*8,160,"- processing -");
+    tft->setTextColor(WHITE,BLACK);
+    return;
 }
 #define NB_SAMPLES 64
 /**
@@ -190,22 +199,9 @@ bool DSOCalibrate::voltageCalibrate()
     
     
     DSO_GFX::newPage("VOLTAGE CALIBRATION");
-    printxy(0,30,"Set Input to DC");
     DSO_GFX::bottomLine("press @OK@ when ready");
     
-    // Set input to DC
-    
-    while(1)
-    {
-        controlButtons->updateCouplingState();
-        DSOControl::DSOCoupling   newcpl=controlButtons->getCouplingState(); 
-        printCoupling(newcpl);
-        if(newcpl==DSOControl::DSO_COUPLING_DC) 
-        {
-            waitOk();
-            break;
-        }
-    }
+    waitForCoupling(DSOControl::DSO_COUPLING_DC);    
     
     // here we go
     
