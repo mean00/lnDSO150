@@ -46,6 +46,15 @@ void DSO_GFX::center(const char *p,int y)
 
 /**
  * 
+ * @param array
+ */
+void DSO_GFX::printxy(int x, int y, const char *t)
+{
+    tft->setCursor(x, y);
+    markup(t);
+}
+/**
+ * 
  * @param title
  */
 void DSO_GFX::newPage(const char *title)

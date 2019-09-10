@@ -26,15 +26,6 @@ static void waitOk()
 }
 
 /**
- * 
- * @param array
- */
-static void printxy(int x, int y, const char *t)
-{
-    tft->setCursor(x, y);
-    tft->myDrawString(t);
-}
-/**
   */
 static void printCalibrationTemplate( const char *st1, const char *st2)
 {
@@ -148,7 +139,8 @@ bool DSOCalibrate::zeroCalibrate()
     doCalibrate(calibrationAC,GREEN, "",DSOControl::DSO_COUPLING_AC);    
     DSOEeprom::write();         
     tft->fillScreen(0);    
-    printxy(20,100,"Restart the unit.");
+    DSO_GFX::printxy(20,100,"Restart the unit.");
+    while(1) {};
     return true;        
 }
 /**
@@ -259,6 +251,11 @@ float performVoltageCalibration(const char *title, float expected,float defalt,f
 {
 #define SCALEUP 1000000    
     fineHeader(title);
+    
+    DSO_GFX::printxy(200,70,"@  ADC  @");
+    DSO_GFX::printxy(10,70, "@ Scale @");
+    DSO_GFX::printxy(10,110,"@Default@");
+    DSO_GFX::printxy(10,140,"@PrevVal@s");
     while(1)
     {   // Raw read
         int sum=averageADCRead();        
@@ -269,13 +266,13 @@ float performVoltageCalibration(const char *title, float expected,float defalt,f
                  f=expected/sum;        
                       
         tft->setCursor(200, 90);
-        tft->print(sum);                
+        tft->print(sum); tft->print("   ");
         tft->setCursor(10, 90);
-        tft->print(f*SCALEUP);
+        tft->print(f*SCALEUP);tft->print("   ");
         tft->setCursor(10, 130);
-        tft->print(defalt*SCALEUP);
+        tft->print(defalt*SCALEUP);tft->print("   ");
         tft->setCursor(10, 160);
-        tft->print(previous*SCALEUP);
+        tft->print(previous*SCALEUP);tft->print("   ");
         
          
         if( SHORT_PRESS(DSO_BUTTON_OK))

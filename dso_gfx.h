@@ -10,5 +10,6 @@ public:
   static void bottomLine(const char *title);
   static void markup(const char *title);
   static void center(const char *p,int y);
+  static void printxy(int x, int y, const char *t);
   
 };
