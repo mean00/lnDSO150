@@ -10,7 +10,11 @@
 extern uint16_t calibrationHash;
 
 #define FINE_TUNE_OFFSET 64
-
+#if 0
+    #define CHECK_READ(x) xAssert(x)
+#else
+    #define CHECK_READ(x) if(!(x)) return false;
+#endif
 /**
  * 
  * @return 
@@ -26,10 +30,20 @@ bool  DSOEeprom::read()
     }
     
     for(int i=0;i<DSO_NB_GAIN_RANGES;i++)
-        calibrationDC[i]=e2.read(2+i);
+            CHECK_READ(EEPROM_OK==e2.read(2+i,calibrationDC+i));
     for(int i=0;i<DSO_NB_GAIN_RANGES;i++)
-        calibrationAC[i]=e2.read(2+i+16);
+            CHECK_READ(EEPROM_OK==e2.read(2+i+16,calibrationAC+i));
     // 15+2+16=33 so far
+    return true;
+}
+/**
+ * 
+ * @return 
+ */
+bool  DSOEeprom::readFineVoltage()
+{
+    EEPROMClass e2;
+    e2.init();
     for(int i=0;i<DSO_NB_GAIN_RANGES;i++)
         voltageFineTune[i]=0;
     int hasFineVoltage=e2.read(FINE_TUNE_OFFSET);
@@ -40,8 +54,9 @@ bool  DSOEeprom::read()
         {
             float f;
             uint16_t *adr=(uint16_t *)&f;
-            uint16_t high=e2.read(FINE_TUNE_OFFSET+2+i*2+0);
-            uint16_t low=e2.read(FINE_TUNE_OFFSET+2+i*2+1);
+            uint16_t high,low;
+            CHECK_READ(EEPROM_OK==e2.read(FINE_TUNE_OFFSET+2+i*2+0,&high)); // 64+4*2+  72 or 75
+            CHECK_READ(EEPROM_OK==e2.read(FINE_TUNE_OFFSET+2+i*2+1,&low));
             
             adr[0]=high;
             adr[1]=low;

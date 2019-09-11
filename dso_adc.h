@@ -19,7 +19,7 @@ typedef struct VoltageSettings
     const char          *name;          /// name of the setting i.e 10 ms/div
     DSOInputGain::InputGainRange gain;
     float               displayGain;    /// multiply by this to get pixels from volt
- 
+    int                 maxSwing;
 };
 
 /**

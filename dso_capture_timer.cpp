@@ -21,12 +21,13 @@
  * @param mode
  * @return 
  */
-static int transformTimer(int dc0_ac1,int16_t *in, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats)
+static int transformTimer(int dc0_ac1,int16_t *in, float *out,int count, VoltageSettings *set,int expand,CaptureStats &stats,int swing)
 {
    if(!count) return false;
    stats.xmin=200;
    stats.xmax=-200;
    stats.avg=0;
+   stats.saturation=false;
    int ocount=(count*4096)/expand;
    if(ocount>240)
    {
@@ -41,8 +42,10 @@ static int transformTimer(int dc0_ac1,int16_t *in, float *out,int count, Voltage
    
     for(int i=0;i<ocount;i++)
     {
-
-        float f=(float)in[i];
+        int v=in[i];
+        if(v<swing) stats.saturation=true;
+        if(v>(4096-swing)) stats.saturation=true;
+        float f=(float)v;
         f-=offset;
         f*=multiplier;
         if(f>stats.xmax) stats.xmax=f;
@@ -146,7 +149,8 @@ bool DSOCapturePriv::taskletTimer()
                                     fset.set1.samples,
                                     vSettings+currentVolt,
                                     expand,
-                                    set->stats);
+                                    set->stats,
+                                    vSettings[DSOCapturePriv::currentVoltageRange].maxSwing);
     if(fset.set2.samples)
     {
         CaptureStats otherStats;
@@ -157,7 +161,8 @@ bool DSOCapturePriv::taskletTimer()
                                     fset.set2.samples,
                                     vSettings+currentVolt,
                                     expand,
-                                    otherStats);                
+                                    otherStats,
+                                    vSettings[DSOCapturePriv::currentVoltageRange].maxSwing);                
         set->stats.avg= (set->stats.avg*set->samples+otherStats.avg*fset.set2.samples)/(set->samples+fset.set2.samples);
         set->samples+=sample2;
         if(otherStats.xmax>set->stats.xmax) set->stats.xmax=otherStats.xmax;

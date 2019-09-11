@@ -10,13 +10,12 @@
 #include "DSO_config.h"
 #include "dso_adc_gain.h"
 
-extern VoltageSettings vSettings[NB_CAPTURE_VOLTAGE];
-
-static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode)
-{
+static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode,int swing)
+{    
    if(!count) return false;
    stats.xmin=200;
    stats.xmax=-200;
+   stats.saturation=false;
    stats.avg=0;
    int ocount=(count*4096)/expand;
    if(ocount>240)
@@ -31,7 +30,10 @@ static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expan
    // First
    float f;
    {
-       f=(float)in[0]; 
+       int v=in[0];
+       if(v<swing) stats.saturation=true;
+       if(v>(4096-swing)) stats.saturation=true;
+       f=(float)v; 
        f-=offset;
        f*=multiplier;       
        if(f>stats.xmax) stats.xmax=f;
@@ -202,7 +204,9 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
                                     expand,
                                     set->stats,
                                     triggerValueFloat,
-                                    adc->getTriggerMode());      
+                                    adc->getTriggerMode(),
+                                    vSettings[DSOCapturePriv::currentVoltageRange].maxSwing
+                                    );      
         
     int fint=computeFrequency(fset.set1.samples,fset.set1.data);
     if(fint)

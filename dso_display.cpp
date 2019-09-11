@@ -219,10 +219,17 @@ void DSODisplay::drawStats(CaptureStats &stats)
 #define AND_ONE_A(x,y) { tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}        
 #define AND_ONE_T(x,y) { tft->setCursor(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT); tft->myDrawString(x,DSO_INFO_MAX_WIDTH);}    
 #define AND_ONE_F(x,y) { tft->setCursor(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT);prettyPrint(x,DSO_INFO_MAX_WIDTH);}    
-    
+    if(stats.saturation)
+    {
+           tft->setTextColor(RED,BLACK);
+    }else
+    {
+           tft->setTextColor(GREEN,BLACK);
+    }
     AND_ONE_F(stats.xmin,1);
     AND_ONE_F(stats.xmax,3);
     AND_ONE_F(stats.avg,5);      
+    tft->setTextColor(GREEN,BLACK);
     if(stats.frequency>0)
     {
         AND_ONE_T(fq2Text(stats.frequency),7);

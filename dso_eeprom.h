@@ -8,6 +8,7 @@ class DSOEeprom
 {
 public:
         static bool read();
+        static bool readFineVoltage();
         static bool write();
         static bool wipe();  
 };

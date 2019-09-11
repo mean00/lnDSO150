@@ -122,7 +122,7 @@ void MainTask( void *a )
         adc->setupADCs ();        
         DSOCalibrate::zeroCalibrate();         
     }
-    
+    DSOEeprom::readFineVoltage();
    
     
     //testAdc();   

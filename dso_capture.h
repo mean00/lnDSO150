@@ -13,6 +13,7 @@ typedef struct
   float avg;
   int   trigger;   // -1 = no trigger; else offset
   int   frequency; //  0 or -1= unknown
+  bool  saturation;
 }CaptureStats;
 
 /**
