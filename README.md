@@ -1,25 +1,23 @@
 DSOSTM32Duino
 
-This is a very work-in-progress project to write a firmware for the DSO shell, using STM32duino as a basis.
+This is a new firmware for the DSO 150/DSO shell cheap oscilloscope.
+It is using the framework provided by the  (very nice) STM32duino project, R Clarck version.
+Please note that it is using cmake-arduino-stm32 as a build system.
 
-It uses my port of arduino-stm32-cmake as a build system
+Features :
 
-It is very early, see the wiki for build instruction (linux only)
-
-
-Status so far:
-* Screen ok (with both ST7789 and ILI9341)
-* Support vanilla hardware and usb+enhanced rotary encoder mod through compiliation switch
-* Support voltage change/ time change / offset change / trigger
-* Micro USB port used a serial 
-* Calibration 
-* No Trigger  / Trigger rising / Trigger falling, Trigger both
+* Screen support for both  ST7789 and ILI9341, autodetected
+* Supports vanilla hardware and usb+enhanced rotary encoder mod through compiliation switch
+* Zero level and fine voltage calibration
+* Smart use of ADC & gain stages to provide maximum accuracy
+* Trigger : Rising, Falling, both
 * Auto setup : Press "OK" for 3 seconds 
 * Settable test signal. Press the rotary encoder for 3 sec to enter the menu.
+* Single shot or repeat mode
+* USB support  (not really used as of today)
+* Multithreaded so that it should be relatively responsive
+* Using ADC in DMA or Timer mode  depending on the time scale
 
-What does NOT work :
-* It is always acquiring, you can't do single shot
-* Tons of bugs
 
 ![screenshot](gfx/front.jpg?raw=true "front")
 
