@@ -5,7 +5,7 @@ SET(PLATFORM_ARCHITECTURE "STM32F1")
 #  else the cmake code will look for ARDUINO
 # while the name will be the name of the folder
 IF(NOT PLATFORM_PATH)
-    SET(PLATFORM_PATH "/home/fx/Arduino/hardware/arduino/")
+    SET(PLATFORM_PATH "/home/fx/Arduino/hardware/stm32/STM32F1/")
     MESSAGE(STATUS "Using default value for PLATFORM_PATH ${PLATFORM_PATH}")
 ENDIF(NOT PLATFORM_PATH)
 IF(NOT PLATFORM_TOOLCHAIN_PATH)
