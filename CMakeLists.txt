@@ -1,27 +1,10 @@
 
 # Select platform and installation for extra arduino files AND toolchain (compiler...)
 SET(PLATFORM_ARCHITECTURE "STM32F1")
+include(./platformConfig.cmake)
 # Must be named arduino
 #  else the cmake code will look for ARDUINO
 # while the name will be the name of the folder
-IF(NOT PLATFORM_PATH)
-    SET(PLATFORM_PATH "/home/fx/Arduino/hardware/stm32/STM32F1/")
-    MESSAGE(STATUS "Using default value for PLATFORM_PATH ${PLATFORM_PATH}")
-ENDIF(NOT PLATFORM_PATH)
-IF(NOT PLATFORM_TOOLCHAIN_PATH)
-    # Use gcc 8.2.1 from MCU eclipse in nano mode
-    SET(ARDUINO_USE_NEWLIB 1)
-    SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/Arduino_stm32/arm-none-eabi-gcc/download/gcc-arm-none-eabi-8.2.1-1.7/bin")
-    #SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/.arduino15/packages/arduino/tools/arm-none-eabi-gcc/4.8.3-2014q1/bin/")
-    MESSAGE(STATUS "Using default value for PLATFORM_TOOLCHAIN_PATH ${PLATFORM_TOOLCHAIN_PATH}")
-ENDIF(NOT PLATFORM_TOOLCHAIN_PATH)
-IF(NOT CUSTOM_LIB_DIR)
-    # Where you store your downloaded libs or manually installed
-    SET(CUSTOM_LIB_DIR /home/fx/Arduino/libraries)
-    MESSAGE(STATUS "Using default value for CUSTOM_LIB_DIR ${CUSTOM_LIB_DIR}")
-ENDIF(NOT CUSTOM_LIB_DIR)
-
-
 # and here we go
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 SET(CMAKE_TOOLCHAIN_FILE cmake/ArduinoToolchain.cmake)

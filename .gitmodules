@@ -10,3 +10,6 @@
 	path = Adafruit_GFX
 	url = https://github.com/adafruit/Adafruit-GFX-Library.git
 	branch = master
+[submodule "Arduino_STM32"]
+	path = Arduino_STM32
+	url = https://github.com/rogerclarkmelbourne/Arduino_STM32
