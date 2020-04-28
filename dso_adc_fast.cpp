@@ -177,6 +177,30 @@ uint32_t DSOADC::getVCCmv()
 {
     return vcc;
 }
+
+
+/**
+ * 
+ * @return 
+ */
+int DSOADC::pollingRead()
+{
+  // deactivate DMA
+  adc_reg_map *regs=ADC1->regs;
+  cr2=regs->CR2;
+  cr2&= ~(ADC_CR2_SWSTART+ADC_CR2_CONT+ADC_CR2_DMA);   
+  regs->CR2=cr2;
+  // then poll
+  cr2|=ADC_CR2_SWSTART;
+  regs->CR2=cr2;
+  // wait for end of sampling  
+  while (!(regs->SR & ADC_SR_EOC))
+  {
+      
+  }      
+  return (uint16)(regs->DR & ADC_DR_DATA);
+}
+
 #include "./dso_adc_util.cpp"
 #include "./dso_adc_addon.cpp"
 #include "./dso_adc_fast_trigger.cpp"

@@ -50,7 +50,6 @@ void DSOADC::getRegisters(void)
     }
 }
 
-
 bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
 {
   // This loop uses dual interleaved mode to get the best performance out of the ADCs
@@ -60,8 +59,10 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
   _triggered=false;
   if(count>ADC_INTERNAL_BUFFER_SIZE/2)
         count=ADC_INTERNAL_BUFFER_SIZE/2;
-    
-  int currentValue=analogRead(_pin);
+   
+    int  currentValue=0;
+  
+  currentValue=pollingRead();
   
   requestedSamples=count;  
   _triggerValueADC=triggerValueADC;
@@ -115,6 +116,7 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
   setupAdcDmaTransfer( ADC_INTERNAL_BUFFER_SIZE,adcInternalBuffer, DMA1_CH1_TriggerEvent );  
   enableDisableIrqSource(true,ADC_AWD);    
   enableDisableIrq(true);
+  startDMA();
   return true;
 }
 /**
