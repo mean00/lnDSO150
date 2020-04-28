@@ -30,7 +30,7 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 #endif ADC_CR1_FASTINT
 
 adc_reg_map *adc_Register;
-uint32_t cr2;
+volatile uint32_t cr2;
 
 
 uint16_t DSOADC::adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE] __attribute__ ((aligned (8)));;;
@@ -112,6 +112,10 @@ bool DSOADC::startDMASampling (int count)
   enableDisableIrq(true);
   setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_Event );
   cr2=ADC1->regs->CR2;
+  cr2&= ~ADC_CR2_SWSTART;   
+  ADC1->regs->CR2=cr2;
+  cr2|=ADC_CR2_CONT+ADC_CR2_DMA;
+  ADC1->regs->CR2=cr2;
   cr2|= ADC_CR2_SWSTART;   
   ADC1->regs->CR2=cr2;
   return true;
@@ -146,7 +150,7 @@ void SPURIOUS_INTERRUPT()
 void DSOADC::stopDmaCapture(void)
 {
     // disable interrupts
-    ADC1->regs->CR2 &= ~(ADC_CR2_SWSTART|ADC_CR2_CONT);   
+    ADC1->regs->CR2 &= ~(ADC_CR2_SWSTART|ADC_CR2_CONT|ADC_CR2_DMA);   
     enableDisableIrq(false);
     enableDisableIrqSource(false,ADC_AWD);
     // Stop dma

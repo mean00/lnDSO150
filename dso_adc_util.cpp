@@ -66,10 +66,10 @@ void DSOADC::setupADCs ()
   
   adc_Register->SQR3 = pinMapADCin;
   
-  uint32_t cr2=ADC_CR2_ADON+ADC_CR2_EXTSEL_SWSTART+/*ADC_CR2_EXTTRIG+*/ADC_CR2_CONT+ADC_CR2_DMA;  
+  cr2=ADC_CR2_EXTSEL ;  
   adc_Register->CR2=cr2;  
-  
-
+  cr2|=ADC_CR2_ADON;
+  adc_Register->CR2=cr2;  
   
 }
 /**
