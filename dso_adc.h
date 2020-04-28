@@ -90,7 +90,7 @@ public:
                     DSOADC();
             bool    setTimeScale(adc_smp_rate one, adc_prescaler two);
             bool    prepareDMASampling (adc_smp_rate rate,adc_prescaler scale);
-            
+            bool    startDualDMASampling (int otherPin, int count);
             bool    prepareTimerSampling (int fq);
             bool    getSamples(FullSampleSet &fullSet)           ;
             void    clearSemaphore() ;
@@ -102,7 +102,7 @@ public:
             TriggerMode getTriggerMode() {return _triggerMode;};
             bool     getTriggerState();
             bool     setVrefPWM(int ratio); // Trigger 
-            
+            void     setupAdcDualDmaTransfer( int otherPin,  int count,uint32_t *buffer, void (*handler)(void) );
 
             bool startDMASampling (int count);
             bool startDMATriggeredSampling (int count, int ADCTriggerValue);

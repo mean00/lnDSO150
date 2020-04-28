@@ -20,7 +20,8 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 #include "fancyLock.h"
 /**
  */
-
+uint32_t cr2;
+ 
 
 InterruptStats adcInterruptStats;
 uint32_t convTime;
@@ -87,8 +88,26 @@ bool DSOADC::startDMASampling (int count)
   enableDisableIrqSource(false,ADC_AWD);
   enableDisableIrq(true);
   setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_Event );
+  cr2=ADC1->regs->CR2;
+  cr2|= ADC_CR2_SWSTART;   
+  ADC1->regs->CR2=cr2;
+ 
   return true;
 }
+/**
+ * 
+ */
+bool DSOADC::startDualDMASampling (int otherPin, int count)
+ {
+ if(count>ADC_INTERNAL_BUFFER_SIZE/2)
+        count=ADC_INTERNAL_BUFFER_SIZE/2;  
+  requestedSamples=count;    
+  enableDisableIrqSource(false,ADC_AWD);
+  enableDisableIrq(true);
+  setupAdcDualDmaTransfer( otherPin, requestedSamples,(uint32_t *)adcInternalBuffer, DMA1_CH1_Event );
+  ADC1->regs->CR2 |= ADC_CR2_SWSTART;   
+  return true;
+ }
 
 /**
  * 
@@ -127,6 +146,25 @@ void DSOADC::captureComplete(SampleSet &one, SampleSet &two)
     dmaSemaphore->giveFromInterrupt();
 }
 
+/**
+ * 
+ * @param otherPin
+ * @param count
+ * @param buffer
+ * @param handler
+ */
+void DSOADC::setupAdcDualDmaTransfer( int otherPin,  int count,uint32_t *buffer, void (*handler)(void) )
+{
+ 
+    
+  dma_init(DMA1);
+  dma_attach_interrupt(DMA1, DMA_CH1, handler); 
+  dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, buffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
+  dma_set_num_transfers(DMA1, DMA_CH1, count );
+  adc_dma_enable(ADC1);
+  dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
+
+}
 
 #include "dso_adc_fast_trigger.cpp"
 #include "dso_adc_util.cpp"
