@@ -7,7 +7,7 @@
 #define ADC_TIMER_CHANNEL TIMER_CH1
 #define ADC_TIMER_COUNT   1
 
-
+#include "fancyLock.h"
 
 class InterruptStats
 {
@@ -57,3 +57,34 @@ public:
 };
 
 extern InterruptStats adcInterruptStats;
+extern int requestedSamples;
+extern DSOADC             *instance;
+
+// time based
+
+extern int                  currentIndex;
+
+#define DMA_OVERSAMPLING_COUNT 8 // 8*21us*24 = 4ms
+extern uint16_t dmaOverSampleBuffer[DMA_OVERSAMPLING_COUNT] __attribute__ ((aligned (8)));;
+
+enum CaptureState
+{
+    Capture_idle,
+    Capture_armed,
+    Capture_dmaDone,
+    Capture_timerDone,
+    Capture_complete
+};
+extern CaptureState captureState;
+extern int nbTimer;
+
+// util
+#define SetCR1(x) {lastCR1=ADC1->regs->CR1=(x);}
+extern volatile uint32_t lastCR1;
+extern volatile uint32_t cr2;
+extern uint32_t vcc;
+extern adc_reg_map *adc_Register;
+extern FancySemaphore      *dmaSemaphore;
+
+extern void  SPURIOUS_INTERRUPT();
+extern voidFuncPtr adcIrqHandler;

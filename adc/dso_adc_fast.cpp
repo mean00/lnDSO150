@@ -170,7 +170,7 @@ volatile uint32_t lastCR1=0;
 
 #define SetCR1(x) {lastCR1=ADC1->regs->CR1=(x);}
 
-static voidFuncPtr adcIrqHandler=NULL;
+voidFuncPtr adcIrqHandler=NULL;
 /**
  */
 uint32_t DSOADC::getVCCmv()
@@ -201,6 +201,3 @@ int DSOADC::pollingRead()
   return (uint16)(regs->DR & ADC_DR_DATA);
 }
 
-#include "./dso_adc_util.cpp"
-#include "./dso_adc_addon.cpp"
-#include "./dso_adc_fast_trigger.cpp"

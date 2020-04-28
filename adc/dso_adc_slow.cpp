@@ -18,15 +18,7 @@
 extern HardwareTimer ADC_TIMER;
 extern adc_reg_map *adc_Register;
 
-enum CaptureState
-{
-    Capture_idle,
-    Capture_armed,
-    Capture_dmaDone,
-    Capture_timerDone,
-    Capture_complete
-};
-static CaptureState captureState=Capture_idle;
+CaptureState captureState=Capture_idle;
 /**
  */
 extern int                  requestedSamples;
@@ -36,12 +28,12 @@ int spuriousTimer=0;
 
 int nbSlowCapture=0;
 static int skippedDma=0;
-static int nbTimer=0;
+int nbTimer=0;
 static int nbDma=0;
 
 
-#define DMA_OVERSAMPLING_COUNT 8 // 8*21us*24 = 4ms
-static uint16_t dmaOverSampleBuffer[DMA_OVERSAMPLING_COUNT] __attribute__ ((aligned (8)));;
+
+ uint16_t dmaOverSampleBuffer[DMA_OVERSAMPLING_COUNT] __attribute__ ((aligned (8)));;
 extern void Oopps();
 
 

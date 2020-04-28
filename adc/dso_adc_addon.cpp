@@ -1,3 +1,12 @@
+
+
+#include "dso_adc_const.h"
+
+#include "dso_adc.h"
+#include "dso_adc_priv.h"
+#include "fancyLock.h"
+#include "dma.h"
+#include "adc.h"
 void DSOADC::DMA1_CH1_Event() 
 {
     SampleSet one,two;

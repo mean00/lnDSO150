@@ -16,8 +16,13 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  */
 #include "dso_adc_const.h"
 
+#include "dso_adc.h"
+#include "dso_adc_priv.h"
+#include "fancyLock.h"
+#include "dma.h"
+#include "adc.h"
 
-#define SetCR1(x) {lastCR1=ADC1->regs->CR1=(x);}
+
 
 
 HardwareTimer pwmtimer(4); // Vref PWM is Timer4 Channel3
