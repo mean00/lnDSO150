@@ -30,7 +30,7 @@ void testCalibrate(void)
          float v=0;
          for(int i=0;i<16;i++)
          {
-             v+=analogRead(analogInPin);;
+             v+=analogRead(DSO_INPUT_PIN);;
              delay(1);
          }
          v/=16.;         

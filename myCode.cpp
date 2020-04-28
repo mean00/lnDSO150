@@ -104,7 +104,7 @@ void MainTask( void *a )
     
     controlButtons->setup();
     
-    adc=new DSOADC;
+    adc=new DSOADC(DSO_INPUT_PIN);
     
     tft->fillScreen(BLACK);
     

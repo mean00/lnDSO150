@@ -29,16 +29,14 @@ extern DSOADC *adc;
 void testTrigger(void)
 {
 
-
+#if 0
     DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_5MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_5V);
     adc->setTriggerMode(DSOADC::Trigger_Both);
     int ratio=0;
-    adc->setVrefPWM(ratio); 
     while(1)
     {        
         tft->fillScreen(0);
-        bool trigger=adc->getTriggerState();
         tft->setCursor(10, 10);
         tft->print("Trigger");        
         tft->setCursor(10, 80);
@@ -58,7 +56,7 @@ void testTrigger(void)
         adc->setVrefPWM(ratio); 
         xDelay(50);
     }
-        
+#endif        
 } 
 
 

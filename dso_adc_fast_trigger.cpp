@@ -39,10 +39,6 @@ static volatile uint32_t reg[NB_REG];
 
 void DSOADC::resetStats()
 {
-    adcInterruptStats.invalidCapture++;
-    adcInterruptStats.adcEOC=0;   
-    adcInterruptStats.eocIgnored=0;   
-    adcInterruptStats.eocTriggered=0;   
 }
 
 void DSOADC::getRegisters(void)
@@ -54,29 +50,20 @@ void DSOADC::getRegisters(void)
     }
 }
 
-void DSOADC::stopDmaCapture(void)
-{
-    // disable interrupts
-    enableDisableIrq(false);
-    enableDisableIrqSource(false,ADC_AWD);
-    // Stop dma
-     adc_dma_disable(ADC1);
-}
 
 bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
 {
   // This loop uses dual interleaved mode to get the best performance out of the ADCs
   //
   enableDisableIrq(false);
-  adcInterruptStats.start();  
+  
   _triggered=false;
   if(count>ADC_INTERNAL_BUFFER_SIZE/2)
         count=ADC_INTERNAL_BUFFER_SIZE/2;
     
-  int currentValue=analogRead(analogInPin);
+  int currentValue=analogRead(_pin);
   
   requestedSamples=count;  
-  convTime=micros();
   _triggerValueADC=triggerValueADC;
   switch(_triggerMode)
   {
@@ -157,7 +144,7 @@ void DSOADC::awdTrigger()
          }
      }else
      {         
-        adcInterruptStats.triggeredAt=micros();
+        
         _triggered=true;   
         enableDisableIrqSource(false,ADC_AWD);
      }
@@ -169,7 +156,7 @@ void DSOADC::awdTrigger()
  */
 void DSOADC::watchDogInterrupt()
 {
-    adcInterruptStats.watchDog++;
+    
     instance->awdTrigger();
     
 }
@@ -178,12 +165,10 @@ void DSOADC::watchDogInterrupt()
  */
 void DSOADC::DMA1_CH1_TriggerEvent() 
 {
-    adcInterruptStats.adcEOC++;
-    adcInterruptStats.lastEocAt=micros();
 
     if(instance->awdTriggered())
     {
-        adcInterruptStats.eocTriggered++;
+        
         enableDisableIrq(false);
         adc_dma_disable(ADC1);       
         SampleSet one(ADC_INTERNAL_BUFFER_SIZE,adcInternalBuffer),two(0,NULL);
@@ -191,11 +176,11 @@ void DSOADC::DMA1_CH1_TriggerEvent()
     }
     else
     {
-        adcInterruptStats.eocIgnored++;
+        
         nextAdcDmaTransfer(requestedSamples,adcInternalBuffer);
         //setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_TriggerEvent );
     }
-    xAssert(adcInterruptStats.adcEOC==(adcInterruptStats.eocTriggered+adcInterruptStats.eocIgnored));
+    
     
 }
 #if 0

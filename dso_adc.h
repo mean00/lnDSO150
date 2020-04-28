@@ -87,7 +87,9 @@ public:
   };
   
 public:
-                    DSOADC();
+                    DSOADC(int pin);
+            bool    setADCPin(int pin);
+            void    setChannel(int channel);
             bool    setTimeScale(adc_smp_rate one, adc_prescaler two);
             bool    prepareDMASampling (adc_smp_rate rate,adc_prescaler scale);
             bool    startDualDMASampling (int otherPin, int count);
@@ -98,6 +100,7 @@ public:
             bool     readCalibrationValue();
     static  uint32_t getVCCmv(); // this one is cached
     static  float    readVCCmv();    
+    static float     adcToVolt(float adc);
             bool     setTriggerMode(TriggerMode mode);
             TriggerMode getTriggerMode() {return _triggerMode;};
             bool     getTriggerState();
@@ -108,7 +111,7 @@ public:
             bool startDMATriggeredSampling (int count, int ADCTriggerValue);
             bool startTimerSampling (int count);
             bool startTriggeredTimerSampling (int count,uint32_t triggerADC);
-
+            void clearSamples();
     static  void adc_dma_disable(const adc_dev * dev) ;            
     static  void adc_dma_enable(const adc_dev * dev) ;    
 
@@ -147,7 +150,7 @@ public:
     
             //void restartDmaTriggerCapture() ;
 protected:
-  
+            int             _pin;
             int             _sampled;
             FullSampleSet   _captured;
             TriggerMode     _triggerMode;

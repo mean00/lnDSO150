@@ -13,21 +13,24 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  
  * Vref is using PWM mode for Timer4/Channel 3
  * 
+ * Correct init order is 
+ *     ADC
+ *     DMA
+ *     SWSTART
+ * 
  */
-
-#include "dso_global.h"
-#include "dso_adc_priv.h"
+#include "dso_adc.h"
 #include "fancyLock.h"
+#include "dma.h"
+#include "adc.h"
 /**
  */
-uint32_t cr2;
- 
+#ifndef ADC_CR1_FASTINT
+    #define ADC_CR1_FASTINT 0x70000
+#endif ADC_CR1_FASTINT
 
-InterruptStats adcInterruptStats;
-uint32_t convTime;
-extern HardwareTimer Timer2;
 adc_reg_map *adc_Register;
-
+uint32_t cr2;
 
 
 uint16_t DSOADC::adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE] __attribute__ ((aligned (8)));;;
@@ -44,30 +47,53 @@ uint32_t vcc; // power Supply in mv
 
 FancySemaphore      *dmaSemaphore;
 DSOADC             *instance=NULL;
-
 /**
  * 
  */
-DSOADC::DSOADC()
+DSOADC::DSOADC(int pin)
 {
   instance=this;
-  adc_calibrate(ADC1);
-  adc_calibrate(ADC2);
+  _pin=pin;
+
  
-  // Set up our sensor pin(s)
-  pinMode(analogInPin, INPUT_ANALOG);
+  // Set up our sensor pin(s)  
   dmaSemaphore=new FancySemaphore;  
-  adc_Register=  PIN_MAP[analogInPin].adc_device->regs;
+  adc_Register=  PIN_MAP[_pin].adc_device->regs;
   
-  setTriggerMode(DSOADC::Trigger_Run);
   
   enableDisableIrq(false);
   enableDisableIrqSource(false,ADC_AWD);
   enableDisableIrqSource(false,ADC_EOC);  
   
+  setTriggerMode(DSOADC::Trigger_Run);
   attachWatchdogInterrupt(NULL);
+  
 }
- 
+  
+/**
+ * 
+ * @param adc
+ * @return 
+ */
+float DSOADC::adcToVolt(float adc)
+{
+    adc=adc*vcc;
+    adc/=4095000.;
+    return adc;
+}
+void DSOADC::clearSamples()
+{
+    memset(adcInternalBuffer,0,sizeof(adcInternalBuffer));
+}
+/**
+ */
+bool    DSOADC::setADCPin(int pin)
+{
+    _pin=pin;
+    adc_Register=  PIN_MAP[_pin].adc_device->regs;
+    setChannel(PIN_MAP[_pin].adc_channel);
+    return true;
+}
 
 // Grab the samples from the ADC
 // Theoretically the ADC can not go any faster than this.
@@ -79,27 +105,25 @@ DSOADC::DSOADC()
 
 bool DSOADC::startDMASampling (int count)
 {
-  adcInterruptStats.start();
-  if(count>ADC_INTERNAL_BUFFER_SIZE/2)
-        count=ADC_INTERNAL_BUFFER_SIZE/2;
-  
-  requestedSamples=count;  
-  convTime=micros();  
+  if(count>ADC_INTERNAL_BUFFER_SIZE)
+        count=ADC_INTERNAL_BUFFER_SIZE;
+  requestedSamples=count;    
   enableDisableIrqSource(false,ADC_AWD);
   enableDisableIrq(true);
   setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_Event );
   cr2=ADC1->regs->CR2;
   cr2|= ADC_CR2_SWSTART;   
   ADC1->regs->CR2=cr2;
- 
   return true;
 }
 /**
  * 
+ * @param count
+ * @return 
  */
 bool DSOADC::startDualDMASampling (int otherPin, int count)
- {
- if(count>ADC_INTERNAL_BUFFER_SIZE/2)
+{
+  if(count>ADC_INTERNAL_BUFFER_SIZE/2)
         count=ADC_INTERNAL_BUFFER_SIZE/2;  
   requestedSamples=count;    
   enableDisableIrqSource(false,ADC_AWD);
@@ -107,64 +131,40 @@ bool DSOADC::startDualDMASampling (int otherPin, int count)
   setupAdcDualDmaTransfer( otherPin, requestedSamples,(uint32_t *)adcInternalBuffer, DMA1_CH1_Event );
   ADC1->regs->CR2 |= ADC_CR2_SWSTART;   
   return true;
- }
+}
+
 
 /**
  * 
  */
 void SPURIOUS_INTERRUPT()
 {
-    adcInterruptStats.spurious++;
-}
-/**
- * 
- */
-void DSOADC::DMA1_CH1_Event() 
-{
-    SampleSet one,two;
-    adcInterruptStats.adcEOC++;
-    adcInterruptStats.eocTriggered++;
-    adcInterruptStats.eocIgnored=0;
     
-    two.samples=0;
-    one.samples=requestedSamples;
-    one.data=adcInternalBuffer;
-    two.data=NULL;
-    instance->captureComplete(one,two);
-    adc_dma_disable(ADC1);
 }
 
 
+void DSOADC::stopDmaCapture(void)
+{
+    // disable interrupts
+    ADC1->regs->CR2 &= ~(ADC_CR2_SWSTART|ADC_CR2_CONT);   
+    enableDisableIrq(false);
+    enableDisableIrqSource(false,ADC_AWD);
+    // Stop dma
+     adc_dma_disable(ADC1);
+}
+
+
+volatile uint32_t lastCR1=0;
+
+#define SetCR1(x) {lastCR1=ADC1->regs->CR1=(x);}
+
+static voidFuncPtr adcIrqHandler=NULL;
 /**
  */
-void DSOADC::captureComplete(SampleSet &one, SampleSet &two)
+uint32_t DSOADC::getVCCmv()
 {
-    convTime=micros()-convTime;
-    _captured.set1=one;
-    _captured.set2=two;
-    adcInterruptStats.nbCaptured++;
-    dmaSemaphore->giveFromInterrupt();
+    return vcc;
 }
-
-/**
- * 
- * @param otherPin
- * @param count
- * @param buffer
- * @param handler
- */
-void DSOADC::setupAdcDualDmaTransfer( int otherPin,  int count,uint32_t *buffer, void (*handler)(void) )
-{
- 
-    
-  dma_init(DMA1);
-  dma_attach_interrupt(DMA1, DMA_CH1, handler); 
-  dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, buffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
-  dma_set_num_transfers(DMA1, DMA_CH1, count );
-  adc_dma_enable(ADC1);
-  dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
-
-}
-
-#include "dso_adc_fast_trigger.cpp"
-#include "dso_adc_util.cpp"
+#include "./dso_adc_util.cpp"
+#include "./dso_adc_addon.cpp"
+#include "./dso_adc_fast_trigger.cpp"

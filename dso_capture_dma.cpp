@@ -143,7 +143,6 @@ bool       DSOCapturePriv:: startCaptureDmaTrigger (int count)
  */
 bool DSOCapturePriv::nextCapture()
 {
-    adc->resetStats();    
     currentTable->nextCapture(lastAskedSampleCount);
     return true;        
 }

@@ -57,7 +57,7 @@ uint8_t waveForm[240];
 int currentDiv=3;
 bool voltageMode=false;
 uint32_t acquisitionTime;
-extern uint32_t convTime;
+
 int expand;
 bool first=true;
 void testAdc2(void)

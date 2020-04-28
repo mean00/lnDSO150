@@ -15,18 +15,12 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  * 
  */
 #include "dso_adc_const.h"
-volatile uint32_t lastCR1=0;
+
 
 #define SetCR1(x) {lastCR1=ADC1->regs->CR1=(x);}
 
-static voidFuncPtr adcIrqHandler=NULL;
+
 HardwareTimer pwmtimer(4); // Vref PWM is Timer4 Channel3
-/**
- */
-uint32_t DSOADC::getVCCmv()
-{
-    return vcc;
-}
 /**
  * 
  * @return 
@@ -63,7 +57,7 @@ void DSOADC::setupADCs ()
 
  // 2 - Setup ADC
     
-  int pinMapADCin = PIN_MAP[analogInPin].adc_channel;
+  int pinMapADCin = PIN_MAP[_pin].adc_channel;
   adc_set_sample_rate(ADC1, ADC_SMPR_1_5); //=0,58uS/sample.  ADC_SMPR_13_5 = 1.08uS - use this one if Rin>10Kohm,
   adc_set_sample_rate(ADC2, ADC_SMPR_1_5);    // if not may get some sporadic noise. see datasheet.
   adc_set_prescaler(ADC_PRE_PCLK2_DIV_2);
@@ -108,7 +102,7 @@ void DSOADC::setupADCs ()
  bool DSOADC::setVrefPWM(int ratio)
  {
      //ratio=(ratio*16384)/0xffff;
-     pwmWrite(vRefPin,(uint16)ratio);
+//     pwmWrite(vRefPin,(uint16)ratio);
      return true;
  }
  
@@ -118,7 +112,7 @@ void DSOADC::setupADCs ()
   */
  bool     DSOADC::getTriggerState()
  {
-     return !!digitalRead(triggerPin);
+     return false; //!!digitalRead(triggerPin);
  }
 /**
  * 
@@ -151,7 +145,7 @@ bool DSOADC::getSamples(FullSampleSet &fullSet)
 {
     if(!dmaSemaphore->take(10)) // dont busy loop
         return false;   
-    adcInterruptStats.nbConsumed++;
+//    adcInterruptStats.nbConsumed++;
     fullSet=_captured;
     return true;
 }
@@ -294,7 +288,7 @@ void DSOADC::enableDisableIrq(bool onoff)
 extern void watchDog();
 void DSOADC::defaultAdcIrqHandler()
 {    
-    adcInterruptStats.rawWatchdog++;
+//    adcInterruptStats.rawWatchdog++;
     if(adcIrqHandler)
         adcIrqHandler();
 }

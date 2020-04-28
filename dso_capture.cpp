@@ -33,7 +33,6 @@ CapturedSet DSOCapturePriv::captureSet[2];
  */
 void DSOCapture::initialize()
 {
-    DSOADC::getRegisters();
     captureSemaphore=new FancySemaphore;
     xTaskCreate( (TaskFunction_t)DSOCapturePriv::task, "Capture", 200, NULL, DSO_CAPTURE_TASK_PRIORITY, &captureTaskHandle );    
 }
@@ -291,7 +290,6 @@ int DSOCapturePriv::triggeredCapture(int count,float *volt,CaptureStats &stats)
     {
         if(watch.elapsed(400))
         {
-            DSOADC::getRegisters();
          //   xAssert(0);
         }
         return 0;

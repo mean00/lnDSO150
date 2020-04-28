@@ -31,7 +31,6 @@ static CaptureState captureState=Capture_idle;
 extern int                  requestedSamples;
 extern DSOADC               *instance;
        int                  currentIndex=0;
-extern uint32_t             convTime;
 int spuriousTimer=0;
 
 int nbSlowCapture=0;
@@ -84,7 +83,7 @@ void DSOADC::stopTimeCapture(void)
  */
 bool DSOADC::startInternalDmaSampling ()
 {
-  adcInterruptStats.start();
+  
   setupAdcDmaTransfer( DMA_OVERSAMPLING_COUNT,dmaOverSampleBuffer, dummy_dma_interrupt_handler );
   return true;
 }
@@ -113,8 +112,7 @@ bool DSOADC::startTimerSampling (int count)
     requestedSamples=count;
 
 
-    currentIndex=0;
-    convTime=micros();
+    currentIndex=0;    
     FancyInterrupts::disable();    
     captureState=Capture_armed;
     startInternalDmaSampling();   

@@ -41,7 +41,7 @@ void watchDog()
 void testAdcWatchdog(void)
 {
     buffer=(uint16_t *)test_samples;
-    adc_Register=  PIN_MAP[analogInPin].adc_device->regs;
+    adc_Register=  PIN_MAP[DSO_INPUT_PIN].adc_device->regs;
     DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_1MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
     tft->setTextSize(2);

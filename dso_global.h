@@ -16,7 +16,7 @@
 #include "dso_capture.h"
 
 
-#define analogInPin  PA0
+#define DSO_INPUT_PIN PA0
 #define triggerPin   PA8
 #define vRefPin      PB8 // Trigger reference voltage
 
