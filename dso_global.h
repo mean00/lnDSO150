@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include <Wire.h>
+#include "Arduino.h"
 #include "SPI.h"
 #include "MapleFreeRTOS1000.h"
 #include "MapleFreeRTOS1000_pp.h"

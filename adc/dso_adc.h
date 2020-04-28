@@ -4,7 +4,8 @@
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
 #pragma once
-#include <Wire.h>
+#include "Arduino.h"
+#include "dma.h"
 #include "dso_adc_gain.h"
 
 // Sampling Queue

@@ -5,7 +5,8 @@
  * and a timer interrupt grabs the result 
  */
 
-#include "dso_global.h"
+//#include "dso_global.h"
+#include "dso_adc.h"
 #include "dso_adc_priv.h"
 #include "fancyLock.h"
 
