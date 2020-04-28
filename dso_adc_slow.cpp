@@ -85,6 +85,7 @@ bool DSOADC::startInternalDmaSampling ()
 {
   
   setupAdcDmaTransfer( DMA_OVERSAMPLING_COUNT,dmaOverSampleBuffer, dummy_dma_interrupt_handler );
+  startDMA();
   return true;
 }
   /**

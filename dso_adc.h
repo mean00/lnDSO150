@@ -94,6 +94,7 @@ public:
             bool    prepareDMASampling (adc_smp_rate rate,adc_prescaler scale);
             bool    startDualDMASampling (int otherPin, int count);
             bool    prepareTimerSampling (int fq);
+            bool    startDMA();
             bool    getSamples(FullSampleSet &fullSet)           ;
             void    clearSemaphore() ;
             bool     setSlowMode(int fqInHz);

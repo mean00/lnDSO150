@@ -103,6 +103,20 @@ bool    DSOADC::setADCPin(int pin)
 // See; http://stm32duino.com/viewtopic.php?f=19&t=107&p=1202#p1194
 
 
+
+bool DSOADC::startDMA()
+{
+  cr2=ADC1->regs->CR2;
+  cr2&= ~ADC_CR2_SWSTART;   
+  ADC1->regs->CR2=cr2;
+  cr2|=ADC_CR2_CONT+ADC_CR2_DMA;
+  ADC1->regs->CR2=cr2;
+  cr2|= ADC_CR2_SWSTART;   
+  ADC1->regs->CR2=cr2;
+  return true;
+  
+}
+
 bool DSOADC::startDMASampling (int count)
 {
   if(count>ADC_INTERNAL_BUFFER_SIZE)
@@ -111,13 +125,7 @@ bool DSOADC::startDMASampling (int count)
   enableDisableIrqSource(false,ADC_AWD);
   enableDisableIrq(true);
   setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_Event );
-  cr2=ADC1->regs->CR2;
-  cr2&= ~ADC_CR2_SWSTART;   
-  ADC1->regs->CR2=cr2;
-  cr2|=ADC_CR2_CONT+ADC_CR2_DMA;
-  ADC1->regs->CR2=cr2;
-  cr2|= ADC_CR2_SWSTART;   
-  ADC1->regs->CR2=cr2;
+  startDMA();
   return true;
 }
 /**
