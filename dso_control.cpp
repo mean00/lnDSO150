@@ -83,7 +83,7 @@ int ampMapping[16]=
 #define NB_BUTTONS 8
 
 #define TX_PIN PA9
-#define RX_PIN PA10
+                                                                                                                                                #define RX_PIN PA10
 
 #define COUPLING_PIN PA5
   

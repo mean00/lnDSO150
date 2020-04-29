@@ -10,6 +10,7 @@
 #include "dso_test_signal.h"
 #include "dso_eeprom.h"
 #include "dso_adc_gain.h"
+#include "cpuID.h"
 static void MainTask( void *a );
 void splash(void);
 //--
@@ -80,6 +81,7 @@ void vApplicationDaemonTaskStartupHook()
  */
 void MainTask( void *a )
 {    
+    cpuID::identify();
     displayIdentifier = tft->readID();
     if(!displayIdentifier) displayIdentifier=0x7789;
     tft=Adafruit_TFTLCD_8bit_STM32::spawn(displayIdentifier);   

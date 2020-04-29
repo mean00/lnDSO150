@@ -8,6 +8,7 @@
 #include "Fonts/digitLcd56.h"
 #include "Fonts/FreeSansBold12pt7b.h"
 #include "gfx/dso_small_compressed.h"
+#include "cpuID.h"
 
 extern void  autoSetup();
 extern void  menuManagement(void);
@@ -54,8 +55,10 @@ void splash(void)
 #endif
         char bf[20];
         sprintf(bf,"%d.%02d",DSO_VERSION_MAJOR,DSO_VERSION_MINOR);
-        tft->setCursor(140, 64+20*2);
-        tft->myDrawString(bf);              
+        tft->setCursor(140, 64+20*2);        
+        tft->myDrawString(bf);       
+        tft->setCursor(140, 64+20*4);
+        tft->myDrawString(cpuID::getIdAsString());         
 }
 
 
