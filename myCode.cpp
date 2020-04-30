@@ -11,6 +11,7 @@
 #include "dso_eeprom.h"
 #include "dso_adc_gain.h"
 #include "cpuID.h"
+#include "pinConfiguration.h"
 static void MainTask( void *a );
 void splash(void);
 //--
@@ -97,7 +98,7 @@ void MainTask( void *a )
     
     splash();
     delay(500);
-    myTestSignal=new testSignal(  PA7,PB12, 3,TIMER_CH2);
+    myTestSignal=new testSignal(  PIN_TEST_SIGNAL,PIN_TEST_SIGNAL_AMP, 3,TIMER_CH2);
     myTestSignal->setAmplitude(true);
         
     myTestSignal->setFrequency(500); // 1Khz
