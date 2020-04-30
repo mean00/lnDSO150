@@ -82,8 +82,17 @@ int ampMapping[16]=
 
 #define NB_BUTTONS 8
 
-#define TX_PIN PA9
-                                                                                                                                                #define RX_PIN PA10
+#if 0 // Use TX/RX pin for rotary encoder
+#define ALT_ROTARY_LEFT   PA9
+#define ALT_ROTARY_RIGHT  PA10
+#define ROTARY_GPIO       GPIOA
+#define ROTATY_SHIFT      9  
+#else  // Use Pb14 & PB15 for rotary encoder
+#define ALT_ROTARY_LEFT   PB14
+#define ALT_ROTARY_RIGHT  PB15
+#define ROTARY_GPIO       GPIOB  
+#define ROTATY_SHIFT      14  
+#endif
 
 #define COUPLING_PIN PA5
   
@@ -255,8 +264,14 @@ DSOControl::DSOControl()
     counter=0;
     
 #ifdef USE_RXTX_PIN_FOR_ROTARY
-    pinMode(TX_PIN,INPUT_PULLUP); // ok
-    pinMode(RX_PIN,INPUT_PULLUP);
+    pinMode(ALT_ROTARY_LEFT,OUTPUT); // ok
+    digitalWrite(ALT_ROTARY_LEFT,1);
+    
+    pinMode(ALT_ROTARY_RIGHT,OUTPUT); // ok
+    digitalWrite(ALT_ROTARY_RIGHT,1);    
+    
+    pinMode(ALT_ROTARY_LEFT,INPUT_PULLUP); // ok
+    pinMode(ALT_ROTARY_RIGHT,INPUT_PULLUP);
 #else    
     pinAsInput(DSO_BUTTON_UP);
     pinAsInput(DSO_BUTTON_DOWN);
@@ -366,8 +381,8 @@ void DSOControl::runLoop()
 bool DSOControl::setup()
 {
 #ifdef USE_RXTX_PIN_FOR_ROTARY         
-     attachInterrupt(TX_PIN,_myInterruptRE,(void *)DSO_BUTTON_UP,CHANGE );
-     attachInterrupt(RX_PIN,_myInterruptRE,(void *)DSO_BUTTON_DOWN,CHANGE );
+     attachInterrupt(ALT_ROTARY_LEFT,_myInterruptRE,(void *)DSO_BUTTON_UP,CHANGE );
+     attachInterrupt(ALT_ROTARY_RIGHT,_myInterruptRE,(void *)DSO_BUTTON_DOWN,CHANGE );
 #else
     attachRE(DSO_BUTTON_UP);
     attachRE(DSO_BUTTON_DOWN);
@@ -383,7 +398,7 @@ bool DSOControl::setup()
 void DSOControl::interruptRE(int a)
 {   
 #ifdef USE_RXTX_PIN_FOR_ROTARY    
-  int pinstate= ((( GPIOA->regs->IDR))>>9)&3;
+  int pinstate= ((( ROTARY_GPIO->regs->IDR))>>ROTATY_SHIFT)&3;
    // Determine new state from the pins and state table.
   state = ttable[state & 0xf][pinstate];
   // Return emit bits, ie the generated event.
