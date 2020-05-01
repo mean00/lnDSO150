@@ -70,6 +70,8 @@ ENDIF(USE_VANILLA_HW)
  
 include_directories(MapleFreeRTOS1000//Source/include)
 include_directories(MapleFreeRTOS1000//)
+include_directories(Adafruit_GFX)
+include_directories(Adafruit_TFTLCD_8bit_STM32)
 include_directories(.)
 link_directories( ${CUSTOM_LIB_DIR})
 include_directories(adc)
@@ -78,14 +80,17 @@ add_subdirectory(adc)
 # FreeRTOS
 SET(PORTNAME Stm32duino)
 ADD_SUBDIRECTORY(MapleFreeRTOS1000/)
+ADD_SUBDIRECTORY(testFunc/)
+#
 generate_arduino_firmware(Dso150${EXTENSION} 
                 SKETCH dso150.ino
-                SRCS    myCode.cpp  dso_test_signal.cpp dso_control.cpp testFunc/test_testSignal.cpp testFunc/test_buttons.cpp testFunc/test_adc.cpp testFunc/test_adc2.cpp testFunc/test_display.cpp  testFunc/test_calibrate.cpp testFunc/test_i2c.cpp  dso_eeprom.cpp dso_calibrate.cpp dso_display.cpp testFunc/test_adc3.cpp  stopWatch.cpp dso_frequency.cpp dso_capture_dma.cpp dso_capture_timer.cpp dso_capture.cpp  dso_capture_modes.cpp dso_capture_const.cpp dso_menu.cpp dso_menuEngine.cpp testFunc/test_capture.cpp testFunc/test_trigger.cpp testFunc/test_watchdog.cpp dso_mainUI.cpp dso_menuButton.cpp fancyLock.cpp dso_autoSetup.cpp  dso_gfx.cpp dso_adc_gain.cpp cpuID.cpp
+                SRCS    myCode.cpp  dso_test_signal.cpp dso_control.cpp   dso_eeprom.cpp dso_calibrate.cpp dso_display.cpp   stopWatch.cpp dso_frequency.cpp dso_capture_dma.cpp dso_capture_timer.cpp dso_capture.cpp  dso_capture_modes.cpp dso_capture_const.cpp dso_menu.cpp dso_menuEngine.cpp  dso_mainUI.cpp dso_menuButton.cpp fancyLock.cpp dso_autoSetup.cpp  dso_gfx.cpp dso_adc_gain.cpp cpuID.cpp
                 PORT ${ARDUINO_DEFAULT_PORT}
                 BOARD_CPU ${ARDUINO_CPU}
                 )
 TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}FreeRTOS)
 TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}adc)
+TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}tests)
 
 
 # EOF
