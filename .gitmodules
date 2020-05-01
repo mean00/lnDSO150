@@ -13,3 +13,6 @@
 [submodule "Arduino_STM32"]
 	path = Arduino_STM32
 	url = https://github.com/rogerclarkmelbourne/Arduino_STM32
+[submodule "embedded_printf"]
+	path = embedded_printf
+	url = https://github.com/mpaland/printf

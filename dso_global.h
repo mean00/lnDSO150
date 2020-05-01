@@ -14,6 +14,7 @@
 #include "Adafruit_TFTLCD_8bit_STM32.h"
 #include "dso_control.h"
 #include "dso_capture.h"
+#include "embedded_printf/printf.h"
 
 
 #define DSO_INPUT_PIN PA0

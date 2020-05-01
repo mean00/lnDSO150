@@ -43,6 +43,7 @@ IF(USE_GD32F303)
     set(ARDUINO_DEFAULT_BOARD genericGD32F303C)        # Default Board ID, when not specified
     set(ARDUINO_CPU           GD32F303C8)
     SET(MCU_SPEED             120000000)                 # Max speed, above 96M USB will not work
+    ADD_DEFINITIONS("-DG32F3")
 ELSE(USE_GD32F303)
     SET(EXTENSION             "_STM32F103")
     set(ARDUINO_DEFAULT_BOARD genericSTM32F103C)        # Default Board ID, when not specified
@@ -84,7 +85,7 @@ ADD_SUBDIRECTORY(testFunc/)
 #
 generate_arduino_firmware(Dso150${EXTENSION} 
                 SKETCH dso150.ino
-                SRCS    myCode.cpp  dso_test_signal.cpp dso_control.cpp   dso_eeprom.cpp dso_calibrate.cpp dso_display.cpp   stopWatch.cpp dso_frequency.cpp dso_capture_dma.cpp dso_capture_timer.cpp dso_capture.cpp  dso_capture_modes.cpp dso_capture_const.cpp dso_menu.cpp dso_menuEngine.cpp  dso_mainUI.cpp dso_menuButton.cpp fancyLock.cpp dso_autoSetup.cpp  dso_gfx.cpp dso_adc_gain.cpp cpuID.cpp
+                SRCS    myCode.cpp  dso_test_signal.cpp dso_control.cpp   dso_eeprom.cpp dso_calibrate.cpp dso_display.cpp   stopWatch.cpp dso_frequency.cpp dso_capture_dma.cpp dso_capture_timer.cpp dso_capture.cpp  dso_capture_modes.cpp dso_capture_const.cpp dso_menu.cpp dso_menuEngine.cpp  dso_mainUI.cpp dso_menuButton.cpp fancyLock.cpp dso_autoSetup.cpp  dso_gfx.cpp dso_adc_gain.cpp cpuID.cpp embedded_printf/printf.c
                 PORT ${ARDUINO_DEFAULT_PORT}
                 BOARD_CPU ${ARDUINO_CPU}
                 )
