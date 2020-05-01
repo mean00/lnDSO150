@@ -40,8 +40,8 @@ Project("dso_stm32" C CXX ASM)
 # Board setup
 IF(USE_GD32F303)
     SET(EXTENSION             "_GD32F303")
-    set(ARDUINO_DEFAULT_BOARD genericSTM32F103C)        # Default Board ID, when not specified
-    set(ARDUINO_CPU           STM32F103C8)
+    set(ARDUINO_DEFAULT_BOARD genericGD32F303C)        # Default Board ID, when not specified
+    set(ARDUINO_CPU           GD32F303C8)
     SET(MCU_SPEED             120000000)                 # Max speed, above 96M USB will not work
 ELSE(USE_GD32F303)
     SET(EXTENSION             "_STM32F103")
