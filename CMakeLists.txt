@@ -93,5 +93,18 @@ TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}FreeRTOS)
 TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}adc)
 TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}tests)
 
-
+# Summary
+MESSAGE(STATUS "Configuration:")
+if(USE_VANILLA_HW)
+    MESSAGE(STATUS "\tUsing vanilla HW")
+else(USE_VANILLA_HW)
+    MESSAGE(STATUS "\tUsing rotary encoder modification (PB14/PB15) ")
+endif(USE_VANILLA_HW)
+#
+if(USE_GD32F303)
+    MESSAGE(STATUS "\tUsing GD32F303 MCU ")
+else(USE_GD32F303)
+    MESSAGE(STATUS "\tUsing STM32F103 MCU ")
+endif(USE_GD32F303)
+# EOF
 # EOF
