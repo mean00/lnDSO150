@@ -14,14 +14,14 @@ OPTION(USE_GD32F303   "Use GD303 MCU" TRUE)        # Else it is STM32F103
 # Select platform and installation for extra arduino files AND toolchain (compiler...)
 SET(PLATFORM_ARCHITECTURE "STM32F1")
 # Do we have patch around ?
-include(cmake/FindPatch.cmake)
+include(cmake_utils/FindPatch.cmake)
 #
 # Patch Arduino_stm32 if needed to add gd32f303 support
 #
 include(./platformConfig.cmake)
 IF(NOT EXISTS "${PLATFORM_PATH}/patched")
     MESSAGE(STATUS "Patching file in ${PLATFORM_PATH} to add gd32f303 support")
-    patch_file_p(2 "${PLATFORM_PATH}" "${CMAKE_SOURCE_DIR}/gd32_patch.diff")
+    patch_file_p(2 "${PLATFORM_PATH}" "${CMAKE_SOURCE_DIR}/patches/gd32_patch.diff")
     file(WRITE "${PLATFORM_PATH}/patched" "patched")
 ENDIF(NOT EXISTS "${PLATFORM_PATH}/patched")
 
@@ -39,12 +39,12 @@ cmake_minimum_required(VERSION 2.8)
 Project("dso_stm32" C CXX ASM)
 # Board setup
 IF(USE_GD32F303)
-    SET(EXTENSION             "GD32F303")
+    SET(EXTENSION             "_GD32F303")
     set(ARDUINO_DEFAULT_BOARD genericSTM32F103C)        # Default Board ID, when not specified
     set(ARDUINO_CPU           STM32F103C8)
     SET(MCU_SPEED             120000000)                 # Max speed, above 96M USB will not work
 ELSE(USE_GD32F303)
-    SET(EXTENSION             "STM32F103")
+    SET(EXTENSION             "_STM32F103")
     set(ARDUINO_DEFAULT_BOARD genericSTM32F103C)        # Default Board ID, when not specified
     set(ARDUINO_CPU           STM32F103C8)
 ENDIF(USE_GD32F303)
