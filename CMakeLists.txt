@@ -1,7 +1,32 @@
+#-----------------------------------------------------------------------------
+#
+# CMAkeLists for DSO-STM32
+# An opensource firmware for the DSO SHELL 150
+# With optional hardware mods :
+#   - Alterntive rotary encoder wiring : MUCH Better, almost mandatory
+#   - Use GD32F303 as another MCU (much faster, better ADC, more memory)
+#
+#-----------------------------------------------------------------------------
 
+
+OPTION(USE_VANILLA_HW "Use vanilla DSO HW" FALSE)  # Use PB14/PB15 for rotary encoder
+OPTION(USE_GD32F303   "Use GD303 MCU" TRUE)        # Else it is STM32F103
 # Select platform and installation for extra arduino files AND toolchain (compiler...)
 SET(PLATFORM_ARCHITECTURE "STM32F1")
+# Do we have patch around ?
+include(cmake/FindPatch.cmake)
+#
+# Patch Arduino_stm32 if needed to add gd32f303 support
+#
 include(./platformConfig.cmake)
+IF(NOT EXISTS "${PLATFORM_PATH}/patched")
+    MESSAGE(STATUS "Patching file in ${PLATFORM_PATH} to add gd32f303 support")
+    patch_file_p(2 "${PLATFORM_PATH}" "${CMAKE_SOURCE_DIR}/gd32_patch.diff")
+    file(WRITE "${PLATFORM_PATH}/patched" "patched")
+ENDIF(NOT EXISTS "${PLATFORM_PATH}/patched")
+
+
+
 # Must be named arduino
 #  else the cmake code will look for ARDUINO
 # while the name will be the name of the folder
@@ -13,9 +38,20 @@ SET(CMAKE_TOOLCHAIN_FILE cmake/ArduinoToolchain.cmake)
 cmake_minimum_required(VERSION 2.8)
 Project("dso_stm32" C CXX ASM)
 # Board setup
-set(ARDUINO_DEFAULT_BOARD genericSTM32F103C)        # Default Board ID, when not specified
+IF(USE_GD32F303)
+    SET(EXTENSION             "GD32F303")
+    set(ARDUINO_DEFAULT_BOARD genericSTM32F103C)        # Default Board ID, when not specified
+    set(ARDUINO_CPU           STM32F103C8)
+    SET(MCU_SPEED             120000000)                 # Max speed, above 96M USB will not work
+ELSE(USE_GD32F303)
+    SET(EXTENSION             "STM32F103")
+    set(ARDUINO_DEFAULT_BOARD genericSTM32F103C)        # Default Board ID, when not specified
+    set(ARDUINO_CPU           STM32F103C8)
+ENDIF(USE_GD32F303)
+
+# Common stuff, we allow update through USB/DFU
+
 set(ARDUINO_DEFAULT_PORT ttyACM0) # Default Port, when not specified
-set(ARDUINO_CPU          STM32F103C8)
 SET(ARDUINO_UPLOAD_METHOD DFUUpload)
 set(ARDUINO_CPUMENU .menu.cpu.${ARDUINO_CPU})
 SET(libPrefix ${ARDUINO_DEFAULT_BOARD}_)
@@ -24,14 +60,14 @@ SET(libPrefix ${ARDUINO_DEFAULT_BOARD}_)
 MESSAGE(STATUS "Starting dso-stm32")
 
 
-OPTION(USE_VANILLA_HW "Use vanilla DSO HW" FALSE)
 IF(USE_VANILLA_HW)    
-    SET(EXTENSION "_vanilla")
+    SET(EXTENSION "${EXTENSION}_vanilla")
 ELSE(USE_VANILLA_HW)    
     ADD_DEFINITIONS("-DUSE_RXTX_PIN_FOR_ROTARY")
-    SET(EXTENSION "_usb")
+    SET(EXTENSION "${EXTENSION}_usb")
 ENDIF(USE_VANILLA_HW)
-  
+ 
+ 
 include_directories(MapleFreeRTOS1000//Source/include)
 include_directories(MapleFreeRTOS1000//)
 include_directories(.)
