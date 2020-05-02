@@ -42,15 +42,15 @@ const TimeSettings tSettings[]
 {
 #ifdef       HIGH_SPEED_ADC    
     
-    // 96 Mhz clock
+// 96 Mhz clock
 //    {"1us",     (adc_prescaler)8,                  ADC_SMPR_1_5,   4390,   2564100},
 //    {"5us",     (adc_prescaler)8,                  ADC_SMPR_1_5,   4390,   2564100},
-    {"10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,   2564103},
-    {"25us",     DSOADC::ADC_PRESCALER_5,  ADC_SMPR_7_5,    4096,   1388889},
+    {"10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2564103},
+    {"25us",     DSOADC::ADC_PRESCALER_5,  ADC_SMPR_7_5,    4096,  1388889},
     {"50us",     DSOADC::ADC_PRESCALER_10, ADC_SMPR_7_5,    4096,   529101},
     {"100us",    DSOADC::ADC_PRESCALER_20, ADC_SMPR_7_5,    4096,   264550},    
-    {"500us",    DSOADC::ADC_PRESCALER_20,  ADC_SMPR_71_5,  4876,   71429},    
-    {"1ms",      DSOADC::ADC_PRESCALER_10,  ADC_SMPR_239_5, 6502,   35714}
+    {"500us",    DSOADC::ADC_PRESCALER_8,  ADC_SMPR_239_5,  4876,    71429},    
+    {"1ms",      DSOADC::ADC_PRESCALER_16,  ADC_SMPR_239_5, 6502,    35714}
     
 #else // 72 Mhz clock
     {"10us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_1_5,   4390,   2564100},
