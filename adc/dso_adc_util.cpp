@@ -124,10 +124,41 @@ void DSOADC::setupADCs ()
  * @param timeScaleUs
  * @return 
  */
- bool    DSOADC::setTimeScale(adc_smp_rate one, adc_prescaler two)
+ bool    DSOADC::setTimeScale(adc_smp_rate one, DSOADC::Prescaler two)
  {
     adc_set_sample_rate(ADC1, one); //=0,58uS/sample.  ADC_SMPR_13_5 = 1.08uS - use this one if Rin>10Kohm,
-    adc_set_prescaler(two);
+
+#ifdef     HIGH_SPEED_ADC
+#define ADC_PSC3 (1<<29)
+#define ADC_PSC2 (1<<28)
+    
+    int val=(int)two;
+    
+    rcc_set_prescaler(RCC_PRESCALER_ADC,(val&3<<14)); // compatibility bits
+    
+    int b2=val&4;
+    int b3=val&8;
+    
+    // B2 is bit 28 in CFGR
+    uint32_t r=RCC_BASE->CFGR;
+    if(b2) r|=ADC_PSC2;
+    else   r&=~ADC_PSC2;
+    RCC_BASE->CFGR=r;
+    
+    // B3 is bit 29 in new register CFG1 at offset 0x2c
+    uint8_t *pointer=(uint8_t *)RCC_BASE;
+    pointer+=0x2c;
+    __IO uint32_t *cfg1=(uint32_t *)pointer;
+    
+    r=*cfg1;
+    if(b3) r|=ADC_PSC3;
+    else   r&=~ADC_PSC3;
+    *cfg1=r;
+    
+#else // plain STM32
+    rcc_set_prescaler(RCC_PRESCALER_ADC,((int)two)<<14);
+#endif
+    
     return true;
  }
  /**
@@ -135,7 +166,7 @@ void DSOADC::setupADCs ()
   * @param count
   * @return 
   */
-bool    DSOADC::prepareDMASampling (adc_smp_rate rate,adc_prescaler scale)
+bool    DSOADC::prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale)
 {    
 
     setTimeScale(rate,scale);

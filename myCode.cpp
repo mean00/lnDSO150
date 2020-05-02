@@ -101,7 +101,7 @@ void MainTask( void *a )
     myTestSignal=new testSignal(  PIN_TEST_SIGNAL,PIN_TEST_SIGNAL_AMP, 3,TIMER_CH2);
     myTestSignal->setAmplitude(true);
         
-    myTestSignal->setFrequency(500); // 1Khz
+    myTestSignal->setFrequency(100000); // 1Khz
     
     controlButtons=new DSOControl ;
     

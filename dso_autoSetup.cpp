@@ -97,7 +97,7 @@ bool autoSetupVoltage()
  */
 bool autoSetupFrequency()
 {
-    int timeBase=(int)DSOCapture::DSO_TIME_BASE_10US;
+    int timeBase=(int)DSOCapture::DSO_TIME_MIN;
     DSOCapture::setTimeBase((DSOCapture::DSO_TIME_BASE)timeBase);
     
     CaptureStats stats;

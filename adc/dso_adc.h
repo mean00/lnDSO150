@@ -24,16 +24,6 @@ typedef struct VoltageSettings
 };
 
 /**
- */
-typedef struct TimeSettings
-{
-  const char    *name;
-  adc_prescaler  prescaler;
-  adc_smp_rate   rate;
-  int            expand4096;
-  int            fqInHz;
-};
-/**
  * 
  */
 class SampleSet
@@ -86,13 +76,29 @@ public:
     Trigger_Preparing,
     Trigger_Armed
   };
-  
+  enum Prescaler
+  {
+    ADC_PRESCALER_2=0,
+    ADC_PRESCALER_4=1,
+    ADC_PRESCALER_6=2,
+    ADC_PRESCALER_8=3,
+    
+#ifdef HIGH_SPEED_ADC
+    ADC_PRESCALER_12= 5,
+    ADC_PRESCALER_16= 7,
+    ADC_PRESCALER_5=  8,
+    ADC_PRESCALER_10= 10,
+    ADC_PRESCALER_20= 11,
+#endif    
+    
+
+  };
 public:
                     DSOADC(int pin);
             bool    setADCPin(int pin);
             void    setChannel(int channel);
-            bool    setTimeScale(adc_smp_rate one, adc_prescaler two);
-            bool    prepareDMASampling (adc_smp_rate rate,adc_prescaler scale);
+            bool    setTimeScale(adc_smp_rate one, DSOADC::Prescaler two);
+            bool    prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale);
             bool    startDualDMASampling (int otherPin, int count);
             bool    prepareTimerSampling (int fq);
             int     pollingRead();
@@ -161,6 +167,18 @@ protected:
             TriggerState    _triggerState;
             int             _triggerValueADC;
 static      uint16_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];            
+};
+
+
+/**
+ */
+typedef struct TimeSettings
+{
+  const char         *name;
+  DSOADC::Prescaler  prescaler;
+  adc_smp_rate       rate;
+  int                expand4096;
+  int                fqInHz;
 };
 
 // EOF

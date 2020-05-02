@@ -18,7 +18,7 @@ extern DSOADC    *adc;
  * 
  */
 
-void testOne(adc_smp_rate one, adc_prescaler two,int sc)
+void testOne(adc_smp_rate one, DSOADC::Prescaler two,int sc)
 {
 #warning FIXME
 
@@ -47,20 +47,21 @@ void testOne(adc_smp_rate one, adc_prescaler two,int sc)
 
 void testAdc(void)
 {
+#if 0
     controlButtons->setInputGain(7); // x1.4
     while(1)
     {
         
-        for(int i=ADC_SMPR_1_5;i<=ADC_SMPR_239_5;i++)
+        for(int i=0;i<=ADC_SMPR_239_5;i++)
         {
-            testOne((adc_smp_rate)i,ADC_PRE_PCLK2_DIV_2,2);
-            testOne((adc_smp_rate)i,ADC_PRE_PCLK2_DIV_4,4);
-            testOne((adc_smp_rate)i,ADC_PRE_PCLK2_DIV_6,6);
-            testOne((adc_smp_rate)i,ADC_PRE_PCLK2_DIV_8,8);
+            testOne((DSOADC::Prescaler)i,ADC_PRE_PCLK2_DIV_2,2);
+            testOne((DSOADC::Prescaler)i,ADC_PRE_PCLK2_DIV_4,4);
+            testOne((DSOADC::Prescaler)i,ADC_PRE_PCLK2_DIV_6,6);
+            testOne((DSOADC::Prescaler)i,ADC_PRE_PCLK2_DIV_8,8);
         }
         xDelay(5000);
     }
-  
+#endif 
 }
 //-
 #define SCALE_STEP 24

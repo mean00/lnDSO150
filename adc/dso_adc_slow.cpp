@@ -88,7 +88,7 @@ bool DSOADC::startInternalDmaSampling ()
   */
 bool    DSOADC::prepareTimerSampling (int fq)
 {      
-    setTimeScale(ADC_SMPR_239_5,ADC_PRE_PCLK2_DIV_6); // 21us
+    setTimeScale(ADC_SMPR_239_5,DSOADC::ADC_PRESCALER_6); // 21us
     setSlowMode(fq);        
     return true;    
 }

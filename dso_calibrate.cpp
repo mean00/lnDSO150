@@ -132,7 +132,7 @@ bool DSOCalibrate::zeroCalibrate()
     tft->setTextColor(WHITE,BLACK);
           
     
-    adc->setTimeScale(ADC_SMPR_1_5,ADC_PRE_PCLK2_DIV_2); // 10 us *1024 => 10 ms scan
+    adc->setTimeScale(ADC_SMPR_1_5,DSOADC::ADC_PRESCALER_2); // 10 us *1024 => 10 ms scan
     printCalibrationTemplate("Connect the 2 crocs","together");
     waitOk();    
     doCalibrate(calibrationDC,YELLOW,"",DSOControl::DSO_COUPLING_DC);       

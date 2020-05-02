@@ -35,20 +35,31 @@ VoltageSettings vSettings[NB_CAPTURE_VOLTAGE]= {
 
 
 /**
- These the time/div settings, it is computed to maximume accuracy 
+ These the time/div settings, it is computed to maximum accuracy 
  * and sample a bit too fast, so that we can decimate it
  *  */
-const TimeSettings tSettings[6]
+const TimeSettings tSettings[]
 {
-    {"10us",    ADC_PRE_PCLK2_DIV_2,ADC_SMPR_1_5,   4390,   2564100},
-    //{"25us",    ADC_PRE_PCLK2_DIV_2,ADC_SMPR_13_5,  5909,   1388890},
-    {"25us",    ADC_PRE_PCLK2_DIV_2,ADC_SMPR_28_5,  3747,   877193},
-    {"50us",    ADC_PRE_PCLK2_DIV_2,ADC_SMPR_55_5,  4496,   529100},
-    {"100us",   ADC_PRE_PCLK2_DIV_4,ADC_SMPR_55_5,  4517,   264550},
-    //{"500us",   ADC_PRE_PCLK2_DIV_4,ADC_SMPR_239_5, 6095,   71430},
-    {"500us",   ADC_PRE_PCLK2_DIV_6,ADC_SMPR_239_5, 4063,   47619},    
-    //{"1ms",     ADC_PRE_PCLK2_DIV_8,ADC_SMPR_239_5, 6095,   35710}
-    {"1ms",     ADC_PRE_PCLK2_DIV_6,ADC_SMPR_239_5, 8127,   47619}
+#ifdef       HIGH_SPEED_ADC    
+    
+    // 96 Mhz clock
+//    {"1us",     (adc_prescaler)8,                  ADC_SMPR_1_5,   4390,   2564100},
+//    {"5us",     (adc_prescaler)8,                  ADC_SMPR_1_5,   4390,   2564100},
+    {"10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,   2564103},
+    {"25us",     DSOADC::ADC_PRESCALER_5,  ADC_SMPR_7_5,    4096,   1388889},
+    {"50us",     DSOADC::ADC_PRESCALER_10, ADC_SMPR_7_5,    4096,   529101},
+    {"100us",    DSOADC::ADC_PRESCALER_20, ADC_SMPR_7_5,    4096,   264550},    
+    {"500us",    DSOADC::ADC_PRESCALER_20,  ADC_SMPR_71_5,  4876,   71429},    
+    {"1ms",      DSOADC::ADC_PRESCALER_10,  ADC_SMPR_239_5, 6502,   35714}
+    
+#else // 72 Mhz clock
+    {"10us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_1_5,   4390,   2564100},
+    {"25us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_28_5,  3747,   877193},
+    {"50us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_55_5,  4496,   529100},
+    {"100us",    DSOADC::ADC_PRESCALER_4,ADC_SMPR_55_5,  4517,   264550},    
+    {"500us",    DSOADC::ADC_PRESCALER_6,ADC_SMPR_239_5, 4063,   47619},    
+    {"1ms",      DSOADC::ADC_PRESCALER_8,ADC_SMPR_239_5, 8127,   47619}
+#endif
 };
 
 /**
