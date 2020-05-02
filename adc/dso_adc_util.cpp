@@ -133,7 +133,7 @@ void DSOADC::setupADCs ()
     
     int val=(int)two;
     
-    rcc_set_prescaler(RCC_PRESCALER_ADC,(val&3<<14)); // compatibility bits
+    rcc_set_prescaler(RCC_PRESCALER_ADC,((val&3)<<14)); // compatibility bits
     
     int b2=val&4;
     int b3=val&8;
