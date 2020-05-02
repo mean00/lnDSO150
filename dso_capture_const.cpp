@@ -44,13 +44,14 @@ const TimeSettings tSettings[]
     
 // !!  96 Mhz clock !!
     #if F_CPU==96000000
-    {"10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2564103},
-    {"25us",     DSOADC::ADC_PRESCALER_5,  ADC_SMPR_7_5,    4096,  1388889},
-    {"50us",     DSOADC::ADC_PRESCALER_10, ADC_SMPR_7_5,    4096,   529101},
-    {"100us",    DSOADC::ADC_PRESCALER_20, ADC_SMPR_7_5,    4096,   264550},    
-    {"500us",    DSOADC::ADC_PRESCALER_8,  ADC_SMPR_239_5,  4063,    71429},    
-    {"1ms",      DSOADC::ADC_PRESCALER_16, ADC_SMPR_239_5,  4063,    35714}
+    {"10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2400000},
+    {"25us",     DSOADC::ADC_PRESCALER_5,  ADC_SMPR_7_5,    4096,   960000},
+    {"50us",     DSOADC::ADC_PRESCALER_10, ADC_SMPR_7_5,    4096,   480000},
+    {"100us",    DSOADC::ADC_PRESCALER_20, ADC_SMPR_7_5,    4096,   240000},    
+    {"500us",    DSOADC::ADC_PRESCALER_8,  ADC_SMPR_239_5,  4063,    47619},    
+    {"1ms",      DSOADC::ADC_PRESCALER_16, ADC_SMPR_239_5,  4063,    23810}
    #elif F_CPU==120000000 
+#warning : We have to drop / duplicate too many samples at 120 Mhz, use 96!
     {"10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2564103},
     {"25us",     DSOADC::ADC_PRESCALER_5,  ADC_SMPR_7_5,    4096,  1388889},
     {"50us",     DSOADC::ADC_PRESCALER_10, ADC_SMPR_7_5,    4096,   529101},

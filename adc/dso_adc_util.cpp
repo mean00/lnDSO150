@@ -24,6 +24,30 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 
 
 
+struct rcc_reg_map_extended {
+    __IO uint32 CR;             /**< Clock control register */
+    __IO uint32 CFGR;           /**< Clock configuration register */
+    __IO uint32 CIR;            /**< Clock interrupt register */
+    __IO uint32 APB2RSTR;       /**< APB2 peripheral reset register */
+    __IO uint32 APB1RSTR;       /**< APB1 peripheral reset register */
+    __IO uint32 AHBENR;         /**< AHB peripheral clock enable register */
+    __IO uint32 APB2ENR;        /**< APB2 peripheral clock enable register */
+    __IO uint32 APB1ENR;        /**< APB1 peripheral clock enable register */
+    __IO uint32 BDCR;           /**< Backup domain control register 0x20*/
+    __IO uint32 CSR;            /**< Control/status register        0x24*/
+    __IO uint32_t AHBRST;       /**< AHB Reset Register             0x28/
+
+/* Below are GD32 specific registers */
+                                  
+    __IO uint32_t CFG1;         /**< Clock configuration register 1 0x2c  */
+    // deepsleep 0x34
+    // addition: internal 48 Mhz clock 0xc0
+    // addition : interrupt 0xcc
+    // addition : CTC 0xe0
+    // addition  : APB1 0xe4
+};
+
+
 HardwareTimer pwmtimer(4); // Vref PWM is Timer4 Channel3
 /**
  * 
@@ -127,37 +151,32 @@ void DSOADC::setupADCs ()
  {
     adc_set_sample_rate(ADC1, one); //=0,58uS/sample.  ADC_SMPR_13_5 = 1.08uS - use this one if Rin>10Kohm,
 
-#ifdef     HIGH_SPEED_ADC
-#define ADC_PSC3 (1<<29)
-#define ADC_PSC2 (1<<28)
-    
+    volatile rcc_reg_map_extended *regs=(rcc_reg_map_extended *)RCC_BASE;
     int val=(int)two;
     
-    rcc_set_prescaler(RCC_PRESCALER_ADC,((val&3)<<14)); // compatibility bits
+    int mask=3<<14;
+    volatile uint32_t  r=regs->CFGR;
+    r&=~mask;
+    r|=(val&3)<<14;
     
+#ifdef     HIGH_SPEED_ADC
+    #define ADC_PSC3 (1<<29)
+    #define ADC_PSC2 (1<<28)
     int b2=val&4;
     int b3=val&8;
     
     // B2 is bit 28 in CFGR
-    uint32_t r=RCC_BASE->CFGR;
     if(b2) r|=ADC_PSC2;
     else   r&=~ADC_PSC2;
-    RCC_BASE->CFGR=r;
     
     // B3 is bit 29 in new register CFG1 at offset 0x2c
-    uint8_t *pointer=(uint8_t *)RCC_BASE;
-    pointer+=0x2c;
-    __IO uint32_t *cfg1=(uint32_t *)pointer;
+    volatile uint32_t cfg1=regs->CFG1;
+    if(b3) cfg1|=ADC_PSC3;
+    else   cfg1&=~ADC_PSC3;
+    regs->CFG1=cfg1;
+#endif    
     
-    r=*cfg1;
-    if(b3) r|=ADC_PSC3;
-    else   r&=~ADC_PSC3;
-    *cfg1=r;
-    
-#else // plain STM32
-    rcc_set_prescaler(RCC_PRESCALER_ADC,((int)two)<<14);
-#endif
-    
+    regs->CFGR=r;
     return true;
  }
  /**

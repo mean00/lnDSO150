@@ -33,6 +33,7 @@ cmake_minimum_required(VERSION 2.8)
 # and here we go
 IF(USE_GD32F303)
     SET(MCU_SPEED             96000000)                 # Max speed, above 96M USB will not work (?)
+                                                        # 96 gives us exact sampling frequencies, 120 does not
 ENDIF(USE_GD32F303)
 
 #
