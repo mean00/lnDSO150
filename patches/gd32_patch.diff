@@ -1384,10 +1384,10 @@ index 0000000..53f3469
 +}
 diff --git a/STM32F1/variants/generic_gd32f303c/wirish/boards_setup.cpp b/STM32F1/variants/generic_gd32f303c/wirish/boards_setup.cpp
 new file mode 100644
-index 0000000..7b7605a
+index 0000000..102099f
 --- /dev/null
 +++ b/STM32F1/variants/generic_gd32f303c/wirish/boards_setup.cpp
-@@ -0,0 +1,126 @@
+@@ -0,0 +1,129 @@
 +/******************************************************************************
 + * The MIT License
 + *
@@ -1437,12 +1437,15 @@ index 0000000..7b7605a
 +// (We're leaving the default to RCC_PLLMUL_9 for now, since that
 +// works for F103 performance line MCUs, which is all that LeafLabs
 +// currently officially supports).
++
++// MEANX : We use a 8 Mhz Xtal !
++
 +#ifndef BOARD_RCC_PLLMUL
 +  #if !USE_HSI_CLOCK
 +	#if F_CPU==120000000
-+		#define BOARD_RCC_PLLMUL RCC_PLLMUL_16
++		#define BOARD_RCC_PLLMUL RCC_PLLMUL_14 // stay below 120 Mhz, 14*8=112
 +    #elif F_CPU==96000000
-+	    #define BOARD_RCC_PLLMUL RCC_PLLMUL_8
++	    #define BOARD_RCC_PLLMUL RCC_PLLMUL_12 // 12*8=96 Mhz
 +	#elif F_CPU==72000000
 +		#define BOARD_RCC_PLLMUL RCC_PLLMUL_9
 +	#elif F_CPU==48000000
@@ -1470,7 +1473,7 @@ index 0000000..7b7605a
 +        __weak void board_reset_pll(void) {
 +            // TODO
 +        }
-+
++// 48 Mhz USB Clock
 +        __weak void board_setup_clock_prescalers(void) {
 +            rcc_set_prescaler(RCC_PRESCALER_AHB, RCC_AHB_SYSCLK_DIV_1);
 +            rcc_set_prescaler(RCC_PRESCALER_APB1, RCC_APB1_HCLK_DIV_2);
@@ -1478,13 +1481,13 @@ index 0000000..7b7605a
 +			rcc_clk_disable(RCC_USB);
 +	        #if F_CPU == 120000000
 +			rcc_set_prescaler(RCC_PRESCALER_USB, RCC_USB_SYSCLK_DIV_2_5);
-+			#elif F_CPU == 96000000
++		#elif F_CPU == 96000000
 +			rcc_set_prescaler(RCC_PRESCALER_USB, RCC_USB_SYSCLK_DIV_2);
-+			#elif F_CPU == 72000000
++                #elif F_CPU == 72000000
 +			rcc_set_prescaler(RCC_PRESCALER_USB, RCC_USB_SYSCLK_DIV_1_5);
-+			#elif F_CPU == 48000000
++                #elif F_CPU == 48000000
 +			rcc_set_prescaler(RCC_PRESCALER_USB, RCC_USB_SYSCLK_DIV_1);			
-+			#endif	
++                #endif	
 +        }
 +
 +        __weak void board_setup_gpio(void) {
