@@ -26,29 +26,33 @@ IF(NOT EXISTS "${PLATFORM_PATH}/patched")
 ENDIF(NOT EXISTS "${PLATFORM_PATH}/patched")
 
 
-
+cmake_minimum_required(VERSION 2.8)
 # Must be named arduino
 #  else the cmake code will look for ARDUINO
 # while the name will be the name of the folder
 # and here we go
+IF(USE_GD32F303)
+    SET(MCU_SPEED             96000000)                 # Max speed, above 96M USB will not work (?)
+ENDIF(USE_GD32F303)
+
+#
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 SET(CMAKE_TOOLCHAIN_FILE cmake/ArduinoToolchain.cmake)
-
-
-cmake_minimum_required(VERSION 2.8)
 Project("dso_stm32" C CXX ASM)
+
 # Board setup
 IF(USE_GD32F303)
     SET(EXTENSION             "_GD32F303")
     set(ARDUINO_DEFAULT_BOARD genericGD32F303C)        # Default Board ID, when not specified
     set(ARDUINO_CPU           GD32F303C8)
-    SET(MCU_SPEED             96000000)                 # Max speed, above 96M USB will not work
     ADD_DEFINITIONS("-DHIGH_SPEED_ADC")
 ELSE(USE_GD32F303)
     SET(EXTENSION             "_STM32F103")
     set(ARDUINO_DEFAULT_BOARD genericSTM32F103C)        # Default Board ID, when not specified
     set(ARDUINO_CPU           STM32F103C8)
 ENDIF(USE_GD32F303)
+
+
 
 # Common stuff, we allow update through USB/DFU
 
