@@ -71,6 +71,35 @@ float DSOADC::readVCCmv()
     return fvcc;
 }
 
+/**
+ * 
+ * @param dev
+ */
+static void initSeqs(adc_dev *dev)
+{
+    adc_disable(dev);    
+    delayMicroseconds(50);
+    adc_init(dev);
+    delayMicroseconds(50);
+    adc_set_extsel(dev, ADC_SWSTART);
+    delayMicroseconds(50);
+    adc_set_exttrig(dev, 1);
+    delayMicroseconds(50);
+    adc_enable(dev);
+    delayMicroseconds(50);
+    adc_calibrate(dev);
+    delayMicroseconds(50);
+}
+/**
+ * 
+ * @param channel
+ */
+
+void DSOADC::setChannel(int channel)
+{    
+    adc_Register->SQR3 = channel;
+}
+
 
 
 /**
@@ -85,14 +114,17 @@ void DSOADC::setupADCs ()
 
  // 2 - Setup ADC
     
-  int pinMapADCin = PIN_MAP[_pin].adc_channel;
+  
   adc_set_sample_rate(ADC1, ADC_SMPR_1_5); //=0,58uS/sample.  ADC_SMPR_13_5 = 1.08uS - use this one if Rin>10Kohm,
   adc_set_sample_rate(ADC2, ADC_SMPR_1_5);    // if not may get some sporadic noise. see datasheet.
   adc_set_prescaler(ADC_PRE_PCLK2_DIV_2);
    
   adc_set_reg_seqlen(ADC1, 1);
+  int channel = PIN_MAP[_pin].adc_channel;
+  setChannel(channel);
   
-  adc_Register->SQR3 = pinMapADCin;
+  
+  
   
   cr2=ADC_CR2_EXTSEL ;  
   adc_Register->CR2=cr2;  
