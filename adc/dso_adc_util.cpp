@@ -186,6 +186,7 @@ void DSOADC::setupADCs ()
   */
 bool    DSOADC::prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale)
 {    
+    _dual=false;
     cr2= ADC1->regs->CR2;
     cr2|=ADC_CR2_DMA | ADC_CR2_CONT;    
     ADC1->regs->CR2 = cr2;    
@@ -200,6 +201,7 @@ bool    DSOADC::prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale)
   */
 bool    DSOADC::prepareDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale)
 {  
+    _dual=true;
     ADC1->regs->CR1|=ADC_CR1_FASTINT; // fast interleaved mode
     ADC2->regs->SQR3 = PIN_MAP[otherPin].adc_channel ;      
     ADC2->regs->CR2 |= ADC_CR2_CONT |ADC_CR2_DMA;

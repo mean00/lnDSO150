@@ -112,8 +112,10 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
   attachWatchdogInterrupt(DSOADC::watchDogInterrupt);  
   
   ADC1->regs->SR=0;
-  
-  setupAdcDmaTransfer( ADC_INTERNAL_BUFFER_SIZE,adcInternalBuffer, DMA1_CH1_TriggerEvent );  
+  if(_dual)
+        setupAdcDualDmaTransfer( _pin, requestedSamples,(uint32_t *)adcInternalBuffer, DMA1_CH1_Event );
+  else
+        setupAdcDmaTransfer( ADC_INTERNAL_BUFFER_SIZE,adcInternalBuffer, DMA1_CH1_TriggerEvent );  
   enableDisableIrqSource(true,ADC_AWD);    
   enableDisableIrq(true);
   startDMA();

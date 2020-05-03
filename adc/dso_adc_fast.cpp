@@ -123,8 +123,7 @@ bool DSOADC::startDMASampling (int count)
         count=ADC_INTERNAL_BUFFER_SIZE;
   requestedSamples=count;    
   enableDisableIrqSource(false,ADC_AWD);
-  enableDisableIrq(true);
-  _dual=false;
+  enableDisableIrq(true);  
   setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_Event );
   startDMA();
   return true;
@@ -141,7 +140,6 @@ bool DSOADC::startDualDMASampling (int otherPin, int count)
   requestedSamples=count;    
   enableDisableIrqSource(false,ADC_AWD);
   enableDisableIrq(true);
-  _dual=true;
   setupAdcDualDmaTransfer( otherPin, requestedSamples,(uint32_t *)adcInternalBuffer, DMA1_CH1_Event );
   startDMA();
   return true;
