@@ -174,6 +174,7 @@ static      uint16_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];
  */
 typedef struct TimeSettings
 {
+  bool               dual;
   const char         *name;
   DSOADC::Prescaler  prescaler;
   adc_smp_rate       rate;

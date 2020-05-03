@@ -39,13 +39,8 @@ public:
     };       
     enum DSO_TIME_BASE 
     {
-#ifdef       HIGH_SPEED_ADC
-      DSO_TIME_BASE_1US=0,DSO_TIME_MIN=0,
-      DSO_TIME_BASE_5US,
+      DSO_TIME_BASE_5US=0,DSO_TIME_MIN=0,
       DSO_TIME_BASE_10US,
-#else
-      DSO_TIME_BASE_10US=0,DSO_TIME_MIN=0,
-#endif
       DSO_TIME_BASE_25US,
       DSO_TIME_BASE_50US,
       DSO_TIME_BASE_100US,

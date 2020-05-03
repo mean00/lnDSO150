@@ -44,32 +44,34 @@ const TimeSettings tSettings[]
     
 // !!  96 Mhz clock !!
     #if F_CPU==96000000
-    {"10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2400000},
-    {"25us",     DSOADC::ADC_PRESCALER_5,  ADC_SMPR_7_5,    4096,   960000},
-    {"50us",     DSOADC::ADC_PRESCALER_10, ADC_SMPR_7_5,    4096,   480000},
-    {"100us",    DSOADC::ADC_PRESCALER_20, ADC_SMPR_7_5,    4096,   240000},    
-    {"500us",    DSOADC::ADC_PRESCALER_8,  ADC_SMPR_239_5,  4063,    47619},    
-    {"1ms",      DSOADC::ADC_PRESCALER_16, ADC_SMPR_239_5,  4063,    23810}
+    {false,"5us",      DSOADC::ADC_PRESCALER_2,  ADC_SMPR_1_5,    2926,  3428571},
+    {false,"10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2400000},
+    {false,"25us",     DSOADC::ADC_PRESCALER_5,  ADC_SMPR_7_5,    4096,   960000},
+    {false,"50us",     DSOADC::ADC_PRESCALER_10, ADC_SMPR_7_5,    4096,   480000},
+    {false,"100us",    DSOADC::ADC_PRESCALER_20, ADC_SMPR_7_5,    4096,   240000},    
+    {false,"500us",    DSOADC::ADC_PRESCALER_8,  ADC_SMPR_239_5,  4063,    47619},    
+    {false,"1ms",      DSOADC::ADC_PRESCALER_16, ADC_SMPR_239_5,  4063,    23810}
    #elif F_CPU==120000000 
-#warning : We have to drop / duplicate too many samples at 120 Mhz, use 96!
-    {"10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2564103},
-    {"25us",     DSOADC::ADC_PRESCALER_5,  ADC_SMPR_7_5,    4096,  1388889},
-    {"50us",     DSOADC::ADC_PRESCALER_10, ADC_SMPR_7_5,    4096,   529101},
-    {"100us",    DSOADC::ADC_PRESCALER_20, ADC_SMPR_7_5,    4096,   264550},    
-    {"500us",    DSOADC::ADC_PRESCALER_8,  ADC_SMPR_239_5,  4876,    71429},    
-    {"1ms",      DSOADC::ADC_PRESCALER_16,  ADC_SMPR_239_5, 6502,    35714}
+#error : We have to drop / duplicate too many samples at 120 Mhz, use 96!
+    {false,"10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2564103},
+    {false,"25us",     DSOADC::ADC_PRESCALER_5,  ADC_SMPR_7_5,    4096,  1388889},
+    {false,"50us",     DSOADC::ADC_PRESCALER_10, ADC_SMPR_7_5,    4096,   529101},
+    {false,"100us",    DSOADC::ADC_PRESCALER_20, ADC_SMPR_7_5,    4096,   264550},    
+    {false,"500us",    DSOADC::ADC_PRESCALER_8,  ADC_SMPR_239_5,  4876,    71429},    
+    {false,"1ms",      DSOADC::ADC_PRESCALER_16,  ADC_SMPR_239_5, 6502,    35714}
            
     #else
         #error unsupported MCU frequency
     #endif
     
 #else // 72 Mhz clock
-    {"10us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_1_5,   4390,   2564100},
-    {"25us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_28_5,  3747,   877193},
-    {"50us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_55_5,  4496,   529100},
-    {"100us",    DSOADC::ADC_PRESCALER_4,ADC_SMPR_55_5,  4517,   264550},    
-    {"500us",    DSOADC::ADC_PRESCALER_6,ADC_SMPR_239_5, 4063,   47619},    
-    {"1ms",      DSOADC::ADC_PRESCALER_8,ADC_SMPR_239_5, 8127,   47619}
+    {true, "5us",      DSOADC::ADC_PRESCALER_2,ADC_SMPR_1_5,   4390,   2564100*2},
+    {false,"10us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_1_5,   4390,   2564100},
+    {false,"25us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_28_5,  3747,   877193},
+    {false,"50us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_55_5,  4496,   529100},
+    {false,"100us",    DSOADC::ADC_PRESCALER_4,ADC_SMPR_55_5,  4517,   264550},    
+    {false,"500us",    DSOADC::ADC_PRESCALER_6,ADC_SMPR_239_5, 4063,   47619},    
+    {false,"1ms",      DSOADC::ADC_PRESCALER_8,ADC_SMPR_239_5, 8127,   47619}
 #endif
 };
 

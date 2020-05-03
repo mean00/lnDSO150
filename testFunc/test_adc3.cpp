@@ -21,12 +21,12 @@ static float voltageScale;
 
 static const TimeSettings tSettings[6]
 {
-    {"10us",     DSOADC::ADC_PRESCALER_2  ,ADC_SMPR_1_5,   4390},
-    {"25us",     DSOADC::ADC_PRESCALER_2  ,ADC_SMPR_13_5,  5909},
-    {"50us",     DSOADC::ADC_PRESCALER_2  ,ADC_SMPR_55_5,  4496},
-    {"100us",    DSOADC::ADC_PRESCALER_4  ,ADC_SMPR_55_5,  4517},
-    {"500us",    DSOADC::ADC_PRESCALER_4  ,ADC_SMPR_239_5, 6095},
-    {"1ms",      DSOADC::ADC_PRESCALER_8  ,ADC_SMPR_239_5, 6095}
+    {false,"10us",     DSOADC::ADC_PRESCALER_2  ,ADC_SMPR_1_5,   4390},
+    {false,"25us",     DSOADC::ADC_PRESCALER_2  ,ADC_SMPR_13_5,  5909},
+    {false,"50us",     DSOADC::ADC_PRESCALER_2  ,ADC_SMPR_55_5,  4496},
+    {false,"100us",    DSOADC::ADC_PRESCALER_4  ,ADC_SMPR_55_5,  4517},
+    {false,"500us",    DSOADC::ADC_PRESCALER_4  ,ADC_SMPR_239_5, 6095},
+    {false,"1ms",      DSOADC::ADC_PRESCALER_8  ,ADC_SMPR_239_5, 6095}
 };
 
 
