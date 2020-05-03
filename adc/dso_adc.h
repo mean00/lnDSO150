@@ -166,6 +166,7 @@ protected:
             bool            _triggered;
             TriggerState    _triggerState;
             int             _triggerValueADC;
+            static bool            _dual;
 static      uint16_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];            
 };
 
