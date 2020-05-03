@@ -107,11 +107,12 @@ void DSOADC::setChannel(int channel)
  */
 void DSOADC::setupADCs ()
 {
- // 1 - Read VCC
-   adc_Register = ADC1->regs;
-   adc_Register->CR2 |= ADC_CR2_TSVREFE;    // enable VREFINT and temp sensor
-   adc_Register->SMPR1 =  ADC_SMPR1_SMP17;  // sample ra
+// Restart from the beginning
+  initSeqs(ADC1);
+  initSeqs(ADC2);
 
+ // 1 - Read VCC
+    readVCCmv();
  // 2 - Setup ADC
     
   
@@ -124,13 +125,17 @@ void DSOADC::setupADCs ()
   setChannel(channel);
   
   
+  cr2=0;
+  ADC1->regs->CR2=cr2;
+  ADC2->regs->CR2=cr2;
   
+  cr2=ADC_CR2_EXTSEL_SWSTART|ADC_CR2_EXTTRIG; //ADC_CR2_EXTSEL
+  ADC1->regs->CR2=cr2;
+  ADC2->regs->CR2=cr2;
   
-  cr2=ADC_CR2_EXTSEL ;  
-  adc_Register->CR2=cr2;  
-  cr2|=ADC_CR2_ADON;
-  adc_Register->CR2=cr2;  
-  
+  cr2 |=ADC_CR2_ADON;
+  ADC1->regs->CR2=cr2;
+  ADC2->regs->CR2=cr2; // Power on
 }
 /**
  * 
