@@ -6,6 +6,10 @@
 #define ADC_TIMER Timer2
 #define ADC_TIMER_CHANNEL TIMER_CH1
 #define ADC_TIMER_COUNT   1
+#ifndef ADC_CR1_FASTINT
+    #define ADC_CR1_FASTINT 0x70000
+#endif ADC_CR1_FASTINT
+
 
 #include "fancyLock.h"
 

@@ -57,7 +57,7 @@ HardwareTimer pwmtimer(4); // Vref PWM is Timer4 Channel3
 float DSOADC::readVCCmv()
 {
    float fvcc=0;
-   adc_Register = ADC1->regs;
+   
    adc_Register->CR2 |= ADC_CR2_TSVREFE;    // enable VREFINT and temp sensor
    adc_Register->SMPR1 =  ADC_SMPR1_SMP17;  // sample ra
    for(int i=0;i<NB_SAMPLE;i++)
@@ -66,7 +66,7 @@ float DSOADC::readVCCmv()
        fvcc+=  adc_read(ADC1, 17); 
    }
     fvcc=(1200. * 4096.*NB_SAMPLE) /fvcc;   
-    //fvcc=3380;
+    adc_Register->CR2 &= ~ADC_CR2_TSVREFE;    // disable VREFINT and temp sensor
     vcc=fvcc;
     return fvcc;
 }
@@ -99,31 +99,25 @@ void DSOADC::setChannel(int channel)
 {    
     adc_Register->SQR3 = channel;
 }
-
-
-
 /**
  * 
  */
 void DSOADC::setupADCs ()
 {
+  // 
+  readVCCmv();  
+    
 // Restart from the beginning
   initSeqs(ADC1);
   initSeqs(ADC2);
-
- // 1 - Read VCC
-    readVCCmv();
  // 2 - Setup ADC
-    
-  
   adc_set_sample_rate(ADC1, ADC_SMPR_1_5); //=0,58uS/sample.  ADC_SMPR_13_5 = 1.08uS - use this one if Rin>10Kohm,
   adc_set_sample_rate(ADC2, ADC_SMPR_1_5);    // if not may get some sporadic noise. see datasheet.
   adc_set_prescaler(ADC_PRE_PCLK2_DIV_2);
    
   adc_set_reg_seqlen(ADC1, 1);
   int channel = PIN_MAP[_pin].adc_channel;
-  setChannel(channel);
-  
+  setChannel(channel); 
   
   cr2=0;
   ADC1->regs->CR2=cr2;
@@ -146,38 +140,7 @@ void DSOADC::setupADCs ()
  {
     ExtIntTriggerMode m;
     _triggerMode=mode;
-#if 0    
-    switch(_triggerMode)
-    {
-        case DSOADC::Trigger_Falling: m=FALLING;break;
-        case DSOADC::Trigger_Rising:  m=RISING;break;
-        case DSOADC::Trigger_Both:    m=CHANGE;break;
-        default: xAssert(0);break;
-    }
-    // Hook trigger interrupt  
-    attachInterrupt(triggerPin,TriggerInterrupt,m );
-#endif  
     return true;
- }
- /**
-  * 
-  * @param ratio
-  * @return 
-  */
- bool DSOADC::setVrefPWM(int ratio)
- {
-     //ratio=(ratio*16384)/0xffff;
-//     pwmWrite(vRefPin,(uint16)ratio);
-     return true;
- }
- 
- /**
-  * 
-  * @return 
-  */
- bool     DSOADC::getTriggerState()
- {
-     return false; //!!digitalRead(triggerPin);
  }
 /**
  * 
@@ -223,10 +186,28 @@ void DSOADC::setupADCs ()
   */
 bool    DSOADC::prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale)
 {    
-
+    cr2= ADC1->regs->CR2;
+    cr2|=ADC_CR2_DMA | ADC_CR2_CONT;    
+    ADC1->regs->CR2 = cr2;    
     setTimeScale(rate,scale);
     return true;
 }
+
+/**
+  * 
+  * @param count
+  * @return 
+  */
+bool    DSOADC::prepareDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale)
+{  
+    ADC1->regs->CR1|=ADC_CR1_FASTINT; // fast interleaved mode
+    ADC2->regs->SQR3 = PIN_MAP[otherPin].adc_channel ;      
+    ADC2->regs->CR2 |= ADC_CR2_CONT |ADC_CR2_DMA;
+    ADC1->regs->CR2 |= ADC_CR2_CONT |ADC_CR2_DMA;
+    adc_set_sample_rate(ADC2, rate); 
+    setTimeScale(rate,scale);
+}
+
 /**
  * 
  * @param count

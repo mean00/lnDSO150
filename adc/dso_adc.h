@@ -99,6 +99,7 @@ public:
             void    setChannel(int channel);
             bool    setTimeScale(adc_smp_rate one, DSOADC::Prescaler two);
             bool    prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale);
+            bool    prepareDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale);
             bool    startDualDMASampling (int otherPin, int count);
             bool    prepareTimerSampling (int fq);
             int     pollingRead();
