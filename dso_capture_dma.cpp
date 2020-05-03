@@ -80,6 +80,8 @@ bool DSOCapturePriv::prepareSamplingDma()
 {
   //     
     const TimeSettings *set= tSettings+currentTimeBase;
+    if(set->dual)
+        return adc->prepareDualDMASampling(DSO_INPUT_PIN,set->rate,set->prescaler);
     return adc->prepareDMASampling(set->rate,set->prescaler);
 }
 /**

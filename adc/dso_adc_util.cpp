@@ -206,6 +206,7 @@ bool    DSOADC::prepareDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::
     ADC1->regs->CR2 |= ADC_CR2_CONT |ADC_CR2_DMA;
     adc_set_sample_rate(ADC2, rate); 
     setTimeScale(rate,scale);
+    return true;
 }
 
 /**
