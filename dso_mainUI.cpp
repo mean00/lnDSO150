@@ -220,7 +220,10 @@ static void buttonManagement()
                 {
                  float v=capture->getTriggerValue();
 
-                   v+=0.1*(float)inc;
+                   // Adjust dependingon current voltage range in 1/2 scale steps
+                   float scale=capture->getVoltageRangeAsFloat(capture->getVoltageRange());
+                   scale/=2.;
+                   v+=scale*(float)inc;
                    STOP_CAPTURE();
                    capture->setTriggerValue(v);    
                    dirty=true;
