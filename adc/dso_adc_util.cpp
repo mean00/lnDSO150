@@ -187,6 +187,7 @@ void DSOADC::setupADCs ()
 bool    DSOADC::prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale)
 {    
     _dual=false;
+    ADC1->regs->CR1&=~ADC_CR1_FASTINT;
     cr2= ADC1->regs->CR2;
     cr2|=ADC_CR2_DMA | ADC_CR2_CONT;    
     ADC1->regs->CR2 = cr2;    

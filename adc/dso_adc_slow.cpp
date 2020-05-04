@@ -76,7 +76,8 @@ void DSOADC::stopTimeCapture(void)
  */
 bool DSOADC::startInternalDmaSampling ()
 {
-  
+  //  slow is always single channel
+  ADC1->regs->CR1&=~ADC_CR1_FASTINT;
   setupAdcDmaTransfer( DMA_OVERSAMPLING_COUNT,dmaOverSampleBuffer, dummy_dma_interrupt_handler );
   startDMA();
   return true;
@@ -109,12 +110,13 @@ bool DSOADC::startTimerSampling (int count)
     currentIndex=0;    
     FancyInterrupts::disable();    
     captureState=Capture_armed;
-    startInternalDmaSampling();   
+    
     
     ADC_TIMER.setCompare(ADC_TIMER_CHANNEL, ADC_TIMER_COUNT);    
     ADC_TIMER.setMode(ADC_TIMER_CHANNEL, TIMER_OUTPUTCOMPARE); // start timer
     ADC_TIMER.refresh();
     ADC_TIMER.resume();
+    startInternalDmaSampling();       
     FancyInterrupts::enable();
     return true;
 } 

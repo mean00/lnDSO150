@@ -28,18 +28,8 @@ uint16_t calibrationHash=0;
 //
 // Test functions
 //
-extern void testTestSignal();
-extern void testButtons();
-extern void testAdc();
-extern void testAdc2();
-extern void testAdc3();
-extern void testDisplay();
-extern void testCalibrate(void);
-extern void testI2c( void);
-extern void testCapture(void);
-extern void testTrigger(void);
-extern void testAdcWatchdog(void);
-extern void testButtonCoupling(void);
+#include "testFunc/testFunc.h"
+
 extern void mainDSOUI(void);
 /**
  * 
@@ -117,6 +107,8 @@ void MainTask( void *a )
     //DSOCalibrate::calibrate();
     
     //xAssert(0);
+    adc->setupADCs ();       
+    testCalibrate();
    // testTestSignal();
     //testButtonCoupling();
     //testButtons();   

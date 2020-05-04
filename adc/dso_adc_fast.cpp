@@ -25,9 +25,6 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 #include "adc.h"
 /**
  */
-#ifndef ADC_CR1_FASTINT
-    #define ADC_CR1_FASTINT 0x70000
-#endif ADC_CR1_FASTINT
 
 adc_reg_map *adc_Register;
 volatile uint32_t cr2;
