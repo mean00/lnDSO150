@@ -191,6 +191,7 @@ bool    DSOADC::prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale)
     cr2= ADC1->regs->CR2;
     cr2|=ADC_CR2_DMA | ADC_CR2_CONT;    
     ADC1->regs->CR2 = cr2;    
+    ADC2->regs->CR2 &= ~(ADC_CR2_CONT |ADC_CR2_DMA);
     setTimeScale(rate,scale);
     return true;
 }
@@ -306,7 +307,7 @@ void DSOADC::setupAdcDualDmaTransfer( int otherPin,  int count,uint32_t *buffer,
  */
 void DSOADC::nextAdcDmaTransfer( int count,uint16_t *buffer)
 {
-    if(_dual)
+    if(!_dual)
         dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, (uint32_t *)buffer, DMA_SIZE_16BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
     else
         dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, buffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
