@@ -108,7 +108,7 @@ void MainTask( void *a )
     
     //xAssert(0);
     adc->setupADCs ();       
-    testCalibrate();
+    //testCalibrate();
    // testTestSignal();
     //testButtonCoupling();
     //testButtons();   

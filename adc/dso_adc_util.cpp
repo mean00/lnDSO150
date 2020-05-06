@@ -289,12 +289,10 @@ void DSOADC::setupAdcDmaTransfer(   int count,uint16_t *buffer, void (*handler)(
  */
 void DSOADC::setupAdcDualDmaTransfer( int otherPin,  int count,uint32_t *buffer, void (*handler)(void) )
 {
- 
-    
   dma_init(DMA1);
   dma_attach_interrupt(DMA1, DMA_CH1, handler); 
   dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, buffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
-  dma_set_num_transfers(DMA1, DMA_CH1, count );
+  dma_set_num_transfers(DMA1, DMA_CH1, count/2 );
   adc_dma_enable(ADC1);
   dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
 
@@ -308,10 +306,16 @@ void DSOADC::setupAdcDualDmaTransfer( int otherPin,  int count,uint32_t *buffer,
 void DSOADC::nextAdcDmaTransfer( int count,uint16_t *buffer)
 {
     if(!_dual)
+    {
         dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, (uint32_t *)buffer, DMA_SIZE_16BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
+        dma_set_num_transfers(DMA1, DMA_CH1, count );
+    }
     else
+    {
         dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, buffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
-    dma_set_num_transfers(DMA1, DMA_CH1, count );
+        dma_set_num_transfers(DMA1, DMA_CH1, count/2 );
+    }
+    
     dma_enable(DMA1, DMA_CH1); // Enable the channel and start the transfer.
 }
 

@@ -184,6 +184,9 @@ int DSOADC::pollingRead()
 {
   // deactivate DMA
   adc_reg_map *regs=ADC1->regs;
+  
+  uint32_t oldCr2=regs->CR2;
+  
   cr2=regs->CR2;
   cr2&= ~(ADC_CR2_SWSTART+ADC_CR2_CONT+ADC_CR2_DMA);   
   regs->CR2=cr2;
@@ -195,6 +198,8 @@ int DSOADC::pollingRead()
   {
       
   }      
-  return (uint16)(regs->DR & ADC_DR_DATA);
+  uint16_t val= (uint16)(regs->DR & ADC_DR_DATA);
+  regs->CR2=oldCr2;
+  return val;
 }
 

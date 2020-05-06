@@ -113,7 +113,7 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
   
   ADC1->regs->SR=0;
   if(_dual)
-        setupAdcDualDmaTransfer( _pin, ADC_INTERNAL_BUFFER_SIZE/2,(uint32_t *)adcInternalBuffer, DMA1_CH1_TriggerEvent );
+        setupAdcDualDmaTransfer( _pin, ADC_INTERNAL_BUFFER_SIZE,(uint32_t *)adcInternalBuffer, DMA1_CH1_TriggerEvent );
   else
         setupAdcDmaTransfer( ADC_INTERNAL_BUFFER_SIZE,adcInternalBuffer, DMA1_CH1_TriggerEvent );  
   enableDisableIrqSource(true,ADC_AWD);    
