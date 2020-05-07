@@ -116,6 +116,8 @@ void DSOADC::setupADCs ()
   adc_set_prescaler(ADC_PRE_PCLK2_DIV_2);
    
   adc_set_reg_seqlen(ADC1, 1);
+  adc_set_reg_seqlen(ADC2, 1);
+  
   int channel = PIN_MAP[_pin].adc_channel;
   setChannel(channel); 
   
