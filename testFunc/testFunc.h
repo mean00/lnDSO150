@@ -12,3 +12,4 @@ extern void testTrigger(void);
 extern void testAdcWatchdog(void);
 extern void testButtonCoupling(void);
 extern void testCalibrate(void);
+extern void testDualADC(void);
