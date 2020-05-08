@@ -144,6 +144,7 @@ void DSOADC::setupADCs ()
     _triggerMode=mode;
     return true;
  }
+ 
 /**
  * 
  * @param timeScaleUs

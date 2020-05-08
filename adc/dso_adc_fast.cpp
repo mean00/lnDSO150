@@ -99,15 +99,41 @@ bool    DSOADC::setADCPin(int pin)
 // I think we have reached the speed limit of the chip, now all we can do is improve accuracy.
 // See; http://stm32duino.com/viewtopic.php?f=19&t=107&p=1202#p1194
 
-
-
 bool DSOADC::startDMA()
-{
+{    
+    
   cr2=ADC1->regs->CR2;
   cr2&= ~ADC_CR2_SWSTART;   
   ADC1->regs->CR2=cr2;
   cr2|=ADC_CR2_CONT+ADC_CR2_DMA;
   ADC1->regs->CR2=cr2;
+  cr2|= ADC_CR2_SWSTART;   
+  ADC1->regs->CR2=cr2;
+  return true;
+  
+}
+/**
+ * 
+ * @return 
+ */
+bool DSOADC::startDualDMA()
+{    
+ volatile uint32_t adc2;   
+ // ADC -- 1 --
+  cr2=ADC1->regs->CR2;
+  cr2&= ~ADC_CR2_SWSTART;   
+  ADC1->regs->CR2=cr2;
+  cr2|=ADC_CR2_CONT+ADC_CR2_DMA;
+  ADC1->regs->CR2=cr2;
+  
+  // ADC -- 2 --
+  adc2=ADC2->regs->CR2;
+  adc2 |=ADC_CR2_CONT;
+  adc2 &=~ADC_CR2_DMA;
+  ADC2->regs->CR2=adc2;
+  
+  // ADC -- 1 --
+  cr2=ADC1->regs->CR2;
   cr2|= ADC_CR2_SWSTART;   
   ADC1->regs->CR2=cr2;
   return true;
@@ -138,7 +164,7 @@ bool DSOADC::startDualDMASampling (int otherPin, int count)
   enableDisableIrqSource(false,ADC_AWD);
   enableDisableIrq(true);
   setupAdcDualDmaTransfer( otherPin, requestedSamples,(uint32_t *)adcInternalBuffer, DMA1_CH1_Event );
-  startDMA();
+  startDualDMA();
   return true;
 }
 

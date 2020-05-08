@@ -123,7 +123,8 @@ bool       DSOCapturePriv:: startCaptureDma (int count)
     int ex=count*tSettings[currentTimeBase].expand4096;
     if(tSettings[currentTimeBase].dual)
         return adc->startDualDMASampling (DSO_INPUT_PIN, ex);
-    return adc->startDMASampling(ex);
+    else
+        return adc->startDMASampling(ex);
 }
 /**
  * 

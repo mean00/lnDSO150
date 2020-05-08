@@ -104,6 +104,7 @@ public:
             bool    prepareTimerSampling (int fq);
             int     pollingRead();
             bool    startDMA();
+            bool    startDualDMA();
             bool    getSamples(FullSampleSet &fullSet)           ;
             void    clearSemaphore() ;
             bool     setSlowMode(int fqInHz);
@@ -167,7 +168,8 @@ protected:
             bool            _triggered;
             TriggerState    _triggerState;
             int             _triggerValueADC;
-            static bool            _dual;
+            static bool     _dual;
+public:            
 static      uint16_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];            
 };
 

@@ -112,6 +112,10 @@ void MainTask( void *a )
    // testTestSignal();
     //testButtonCoupling();
     //testButtons();   
+    testDualADC();
+    //testPigOsCope();
+    //
+    //
     if(!DSOEeprom::read())
     {  
         adc->setupADCs ();        
@@ -147,17 +151,6 @@ void MainTask( void *a )
 
 void dummyForwardReference()
 {
-   testTestSignal();
-   testButtons();   
-   testAdc();   
-   testAdc2();   
-   testAdc3();  
-   testDisplay();
-   testCalibrate();
-   testI2c();
-   testCapture();
-   testTrigger();
-   testAdcWatchdog();
    mainDSOUI();
 }
 

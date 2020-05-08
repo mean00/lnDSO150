@@ -65,6 +65,7 @@ extern uint32_t convTime;
 static int expand;
 static bool first=true;
 static void processSamples(int nbSamples, uint16_t *data);
+uint32_t reg1[10],reg2[10];
 void testDualADC(void)
 {
 
@@ -88,6 +89,17 @@ void testDualADC(void)
         // Ask samples , taking expand into account
         adc->prepareDualDMASampling (PA0,ADC_SMPR_1_5,DSOADC::ADC_PRESCALER_2);            
         adc->startDualDMASampling (PA0,240);
+        
+        
+        __IO uint32_t *xadc=(uint32_t *)ADC1->regs;
+        __IO uint32_t *xadc2=(uint32_t *)ADC2->regs;
+        
+        for(int i=0;i<10;i++)
+        {
+            reg1[i]=xadc[i];
+            reg2[i]=xadc2[i];
+        }
+        
         while(1)
         {
             FullSampleSet   s;
@@ -96,6 +108,11 @@ void testDualADC(void)
                 if(adc->getSamples(s))
                 {
                     processSamples(s.set1.samples,s.set1.data);
+                    for(int i=0;i<10;i++)
+                    {
+                        reg1[i]=xadc[i];
+                        reg2[i]=xadc2[i];
+                    }        
                     break;
                 }
                 
