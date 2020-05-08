@@ -142,6 +142,8 @@ bool DSOADC::startDualDMA()
 
 bool DSOADC::startDMASampling (int count)
 {
+  
+    
   if(count>ADC_INTERNAL_BUFFER_SIZE)
         count=ADC_INTERNAL_BUFFER_SIZE;
   requestedSamples=count;    
@@ -158,6 +160,8 @@ bool DSOADC::startDMASampling (int count)
  */
 bool DSOADC::startDualDMASampling (int otherPin, int count)
 {
+  
+    
   if(count>ADC_INTERNAL_BUFFER_SIZE/2)
         count=ADC_INTERNAL_BUFFER_SIZE/2;  
   requestedSamples=count;    
