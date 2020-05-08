@@ -8,7 +8,7 @@
 #include "dso_test_signal.h"
 
 extern void splash(void);
-
+#define ADC_CR1_FASTINT 0x70000
 
 //--
 extern Adafruit_TFTLCD_8bit_STM32 *tft;
@@ -66,6 +66,26 @@ static int expand;
 static bool first=true;
 static void processSamples(int nbSamples, uint16_t *data);
 uint32_t reg1[10],reg2[10];
+
+
+static void ysetADCs ()
+{
+  //  const adc_dev *dev = PIN_MAP[analogInPin].adc_device;
+  int pinMapADCin = PIN_MAP[PA0].adc_channel;
+  adc_set_sample_rate(ADC1, ADC_SMPR_1_5); //=0,58uS/sample.  ADC_SMPR_13_5 = 1.08uS - use this one if Rin>10Kohm,
+  adc_set_sample_rate(ADC2, ADC_SMPR_1_5);    // if not may get some sporadic noise. see datasheet.
+
+  //  adc_reg_map *regs = dev->regs;
+  adc_set_reg_seqlen(ADC1, 1);
+  ADC1->regs->SQR3 = pinMapADCin;
+  ADC1->regs->CR2 |= ADC_CR2_CONT; // | ADC_CR2_DMA; // Set continuous mode and DMA
+  ADC1->regs->CR1 |= ADC_CR1_FASTINT; // Interleaved mode
+  ADC1->regs->CR2 |= ADC_CR2_SWSTART;
+
+  ADC2->regs->CR2 |= ADC_CR2_CONT; // ADC 2 continuos
+  ADC2->regs->SQR3 = pinMapADCin;
+}
+
 void testDualADC(void)
 {
 
@@ -88,6 +108,7 @@ void testDualADC(void)
         int i=0;
         // Ask samples , taking expand into account
         adc->prepareDualDMASampling (PA0,ADC_SMPR_1_5,DSOADC::ADC_PRESCALER_2);            
+        ysetADCs();
         adc->startDualDMASampling (PA0,240);
         
         
