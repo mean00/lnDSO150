@@ -135,7 +135,7 @@ bool DSOCapturePriv::refineCapture(FullSampleSet &set)
             return false;
         }
         
-        set.set1.data+=(found-lastRequested/2)&~1; // must be even
+        set.set1.data+=(found-lastRequested/2)&~1; // must be even, else we'll swap them wrong
         set.set1.samples=lastRequested;        
         return true;
 }
