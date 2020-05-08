@@ -139,14 +139,16 @@ bool DSOADC::startDualDMA()
   return true;
   
 }
-
-bool DSOADC::startDMASampling (int count)
+#define XMAX(a,b) (((a)>(b))?(a):(b))
+#define XMIN(a,b) (((a)<(b))?(a):(b))
+/**
+ * 
+ * @param count
+ * @return 
+ */
+bool DSOADC::startDMASampling (const int count)
 {
-  
-    
-  if(count>ADC_INTERNAL_BUFFER_SIZE)
-        count=ADC_INTERNAL_BUFFER_SIZE;
-  requestedSamples=count;    
+  requestedSamples=XMIN(count,ADC_INTERNAL_BUFFER_SIZE);    
   enableDisableIrqSource(false,ADC_AWD);
   enableDisableIrq(true);  
   setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_Event );
@@ -158,13 +160,9 @@ bool DSOADC::startDMASampling (int count)
  * @param count
  * @return 
  */
-bool DSOADC::startDualDMASampling (int otherPin, int count)
+bool DSOADC::startDualDMASampling (const int otherPin, const int count)
 {
-  
-    
-  if(count>ADC_INTERNAL_BUFFER_SIZE/2)
-        count=ADC_INTERNAL_BUFFER_SIZE/2;  
-  requestedSamples=count;    
+  requestedSamples=XMIN(count,ADC_INTERNAL_BUFFER_SIZE);    
   enableDisableIrqSource(false,ADC_AWD);
   enableDisableIrq(true);
   setupAdcDualDmaTransfer( otherPin, requestedSamples,(uint32_t *)adcInternalBuffer, DMA1_CH1_Event );

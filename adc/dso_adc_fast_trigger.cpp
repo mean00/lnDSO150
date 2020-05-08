@@ -57,9 +57,6 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
   enableDisableIrq(false);
   
   _triggered=false;
-  if(count>ADC_INTERNAL_BUFFER_SIZE/2)
-        count=ADC_INTERNAL_BUFFER_SIZE/2;
-   
     int  currentValue=0;
   
   currentValue=pollingRead();

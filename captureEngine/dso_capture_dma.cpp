@@ -202,10 +202,12 @@ const char *DSOCapturePriv::getTimeBaseAsTextDma()
 bool       DSOCapturePriv:: startCaptureDma (int count)
 {
     int ex=count*tSettings[currentTimeBase].expand4096;
-    if(tSettings[currentTimeBase].dual)
-        return adc->startDualDMASampling (DSO_INPUT_PIN, ex);
+    lastRequested=ex/4096;
+    lastAskedSampleCount=count;
+    if(IS_CAPTURE_DUAL())
+        return adc->startDualDMASampling (DSO_INPUT_PIN, lastRequested);
     else
-        return adc->startDMASampling(ex);
+        return adc->startDMASampling(lastRequested);
 }
 /**
  * 
@@ -220,8 +222,8 @@ bool       DSOCapturePriv:: startCaptureDmaTrigger (int count)
     lastRequested=ex/4096;
     lastAskedSampleCount=count;
     xAssert(lastRequested>0);
-    xAssert(lastRequested<2048);
-    return adc->startDMATriggeredSampling(ex,triggerValueADC);
+    xAssert(lastRequested<ADC_INTERNAL_BUFFER_SIZE);
+    return adc->startDMATriggeredSampling(lastRequested,triggerValueADC);
 }
 /**
  * 
@@ -281,7 +283,7 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
     float *data=set->data;    
 
     p=((int16_t *)fset.set1.data);
-    if(tSettings[currentTimeBase].dual )
+    if(IS_CAPTURE_DUAL() )
         swapADCs(fset.set1.samples,(uint16_t *)p);
     set->samples=transformDma(      INDEX_AC1_DC0(),
                                     p,

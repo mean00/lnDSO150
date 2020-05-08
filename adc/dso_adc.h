@@ -10,7 +10,7 @@
 
 // Sampling Queue
 
-#define ADC_INTERNAL_BUFFER_SIZE 1024
+#define ADC_INTERNAL_BUFFER_SIZE (1024)
 /* 
  * \brief Describe a voltage setting
  */
@@ -100,7 +100,7 @@ public:
             bool    setTimeScale(adc_smp_rate one, DSOADC::Prescaler two);
             bool    prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale);
             bool    prepareDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale);
-            bool    startDualDMASampling (int otherPin, int count);
+            bool    startDualDMASampling (const int otherPin, const int count);
             bool    prepareTimerSampling (int fq);
             int     pollingRead();
             bool    startDMA();
@@ -118,8 +118,8 @@ public:
             bool     setVrefPWM(int ratio); // Trigger 
             void     setupAdcDualDmaTransfer( int otherPin,  int count,uint32_t *buffer, void (*handler)(void) );
 
-            bool startDMASampling (int count);
-            bool startDMATriggeredSampling (int count, int ADCTriggerValue);
+            bool startDMASampling (const int count);
+            bool startDMATriggeredSampling (const int count, int ADCTriggerValue);
             bool startTimerSampling (int count);
             bool startTriggeredTimerSampling (int count,uint32_t triggerADC);
             void clearSamples();
