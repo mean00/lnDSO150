@@ -7,6 +7,7 @@ Please note that it is using cmake-arduino-stm32 as a build system.
 Features :
 
 * Screen support for both  ST7789 and ILI9341, autodetected
+* Support both STM32F103 and GD32F303 (the latter is ~ 2 times faster)
 * Supports vanilla hardware and usb+enhanced rotary encoder mod through compiliation switch
 * Zero level and fine voltage calibration
 * Smart use of ADC & gain stages to provide maximum accuracy
@@ -17,6 +18,9 @@ Features :
 * USB support  (not really used as of today)
 * Multithreaded so that it should be relatively responsive
 * Using ADC in DMA or Timer mode  depending on the time scale
+* Frequency down to 5us / division using dual ADC capture mode
+
+NB: Recent versions are using PB14 and PB15 for the rotary encoder hack!
 
 
 ![screenshot](gfx/front.jpg?raw=true "front")
