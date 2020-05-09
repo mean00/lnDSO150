@@ -114,6 +114,11 @@ public:
     static float     adcToVolt(float adc);
             bool     setTriggerMode(TriggerMode mode);
             TriggerMode getTriggerMode() {return _triggerMode;};
+            TriggerMode getActualTriggerMode() 
+                        {
+                            if(_triggerMode!=Trigger_Both) return _triggerMode;
+                            return _both;
+                        };
             bool     getTriggerState();
             bool     setVrefPWM(int ratio); // Trigger 
             void     setupAdcDualDmaTransfer( int otherPin,  int count,uint32_t *buffer, void (*handler)(void) );

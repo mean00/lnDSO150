@@ -131,10 +131,7 @@ void DSOADC::awdTrigger()
      if(_triggerState==Trigger_Preparing)
      {
          _triggerState=Trigger_Armed;
-         TriggerMode actualTrigger=_triggerMode;
-         if(actualTrigger==Trigger_Both)
-             actualTrigger=_both;
-         switch(actualTrigger)
+         switch(getActualTriggerMode())
          {
             case Trigger_Rising:
                 setWatchdogTriggerValue(_triggerValueADC,0);
