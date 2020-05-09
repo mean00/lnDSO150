@@ -1,10 +1,11 @@
 DSOSTM32Duino
+=============
 
 This is a new firmware for the DSO 150/DSO shell cheap oscilloscope.
 It is using the framework provided by the  (very nice) STM32duino project, R Clarck version.
 Please note that it is using cmake-arduino-stm32 as a build system.
 
-Features :
+__Features__ :
 
 * Screen support for both  ST7789 and ILI9341, autodetected
 * Support both STM32F103 and GD32F303 (the latter is ~ 2 times faster)
@@ -20,7 +21,7 @@ Features :
 * Using ADC in DMA or Timer mode  depending on the time scale
 * Frequency down to 5us / division using dual ADC capture mode
 
-NB: Recent versions are using PB14 and PB15 for the rotary encoder hack!
+**NB:** Recent versions are using PB14 and PB15 for the rotary encoder hack!
 
 
 ![screenshot](gfx/front.jpg?raw=true "front")
