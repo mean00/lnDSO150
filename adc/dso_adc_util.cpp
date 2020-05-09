@@ -292,6 +292,7 @@ void DSOADC::setupAdcDmaTransfer(   int count,uint16_t *buffer, void (*handler)(
  */
 void DSOADC::setupAdcDualDmaTransfer( int otherPin,  int count,uint32_t *buffer, void (*handler)(void) )
 {
+  xAssert(count<= ADC_INTERNAL_BUFFER_SIZE);
   ADC2->regs->SQR3=0; // WTF ?
   dma_init(DMA1);
   dma_attach_interrupt(DMA1, DMA_CH1, handler); 

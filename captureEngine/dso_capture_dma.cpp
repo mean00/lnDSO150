@@ -12,6 +12,60 @@
 
 /**
  * 
+ * @param set
+ */
+bool DSOCapturePriv::refineCapture(FullSampleSet &set,int needed)
+{
+         // Try to find the trigger, we have ADC_INTERNAL_BUFFER_SIZE samples coming in, we want requestSample out..
+        uint16_t *p=(uint16_t *)set.set1.data;
+        int count=set.set1.samples;        
+        static int found=-1;
+        int start=needed/2;  // try to center the output if we can
+        int end=count-needed/2;
+        xAssert(end>start);
+        
+        switch(adc->getActualTriggerMode())
+        {
+            case Trigger_Run:
+                found=0;
+                break;
+            case Trigger_Rising:
+                for(int i=start;i<end;i++)
+                {
+                    if(p[i]<triggerValueADC && p[i+1]>=triggerValueADC) 
+                    {
+                        found=i;
+                        break;
+                    }
+                }
+                break;
+            case Trigger_Falling :
+                for(int i=start;i<end;i++)
+                {
+                    if(p[i]>triggerValueADC && p[i+1]<=triggerValueADC) 
+                    {
+                        found=i;
+                        break;
+                    }
+                }
+                 break;
+            case Trigger_Both:
+                xAssert(0); 
+                break;
+        }
+        if(found==-1)
+        {     
+            set.set1.samples=needed; // just grab the N first 
+            return false;
+        }
+        // center on the trigger
+        int offset=(found-needed/2)&0xfffe;
+        set.set1.data+=offset; // must be even, else we'll swap them wrong
+        set.set1.samples=needed;        
+        return true;
+}
+/**
+ * 
  * @param dc0_ac1
  * @param in
  * @param out
@@ -217,9 +271,8 @@ bool       DSOCapturePriv:: startCaptureDma (int count)
 bool       DSOCapturePriv:: startCaptureDmaTrigger (int count)
 {
     
-    int ex=count;
-    ex=count*tSettings[currentTimeBase].expand4096;
-    lastRequested=ex/4096;
+    // ask for  ~ the full buffer
+    lastRequested=ADC_INTERNAL_BUFFER_SIZE-2;
     lastAskedSampleCount=count;
     xAssert(lastRequested>0);
     xAssert(lastRequested<ADC_INTERNAL_BUFFER_SIZE);
@@ -242,15 +295,12 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
 {
     
     FullSampleSet fset; // Shallow copy
-    int16_t *p;
-    
-    int currentVolt=currentVoltageRange; // use a local copy so that it does not change in the middle
+    int16_t *p;    
     int currentTime=currentTimeBase;
 
     if(!adc->getSamples(fset))
           return false;
-            
-    
+                
     if(!fset.set1.samples)
     {
         nextCapture();
@@ -261,29 +311,26 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
     
     set->stats.trigger=-1;     
     set->stats.frequency=-1;
-    if(trigger)
-    {
-        bool triggerFound=refineCapture(fset);
-        if(!triggerFound)
-        {
-          if(trigger)
-          {
-                nextCapture();                
-                return false;
-          }
-        }
-        set->stats.trigger=120; // right in the middle
-    }else
-    {
-        set->stats.trigger=120; // right in the middle
-    }
     int     expand=tSettings[currentTime].expand4096;
-    
+    int needed=(expand*lastAskedSampleCount)/4096;
+    int window=0;
     float *data=set->data;    
-
     p=((int16_t *)fset.set1.data);
+    
     if(IS_CAPTURE_DUAL() )
         swapADCs(fset.set1.samples,(uint16_t *)p);
+    
+    if(trigger)
+    {
+        bool triggerFound=refineCapture(fset,needed);
+        if(!triggerFound)
+        {
+            nextCapture();                
+            return false;
+        }        
+    }
+    set->stats.trigger=120; // right in the middle
+    p=((int16_t *)fset.set1.data);
     set->samples=transformDma(      INDEX_AC1_DC0(),
                                     p,
                                     data,
