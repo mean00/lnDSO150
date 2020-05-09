@@ -454,6 +454,7 @@ int         DSOCapture::timeBaseToFrequency(DSOCapture::DSO_TIME_BASE timeBase)
     
     switch(timeBase)
     {
+        CASE(5US,   500*1000) 
         CASE(10US,  100*1000) 
         CASE(25US,  40*1000) 
         CASE(50US,  20*1000) 

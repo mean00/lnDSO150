@@ -22,7 +22,7 @@ void        autoSetup()
     DSOCapture::stopCapture();
     DSOCapture::setTriggerMode(DSOCapture::Trigger_Run);
        
-    DSOCapture::DSO_TIME_BASE timeBase=DSOCapture::DSO_TIME_BASE_5MS;
+    DSOCapture::DSO_TIME_BASE timeBase=DSOCapture::DSO_TIME_BASE_1MS;
     DSOCapture::setTimeBase(timeBase);
     // voltage range
     

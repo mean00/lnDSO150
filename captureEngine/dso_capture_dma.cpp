@@ -9,7 +9,39 @@
 #include "dso_capture_priv.h"
 #include "DSO_config.h"
 #include "dso_adc_gain.h"
+#if 0
+void swapADCs(int nb, uint16_t *data)
+{    
+    int nbWord=nb/2;   
+    uint16_t swap;
+    for(int i=0;i<nbWord;i++)
+    {
+        swap=*data;
+        *data=data[1];
+        data[1]=swap;
+        data+=2;
+    }
+}
+#else
+void swapADCs(int nb, uint16_t *data)  __attribute__( ( naked ) );
+void swapADCs(int nb, uint16_t *data) 
+{    
+    __asm volatile (
+            "   lsr r0,#1       \n"
+            "nxt:               \n"
+            "   ldr r2,[r1]     \n"
+            "   rev r2,r2       \n"
+            "   rev16 r2,r2     \n"
+            "   str r2,[r1]     \n"
+            "   add r1,r1,#4    \n"
+            "   sub r0,r0,#1    \n"
+            "   cmp r0,#0       \n"
+            "   bne nxt         \n" 
+            "   mov pc,lr       \n" 
+            : : : "memory");
+}
 
+#endif
 /**
  * 
  * @param set
@@ -195,18 +227,7 @@ static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expan
    stats.avg/=(float)ocount;
    return ocount;
 }
-void swapADCs(int nb, uint16_t *data)
-{    
-    int nbWord=nb/2;   
-    uint16_t swap;
-    for(int i=0;i<nbWord;i++)
-    {
-        swap=*data;
-        *data=data[1];
-        data[1]=swap;
-        data+=2;
-    }
-}
+
 /**
  * 
  * @return 
