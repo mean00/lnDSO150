@@ -164,7 +164,7 @@ protected:
             int             _pin;
             int             _sampled;
             FullSampleSet   _captured;
-            TriggerMode     _triggerMode;
+            TriggerMode     _triggerMode,_both;
             bool            _triggered;
             TriggerState    _triggerState;
             int             _triggerValueADC;

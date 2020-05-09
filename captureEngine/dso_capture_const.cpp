@@ -44,7 +44,7 @@ const TimeSettings tSettings[]
     
 // !!  96 Mhz clock !!
     #if F_CPU==96000000
-    {true,"3.5us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_1_5,    4096,  6857142},
+    {true,"3.5us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_1_5,    4096,  6857142}, // Seems buggy !
     {false,"10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2400000},
     {false,"25us",     DSOADC::ADC_PRESCALER_5,  ADC_SMPR_7_5,    4096,   960000},
     {false,"50us",     DSOADC::ADC_PRESCALER_10, ADC_SMPR_7_5,    4096,   480000},

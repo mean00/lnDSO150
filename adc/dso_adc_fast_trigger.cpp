@@ -90,12 +90,14 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
     
     
     case Trigger_Both:    
-                        _triggerState=Trigger_Armed;
+                        _triggerState=Trigger_Armed;                        
                         if(currentValue>triggerValueADC) 
                         {
+                            _both=Trigger_Falling;
                             setWatchdogTriggerValue(ADC_MAX,triggerValueADC);
                         }else
                         {
+                            _both=Trigger_Rising;
                             setWatchdogTriggerValue(triggerValueADC,0);
                         }
                         break;
@@ -129,7 +131,10 @@ void DSOADC::awdTrigger()
      if(_triggerState==Trigger_Preparing)
      {
          _triggerState=Trigger_Armed;
-         switch(_triggerMode)
+         TriggerMode actualTrigger=_triggerMode;
+         if(actualTrigger==Trigger_Both)
+             actualTrigger=_both;
+         switch(actualTrigger)
          {
             case Trigger_Rising:
                 setWatchdogTriggerValue(_triggerValueADC,0);
@@ -138,8 +143,7 @@ void DSOADC::awdTrigger()
                 setWatchdogTriggerValue(ADC_MAX,_triggerValueADC);
                  break;
             case Trigger_Both:
-                // Tricky !
-                setWatchdogTriggerValue(ADC_MAX,_triggerValueADC); // FIXME!
+                xAssert(0); // should be _both and either Rising or falling
                  break;
             case Trigger_Run:
                 _triggered=true;   
