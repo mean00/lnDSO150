@@ -249,8 +249,7 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
 
     if(!adc->getSamples(fset))
           return false;
-        
-    
+            
     
     if(!fset.set1.samples)
     {
