@@ -9,8 +9,7 @@
 #include "dso_capture_priv.h"
 #include "DSO_config.h"
 #include "dso_adc_gain.h"
-#if 0
-void swapADCs(int nb, uint16_t *data)
+static void swapADCs_c(int nb, uint16_t *data)
 {    
     int nbWord=nb/2;   
     uint16_t swap;
@@ -22,26 +21,60 @@ void swapADCs(int nb, uint16_t *data)
         data+=2;
     }
 }
-#else
-void swapADCs(int nb, uint16_t *data)  __attribute__( ( naked ) );
-void swapADCs(int nb, uint16_t *data) 
+static void swapADCs_asm(int nb, uint16_t *data)  __attribute__( ( naked ) );
+/**
+ *   Convert 8 samples at a time
+ *    aa bb cc dd ee ff gg hh => bb aa dd cc ff ee hh gg
+ * 
+ */
+static void swapADCs_asm(int nb, uint16_t *data) 
 {    
-    __asm volatile (
-            "   lsr r0,#1       \n"
+    __asm volatile (    
+            "   push {r2}         \n"
+            "   lsr r0,#3       \n" //4x 32 bits at a time
             "nxt:               \n"
             "   ldr r2,[r1]     \n"
             "   rev r2,r2       \n"
             "   rev16 r2,r2     \n"
-            "   str r2,[r1]     \n"
+            "   str r2,[r1]     \n"    
+    
+            "   add r1,r1,#4    \n"
+            "   ldr r2,[r1]     \n"
+            "   rev r2,r2       \n"
+            "   rev16 r2,r2     \n"
+            "   str r2,[r1]     \n"    
+
+                "   add r1,r1,#4    \n"
+            "   ldr r2,[r1]     \n"
+            "   rev r2,r2       \n"
+            "   rev16 r2,r2     \n"
+            "   str r2,[r1]     \n"    
+
+            "   add r1,r1,#4    \n"
+            "   ldr r2,[r1]     \n"
+            "   rev r2,r2       \n"
+            "   rev16 r2,r2     \n"
+            "   str r2,[r1]     \n"    
+
+    
+    
             "   add r1,r1,#4    \n"
             "   sub r0,r0,#1    \n"
             "   cmp r0,#0       \n"
             "   bne nxt         \n" 
+            "   pop {r2}        \n"    
             "   mov pc,lr       \n" 
             : : : "memory");
 }
 
-#endif
+static void swapADCs(int nb, uint16_t *data)
+{    
+    int ex=nb&7;
+    int r=(nb>>3)<<3;
+    swapADCs_asm(r,data);    
+    if(ex)
+        swapADCs_c(ex,data+r);
+}
 /**
  * 
  * @param set
