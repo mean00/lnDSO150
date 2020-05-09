@@ -6,10 +6,11 @@
 #pragma once
 #include "fancyLock.h"
 #include "dso_capture.h"
+#include "dso_adc.h"
 
 #define INDEX_AC1_DC0() (controlButtons->getCouplingState()==DSOControl::DSO_COUPLING_AC) // 0 if DC, 1 if AC, for gnd it does not matter
 
-#define IS_CAPTURE_DUAL() (tSettings[currentTimeBase].dual)
+#define IS_CAPTURE_DUAL() (tSettings[currentTimeBase].dual!=DSOADC::ADC_CAPTURE_MODE_NORMAL)
 /**
  */
 typedef struct 

@@ -77,7 +77,7 @@ void DSOADC::stopTimeCapture(void)
 bool DSOADC::startInternalDmaSampling ()
 {
   //  slow is always single channel
-  ADC1->regs->CR1&=~ADC_CR1_FASTINT;
+  ADC1->regs->CR1&=~ADC_CR1_DUALMASK;
   setupAdcDmaTransfer( DMA_OVERSAMPLING_COUNT,dmaOverSampleBuffer, dummy_dma_interrupt_handler );
   startDMA();
   return true;

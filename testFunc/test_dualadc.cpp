@@ -21,12 +21,12 @@ static float voltageScale;
 
 static const TimeSettings tSettings[6]
 {
-    {false,"10us",     DSOADC::ADC_PRESCALER_2  ,ADC_SMPR_1_5,   4390},
-    {false,"25us",     DSOADC::ADC_PRESCALER_2  ,ADC_SMPR_13_5,  5909},
-    {false,"50us",     DSOADC::ADC_PRESCALER_2  ,ADC_SMPR_55_5,  4496},
-    {false,"100us",    DSOADC::ADC_PRESCALER_4  ,ADC_SMPR_55_5,  4517},
-    {false,"500us",    DSOADC::ADC_PRESCALER_4  ,ADC_SMPR_239_5, 6095},
-    {false,"1ms",      DSOADC::ADC_PRESCALER_8  ,ADC_SMPR_239_5, 6095}
+    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"10us",     DSOADC::ADC_PRESCALER_2  ,ADC_SMPR_1_5,   4390},
+    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"25us",     DSOADC::ADC_PRESCALER_2  ,ADC_SMPR_13_5,  5909},
+    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"50us",     DSOADC::ADC_PRESCALER_2  ,ADC_SMPR_55_5,  4496},
+    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"100us",    DSOADC::ADC_PRESCALER_4  ,ADC_SMPR_55_5,  4517},
+    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"500us",    DSOADC::ADC_PRESCALER_4  ,ADC_SMPR_239_5, 6095},
+    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"1ms",      DSOADC::ADC_PRESCALER_8  ,ADC_SMPR_239_5, 6095}
 };
 
 
@@ -99,7 +99,7 @@ void testDualADC(void)
         int count;
         int i=0;
         // Ask samples , taking expand into account
-        adc->prepareDualDMASampling (PA0,ADC_SMPR_1_5,DSOADC::ADC_PRESCALER_2);            
+        adc->prepareFastDualDMASampling (PA0,ADC_SMPR_1_5,DSOADC::ADC_PRESCALER_2);            
         ysetADCs();
         adc->startDualDMASampling (PA0,240);
         

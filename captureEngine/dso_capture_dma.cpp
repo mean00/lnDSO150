@@ -215,10 +215,15 @@ bool DSOCapturePriv::prepareSamplingDma()
 {
   //     
     const TimeSettings *set= tSettings+currentTimeBase;
-    if(set->dual)
-        return adc->prepareDualDMASampling(DSO_INPUT_PIN,set->rate,set->prescaler);
-    return adc->prepareDMASampling(set->rate,set->prescaler);
+    switch(set->dual)
+    {
+    case DSOADC::ADC_CAPTURE_FAST_INTERLEAVED:  return adc->prepareFastDualDMASampling(DSO_INPUT_PIN,set->rate,set->prescaler); break;
+    case DSOADC::ADC_CAPTURE_SLOW_INTERLEAVED:  return adc->prepareSlowDualDMASampling(DSO_INPUT_PIN,set->rate,set->prescaler);break;
+    case DSOADC::ADC_CAPTURE_MODE_NORMAL:  return adc->prepareDMASampling(set->rate,set->prescaler);break;
+    default: xAssert(0);break;
+    }
 }
+
 /**
  * 
  * @return 

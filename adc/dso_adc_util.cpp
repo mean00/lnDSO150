@@ -21,7 +21,7 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 #include "dma.h"
 #include "adc.h"
 
-bool           DSOADC::_dual=false;
+DSOADC::ADC_CAPTURE_MODE           DSOADC::_dual=DSOADC::ADC_CAPTURE_MODE_NORMAL;
 
 
 struct rcc_reg_map_extended {
@@ -189,8 +189,8 @@ void DSOADC::setupADCs ()
   */
 bool    DSOADC::prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale)
 {    
-    _dual=false;
-    ADC1->regs->CR1&=~ADC_CR1_FASTINT;
+    _dual=DSOADC::ADC_CAPTURE_MODE_NORMAL;
+    ADC1->regs->CR1&=~ADC_CR1_DUALMASK;
     cr2= ADC1->regs->CR2;
     cr2|=ADC_CR2_DMA | ADC_CR2_CONT;    
     ADC1->regs->CR2 = cr2;    
@@ -204,9 +204,10 @@ bool    DSOADC::prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale)
   * @param count
   * @return 
   */
-bool    DSOADC::prepareDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale)
+bool    DSOADC::prepareFastDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale)
 {  
-    _dual=true;
+    _dual=DSOADC::ADC_CAPTURE_FAST_INTERLEAVED;
+    ADC1->regs->CR1&=~ADC_CR1_DUALMASK;
     ADC1->regs->CR1|=ADC_CR1_FASTINT; // fast interleaved mode
     ADC2->regs->SQR3 = PIN_MAP[otherPin].adc_channel ;      
     ADC2->regs->CR2 |= ADC_CR2_CONT;
@@ -215,6 +216,19 @@ bool    DSOADC::prepareDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::
     setTimeScale(rate,scale);    
     return true;
 }
+bool    DSOADC::prepareSlowDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale)
+{  
+    _dual=DSOADC::ADC_CAPTURE_SLOW_INTERLEAVED;
+    ADC1->regs->CR1&=~ADC_CR1_DUALMASK;
+    ADC1->regs->CR1|=ADC_CR1_SLOWINT; // fast interleaved mode
+    ADC2->regs->SQR3 = PIN_MAP[otherPin].adc_channel ;      
+    ADC2->regs->CR2 |= ADC_CR2_CONT;
+    ADC1->regs->CR2 |= ADC_CR2_CONT |ADC_CR2_DMA;
+    adc_set_sample_rate(ADC2, rate); 
+    setTimeScale(rate,scale);    
+    return true;
+}
+
 
 /**
  * 
@@ -310,7 +324,7 @@ void DSOADC::setupAdcDualDmaTransfer( int otherPin,  int count,uint32_t *buffer,
  */
 void DSOADC::nextAdcDmaTransfer( int count,uint16_t *buffer)
 {
-    if(!_dual)
+    if(_dual==DSOADC::ADC_CAPTURE_MODE_NORMAL)
     {
         dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, (uint32_t *)buffer, DMA_SIZE_16BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
         dma_set_num_transfers(DMA1, DMA_CH1, count );

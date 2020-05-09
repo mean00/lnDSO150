@@ -76,6 +76,15 @@ public:
     Trigger_Preparing,
     Trigger_Armed
   };
+
+  enum ADC_CAPTURE_MODE
+  {
+      ADC_CAPTURE_MODE_NORMAL=0,
+      ADC_CAPTURE_FAST_INTERLEAVED=1,
+      ADC_CAPTURE_SLOW_INTERLEAVED=2
+  };
+
+  
   enum Prescaler
   {
     ADC_PRESCALER_2=0,
@@ -99,7 +108,8 @@ public:
             void    setChannel(int channel);
             bool    setTimeScale(adc_smp_rate one, DSOADC::Prescaler two);
             bool    prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale);
-            bool    prepareDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale);
+            bool    prepareFastDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale);
+            bool    prepareSlowDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale);
             bool    startDualDMASampling (const int otherPin, const int count);
             bool    prepareTimerSampling (int fq);
             int     pollingRead();
@@ -173,7 +183,7 @@ protected:
             bool            _triggered;
             TriggerState    _triggerState;
             int             _triggerValueADC;
-            static bool     _dual;
+  static    ADC_CAPTURE_MODE     _dual;
 public:            
 static      uint16_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];            
 };
@@ -183,7 +193,7 @@ static      uint16_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];
  */
 typedef struct TimeSettings
 {
-  bool               dual;
+  DSOADC::ADC_CAPTURE_MODE   dual;
   const char         *name;
   DSOADC::Prescaler  prescaler;
   adc_smp_rate       rate;
