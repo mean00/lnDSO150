@@ -73,7 +73,7 @@ bool DSOCapturePriv::prepareSamplingTimer()
  */
 DSOCapture::DSO_TIME_BASE DSOCapturePriv::getTimeBaseTimer()
 {
-    return (DSOCapture::DSO_TIME_BASE)(currentTimeBase+DSO_TIME_BASE::DSO_TIME_BASE_5MS);
+    return (DSOCapture::DSO_TIME_BASE)(currentTimeBase+DSO_TIME_BASE::SLOWER_FAST_MODE+1);
 }
 
 

@@ -85,7 +85,7 @@ bool     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE timeBase)
     {
         xAssert(0);
     }
-    if(timeBase<DSO_TIME_BASE::DSO_TIME_BASE_5MS) // fast mode
+    if(timeBase<=DSO_TIME_BASE::SLOWER_FAST_MODE) // fast mode
     {
         if(adc->getTriggerMode()!=DSOADC::Trigger_Run)
             currentTable=&DmaTableTrigger;
@@ -99,7 +99,7 @@ bool     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE timeBase)
             currentTable=&TimerTableTrigger;
         else
             currentTable=&TimerTableRunning;                
-        DSOCapturePriv::currentTimeBase=timeBase-DSO_TIME_BASE::DSO_TIME_BASE_5MS;
+        DSOCapturePriv::currentTimeBase=timeBase-DSO_TIME_BASE::SLOWER_FAST_MODE-1;
     }
     return true;
 }

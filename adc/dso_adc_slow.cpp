@@ -89,7 +89,8 @@ bool DSOADC::startInternalDmaSampling ()
   */
 bool    DSOADC::prepareTimerSampling (int fq)
 {      
-    setTimeScale(ADC_SMPR_239_5,DSOADC::ADC_PRESCALER_6); // 21us for STM32, 16 us for GD32F3
+    // At 1ms for 24 sample => 41 us /sample, with oversampling that gives 5 us /sample
+    setTimeScale(ADC_SMPR_71_5,DSOADC::ADC_PRESCALER_4); // about 3us /sample
     setSlowMode(fq);        
     return true;    
 }

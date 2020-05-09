@@ -50,7 +50,6 @@ const TimeSettings tSettings[]
     {DSOADC::ADC_CAPTURE_MODE_NORMAL,"50us",     DSOADC::ADC_PRESCALER_10, ADC_SMPR_7_5,    4096,   480000},
     {DSOADC::ADC_CAPTURE_MODE_NORMAL,"100us",    DSOADC::ADC_PRESCALER_20, ADC_SMPR_7_5,    4096,   240000},    
     {DSOADC::ADC_CAPTURE_MODE_NORMAL,"500us",    DSOADC::ADC_PRESCALER_8,  ADC_SMPR_239_5,  4063,    47619},    
-    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"1ms",      DSOADC::ADC_PRESCALER_16, ADC_SMPR_239_5,  4063,    23810}
    #elif F_CPU==120000000 
 #error : We have to drop / duplicate too many samples at 120 Mhz, use 96!
     {false,"10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2564103},
@@ -58,7 +57,6 @@ const TimeSettings tSettings[]
     {false,"50us",     DSOADC::ADC_PRESCALER_10, ADC_SMPR_7_5,    4096,   529101},
     {false,"100us",    DSOADC::ADC_PRESCALER_20, ADC_SMPR_7_5,    4096,   264550},    
     {false,"500us",    DSOADC::ADC_PRESCALER_8,  ADC_SMPR_239_5,  4876,    71429},    
-    {false,"1ms",      DSOADC::ADC_PRESCALER_16,  ADC_SMPR_239_5, 6502,    35714}
            
     #else
         #error unsupported MCU frequency
@@ -71,7 +69,6 @@ const TimeSettings tSettings[]
     {DSOADC::ADC_CAPTURE_MODE_NORMAL,"50us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_55_5,  4496,   529100},
     {DSOADC::ADC_CAPTURE_MODE_NORMAL,"100us",    DSOADC::ADC_PRESCALER_4,ADC_SMPR_55_5,  4517,   264550},    
     {DSOADC::ADC_CAPTURE_MODE_NORMAL,"500us",    DSOADC::ADC_PRESCALER_6,ADC_SMPR_239_5, 4063,   47619},    
-    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"1ms",      DSOADC::ADC_PRESCALER_8,ADC_SMPR_239_5, 8127,   47619}
 #endif
 };
 
@@ -79,6 +76,7 @@ const TimeSettings tSettings[]
  */
 const TimerTimeBase timerBases[]
 {
+    { DSOCapture::DSO_TIME_BASE_1MS,    "1ms",  24000},
     { DSOCapture::DSO_TIME_BASE_5MS,    "5ms",  4800},
     { DSOCapture::DSO_TIME_BASE_10MS,   "10ms", 2400},
     { DSOCapture::DSO_TIME_BASE_50MS,   "50ms", 480},
