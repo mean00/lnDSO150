@@ -6,13 +6,12 @@
 class testSignal
 {
 public:
-                 testSignal(int pin,int pinAmp,int timer, int channel);
+                 testSignal(int pin,int pinAmp);
             bool setFrequency(int fq);
             bool setAmplitude(bool large);
             
 protected:
-            HardwareTimer *pwmtimer;
             int            pinAmp;
-            int            channel;
+            int            pinSignal;
             
 };

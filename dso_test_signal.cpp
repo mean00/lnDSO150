@@ -6,31 +6,23 @@
 #include <Wire.h>
 #include "SPI.h"
 #include "dso_test_signal.h"
+#include "helpers/helper_pwm.h"
 /**
  */
-testSignal::testSignal(int pin,int pinAmp,int timer, int channel)
+testSignal::testSignal(int pin,int pinAmp)
 {
     this->pinAmp=pinAmp;
-    this->channel=channel;
-    pwmtimer=new HardwareTimer(timer);
+    this->pinSignal=pin;  
     digitalWrite(pin,1);
     pinMode(pin,PWM); 
     setAmplitude(true);
-    setFrequency(1000);
+    setFrequency(1000);  
 }
 /**
  */
  bool testSignal::setFrequency(int fq)
  {
-    pwmtimer->pause();
-    pwmtimer->setPrescaleFactor(18);
-    //  4Mhz tick
-    int v=(4000000/fq)&~1;
-    pwmtimer->setCount(0);
-    pwmtimer->setOverflow(v);
-    pwmtimer->setCompare(channel, v/2);  
-    pwmtimer->refresh();
-    pwmtimer->resume();
+    setPWMPinFrequency(pinSignal, fq);
     return true;
 }
  /**
