@@ -105,6 +105,7 @@ public:
             bool    startDMA();
             bool    startDualDMA();
             bool    getSamples(FullSampleSet &fullSet)           ;
+            bool    getSamples(uint16_t **samples, int  &nbSamples);
             void    clearSemaphore() ;
             bool     setSlowMode(int fqInHz);
             bool     readCalibrationValue();
@@ -131,13 +132,14 @@ public:
     static  void adc_dma_enable(const adc_dev * dev) ;    
 
             void setupADCs ();
+            bool fastSampleDown(int threshold,int &value, int &timeUs)  ;
+            bool fastSampleUp(int threshold1,int threshold2,int &value1,int &value2, int &timeUs1,int &timeUs2)  ;
+            
 protected:            
             
     static  void DMA1_CH1_Event();
     static  void DMA1_CH1_TriggerEvent() ;
             void captureComplete(SampleSet &one, SampleSet &two);
-            bool fastSampleDown(int threshold,int &value, int &timeUs)  ;
-            bool fastSampleUp(int threshold1,int threshold2,int &value1,int &value2, int &timeUs1,int &timeUs2)  ;
     static  void Timer_Event();
     static  void Timer_Trigger_Event();
 
