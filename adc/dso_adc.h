@@ -127,7 +127,7 @@ public:
             bool startDMATriggeredSampling (const int count, int ADCTriggerValue);
             bool startTimerSampling (int count);
             bool startTriggeredTimerSampling (int count,uint32_t triggerADC);
-            void clearSamples();
+    static  void clearSamples();
     static  void adc_dma_disable(const adc_dev * dev) ;            
     static  void adc_dma_enable(const adc_dev * dev) ;    
 

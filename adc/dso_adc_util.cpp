@@ -220,7 +220,7 @@ bool    DSOADC::prepareSlowDualDMASampling (int otherPin, adc_smp_rate rate,DSOA
 {  
     _dual=DSOADC::ADC_CAPTURE_SLOW_INTERLEAVED;
     ADC1->regs->CR1&=~ADC_CR1_DUALMASK;
-    ADC1->regs->CR1|=ADC_CR1_SLOWINT; // fast interleaved mode
+    ADC1->regs->CR1|=ADC_CR1_SLOWINT; // slow interleaved mode
     ADC2->regs->SQR3 = PIN_MAP[otherPin].adc_channel ;      
     ADC2->regs->CR2 |= ADC_CR2_CONT;
     ADC1->regs->CR2 |= ADC_CR2_CONT |ADC_CR2_DMA;
@@ -246,10 +246,10 @@ bool DSOADC::getSamples(FullSampleSet &fullSet)
 
 bool DSOADC::getSamples(uint16_t **samples, int  &nbSamples)
 {
-    if(!dmaSemaphore->take(10)) // dont busy loop
+    if(!dmaSemaphore->take(200)) // dont busy loop
         return false;   
-    *samples=_captured.set1.data;
-    nbSamples=_captured.set1.samples;
+    *samples=adcInternalBuffer;
+    nbSamples=requestedSamples;
     return true;
 }
 
@@ -317,7 +317,7 @@ void DSOADC::setupAdcDmaTransfer(   int count,uint16_t *buffer, void (*handler)(
 void DSOADC::setupAdcDualDmaTransfer( int otherPin,  int count,uint32_t *buffer, void (*handler)(void) )
 {
   xAssert(count<= ADC_INTERNAL_BUFFER_SIZE);
-  ADC2->regs->SQR3=0; // WTF ?
+  ADC2->regs->SQR3=PIN_MAP[otherPin].adc_channel; // WTF ?
   dma_init(DMA1);
   dma_attach_interrupt(DMA1, DMA_CH1, handler); 
   dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, buffer, DMA_SIZE_32BITS, (DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
