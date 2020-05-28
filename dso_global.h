@@ -8,7 +8,7 @@
 #include "SPI.h"
 #include "MapleFreeRTOS1000.h"
 #include "MapleFreeRTOS1000_pp.h"
-#include "dso_adc.h"
+#include "dso_adc_ext.h"
 #include "dso_calibrate.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_TFTLCD_8bit_STM32.h"
