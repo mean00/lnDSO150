@@ -74,9 +74,13 @@ public:
   };
   enum ADC_TRIGGER_SOURCE
   {
-    ADC_SOURCE_TIMER_2_CHANNEL2=3,
-    ADC_SOURCE_TIMER_3_TRGO=4,
-    ADC_SOURCE_SWSTART         =7,
+    ADC_SOURCE_TIMER_1_CHANNEL1 =0,
+    ADC_SOURCE_TIMER_1_CHANNEL2 =1,
+    ADC_SOURCE_TIMER_1_CHANNEL3 =2,
+    ADC_SOURCE_TIMER_2_CHANNEL2 =3,
+    ADC_SOURCE_TIMER_3_TRGO     =4,
+    ADC_SOURCE_TIMER_4_CHANNEL4 =5,
+    ADC_SOURCE_SWSTART          =7,
   };  
   enum Prescaler
   {
@@ -167,8 +171,7 @@ public:
             void stopTimeCapture();
     static  void getRegisters();
             void resetStats();
-    
-            //void restartDmaTriggerCapture() ;
+              
 protected:
             int             _pin;
             int             _sampled;
