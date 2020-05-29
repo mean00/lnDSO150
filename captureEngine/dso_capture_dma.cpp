@@ -141,7 +141,7 @@ bool DSOCapturePriv::refineCapture(FullSampleSet &set,int needed)
  * @param swing
  * @return 
  */
-static int transformDmaExact(int dc0_ac1,int16_t *in, float *out,int count, CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode,int swing)
+int transformDmaExact(int dc0_ac1,int16_t *in, float *out,int count, CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode,int swing)
 {    
    if(!count) return false;
    stats.xmin=200;

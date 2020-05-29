@@ -3,8 +3,17 @@
 //
 #pragma once
 
-#define ADC_TIMER Timer2
-#define ADC_TIMER_CHANNEL TIMER_CH1
+#ifdef HIGH_SPEED_ADC
+    #define ADC_TIMER         Timer1
+    #define ADC_TIMER_CHANNEL TIMER_CH1
+    #define ADC_SOURCE_TIMER  ADC_SOURCE_TIMER_1_CHANNEL1
+#else
+    #define ADC_TIMER         Timer2
+    #define ADC_TIMER_CHANNEL TIMER_CH2
+    #define ADC_SOURCE_TIMER  ADC_SOURCE_TIMER_2_CHANNEL2
+#endif
+
+
 #define ADC_TIMER_COUNT   1
 #ifndef ADC_CR1_FASTINT
     #define ADC_CR1_FASTINT (7<<16)

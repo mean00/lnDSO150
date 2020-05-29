@@ -25,7 +25,7 @@ uint32_t cr2;
 
 InterruptStats adcInterruptStats;
 uint32_t convTime;
-extern HardwareTimer Timer2;
+extern HardwareTimer ADC_TIMER;
 adc_reg_map *adc_Register;
 
 

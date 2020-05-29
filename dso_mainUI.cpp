@@ -259,7 +259,7 @@ void drawBackground()
  */
 void initMainUI(void)
 {
-    DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_100US);
+    DSOCapture::setTimeBase(    DSOCapture::DSO_TIME_BASE_1MS);
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
     DSOCapture::setTriggerValue(1.);
     drawBackground();    

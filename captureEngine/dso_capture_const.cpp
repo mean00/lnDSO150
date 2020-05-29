@@ -75,8 +75,8 @@ const TimeSettings tSettings[]
 /**
  */
 const TimerTimeBase timerBases[]
-{
-    { DSOCapture::DSO_TIME_BASE_1MS,    "1ms",  24000},
+{   
+    { DSOCapture::DSO_TIME_BASE_1MS,    "1ms",  24000}, // 24 pixels per div => 1MS => 1MS/24=> 24 kHZ Sampling Fq
     { DSOCapture::DSO_TIME_BASE_5MS,    "5ms",  4800},
     { DSOCapture::DSO_TIME_BASE_10MS,   "10ms", 2400},
     { DSOCapture::DSO_TIME_BASE_50MS,   "50ms", 480},

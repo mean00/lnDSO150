@@ -12,6 +12,7 @@
 #include "dso_adc_gain.h"
 #include "cpuID.h"
 #include "pinConfiguration.h"
+#include "helpers/helper_pwm.h"
 static void MainTask( void *a );
 void splash(void);
 //--
@@ -105,7 +106,9 @@ void MainTask( void *a )
     tft->setTextSize(3);
    
     //DSOCalibrate::calibrate();
-    
+    // Start ADC timer timebase at 8 Mhz
+    // total period = 0.125 us
+    setTimerFrequency(&Timer2,2, 62, 63); 
     //xAssert(0);
     adc->setupADCs ();       
     //testCalibrate();

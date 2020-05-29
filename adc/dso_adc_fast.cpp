@@ -101,12 +101,23 @@ bool    DSOADC::setADCPin(int pin)
 
 bool DSOADC::startDMA()
 {    
-    
-  cr2=ADC1->regs->CR2;
+  
+  
+  cr2=ADC1->regs->CR2;  
   cr2&= ~ADC_CR2_SWSTART;   
   ADC1->regs->CR2=cr2;
-  cr2|=ADC_CR2_CONT+ADC_CR2_DMA;
-  ADC1->regs->CR2=cr2;
+  if(_source!=ADC_SOURCE_SWSTART)
+  {
+    setSourceInternal();
+    cr2|=ADC_CR2_DMA;    
+    ADC1->regs->CR2=cr2;    
+  }
+  else
+  {
+    cr2|=ADC_CR2_CONT+ADC_CR2_DMA;
+    ADC1->regs->CR2=cr2;
+  }
+  
   cr2|= ADC_CR2_SWSTART;   
   ADC1->regs->CR2=cr2;
   return true;
@@ -187,7 +198,9 @@ void SPURIOUS_INTERRUPT()
 void DSOADC::stopDmaCapture(void)
 {
     // disable interrupts
-    ADC1->regs->CR2 &= ~(ADC_CR2_SWSTART|ADC_CR2_CONT|ADC_CR2_DMA);   
+    cr2=  ADC1->regs->CR2 ;
+    cr2 &= ~(ADC_CR2_SWSTART|ADC_CR2_CONT|ADC_CR2_DMA);   
+    ADC1->regs->CR2 =cr2;
     enableDisableIrq(false);
     enableDisableIrqSource(false,ADC_AWD);
     // Stop dma
@@ -214,6 +227,7 @@ uint32_t DSOADC::getVCCmv()
  */
 int DSOADC::pollingRead()
 {
+#if 0
   // deactivate DMA
   adc_reg_map *regs=ADC1->regs;
   
@@ -233,5 +247,8 @@ int DSOADC::pollingRead()
   uint16_t val= (uint16)(regs->DR & ADC_DR_DATA);
   regs->CR2=oldCr2;
   return val;
+#else
+  return 0;
+#endif  
 }
 

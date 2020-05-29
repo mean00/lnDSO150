@@ -32,3 +32,80 @@ bool setPWMPinFrequency(int pin, int frequency)
     timer->resume();
     return true;
 }
+
+bool setTimerFrequency(HardwareTimer *timer, int channel, int periodOnPs, int periodOffPs)
+{  
+    timer->pause();
+    
+    float  period;
+    
+    period=periodOnPs+periodOffPs;
+    period=period/1000000000.;     //in second            
+    
+    float fq=1./period;
+    
+    // count*scale=F_CPU/fq
+    
+    float ratio=(float)F_CPU/fq;
+    
+    int iratio=ratio*1024.;
+    
+    int scale=1;
+    int count=iratio/1024;
+    
+    while(count>65535)
+    {
+        scale++;
+        count=iratio/(1024*scale);
+    }
+    timer->setPrescaleFactor(scale);         
+    count=(period*F_CPU)/(float)scale;
+    
+    
+    timer->setCount(0);
+    timer->setOverflow(count);
+    timer->setCompare(channel,count/2); // square output for now
+    timer->refresh();
+    timer->resume();
+    return true;
+}
+
+/**
+ * 
+ * @param timer
+ * @param channel
+ * @param frequency
+ * @return 
+ */
+bool setTimerFrequency(HardwareTimer *timer, int channel, int frequency)
+{  
+    timer->pause();
+    
+    float fq=frequency;
+        
+    
+    float ratio=(float)F_CPU/(float)fq;
+    
+    int iratio=ratio*1024.;
+    
+    int scale=1;
+    int count=iratio/1024;
+    
+    while(count>65535)
+    {
+        scale++;
+        count=iratio/(1024*scale);
+    }
+    timer->setPrescaleFactor(scale);         
+    count=F_CPU/((float)scale*frequency);
+    
+    
+    timer->setCount(0);
+    timer->setOverflow(count);
+    timer->setCompare(channel,count/2); // square output for now
+    timer->refresh();
+    timer->resume();
+    return true;
+}
+
+

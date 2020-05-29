@@ -9,13 +9,13 @@
 #include "dso_adc.h"
 #include "dso_adc_priv.h"
 #include "fancyLock.h"
+#include "helpers/helper_pwm.h"
 
 /**
  */
 
+uint32_t lastStartedCR2=0;
 
-
-extern HardwareTimer ADC_TIMER;
 extern adc_reg_map *adc_Register;
 
 CaptureState captureState=Capture_idle;
@@ -44,8 +44,6 @@ extern void Oopps();
  */
 bool DSOADC::setSlowMode(int fqInHz)
 {    
-    ADC_TIMER.attachInterrupt(ADC_TIMER_CHANNEL, Timer_Event);
-    ADC_TIMER.setPeriod(1000000/(fqInHz*ADC_TIMER_COUNT)); // in microseconds, oversampled 16 times
     return true;
 }
 /*
@@ -78,8 +76,9 @@ bool DSOADC::startInternalDmaSampling ()
 {
   //  slow is always single channel
   ADC1->regs->CR1&=~ADC_CR1_DUALMASK;
-  setupAdcDmaTransfer( DMA_OVERSAMPLING_COUNT,dmaOverSampleBuffer, dummy_dma_interrupt_handler );
+  setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_Event );
   startDMA();
+  lastStartedCR2=ADC1->regs->CR2;
   return true;
 }
   /**
@@ -88,10 +87,10 @@ bool DSOADC::startInternalDmaSampling ()
   * @return 
   */
 bool    DSOADC::prepareTimerSampling (int fq)
-{      
-    // At 1ms for 24 sample => 41 us /sample, with oversampling that gives 5 us /sample
-    setTimeScale(ADC_SMPR_71_5,DSOADC::ADC_PRESCALER_4); // about 3us /sample
-    setSlowMode(fq);        
+{         
+    setTimerFrequency(&ADC_TIMER,ADC_TIMER_CHANNEL, fq);;  
+    setTimeScale(ADC_SMPR_28_5,DSOADC::ADC_PRESCALER_6); // slow enough sampling FQ, no need to be faster
+    setSource(ADC_SOURCE_TIMER);    
     return true;    
 }
 /**
@@ -107,93 +106,13 @@ bool DSOADC::startTimerSampling (int count)
         count=ADC_INTERNAL_BUFFER_SIZE/2;
     requestedSamples=count;
 
-
     currentIndex=0;    
     FancyInterrupts::disable();    
-    captureState=Capture_armed;
-    
-    
-    ADC_TIMER.setCompare(ADC_TIMER_CHANNEL, ADC_TIMER_COUNT);    
-    ADC_TIMER.setMode(ADC_TIMER_CHANNEL, TIMER_OUTPUTCOMPARE); // start timer
-    ADC_TIMER.refresh();
-    ADC_TIMER.resume();
-    startInternalDmaSampling();       
+    captureState=Capture_armed;    
+    startInternalDmaSampling();           
     FancyInterrupts::enable();
     return true;
 } 
-/**
- * 
- */
-void DSOADC::Timer_Event() 
-{    
-    nbTimer++;
-    instance->timerCapture();
-}
-/**
- * 
- * @param avg
- * @return 
- */
-bool   DSOADC::validateAverageSample(uint32_t &avg)
-{
-    switch(captureState)
-    {
-        case Capture_armed: // skipped one ADC DMA ?
-            skippedDma++;
-            return false;
-        case Capture_dmaDone:
-            captureState=Capture_timerDone;
-            break;
-        case Capture_timerDone:
-        case Capture_idle:
-            spuriousTimer++;
-            //Oopps();
-            return false;
-            break;
-        case Capture_complete:
-            break;
-        default:
-            Oopps();
-            break;
-    }
-    
-    avg=0;
-    uint16_t *ptr=dmaOverSampleBuffer;
-   
-    for(int i=0;i<DMA_OVERSAMPLING_COUNT;i++)
-    {        
-        avg+=*ptr;
-        ptr++;
-    }    
-    avg=(avg+DMA_OVERSAMPLING_COUNT/2+1)/DMA_OVERSAMPLING_COUNT;
-    return true;
-}
-/**
- * \fn timerCapture
- * \brief this is one is called by a timer interrupt
- */
-void DSOADC::timerCapture()
-{    
-    uint32_t avg=0;
-    if(! validateAverageSample(avg))
-        return;
-    adcInternalBuffer[currentIndex]=avg;
-    currentIndex++;
-    if(currentIndex>=requestedSamples)
-    {                
-        dma_disable(DMA1, DMA_CH1);
-        ADC_TIMER.setMode(ADC_TIMER_CHANNEL,TIMER_DISABLED);
-        ADC_TIMER.pause();
-        captureState=Capture_complete;
-        
-        SampleSet one(requestedSamples,adcInternalBuffer),two(0,NULL);
-        captureComplete(one,two);
-        return;
-    }
-    // Ask for next set of samples
-    captureState=Capture_armed;
-    nextAdcDmaTransfer( DMA_OVERSAMPLING_COUNT,dmaOverSampleBuffer);
-}
 #include "dso_adc_slow_trigger.cpp"
 // EOF
 

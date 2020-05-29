@@ -72,8 +72,15 @@ public:
       ADC_CAPTURE_FAST_INTERLEAVED=1,
       ADC_CAPTURE_SLOW_INTERLEAVED=2
   };
-
-  
+  enum ADC_TRIGGER_SOURCE
+  {
+#ifdef   HIGH_SPEED_ADC  
+    ADC_SOURCE_TIMER_1_CHANNEL1=3,
+#else
+    ADC_SOURCE_TIMER_2_CHANNEL2=3,
+#endif
+    ADC_SOURCE_SWSTART         =7,
+  };  
   enum Prescaler
   {
     ADC_PRESCALER_2=0,
@@ -93,6 +100,7 @@ public:
   };
 public:
                     DSOADC(int pin);
+            bool    setSource(const ADC_TRIGGER_SOURCE source);            
             bool    setADCPin(int pin);
             void    setChannel(int channel);
             bool    setTimeScale(adc_smp_rate one, DSOADC::Prescaler two);
@@ -136,7 +144,7 @@ public:
             bool fastSampleUp(int threshold1,int threshold2,int &value1,int &value2, int &timeUs1,int &timeUs2)  ;
             
 protected:            
-            
+            bool setSourceInternal();
     static  void DMA1_CH1_Event();
     static  void DMA1_CH1_TriggerEvent() ;
             void captureComplete(SampleSet &one, SampleSet &two);
@@ -177,6 +185,7 @@ protected:
             TriggerState    _triggerState;
             int             _triggerValueADC;
   static    ADC_CAPTURE_MODE     _dual;
+            ADC_TRIGGER_SOURCE _source; // source of sampling signal : SWSTART or Timer
 public:            
 static      uint16_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];            
 };
