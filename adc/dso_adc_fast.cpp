@@ -109,17 +109,17 @@ bool DSOADC::startDMA()
   if(_source!=ADC_SOURCE_SWSTART)
   {
     setSourceInternal();
-    cr2|=ADC_CR2_DMA;    
+    cr2|=ADC_CR2_CONT+ADC_CR2_DMA;    
     ADC1->regs->CR2=cr2;    
   }
   else
   {
     cr2|=ADC_CR2_CONT+ADC_CR2_DMA;
     ADC1->regs->CR2=cr2;
+    cr2|= ADC_CR2_SWSTART;   
+    ADC1->regs->CR2=cr2;    
   }
   
-  cr2|= ADC_CR2_SWSTART;   
-  ADC1->regs->CR2=cr2;
   return true;
   
 }

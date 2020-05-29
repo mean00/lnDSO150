@@ -74,11 +74,8 @@ public:
   };
   enum ADC_TRIGGER_SOURCE
   {
-#ifdef   HIGH_SPEED_ADC  
-    ADC_SOURCE_TIMER_1_CHANNEL1=3,
-#else
     ADC_SOURCE_TIMER_2_CHANNEL2=3,
-#endif
+    ADC_SOURCE_TIMER_3_TRGO=4,
     ADC_SOURCE_SWSTART         =7,
   };  
   enum Prescaler

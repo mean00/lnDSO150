@@ -46,16 +46,7 @@ bool DSOADC::setSlowMode(int fqInHz)
 {    
     return true;
 }
-/*
- * Can we skip that ?
- */
-static void dummy_dma_interrupt_handler(void)
-{
-    if(captureState!=Capture_armed)
-        Oopps();
-    captureState=Capture_dmaDone;
-    nbDma++;
-}
+
 /**
  * 
  */
@@ -63,7 +54,6 @@ void DSOADC::stopTimeCapture(void)
 {
      ADC_TIMER.pause();
      adc_dma_disable(ADC1);
-     ADC_TIMER.attachInterrupt(ADC_TIMER_CHANNEL, NULL);
 }
 
 /**
@@ -77,6 +67,7 @@ bool DSOADC::startInternalDmaSampling ()
   //  slow is always single channel
   ADC1->regs->CR1&=~ADC_CR1_DUALMASK;
   setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_Event );
+  ADC_TIMER.resume();
   startDMA();
   lastStartedCR2=ADC1->regs->CR2;
   return true;
@@ -89,6 +80,7 @@ bool DSOADC::startInternalDmaSampling ()
 bool    DSOADC::prepareTimerSampling (int fq)
 {         
     setTimerFrequency(&ADC_TIMER,ADC_TIMER_CHANNEL, fq);;  
+    Timer3.setMasterModeTrGo(TIMER_CR2_MMS_UPDATE);
     setTimeScale(ADC_SMPR_28_5,DSOADC::ADC_PRESCALER_6); // slow enough sampling FQ, no need to be faster
     setSource(ADC_SOURCE_TIMER);    
     return true;    
@@ -108,11 +100,17 @@ bool DSOADC::startTimerSampling (int count)
 
     currentIndex=0;    
     FancyInterrupts::disable();    
-    captureState=Capture_armed;    
+    captureState=Capture_armed;   
+    
+    Timer2.setMasterModeTrGo(TIMER_CR2_MMS_UPDATE);
+
+
     startInternalDmaSampling();           
     FancyInterrupts::enable();
     return true;
 } 
 #include "dso_adc_slow_trigger.cpp"
+
+
 // EOF
 
