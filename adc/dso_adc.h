@@ -108,6 +108,7 @@ public:
             bool    prepareTimerSampling (int fq);
             int     pollingRead();
             bool    startDMA();
+            bool    startDMATime();
             bool    startDualDMA();
             bool    getSamples(FullSampleSet &fullSet)           ;
             bool    getSamples(uint16_t **samples, int  &nbSamples);
@@ -145,16 +146,11 @@ protected:
     static  void DMA1_CH1_Event();
     static  void DMA1_CH1_TriggerEvent() ;
             void captureComplete(SampleSet &one, SampleSet &two);
-    static  void Timer_Event();
-    static  void Timer_Trigger_Event();
 
-            void timerCapture();
-            void timerTriggerCapture();
             
             bool startInternalDmaSampling ();
             
-            bool validateAverageSample(uint32_t &avg);
-    static void TriggerInterrupt();
+            bool validateAverageSample(uint32_t &avg);    
 public:        
     static void setupAdcDmaTransfer(   int count,uint16_t *buffer, void (*handler)(void) );
     static void nextAdcDmaTransfer( int count,uint16_t *buffer);

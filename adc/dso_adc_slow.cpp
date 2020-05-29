@@ -55,7 +55,20 @@ void DSOADC::stopTimeCapture(void)
      ADC_TIMER.pause();
      adc_dma_disable(ADC1);
 }
-
+/**
+ * 
+ * @return 
+ */
+bool DSOADC::startDMATime()
+{    
+  cr2=ADC1->regs->CR2;  
+  cr2&= ~ADC_CR2_SWSTART;   
+  ADC1->regs->CR2=cr2;
+  setSourceInternal();   
+  cr2|=ADC_CR2_CONT+ADC_CR2_DMA;    
+  ADC1->regs->CR2=cr2;    
+  return true;  
+}
 /**
  * 
  * @param count
@@ -68,7 +81,7 @@ bool DSOADC::startInternalDmaSampling ()
   ADC1->regs->CR1&=~ADC_CR1_DUALMASK;
   setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_Event );
   ADC_TIMER.resume();
-  startDMA();
+  startDMATime();
   lastStartedCR2=ADC1->regs->CR2;
   return true;
 }
@@ -79,7 +92,7 @@ bool DSOADC::startInternalDmaSampling ()
   */
 bool    DSOADC::prepareTimerSampling (int fq)
 {         
-    setTimerFrequency(&ADC_TIMER,ADC_TIMER_CHANNEL, fq);;  
+    setTimerFrequency(&ADC_TIMER,ADC_TIMER_CHANNEL, fq);      
     Timer3.setMasterModeTrGo(TIMER_CR2_MMS_UPDATE);
     setTimeScale(ADC_SMPR_28_5,DSOADC::ADC_PRESCALER_6); // slow enough sampling FQ, no need to be faster
     setSource(ADC_SOURCE_TIMER);    

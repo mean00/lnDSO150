@@ -36,6 +36,7 @@ DSOCapture::DSO_TIME_BASE DSOCapturePriv::getTimeBaseTimer()
 void DSOCapturePriv::stopCaptureTimer()
 {
     adc->stopDmaCapture();
+    
 }
 /**
  * 
@@ -119,14 +120,12 @@ bool DSOCapturePriv::taskletTimer()
                                     );      
         
     int fint=computeFrequency(fset.set1.samples,fset.set1.data);
-#if 0
     if(fint)
     {
             float f=fint;    
             f=(float)(tSettings[currentTimeBase].fqInHz)*1000./f;
             set->stats.frequency=f;
-    }else
-#endif   
+    }else  
     {
          set->stats.frequency=0;
     }

@@ -106,22 +106,11 @@ bool DSOADC::startDMA()
   cr2=ADC1->regs->CR2;  
   cr2&= ~ADC_CR2_SWSTART;   
   ADC1->regs->CR2=cr2;
-  if(_source!=ADC_SOURCE_SWSTART)
-  {
-    setSourceInternal();
-    cr2|=ADC_CR2_CONT+ADC_CR2_DMA;    
-    ADC1->regs->CR2=cr2;    
-  }
-  else
-  {
-    cr2|=ADC_CR2_CONT+ADC_CR2_DMA;
-    ADC1->regs->CR2=cr2;
-    cr2|= ADC_CR2_SWSTART;   
-    ADC1->regs->CR2=cr2;    
-  }
-  
-  return true;
-  
+  cr2|=ADC_CR2_CONT+ADC_CR2_DMA;    
+  ADC1->regs->CR2=cr2;    
+  cr2|= ADC_CR2_SWSTART;   
+  ADC1->regs->CR2=cr2;    
+  return true;  
 }
 /**
  * 
@@ -204,7 +193,7 @@ void DSOADC::stopDmaCapture(void)
     enableDisableIrq(false);
     enableDisableIrqSource(false,ADC_AWD);
     // Stop dma
-     adc_dma_disable(ADC1);
+    adc_dma_disable(ADC1);
 }
 
 
