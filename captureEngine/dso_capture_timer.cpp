@@ -136,4 +136,24 @@ bool DSOCapturePriv::taskletTimer()
     return true;
 }
 
+/**
+ * 
+ * @return 
+ */   
+bool          DSOCapturePriv::initOnceTimerRunning()
+{
+    adc->setupTimerSampling();
+    return true;
+}
+/**
+ * 
+ * @return 
+ */
+bool          DSOCapturePriv::initOnceTimerTrigger()
+{
+    adc->setupTimerSampling();
+    return true;
+}
+
+
 // EOF

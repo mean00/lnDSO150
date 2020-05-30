@@ -23,6 +23,7 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 #include "fancyLock.h"
 #include "dma.h"
 #include "adc.h"
+#include "dso_adc_priv.h"
 /**
  */
 
@@ -64,7 +65,8 @@ DSOADC::DSOADC(int pin)
   
   setTriggerMode(DSOADC::Trigger_Run);
   attachWatchdogInterrupt(NULL);
-  
+ 
+  _oldTimerFq=0;
 }
   
 /**
@@ -241,3 +243,13 @@ int DSOADC::pollingRead()
 #endif  
 }
 
+/**
+ * 
+ * @return 
+ */
+bool    DSOADC::setupDmaSampling()
+{   
+  ADC_TIMER.pause();
+  setSource(ADC_SOURCE_SWSTART);  
+  return true;
+}

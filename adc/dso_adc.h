@@ -171,7 +171,8 @@ public:
             void stopTimeCapture();
     static  void getRegisters();
             void resetStats();
-              
+            bool setupTimerSampling();
+            bool setupDmaSampling();
 protected:
             int             _pin;
             int             _sampled;
@@ -180,6 +181,7 @@ protected:
             bool            _triggered;
             TriggerState    _triggerState;
             int             _triggerValueADC;
+            int             _oldTimerFq;
   static    ADC_CAPTURE_MODE     _dual;
             ADC_TRIGGER_SOURCE _source; // source of sampling signal : SWSTART or Timer
 public:            

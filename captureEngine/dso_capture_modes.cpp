@@ -22,6 +22,8 @@ const CaptureFunctionTable TimerTableTrigger=
     DSOCapturePriv::startCaptureTimerTrigger,
     DSOCapturePriv::taskletTimer,
     DSOCapturePriv::nextCaptureTimerTrigger,
+    DSOCapturePriv::initOnceTimerTrigger,
+    
 };
 /**
  */
@@ -34,6 +36,7 @@ const CaptureFunctionTable DmaTableTrigger=
     DSOCapturePriv::startCaptureDmaTrigger,
     DSOCapturePriv::taskletDma,
     DSOCapturePriv::nextCaptureDmaTrigger,
+    DSOCapturePriv::initOnceDmaTrigger,
 };
 /**
  */
@@ -46,6 +49,7 @@ const CaptureFunctionTable TimerTableRunning=
     DSOCapturePriv::startCaptureTimer,
     DSOCapturePriv::taskletTimer,
     DSOCapturePriv::nextCaptureTimer,
+    DSOCapturePriv::initOnceTimerRunning,
 };
 /**
  */
@@ -58,6 +62,7 @@ const CaptureFunctionTable DmaTableRunning=
     DSOCapturePriv::startCaptureDma,
     DSOCapturePriv::taskletDmaRunning,
     DSOCapturePriv::nextCaptureDma,
+    DSOCapturePriv::initOnceDmaRunning,
 };
 /**
  */
@@ -101,6 +106,7 @@ bool     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE timeBase)
             currentTable=&TimerTableRunning;                
         DSOCapturePriv::currentTimeBase=timeBase-DSO_TIME_BASE::SLOWER_FAST_MODE-1;
     }
+    currentTable->initOnce();
     return true;
 }
 /**

@@ -22,6 +22,7 @@ typedef struct
     bool                        (*startCapture) (int count);
     bool                        (*tasklet)();
     bool                        (*nextCapture)(int count);
+    bool                        (*initOnce)(void);
 }CaptureFunctionTable;
 
 /*
@@ -82,6 +83,11 @@ public:
     static bool        startCapture (int count);    
     static void        InternalStopCapture();
     static bool        getSamples(CapturedSet **set,int timeoutMs);
+    static bool        initOnceDmaRunning();
+    static bool        initOnceDmaTrigger();
+    static bool        initOnceTimerRunning();
+    static bool        initOnceTimerTrigger();
+    
 protected:
     
 public:

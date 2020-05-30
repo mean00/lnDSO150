@@ -93,55 +93,39 @@ bool DSOADC::startInternalDmaSampling ()
   lastStartedCR2=ADC1->regs->CR2;
   return true;
 }
-int nbHandler4=0;
-void handler4(void)
-{
-    nbHandler4++;
-    lastStartedCR2=ADC1->regs->CR2;
-    lastStartedCR1=ADC1->regs->CR1;
-    lastStartedSR=ADC1->regs->SR;
+/**
+ * 
+ * @return 
+ */
+bool    DSOADC::setupTimerSampling()
+{   
+  ADC_TIMER.pause();
+  ADC_TIMER.setChannel1Mode(TIMER_OUTPUT_COMPARE); //TIMER_OUTPUT_COMPARE);
+  ADC_TIMER.setMasterModeTrGo(TIMER_CR2_MMS_UPDATE); //TIMER_CR2_MMS_UPDATE); 
+  setSource(ADC_SOURCE_TIMER);    
+  setTimeScale(ADC_SMPR_7_5,DSOADC::ADC_PRESCALER_2); // slow enough sampling FQ, no need to be faster
+  _oldTimerFq=0;
+  return true;
 }
-  /**
-  * 
-  * @param count
-  * @return 
-  */
-void time1Irq()
-{
-    
-}
+
+/**
+ * 
+ * @param fq
+ * @return 
+ */
 bool    DSOADC::prepareTimerSampling (int fq)
 {   
-    int base=100; 
-#define TIMER ADC_TIMER
-
+  ADC_TIMER.pause();
+  if(fq!=_oldTimerFq)
+  {
     int  samplePeriodus =     1000000*10 / fq;
-
-  TIMER.pause();
-  TIMER.setPeriod(samplePeriodus/10);  
-  TIMER.setChannel1Mode(TIMER_OUTPUT_COMPARE); //TIMER_OUTPUT_COMPARE);
-  TIMER.setMasterModeTrGo(TIMER_CR2_MMS_UPDATE); //TIMER_CR2_MMS_UPDATE);
-  int ov=TIMER.getOverflow();
-  TIMER.setCompare1(ov-1);
-  TIMER.attachCompare1Interrupt(time1Irq);
-  TIMER.refresh();
-
-#if 0  
-    ADC_TIMER.pause();
-    ADC_TIMER.setMode(ADC_TIMER_CHANNEL,TIMER_OUTPUT_COMPARE);    
-    ADC_TIMER.setCount(0);    
-    ADC_TIMER.setPrescaleFactor(18);     // 1Mhz clock
-    ADC_TIMER.setOverflow(base);    
-    ADC_TIMER.setCompare(ADC_TIMER_CHANNEL, base-1);   // somewhere in the middle
-    ADC_TIMER.attachCompare1Interrupt(handler4);
-    //bitSet(ADC_TIMER.c_dev()->regs.adv->SMCR, TIMER_SMCR_MSM_BIT);
-    ADC_TIMER.setMasterModeTrGo(TIMER_CR2_MMS_COMPARE_OC2REF*0+1*TIMER_CR2_MMS_UPDATE);
+    ADC_TIMER.setPeriod(samplePeriodus/10);  
+    int ov=ADC_TIMER.getOverflow();
+    ADC_TIMER.setCompare1(ov-1);
     ADC_TIMER.refresh();
-
-#endif    
-    setTimeScale(ADC_SMPR_7_5,DSOADC::ADC_PRESCALER_2); // slow enough sampling FQ, no need to be faster
-    setSource(ADC_SOURCE_TIMER);    
-    return true;    
+    _oldTimerFq=fq;
+  }
+  return true;    
 }
 /**
  * 
@@ -159,10 +143,6 @@ bool DSOADC::startTimerSampling (int count)
     currentIndex=0;    
     FancyInterrupts::disable();    
     captureState=Capture_armed;   
-    
-   
-
-
     startInternalDmaSampling();           
     FancyInterrupts::enable();
     return true;

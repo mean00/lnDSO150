@@ -451,4 +451,22 @@ void DSOCapturePriv::reigniteDmaCommon(const bool trigger)
     adc->restartDmaTriggerCapture();
 }
 #endif
+/**
+ * 
+ * @return 
+ */
+bool          DSOCapturePriv::initOnceDmaRunning()
+{
+    adc->setupDmaSampling();
+    return true;
+}
+/**
+ * 
+ * @return 
+ */
+bool          DSOCapturePriv::initOnceDmaTrigger()
+{
+    adc->setupDmaSampling();
+    return true;
+}
 // EOF
