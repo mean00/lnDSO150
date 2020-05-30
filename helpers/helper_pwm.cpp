@@ -79,8 +79,11 @@ bool setTimerFrequency(HardwareTimer *timer, int channel, int periodOnPs, int pe
  */
 bool setTimerFrequency(HardwareTimer *timer, int channel, int frequency)
 {  
+/*    
+    timer->setPeriod(1000000/frequency);
+    return true;
+ * */
     timer->pause();
-    
     float fq=frequency;
         
     
@@ -97,14 +100,12 @@ bool setTimerFrequency(HardwareTimer *timer, int channel, int frequency)
         count=iratio/(1024*scale);
     }
     timer->setPrescaleFactor(scale);         
-    count=F_CPU/((float)scale*frequency);
-    
-    
+    count=((int)(F_CPU/((float)scale*frequency))+1)&~1;
     timer->setCount(0);
     timer->setOverflow(count);
     timer->setCompare(channel,count/2); // square output for now
     timer->refresh();
-    timer->resume();
+
     return true;
 }
 

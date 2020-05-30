@@ -105,17 +105,21 @@ void DSOADC::setChannel(int channel)
 bool DSOADC::setSource(const ADC_TRIGGER_SOURCE source)
 {
     _source=source;
+    setSourceInternal();
     return true;
 }
-
+/**
+ * 
+ * @return 
+ */
 bool DSOADC::setSourceInternal()
 {
    cr2=ADC1->regs->CR2;  
    cr2 &=~ ADC_CR2_EXTSEL_SWSTART;
-   ADC2->regs->CR2=cr2;
+   ADC1->regs->CR2=cr2;
    cr2 |= ((int)_source) << 17;
-   ADC2->regs->CR2=cr2;         
-   cr2=ADC2->regs->CR2;
+   ADC1->regs->CR2=cr2;         
+   cr2=ADC1->regs->CR2;
    return true;
 }
 /**
@@ -478,7 +482,7 @@ void DSOADC::setWatchdogTriggerValue(uint32_t high, uint32_t low)
  uint16_t directADC2Read(int pin)
  {
 #if 0
-    adc_reg_map *regs=  ADC2->regs; //PIN_MAP[COUPLING_PIN].adc_device.regs;
+    volatile adc_reg_map *regs=  ADC2->regs; //PIN_MAP[COUPLING_PIN].adc_device.regs;
     adc_set_reg_seqlen(ADC2, 1);
 
     regs->SQR3 = pin;

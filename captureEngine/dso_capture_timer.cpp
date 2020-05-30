@@ -122,9 +122,11 @@ bool DSOCapturePriv::taskletTimer()
     int fint=computeFrequency(fset.set1.samples,fset.set1.data);
     if(fint)
     {
-            float f=fint;    
-            f=(float)(tSettings[currentTimeBase].fqInHz)*1000./f;
+            float f=fint;
+            f=((float)timerBases[currentTimeBase].fq)*1000./f;
             set->stats.frequency=f;
+            set->stats.trigger=120;
+
     }else  
     {
          set->stats.frequency=0;
