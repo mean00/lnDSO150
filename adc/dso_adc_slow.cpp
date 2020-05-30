@@ -118,12 +118,16 @@ bool    DSOADC::prepareTimerSampling (int fq)
   ADC_TIMER.pause();
   if(fq!=_oldTimerFq)
   {
-    int  samplePeriodus =     1000000*10 / fq;
-    ADC_TIMER.setPeriod(samplePeriodus/10);  
-    int ov=ADC_TIMER.getOverflow();
-    ADC_TIMER.setCompare1(ov-1);
-    ADC_TIMER.refresh();
-    _oldTimerFq=fq;
+      int scaler=F_CPU/(fq*65535);
+      scaler+=1;
+      int high=F_CPU/scaler;
+      int overFlow=(high+fq/2)/fq;
+      ADC_TIMER.pause();
+      ADC_TIMER.setPrescaleFactor(scaler);
+      ADC_TIMER.setOverflow(overFlow);
+      ADC_TIMER.setCompare1(overFlow-1);
+      ADC_TIMER.refresh();     
+      _oldTimerFq=fq;
   }
   return true;    
 }

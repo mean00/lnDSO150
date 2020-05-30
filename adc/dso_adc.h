@@ -171,8 +171,8 @@ public:
             void stopTimeCapture();
     static  void getRegisters();
             void resetStats();
-            bool setupTimerSampling();
-            bool setupDmaSampling();
+            bool setupTimerSampling(); // this is to be called once when switching from DMA to timer
+            bool setupDmaSampling();   // same when switching back
 protected:
             int             _pin;
             int             _sampled;
@@ -181,7 +181,7 @@ protected:
             bool            _triggered;
             TriggerState    _triggerState;
             int             _triggerValueADC;
-            int             _oldTimerFq;
+            int             _oldTimerFq; // old timer frequency value
   static    ADC_CAPTURE_MODE     _dual;
             ADC_TRIGGER_SOURCE _source; // source of sampling signal : SWSTART or Timer
 public:            
