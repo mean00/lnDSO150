@@ -19,7 +19,7 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  * Vref is using PWM mode for Timer4/Channel 3
  * 
  */
-#define ADC_MAX 0xfff // 12 bits
+
 
 
 // Grab the samples from the ADC
@@ -176,8 +176,7 @@ void DSOADC::DMA1_CH1_TriggerEvent()
 {
 
     if(instance->awdTriggered())
-    {
-        
+    {   
         enableDisableIrq(false);
         adc_dma_disable(ADC1);       
         SampleSet one(ADC_INTERNAL_BUFFER_SIZE,adcInternalBuffer),two(0,NULL);
@@ -185,29 +184,11 @@ void DSOADC::DMA1_CH1_TriggerEvent()
     }
     else
     {
-        
         nextAdcDmaTransfer(requestedSamples,adcInternalBuffer);
-        //setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_TriggerEvent );
     }
     
     
 }
-#if 0
-/**
- * 
- */
-void DSOADC::restartDmaTriggerCapture() 
-{   
-    // Re-enable AWD interupt
-    adcInterruptStats.adcEOC=0;
-    adcInterruptStats.eocTriggered=0;
-    adcInterruptStats.eocIgnored=0;
-    enableDisableIrq(false);
-    enableDisableIrqSource(true,ADC_AWD);    
-    setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_TriggerEvent );    
-    enableDisableIrq(true);
-}
-#endif
 //
 
   

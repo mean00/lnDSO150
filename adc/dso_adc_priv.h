@@ -102,3 +102,5 @@ extern FancySemaphore      *dmaSemaphore;
 
 extern void  SPURIOUS_INTERRUPT();
 extern voidFuncPtr adcIrqHandler;
+
+#define ADC_MAX 0xfff // 12 bits

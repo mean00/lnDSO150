@@ -481,7 +481,7 @@ void DSOADC::setWatchdogTriggerValue(uint32_t high, uint32_t low)
  */
  uint16_t directADC2Read(int pin)
  {
-#if 0
+
     volatile adc_reg_map *regs=  ADC2->regs; //PIN_MAP[COUPLING_PIN].adc_device.regs;
     adc_set_reg_seqlen(ADC2, 1);
 
@@ -490,8 +490,6 @@ void DSOADC::setWatchdogTriggerValue(uint32_t high, uint32_t low)
     while (!(regs->SR & ADC_SR_EOC))
         ;
     return regs->DR&0xffff;
-#endif
-    return 0;
  }
  
 //

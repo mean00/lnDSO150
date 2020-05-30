@@ -218,14 +218,22 @@ uint32_t DSOADC::getVCCmv()
  */
 int DSOADC::pollingRead()
 {
-#if 0
-  // deactivate DMA
+  
+  
   adc_reg_map *regs=ADC1->regs;
   
   uint32_t oldCr2=regs->CR2;
   
   cr2=regs->CR2;
   cr2&= ~(ADC_CR2_SWSTART+ADC_CR2_CONT+ADC_CR2_DMA);   
+  // Set source to SWSTART
+   cr2=ADC1->regs->CR2;  
+   cr2 &=~ ADC_CR2_EXTSEL_SWSTART;
+   ADC1->regs->CR2=cr2;
+   cr2 |= ((int)ADC_CR2_EXTSEL_SWSTART) << 17;
+   ADC1->regs->CR2=cr2;         
+   cr2=ADC1->regs->CR2;
+  
   regs->CR2=cr2;
   // then poll
   cr2|=ADC_CR2_SWSTART;
@@ -238,9 +246,6 @@ int DSOADC::pollingRead()
   uint16_t val= (uint16)(regs->DR & ADC_DR_DATA);
   regs->CR2=oldCr2;
   return val;
-#else
-  return 0;
-#endif  
 }
 
 /**
