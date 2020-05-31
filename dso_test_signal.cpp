@@ -9,6 +9,7 @@
 #include "helpers/helper_pwm.h"
 /**
  */
+
 testSignal::testSignal(int pin,int pinAmp)
 {
     this->pinAmp=pinAmp;
@@ -17,15 +18,22 @@ testSignal::testSignal(int pin,int pinAmp)
     pinMode(pin,PWM); 
     setAmplitude(true);
     setFrequency(1000);  
-    timer_set_mode(Timer1.c_dev(),1,  TIMER_PWM );
-    timer_set_mode(Timer3.c_dev(),2,  TIMER_PWM );
+#if 0
+    timer_dev *dev=Timer1.c_dev();
+    int channel;
+    *bb_perip(&(dev->regs).gen->CCER, 4 * (channel - 1)) = 1; // Disable normal & enable complimentary & regular
+    *bb_perip(&(dev->regs).gen->CCER, 4 * (channel - 1)+2) = 1;
+    *bb_perip(&(dev->regs).gen->CCER, 4 * (channel - 1)+3) = *bb_perip(&(dev->regs).gen->CCER, 4 * (channel - 1)+1);
+    Timer1.pause();
+    Timer1.refresh();
+    Timer1.resume();
+#endif
 }
 /**
  */
  bool testSignal::setFrequency(int fq)
  {
     setPWMPinFrequency(&Timer1,1, fq);
-    setPWMPinFrequency(&Timer3,2, fq);
     return true;
 }
  /**
