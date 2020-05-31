@@ -73,7 +73,8 @@ bool       DSOCapturePriv:: startCaptureTimer (int count)
 bool       DSOCapturePriv:: startCaptureTimerTrigger (int count)
 {
     lastAskedSampleCount=count;
-    return adc->startTriggeredTimerSampling(count,triggerValueADC);
+    lastRequested=ADC_INTERNAL_BUFFER_SIZE-2;
+    return adc->startTriggeredTimerSampling(lastRequested,triggerValueADC);
 }
 /**
  */

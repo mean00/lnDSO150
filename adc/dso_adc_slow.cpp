@@ -142,8 +142,8 @@ bool    DSOADC::prepareTimerSampling (int fq)
 bool DSOADC::startTimerSampling (int count)
 {
 
-   if(count>ADC_INTERNAL_BUFFER_SIZE/2)
-        count=ADC_INTERNAL_BUFFER_SIZE/2;
+   if(count>ADC_INTERNAL_BUFFER_SIZE)
+        count=ADC_INTERNAL_BUFFER_SIZE;
     requestedSamples=count;
 
     currentIndex=0;    
