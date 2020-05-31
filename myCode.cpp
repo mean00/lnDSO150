@@ -46,15 +46,15 @@ void vApplicationDaemonTaskStartupHook(void);
 
 
 void mySetup() 
-{
-   // Remap some pins :
-   // Use TIM1 alternate partial remap so that PA7 is connected to TIM1C1N => TIM3 is free for the ADC
-   uint32_t map=  AFIO_BASE->MAPR;
-   map&=0x1fff3f; 
-   map|=2<<24; // Enable SWD, disable jtag 
-   map|=1<<6;  // TIM1 partial remap
-   AFIO_BASE->MAPR= map;
-   //afio_cfg_debug_ports( AFIO_DEBUG_SW_ONLY); // Unlock PB3 & PB4
+{   
+   afio_cfg_debug_ports( AFIO_DEBUG_SW_ONLY); // Unlock PB3 & PB4
+#if 0
+    __IO uint32 *mapr = &AFIO_BASE->MAPR;
+    uint32_t r=*mapr;
+    r=r & ~AFIO_MAPR_SWJ_CFG;
+    r|=AFIO_DEBUG_SW_ONLY;
+    *mapr=r;
+#endif
 #ifdef     USE_RXTX_PIN_FOR_ROTARY // Use Serial only if we have USB
     Serial.begin(115200);
     Serial.println("Init"); 
