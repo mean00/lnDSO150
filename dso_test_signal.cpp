@@ -7,6 +7,9 @@
 #include "SPI.h"
 #include "dso_test_signal.h"
 #include "helpers/helper_pwm.h"
+#include "MapleFreeRTOS1000.h"
+#include "MapleFreeRTOS1000_pp.h"
+
 /**
  */
 
@@ -33,7 +36,12 @@ testSignal::testSignal(int pin,int pinAmp)
  */
  bool testSignal::setFrequency(int fq)
  {
-    setPWMPinFrequency(&Timer1,1, fq);
+     HardwareTimer *t=NULL;
+     if((PIN_MAP[pinSignal].timer_device==Timer1.c_dev())) t=&Timer1;
+     else if((PIN_MAP[pinSignal].timer_device==Timer3.c_dev())) t=&Timer3;
+     else xAssert(0);    
+         
+    setPWMPinFrequency(t,PIN_MAP[pinSignal].timer_channel, fq);
     return true;
 }
  /**
