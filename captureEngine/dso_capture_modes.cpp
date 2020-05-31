@@ -20,7 +20,7 @@ const CaptureFunctionTable TimerTableTrigger=
     DSOCapturePriv::prepareSamplingTimer,
     DSOCapturePriv::getTimeBaseAsTextTimer,
     DSOCapturePriv::startCaptureTimerTrigger,
-    DSOCapturePriv::taskletTimer,
+    DSOCapturePriv::taskletTimerTrigger,
     DSOCapturePriv::nextCaptureTimerTrigger,
     DSOCapturePriv::initOnceTimerTrigger,
     

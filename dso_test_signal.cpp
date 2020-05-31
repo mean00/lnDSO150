@@ -17,12 +17,15 @@ testSignal::testSignal(int pin,int pinAmp)
     pinMode(pin,PWM); 
     setAmplitude(true);
     setFrequency(1000);  
+    timer_set_mode(Timer1.c_dev(),1,  TIMER_PWM );
+    timer_set_mode(Timer3.c_dev(),2,  TIMER_PWM );
 }
 /**
  */
  bool testSignal::setFrequency(int fq)
  {
-    setPWMPinFrequency(pinSignal, fq);
+    setPWMPinFrequency(&Timer1,1, fq);
+    setPWMPinFrequency(&Timer3,2, fq);
     return true;
 }
  /**

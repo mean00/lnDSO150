@@ -49,10 +49,11 @@ void DSOADC::getRegisters(void)
        reg[i]=p[i]; 
     }
 }
-
-bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
+/**
+ */
+bool DSOADC::commonTrigger (int count,uint32_t triggerValueADC)
 {
-  // This loop uses dual interleaved mode to get the best performance out of the ADCs
+    // This loop uses dual interleaved mode to get the best performance out of the ADCs
   //
   enableDisableIrq(false);
   
@@ -110,15 +111,28 @@ bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
   
   attachWatchdogInterrupt(DSOADC::watchDogInterrupt);  
   
-  ADC1->regs->SR=0;
+  ADC1->regs->SR=0; 
+  return true;
+}
+/**
+ * 
+ * @param count
+ * @param triggerValueADC
+ * @return 
+ */
+bool DSOADC::startDMATriggeredSampling (int count,int triggerValueADC)
+{
+  commonTrigger(count,triggerValueADC);
   bool dual=false;
   if(_dual!=DSOADC::ADC_CAPTURE_MODE_NORMAL)
   {
-        setupAdcDualDmaTransfer( _pin, requestedSamples,(uint32_t *)adcInternalBuffer, DMA1_CH1_TriggerEvent );
+        setupAdcDualDmaTransfer( _pin, requestedSamples,(uint32_t *)adcInternalBuffer, DMA1_CH1_TriggerEvent,true );
         dual=true;
   }
   else
-        setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_TriggerEvent );  
+  {
+        setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_TriggerEvent,true );  
+  }
   enableDisableIrqSource(true,ADC_AWD);    
   enableDisableIrq(true);
   if(dual)
@@ -181,12 +195,7 @@ void DSOADC::DMA1_CH1_TriggerEvent()
         adc_dma_disable(ADC1);       
         SampleSet one(ADC_INTERNAL_BUFFER_SIZE,adcInternalBuffer),two(0,NULL);
         instance->captureComplete(one,two);
-    }
-    else
-    {
-        nextAdcDmaTransfer(requestedSamples,adcInternalBuffer);
-    }
-    
+    }  
     
 }
 //

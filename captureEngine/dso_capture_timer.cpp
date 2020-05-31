@@ -64,6 +64,7 @@ bool        DSOCapturePriv::nextCaptureTimerTrigger(int count)
  */
 bool       DSOCapturePriv:: startCaptureTimer (int count)
 {    
+    lastAskedSampleCount=count;
     return adc->startTimerSampling(count);
 }
 /**
@@ -71,11 +72,12 @@ bool       DSOCapturePriv:: startCaptureTimer (int count)
  */
 bool       DSOCapturePriv:: startCaptureTimerTrigger (int count)
 {
+    lastAskedSampleCount=count;
     return adc->startTriggeredTimerSampling(count,triggerValueADC);
 }
 /**
  */
-bool DSOCapturePriv::taskletTimer()
+bool DSOCapturePriv::taskletTimerCommon(bool trigger)
 {    
     FullSampleSet fset; // Shallow copy
     int16_t *p;    
@@ -96,9 +98,10 @@ bool DSOCapturePriv::taskletTimer()
     set->stats.frequency=-1;
     float *data=set->data;    
     p=((int16_t *)fset.set1.data);
-#if 0    
+
     if(trigger)
     {
+        int needed=lastAskedSampleCount;
         bool triggerFound=refineCapture(fset,needed);
         if(!triggerFound)
         {
@@ -106,7 +109,6 @@ bool DSOCapturePriv::taskletTimer()
             return false;
         }        
     }
-#endif    
     set->stats.trigger=120; // right in the middle
     p=((int16_t *)fset.set1.data);
     set->samples=transformDmaExact(      INDEX_AC1_DC0(),
@@ -134,6 +136,14 @@ bool DSOCapturePriv::taskletTimer()
     // Data ready!
     captureSemaphore->give();
     return true;
+}
+bool DSOCapturePriv::taskletTimer()
+{
+    return   taskletTimerCommon(false);
+}
+bool DSOCapturePriv::taskletTimerTrigger()
+{
+    return   taskletTimerCommon(true);
 }
 
 /**

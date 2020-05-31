@@ -56,7 +56,8 @@ public:
     static bool        taskletDma();
     static bool        taskletDmaRunning();
     static bool        taskletDmaCommon(const bool trigger);
-    
+    static bool        taskletTimerCommon(bool trigger);
+    static bool        taskletTimerTrigger();
     static bool        taskletTimer();
     static void        task(void *);
     static bool        startCaptureDma (int count);

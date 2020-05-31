@@ -62,7 +62,7 @@ void testAdcWatchdog(void)
     done=false;
     mikro=micros();
 
-    DSOADC::setupAdcDmaTransfer(   240,buffer, dmaInterrupt )   ;        
+    DSOADC::setupAdcDmaTransfer(   240,buffer, dmaInterrupt,false )   ;        
     
     while(1)
     {
@@ -73,7 +73,7 @@ void testAdcWatchdog(void)
         }
         done=false;
         DSOADC::adc_dma_disable(ADC1);
-        DSOADC::setupAdcDmaTransfer( 240,buffer,dmaInterrupt)  ;
+        DSOADC::setupAdcDmaTransfer( 240,buffer,dmaInterrupt,false)  ;
         
         tft->fillScreen(0);
         tft->setCursor(240, 100);

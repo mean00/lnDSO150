@@ -131,10 +131,11 @@ public:
                         };
             bool     getTriggerState();
             bool     setVrefPWM(int ratio); // Trigger 
-            void     setupAdcDualDmaTransfer( int otherPin,  int count,uint32_t *buffer, void (*handler)(void) );
+            void     setupAdcDualDmaTransfer( int otherPin,  int count,uint32_t *buffer, void (*handler)(void) ,bool circular);
 
             bool startDMASampling (const int count);
             bool startDMATriggeredSampling (const int count, int ADCTriggerValue);
+            bool commonTrigger (int count,uint32_t triggerValueADC);
             bool startTimerSampling (int count);
             bool startTriggeredTimerSampling (int count,uint32_t triggerADC);
     static  void clearSamples();
@@ -156,7 +157,7 @@ protected:
             
             bool validateAverageSample(uint32_t &avg);    
 public:        
-    static void setupAdcDmaTransfer(   int count,uint16_t *buffer, void (*handler)(void) );
+    static void setupAdcDmaTransfer(   int count,uint16_t *buffer, void (*handler)(void),bool circular );
     static void nextAdcDmaTransfer( int count,uint16_t *buffer);
 
     static void enableDisableIrqSource(bool onoff, int interruptMask);

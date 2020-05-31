@@ -87,14 +87,16 @@ bool DSOADC::startInternalDmaSampling ()
 {
   //  slow is always single channel
   ADC1->regs->CR1&=~ADC_CR1_DUALMASK;
-  setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_Event );
+  setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_Event,false );
+  
   startDMATime();
+  volatile uint32_t s =ADC1->regs->DR;
   ADC_TIMER.resume();  
   lastStartedCR2=ADC1->regs->CR2;
   return true;
 }
 /**
- * 
+ *  This is called only once when we change mode
  * @return 
  */
 bool    DSOADC::setupTimerSampling()
@@ -151,8 +153,6 @@ bool DSOADC::startTimerSampling (int count)
     FancyInterrupts::enable();
     return true;
 } 
-#include "dso_adc_slow_trigger.cpp"
-
 
 // EOF
 
