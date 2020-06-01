@@ -10,35 +10,14 @@
 #include "dso_adc_priv.h"
 #include "fancyLock.h"
 #include "helpers/helper_pwm.h"
-
-
 /**
  */
-
 uint32_t lastStartedCR2=0;
 uint32_t lastStartedCR1=0;
 uint32_t lastStartedSR;
 //
-extern adc_reg_map *adc_Register;
 
 CaptureState captureState=Capture_idle;
-/**
- */
-extern int                  requestedSamples;
-extern DSOADC               *instance;
-       int                  currentIndex=0;
-int spuriousTimer=0;
-
-int nbSlowCapture=0;
-static int skippedDma=0;
-int nbTimer=0;
-static int nbDma=0;
-
-
-
- uint16_t dmaOverSampleBuffer[DMA_OVERSAMPLING_COUNT] __attribute__ ((aligned (8)));;
-extern void Oopps();
-
 
 /**
  * 
@@ -71,7 +50,7 @@ bool DSOADC::startDMATime()
   setSourceInternal();   
   cr2|=ADC_CR2_CONT*USE_CONT+ADC_CR2_DMA;    
   ADC1->regs->CR2=cr2;    
-#if 1  
+#if 0  
   cr2|= ADC_CR2_SWSTART;   
   ADC1->regs->CR2=cr2;    
 #endif  
@@ -147,7 +126,6 @@ bool DSOADC::startTimerSampling (int count)
         count=ADC_INTERNAL_BUFFER_SIZE;
     requestedSamples=count;
 
-    currentIndex=0;    
     FancyInterrupts::disable();    
     captureState=Capture_armed;   
     startInternalDmaSampling();           
