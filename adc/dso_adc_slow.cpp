@@ -102,8 +102,8 @@ bool DSOADC::startInternalDmaSampling ()
 bool    DSOADC::setupTimerSampling()
 {   
   ADC_TIMER.pause();
-  ADC_TIMER.setChannel1Mode(TIMER_OUTPUT_COMPARE); //TIMER_OUTPUT_COMPARE);
-  ADC_TIMER.setMasterModeTrGo(TIMER_CR2_MMS_UPDATE); //TIMER_CR2_MMS_UPDATE); 
+  //ADC_TIMER.setChannel1Mode(TIMER_OUTPUT_COMPARE); //TIMER_OUTPUT_COMPARE);
+  //ADC_TIMER.setMasterModeTrGo(TIMER_CR2_MMS_UPDATE); //TIMER_CR2_MMS_UPDATE); 
   setSource(ADC_SOURCE_TIMER);    
   setTimeScale(ADC_SMPR_7_5,DSOADC::ADC_PRESCALER_2); // slow enough sampling FQ, no need to be faster
   _oldTimerFq=0;
@@ -124,12 +124,13 @@ bool    DSOADC::prepareTimerSampling (int fq)
       scaler+=1;
       int high=F_CPU/scaler;
       int overFlow=(high+fq/2)/fq;
-      ADC_TIMER.pause();
-      ADC_TIMER.setPrescaleFactor(scaler);
-      ADC_TIMER.setOverflow(overFlow);
-      ADC_TIMER.setCompare1(overFlow-1);
-      ADC_TIMER.refresh();     
-      _oldTimerFq=fq;
+
+        ADC_TIMER.pause();
+        ADC_TIMER.setPrescaleFactor(scaler);
+        ADC_TIMER.setOverflow(overFlow);
+        ADC_TIMER.setCompare(ADC_TIMER_CHANNEL,overFlow-1);
+        timer_cc_enable(ADC_TIMER.c_dev(), ADC_TIMER_CHANNEL);
+        _oldTimerFq=fq;
   }
   return true;    
 }

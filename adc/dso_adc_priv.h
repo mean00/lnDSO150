@@ -3,14 +3,14 @@
 //
 #pragma once
 
-#if 1
+#if 0
     #define ADC_TIMER         Timer3 // Timer3
     #define ADC_TIMER_CHANNEL TIMER_CH2
     #define ADC_SOURCE_TIMER  ADC_SOURCE_TIMER_3_TRGO //ADC_SOURCE_TIMER_2_CHANNEL2
 #else
-    #define ADC_TIMER         Timer2 // Timer2
-    #define ADC_TIMER_CHANNEL TIMER_CH2
-    #define ADC_SOURCE_TIMER  ADC_SOURCE_TIMER_2_CHANNEL2 //ADC_SOURCE_TIMER_2_CHANNEL2
+    #define ADC_TIMER         Timer4 // Timer2
+    #define ADC_TIMER_CHANNEL TIMER_CH4
+    #define ADC_SOURCE_TIMER  ADC_SOURCE_TIMER_4_CHANNEL4 //ADC_SOURCE_TIMER_2_CHANNEL2 //ADC_SOURCE_TIMER_2_CHANNEL2
 #endif
 
 #ifndef ADC_CR1_FASTINT
