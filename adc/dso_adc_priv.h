@@ -3,6 +3,9 @@
 //
 #pragma once
 
+
+#define OVERSAMPLING_FACTOR  4 // Used with gd32 chip
+
 #if 0
     #define ADC_TIMER         Timer3 // Timer3
     #define ADC_TIMER_CHANNEL TIMER_CH2

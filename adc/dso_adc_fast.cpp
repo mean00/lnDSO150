@@ -254,6 +254,9 @@ int DSOADC::pollingRead()
  */
 bool    DSOADC::setupDmaSampling()
 {   
+#ifdef HIGH_SPEED_ADC
+  setOverSamplingFactor(OVERSAMPLING_FACTOR);    
+#endif
   ADC_TIMER.pause();
   setSource(ADC_SOURCE_SWSTART);  
   return true;

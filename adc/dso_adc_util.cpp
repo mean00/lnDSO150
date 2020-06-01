@@ -47,6 +47,9 @@ struct rcc_reg_map_extended {
     // addition  : APB1 0xe4
 };
 
+#define GD_OVERSAMPLING_ENABLED 1
+#define GD_OVERSAMPLING_OVSR(x) (x<<2)
+#define GD_OVERSAMPLING_OVSS(x) (x<<5)
 
 HardwareTimer pwmtimer(4); // Vref PWM is Timer4 Channel3
 /**
@@ -496,5 +499,32 @@ void DSOADC::setWatchdogTriggerValue(uint32_t high, uint32_t low)
         ;
     return regs->DR&0xffff;
  }
- 
+#ifdef     HIGH_SPEED_ADC
+/**
+ * 
+ * @param overSamp
+ * @return 
+ */ 
+bool    DSOADC::setOverSamplingFactor  (int overSamp)
+{
+     __IO uint32 *ovr=(uint32_t *)(0x40012480);
+    
+    // set adc1 off
+    volatile adc_reg_map *regs=  ADC1->regs;       
+    regs->CR2&=~1; 
+    
+    switch(overSamp)
+    {
+        case 1:     *ovr=0;break; // oversampling off
+        case 4 :    *ovr=GD_OVERSAMPLING_ENABLED+GD_OVERSAMPLING_OVSR(1)+GD_OVERSAMPLING_OVSS(2); break; // shift 2 bits, x4
+        case 8 :    *ovr=GD_OVERSAMPLING_ENABLED+GD_OVERSAMPLING_OVSR(2)+GD_OVERSAMPLING_OVSS(3); break; // Shift 3 bits, x8
+        default:
+            xAssert(0);
+            break;
+    }
+    // adc on
+    regs->CR2 |=1;
+    return true;
+}
+#endif
 //
