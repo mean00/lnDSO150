@@ -84,7 +84,7 @@ bool    DSOADC::setupTimerSampling()
   //ADC_TIMER.setChannel1Mode(TIMER_OUTPUT_COMPARE); //TIMER_OUTPUT_COMPARE);
   //ADC_TIMER.setMasterModeTrGo(TIMER_CR2_MMS_UPDATE); //TIMER_CR2_MMS_UPDATE); 
   setSource(ADC_SOURCE_TIMER);    
-  setTimeScale(ADC_SMPR_7_5,DSOADC::ADC_PRESCALER_2); // slow enough sampling FQ, no need to be faster
+  setTimeScale(ADC_SMPR_239_5,DSOADC::ADC_PRESCALER_8); // slow enough sampling FQ, no need to be faster. This gives < 30 us sampling period, we are above 40 us
   _oldTimerFq=0;
   return true;
 }
