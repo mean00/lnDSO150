@@ -100,9 +100,8 @@ public:
 
   };
 public:
-#ifdef HIGH_SPEED_ADC  
-            bool    setOverSamplingFactor  (int overSamp);
-#endif
+
+            bool    setOverSamplingFactor  (int overSamp); // Does nothing on stm32
                     DSOADC(int pin);
             bool    setSource(const ADC_TRIGGER_SOURCE source);            
             bool    setADCPin(int pin);
