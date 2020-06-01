@@ -216,47 +216,9 @@ uint32_t DSOADC::getVCCmv()
  * 
  * @return 
  */
-int DSOADC::pollingRead()
-{
-  
-  
-  adc_reg_map *regs=ADC1->regs;
-  
-  uint32_t oldCr2=regs->CR2;
-  
-  cr2=regs->CR2;
-  cr2&= ~(ADC_CR2_SWSTART+ADC_CR2_CONT+ADC_CR2_DMA);   
-  // Set source to SWSTART
-   cr2=ADC1->regs->CR2;  
-   cr2 &=~ ADC_CR2_EXTSEL_SWSTART;
-   ADC1->regs->CR2=cr2;
-   cr2 |= ((int)ADC_CR2_EXTSEL_SWSTART) << 17;
-   ADC1->regs->CR2=cr2;         
-   cr2=ADC1->regs->CR2;
-  
-  regs->CR2=cr2;
-  // then poll
-  cr2|=ADC_CR2_SWSTART;
-  regs->CR2=cr2;
-  // wait for end of sampling  
-  while (!(regs->SR & ADC_SR_EOC))
-  {
-      
-  }      
-  uint16_t val= (uint16)(regs->DR & ADC_DR_DATA);
-  regs->CR2=oldCr2;
-  return val;
-}
-
-/**
- * 
- * @return 
- */
 bool    DSOADC::setupDmaSampling()
 {   
-#ifdef HIGH_SPEED_ADC
-  setOverSamplingFactor(OVERSAMPLING_FACTOR);    
-#endif
+  setOverSamplingFactor(1);    
   ADC_TIMER.pause();
   setSource(ADC_SOURCE_SWSTART);  
   return true;
