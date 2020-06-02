@@ -87,6 +87,7 @@ void header(int color,const char *txt,DSOControl::DSOCoupling target)
 static int averageADCRead()
 {
     // Start Capture
+    adc->setupTimerSampling(); // switch to time
     adc->prepareTimerSampling(1000); // 1Khz
     adc->startTimerSampling(200);
     FullSampleSet fset;
