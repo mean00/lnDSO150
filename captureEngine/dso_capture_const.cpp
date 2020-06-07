@@ -69,15 +69,19 @@ const TimeSettings tSettings[]
  */
 const TimerTimeBase timerBases[]
 {    
-    { DSOCapture::DSO_TIME_BASE_25US,   "25us", 960*1000    , false, ADC_SMPR_1_5,   DSOADC::ADC_PRESCALER_4 }, // 1 us / sample round up, error =0.3%%
-    { DSOCapture::DSO_TIME_BASE_50US,   "50us", 480*1000    , false, ADC_SMPR_13_5,  DSOADC::ADC_PRESCALER_6 }, // 2 us / sample => 0.5 with OS, no oversampling
-    { DSOCapture::DSO_TIME_BASE_100US,  "100us",240*1000    , true,  ADC_SMPR_28_5,  DSOADC::ADC_PRESCALER_6 },    // 4 us with os
-    { DSOCapture::DSO_TIME_BASE_500US,  "500us",48*1000     , true,  ADC_SMPR_41_5,  DSOADC::ADC_PRESCALER_6 },    // 500/24=> 20 us /sample => 5 us with over
+    { DSOCapture::DSO_TIME_BASE_25US,   "25us", 960*1000    , false, ADC_SMPR_13_5,  DSOADC::ADC_PRESCALER_2 }, // 1 us / sample round up, error =0.3%%
+    { DSOCapture::DSO_TIME_BASE_50US,   "50us", 480*1000    , false, ADC_SMPR_55_5,  DSOADC::ADC_PRESCALER_2 }, // 2 us / sample => 0.5 with OS, no oversampling
+    { DSOCapture::DSO_TIME_BASE_100US,  "100us",240*1000    , false, ADC_SMPR_55_5,  DSOADC::ADC_PRESCALER_4 },    // 100/24= 4 us , 1 us with os
+    { DSOCapture::DSO_TIME_BASE_500US,  "500us",48*1000     , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_4 },    // 500/24=> 20 us /sample => 5 us with over
+    
+    // 71.5  / 8 => 10us / sample
+    // 239.5 / 8 => 28 us / sample
+    
     { DSOCapture::DSO_TIME_BASE_1MS,    "1ms",  24*1000     , true,  ADC_SMPR_71_5,  DSOADC::ADC_PRESCALER_8 }, // 40 us / sample => 10 us with oversampling
-    { DSOCapture::DSO_TIME_BASE_5MS,    "5ms",  4800        , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8 },  // 200 is / sample => 50 us with os
-    { DSOCapture::DSO_TIME_BASE_10MS,   "10ms", 2400        , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8 },
-    { DSOCapture::DSO_TIME_BASE_50MS,   "50ms", 480         , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8},
-    { DSOCapture::DSO_TIME_BASE_100MS,  "100ms",240         , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8 },
-    { DSOCapture::DSO_TIME_BASE_500MS,  "500ms",48          , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8},
-    { DSOCapture::DSO_TIME_BASE_1S,     "1s",   24          , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8}    
+    { DSOCapture::DSO_TIME_BASE_5MS,    "5ms",  4800        , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8 }, // 200 us / sample => 50 us with os
+    { DSOCapture::DSO_TIME_BASE_10MS,   "10ms", 2400        , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8 }, // 400 us    **20
+    { DSOCapture::DSO_TIME_BASE_50MS,   "50ms", 480         , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8},  // 2 ms      **71
+    { DSOCapture::DSO_TIME_BASE_100MS,  "100ms",240         , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8 }, // 4 ms      **142
+    { DSOCapture::DSO_TIME_BASE_500MS,  "500ms",48          , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8},  // 20 ms     **714
+    { DSOCapture::DSO_TIME_BASE_1S,     "1s",   24          , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8}   // 40 ms     **1428
 };
