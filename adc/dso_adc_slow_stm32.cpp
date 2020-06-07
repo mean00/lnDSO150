@@ -20,8 +20,6 @@ bool    DSOADC::setupTimerSampling()
 {   
   ADC_TIMER.pause();
   setSource(ADC_SOURCE_TIMER);    
-// 239_5 =>This gives < 30 us sampling period, we are above 40 us  at 1ms/div
-  setTimeScale(ADC_SMPR_71_5,DSOADC::ADC_PRESCALER_8); 
   _oldTimerFq=0;
   return true;
 }
