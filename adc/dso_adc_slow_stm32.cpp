@@ -31,22 +31,25 @@ bool    DSOADC::setupTimerSampling()
  * @param fq
  * @return 
  */
-bool    DSOADC::prepareTimerSampling (int fq)
+bool    DSOADC::prepareTimerSampling (int fq,bool overSampling,adc_smp_rate rate , DSOADC::Prescaler scale)
 {   
   ADC_TIMER.pause();
   if(fq!=_oldTimerFq)
   {
-      int scaler=F_CPU/(fq*65535);
-      scaler+=1;
-      int high=F_CPU/scaler;
-      int overFlow=(high+fq/2)/fq;
+    _oldTimerFq=fq;
+    _timerSamplingRate=rate;
+    _timerScale=scale;
+    _overSampling=false;
+    int scaler=F_CPU/(fq*65535);
+    scaler+=1;
+    int high=F_CPU/scaler;
+    int overFlow=(high+fq/2)/fq;
 
-        ADC_TIMER.pause();
-        ADC_TIMER.setPrescaleFactor(scaler);
-        ADC_TIMER.setOverflow(overFlow);
-        ADC_TIMER.setCompare(ADC_TIMER_CHANNEL,overFlow-1);
-        timer_cc_enable(ADC_TIMER.c_dev(), ADC_TIMER_CHANNEL);
-        _oldTimerFq=fq;
+    ADC_TIMER.pause();
+    ADC_TIMER.setPrescaleFactor(scaler);
+    ADC_TIMER.setOverflow(overFlow);
+    ADC_TIMER.setCompare(ADC_TIMER_CHANNEL,overFlow-1);
+    timer_cc_enable(ADC_TIMER.c_dev(), ADC_TIMER_CHANNEL);
   }
   return true;    
 }

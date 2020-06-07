@@ -17,8 +17,9 @@ extern int transformDmaExact(int dc0_ac1,int16_t *in, float *out,int count, Capt
  * @return 
  */
 bool DSOCapturePriv::prepareSamplingTimer()
-{
-    return adc->prepareTimerSampling(timerBases[currentTimeBase].fq);
+{ 
+    const TimerTimeBase &t=timerBases[currentTimeBase];
+    return adc->prepareTimerSampling(t.fq,t.overSampling,t.rate,t.scale);
 }
 
 /**

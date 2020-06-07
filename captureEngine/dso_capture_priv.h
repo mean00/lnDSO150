@@ -34,6 +34,9 @@ typedef struct TimerTimeBase
   DSOCapture::DSO_TIME_BASE timeBase;
   const char    *name;
   int           fq;  
+  bool          overSampling;
+  adc_smp_rate  rate ;
+  DSOADC::Prescaler scale;
 };
 
 extern const TimerTimeBase  timerBases[];

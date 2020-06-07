@@ -29,6 +29,7 @@ extern testSignal *myTestSignal;
  */
 static int averageADCRead()
 {
+#if 0
     // Start Capture
     adc->prepareTimerSampling(500); // 1Khz
     adc->startTimerSampling(64);
@@ -44,7 +45,9 @@ static int averageADCRead()
         sum+=fset.set1.data[i];
     }
     sum=(sum+(nb/2)-1)/nb;
+    
     return sum;
+#endif
 }
 
 /**

@@ -40,47 +40,44 @@ VoltageSettings vSettings[NB_CAPTURE_VOLTAGE]= {
  *  */
 const TimeSettings tSettings[]
 {
-#ifdef       HIGH_SPEED_ADC    
-    
+#ifdef       HIGH_SPEED_ADC        
 // !!  96 Mhz clock !!
     #if F_CPU==96000000
-    {DSOADC::ADC_CAPTURE_SLOW_INTERLEAVED,"5us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2400000*2}, // Seems buggy !
-    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2400000},
-    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"25us",     DSOADC::ADC_PRESCALER_5,  ADC_SMPR_7_5,    4096,   960000},
-    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"50us",     DSOADC::ADC_PRESCALER_10, ADC_SMPR_7_5,    4096,   480000},
-    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"100us",    DSOADC::ADC_PRESCALER_20, ADC_SMPR_7_5,    4096,   240000},    
-    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"500us",    DSOADC::ADC_PRESCALER_8,  ADC_SMPR_239_5,  4063,    47619},    
+    {DSOADC::ADC_CAPTURE_SLOW_INTERLEAVED,"5us",      DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2400000*2}, // Seems buggy !
+    {DSOADC::ADC_CAPTURE_MODE_NORMAL,     "10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2400000},
+  
+ 
    #elif F_CPU==120000000 
 #error : We have to drop / duplicate too many samples at 120 Mhz, use 96!
     {false,"10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2564103},
-    {false,"25us",     DSOADC::ADC_PRESCALER_5,  ADC_SMPR_7_5,    4096,  1388889},
-    {false,"50us",     DSOADC::ADC_PRESCALER_10, ADC_SMPR_7_5,    4096,   529101},
-    {false,"100us",    DSOADC::ADC_PRESCALER_20, ADC_SMPR_7_5,    4096,   264550},    
-    {false,"500us",    DSOADC::ADC_PRESCALER_8,  ADC_SMPR_239_5,  4876,    71429},    
-           
+  
+         
     #else
         #error unsupported MCU frequency
     #endif
     
 #else // 72 Mhz clock
     {DSOADC::ADC_CAPTURE_FAST_INTERLEAVED, "5us",      DSOADC::ADC_PRESCALER_2,ADC_SMPR_1_5,   4390,   2564100*2},
-    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"10us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_1_5,   4390,   2564100},
-    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"25us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_28_5,  3747,   877193},
-    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"50us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_55_5,  4496,   529100},
-    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"100us",    DSOADC::ADC_PRESCALER_4,ADC_SMPR_55_5,  4517,   264550},    
-    {DSOADC::ADC_CAPTURE_MODE_NORMAL,"500us",    DSOADC::ADC_PRESCALER_6,ADC_SMPR_239_5, 4063,   47619},    
-#endif
+    {DSOADC::ADC_CAPTURE_MODE_NORMAL,      "10us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_1_5,   4390,   2564100},
+ #endif
 };
 
 /**
+ *   bool          overSampling;
+  adc_smp_rate  rate ;
+  DSOADC::Prescaler scale;
  */
 const TimerTimeBase timerBases[]
-{   
-    { DSOCapture::DSO_TIME_BASE_1MS,    "1ms",  24000}, // 24 pixels per div => 1MS => 1MS/24=> 24 kHZ Sampling Fq
-    { DSOCapture::DSO_TIME_BASE_5MS,    "5ms",  4800},
-    { DSOCapture::DSO_TIME_BASE_10MS,   "10ms", 2400},
-    { DSOCapture::DSO_TIME_BASE_50MS,   "50ms", 480},
-    { DSOCapture::DSO_TIME_BASE_100MS,  "100ms",240},
-    { DSOCapture::DSO_TIME_BASE_500MS,  "500ms",48},
-    { DSOCapture::DSO_TIME_BASE_1S,     "1s",   24}    
+{    
+    { DSOCapture::DSO_TIME_BASE_25US,   "25us", 960*1000    , false, ADC_SMPR_1_5,   DSOADC::ADC_PRESCALER_4 }, // 1 us / sample round up, error =0.3%%
+    { DSOCapture::DSO_TIME_BASE_50US,   "50us", 480*1000    , false, ADC_SMPR_13_5,  DSOADC::ADC_PRESCALER_6 }, // 2 us / sample => 0.5 with OS, no oversampling
+    { DSOCapture::DSO_TIME_BASE_100US,  "100us",240*1000    , true,  ADC_SMPR_28_5,  DSOADC::ADC_PRESCALER_6 },    // 4 us with os
+    { DSOCapture::DSO_TIME_BASE_500US,  "500us",48*1000     , true,  ADC_SMPR_41_5,  DSOADC::ADC_PRESCALER_6 },    // 500/24=> 20 us /sample => 5 us with over
+    { DSOCapture::DSO_TIME_BASE_1MS,    "1ms",  24*1000     , true,  ADC_SMPR_71_5,  DSOADC::ADC_PRESCALER_8 }, // 40 us / sample => 10 us with oversampling
+    { DSOCapture::DSO_TIME_BASE_5MS,    "5ms",  4800        , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8 },  // 200 is / sample => 50 us with os
+    { DSOCapture::DSO_TIME_BASE_10MS,   "10ms", 2400        , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8 },
+    { DSOCapture::DSO_TIME_BASE_50MS,   "50ms", 480         , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8},
+    { DSOCapture::DSO_TIME_BASE_100MS,  "100ms",240         , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8 },
+    { DSOCapture::DSO_TIME_BASE_500MS,  "500ms",48          , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8},
+    { DSOCapture::DSO_TIME_BASE_1S,     "1s",   24          , true,  ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8}    
 };

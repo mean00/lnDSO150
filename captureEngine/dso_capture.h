@@ -55,7 +55,7 @@ public:
       DSO_TIME_BASE_MAX=DSO_TIME_BASE_1S
     };
 #define NB_CAPTURE_VOLTAGE (11)     
-#define SLOWER_FAST_MODE     DSO_TIME_BASE_500US
+#define SLOWER_FAST_MODE     DSO_TIME_BASE_10US
     enum DSO_VOLTAGE_RANGE
     {
       DSO_VOLTAGE_GND,  // 0

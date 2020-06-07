@@ -111,7 +111,7 @@ public:
             bool    prepareFastDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale);
             bool    prepareSlowDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale);
             bool    startDualDMASampling (const int otherPin, const int count);
-            bool    prepareTimerSampling (int fq);
+            bool    prepareTimerSampling (int fq,bool overSampling,adc_smp_rate rate,DSOADC::Prescaler  scale );
             int     pollingRead();
             bool    startDMA();
             bool    startDMATime();
@@ -187,6 +187,9 @@ protected:
             int             _oldTimerFq; // old timer frequency value
   static    ADC_CAPTURE_MODE     _dual;
             ADC_TRIGGER_SOURCE _source; // source of sampling signal : SWSTART or Timer
+            bool               _overSampling;
+            adc_smp_rate       _timerSamplingRate;
+            DSOADC::Prescaler  _timerScale;
 public:            
 static      uint16_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];            
 };

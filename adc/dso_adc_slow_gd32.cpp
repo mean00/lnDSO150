@@ -28,8 +28,6 @@ bool    DSOADC::setupTimerSampling()
   ADC_TIMER.pause();
   setSource(ADC_SOURCE_TIMER);    
 // 239_5 =>This gives < 30 us sampling period, we are above 40 us  at 1ms/div
-  setTimeScale(ADC_SMPR_71_5,DSOADC::ADC_PRESCALER_8); 
-  setOverSamplingFactor(OVERSAMPLING_FACTOR);
   _oldTimerFq=0;
   return true;
 }
@@ -39,24 +37,34 @@ bool    DSOADC::setupTimerSampling()
  * @param fq
  * @return 
  */
-bool    DSOADC::prepareTimerSampling (int fq)
+bool    DSOADC::prepareTimerSampling (int fq,bool overSampling,adc_smp_rate rate , DSOADC::Prescaler scale)
 {   
   ADC_TIMER.pause();
   if(fq!=_oldTimerFq)
   {
-      _oldTimerFq=fq;
-      // do a 4 time oversampling
+    _oldTimerFq=fq;
+    _timerSamplingRate=rate;
+    _timerScale=scale;
+    _overSampling=overSampling;
+    // do a 4 time oversampling
+    if(overSampling)
+    {
       fq*=OVERSAMPLING_FACTOR;
-      int scaler=F_CPU/(fq*65535);
-      scaler+=1;
-      int high=F_CPU/scaler;
-      int overFlow=(high+fq/2)/fq;
+      setOverSamplingFactor(OVERSAMPLING_FACTOR);        
+    }else          
+    {
+        setOverSamplingFactor(1);
+    }
+    int scaler=F_CPU/(fq*65535);
+    scaler+=1;
+    int high=F_CPU/scaler;
+    int overFlow=(high+fq/2)/fq;
 
-        ADC_TIMER.pause();
-        ADC_TIMER.setPrescaleFactor(scaler);
-        ADC_TIMER.setOverflow(overFlow);
-        ADC_TIMER.setCompare(ADC_TIMER_CHANNEL,overFlow-1);
-        timer_cc_enable(ADC_TIMER.c_dev(), ADC_TIMER_CHANNEL);
+    ADC_TIMER.pause();
+    ADC_TIMER.setPrescaleFactor(scaler);
+    ADC_TIMER.setOverflow(overFlow);
+    ADC_TIMER.setCompare(ADC_TIMER_CHANNEL,overFlow-1);
+    timer_cc_enable(ADC_TIMER.c_dev(), ADC_TIMER_CHANNEL);
         
   }
   return true;    
