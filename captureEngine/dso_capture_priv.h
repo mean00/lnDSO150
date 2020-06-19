@@ -37,6 +37,8 @@ typedef struct TimerTimeBase
   bool          overSampling;
   adc_smp_rate  rate ;
   DSOADC::Prescaler scale;
+  DSOADC::Prescaler scaleGD32;
+  
 };
 
 extern const TimerTimeBase  timerBases[];

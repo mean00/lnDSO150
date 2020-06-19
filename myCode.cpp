@@ -117,6 +117,17 @@ void MainTask( void *a )
     setTimerFrequency(&Timer2,2, 62, 63); 
     //xAssert(0);
     adc->setupADCs ();       
+
+
+ // Do a dummy capture to make sure everything is fine
+    
+    adc->setADCPin(PA0);
+    adc->setupDmaSampling();
+    adc->prepareDMASampling(ADC_SMPR_239_5,DSOADC::ADC_PRESCALER_8);    
+    adc->stopDmaCapture();
+
+
+
     //testCalibrate();
    // testTestSignal();
     //testButtonCoupling();
@@ -127,7 +138,6 @@ void MainTask( void *a )
     //
     if(!DSOEeprom::read())
     {  
-        adc->setupADCs ();        
         DSOCalibrate::zeroCalibrate();         
     }
     DSOEeprom::readFineVoltage();

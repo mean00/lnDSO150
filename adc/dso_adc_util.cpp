@@ -11,7 +11,6 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  We use PA0 as input pin
  * DMA1, channel 0
  
- * Vref is using PWM mode for Timer4/Channel 3
  * 
  */
 
@@ -48,7 +47,6 @@ struct rcc_reg_map_extended {
 };
 
 
-HardwareTimer pwmtimer(4); // Vref PWM is Timer4 Channel3
 /**
  * 
  * @return 

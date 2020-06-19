@@ -87,15 +87,13 @@ public:
     ADC_PRESCALER_2=0,
     ADC_PRESCALER_4=1,
     ADC_PRESCALER_6=2,
-    ADC_PRESCALER_8=3,
-    
-#ifdef HIGH_SPEED_ADC
+    ADC_PRESCALER_8=3,   
+    // The ones below only works with GD32 chip
     ADC_PRESCALER_12= 5,
     ADC_PRESCALER_16= 7,
     ADC_PRESCALER_5=  8,
     ADC_PRESCALER_10= 10,
     ADC_PRESCALER_20= 11,
-#endif    
     
 
   };
