@@ -9,7 +9,7 @@
 #include "dso_adc.h"
 #include "dso_adc_priv.h"
 #include "fancyLock.h"
-#include "helpers/helper_pwm.h"
+#include "myPwm.h"
 
 
 /**
@@ -22,6 +22,38 @@ bool    DSOADC::setupTimerSampling()
   setSource(ADC_SOURCE_TIMER);    
   _oldTimerFq=0;
   return true;
+}
+bool    DSOADC::prepareTimerSampling (int timerScale, int timerOvf,bool overSampling,adc_smp_rate adcRate , DSOADC::Prescaler adcScale)
+{   
+    
+    int fq;
+    ADC_TIMER.pause();
+     pwmGetFrequency(  timerScale, timerOvf,fq);
+     if(fq!=_oldTimerFq)
+     {
+        
+       _oldTimerFq=fq;
+       _timerSamplingRate=adcRate;
+       _timerScale=adcScale;
+       
+       
+       _overSampling=false;
+        programTimer(  timerOvf,   timerScale);       
+     }  
+    return true;    
+}
+/**
+ * 
+ * @param timerScale
+ * @param timerOvf
+ * @param overSampling
+ * @param adcRate
+ * @param adcScale
+ * @return 
+ */
+bool    DSOADC::prepareDualTimerSampling (int timerScale, int timerOvf,bool overSampling,adc_smp_rate adcRate , DSOADC::Prescaler adcScale)
+{       
+   return   prepareTimerSampling(timerScale,timerOvf,overSampling,adcRate,adcScale);
 }
 
 /**
@@ -43,11 +75,7 @@ bool    DSOADC::prepareTimerSampling (int fq,bool overSampling,adc_smp_rate rate
     int high=F_CPU/scaler;
     int overFlow=(high+fq/2)/fq;
 
-    ADC_TIMER.pause();
-    ADC_TIMER.setPrescaleFactor(scaler);
-    ADC_TIMER.setOverflow(overFlow);
-    ADC_TIMER.setCompare(ADC_TIMER_CHANNEL,overFlow-1);
-    timer_cc_enable(ADC_TIMER.c_dev(), ADC_TIMER_CHANNEL);
+    programTimer(  overFlow,   scaler);
   }
   return true;    
 }

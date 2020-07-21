@@ -43,8 +43,9 @@ const TimeSettings tSettings[]
 #ifdef       HIGH_SPEED_ADC        
 // !!  96 Mhz clock !!
     #if F_CPU==96000000
-    {DSOADC::ADC_CAPTURE_SLOW_INTERLEAVED,"5us",      DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2400000*2}, // Seems buggy !
-    {DSOADC::ADC_CAPTURE_MODE_NORMAL,     "10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2400000},
+#warning FIXME
+    {DSOADC::ADC_CAPTURE_FAST_INTERLEAVED,"5us",      DSOADC::ADC_PRESCALER_2,  ADC_SMPR_1_5,    5850,  6857100 }, // Seems buggy !
+    {DSOADC::ADC_CAPTURE_MODE_NORMAL,     "10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    5606,  2400000},
   
  
    #elif F_CPU==120000000 

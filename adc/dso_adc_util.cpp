@@ -11,6 +11,7 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
  We use PA0 as input pin
  * DMA1, channel 0
  
+ * Vref is using PWM mode for Timer4/Channel 3
  * 
  */
 
@@ -20,8 +21,10 @@ Adafruit Libraries released under their specific licenses Copyright (c) 2013 Ada
 #include "dma.h"
 #include "adc.h"
 
-DSOADC::ADC_CAPTURE_MODE           DSOADC::_dual=DSOADC::ADC_CAPTURE_MODE_NORMAL;
+uint32_t sqr3=0;
 
+DSOADC::ADC_CAPTURE_MODE           DSOADC::_dual=DSOADC::ADC_CAPTURE_MODE_NORMAL;
+extern void dumpAdcRegs();
 
 struct rcc_reg_map_extended {
     __IO uint32 CR;             /**< Clock control register */
@@ -34,7 +37,7 @@ struct rcc_reg_map_extended {
     __IO uint32 APB1ENR;        /**< APB1 peripheral clock enable register */
     __IO uint32 BDCR;           /**< Backup domain control register 0x20*/
     __IO uint32 CSR;            /**< Control/status register        0x24*/
-    __IO uint32_t AHBRST;       /**< AHB Reset Register             0x28/
+    __IO uint32_t AHBRST;       /**< AHB Reset Register             0x28*/
 
 /* Below are GD32 specific registers */
                                   
@@ -46,6 +49,21 @@ struct rcc_reg_map_extended {
     // addition  : APB1 0xe4
 };
 
+void DSOADC::allAdcsOnOff(bool on)
+{
+#if 0
+    if(!on)
+    {
+        ADC1->regs->CR2&=~ADC_CR2_ADON;
+        ADC2->regs->CR2&=~ADC_CR2_ADON;
+    }else
+    {
+        ADC1->regs->CR2|=ADC_CR2_ADON;
+        ADC2->regs->CR2|=ADC_CR2_ADON;
+        
+    }
+#endif
+}
 
 /**
  * 
@@ -95,6 +113,7 @@ static void initSeqs(adc_dev *dev)
 
 void DSOADC::setChannel(int channel)
 {    
+    sqr3=channel;
     adc_Register->SQR3 = channel;
 }
 /**
@@ -110,14 +129,14 @@ bool DSOADC::setSource(const ADC_TRIGGER_SOURCE source)
  * 
  * @return 
  */
-bool DSOADC::setSourceInternal()
+bool DSOADC::setSourceInternal(adc_dev *dev)
 {
-   cr2=ADC1->regs->CR2;  
+   cr2=dev->regs->CR2;  
    cr2 &=~ ADC_CR2_EXTSEL_SWSTART;
-   ADC1->regs->CR2=cr2;
+   dev->regs->CR2=cr2;
    cr2 |= ((int)_source) << 17;
-   ADC1->regs->CR2=cr2;         
-   cr2=ADC1->regs->CR2;
+   dev->regs->CR2=cr2;         
+   cr2=dev->regs->CR2;
    return true;
 }
 /**
@@ -210,6 +229,7 @@ void DSOADC::setupADCs ()
   */
 bool    DSOADC::prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale)
 {    
+    
     _dual=DSOADC::ADC_CAPTURE_MODE_NORMAL;
     ADC1->regs->CR1&=~ADC_CR1_DUALMASK;
     cr2= ADC1->regs->CR2;
@@ -218,6 +238,7 @@ bool    DSOADC::prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale)
     cr2&= ~(ADC_CR2_CONT |ADC_CR2_DMA);
     ADC2->regs->CR2=cr2;
     setTimeScale(rate,scale);
+    
     return true;
 }
 
@@ -229,28 +250,34 @@ bool    DSOADC::prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale)
 bool    DSOADC::prepareFastDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale)
 {  
     _dual=DSOADC::ADC_CAPTURE_FAST_INTERLEAVED;
+    
     ADC1->regs->CR1&=~ADC_CR1_DUALMASK;
     ADC1->regs->CR1|=ADC_CR1_FASTINT; // fast interleaved mode
     ADC2->regs->SQR3 = PIN_MAP[otherPin].adc_channel ;      
+    sqr3=ADC2->regs->SQR3;
+    
     ADC2->regs->CR2 |= ADC_CR2_CONT;
     ADC1->regs->CR2 |= ADC_CR2_CONT |ADC_CR2_DMA;
     adc_set_sample_rate(ADC2, rate); 
     setTimeScale(rate,scale);    
+
     return true;
 }
 bool    DSOADC::prepareSlowDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale)
 {  
-    _dual=DSOADC::ADC_CAPTURE_SLOW_INTERLEAVED;
+    _dual=DSOADC::ADC_CAPTURE_DUAL_SIMULTANEOUS;
+    
     ADC1->regs->CR1&=~ADC_CR1_DUALMASK;
-    ADC1->regs->CR1|=ADC_CR1_SLOWINT; // slow interleaved mode
+    ADC1->regs->CR1|=ADC_CR1_DUAL_REGULAR_SIMULTANEOUS; // slow interleaved mode
     ADC2->regs->SQR3 = PIN_MAP[otherPin].adc_channel ;      
+    sqr3=ADC2->regs->SQR3;
     ADC2->regs->CR2 |= ADC_CR2_CONT;
     ADC1->regs->CR2 |= ADC_CR2_CONT |ADC_CR2_DMA;
     adc_set_sample_rate(ADC2, rate); 
     setTimeScale(rate,scale);    
+    
     return true;
 }
-
 
 /**
  * 
@@ -268,8 +295,11 @@ bool DSOADC::getSamples(FullSampleSet &fullSet)
 
 bool DSOADC::getSamples(uint16_t **samples, int  &nbSamples)
 {
-    if(!dmaSemaphore->take(200)) // dont busy loop
+    dumpAdcRegs();
+    if(!dmaSemaphore->take(5000)) // dont busy loop
+    {                
         return false;   
+    }
     *samples=adcInternalBuffer;
     nbSamples=requestedSamples;
     return true;
@@ -345,6 +375,8 @@ void DSOADC::setupAdcDualDmaTransfer( int otherPin,  int count,uint32_t *buffer,
 
   xAssert(count<= ADC_INTERNAL_BUFFER_SIZE);
   ADC2->regs->SQR3=PIN_MAP[otherPin].adc_channel; // WTF ?
+  sqr3=ADC2->regs->SQR3;
+
   dma_init(DMA1);
   dma_attach_interrupt(DMA1, DMA_CH1, handler); 
   dma_setup_transfer(DMA1, DMA_CH1, &ADC1->regs->DR, DMA_SIZE_32BITS, buffer, DMA_SIZE_32BITS, (C | DMA_MINC_MODE | DMA_TRNS_CMPLT));// Receive buffer DMA
@@ -489,6 +521,7 @@ void DSOADC::setWatchdogTriggerValue(uint32_t high, uint32_t low)
     adc_set_reg_seqlen(ADC2, 1);
 
     regs->SQR3 = pin;
+    sqr3=regs->SQR3;
     regs->CR2 |= ADC_CR2_SWSTART;
     while (!(regs->SR & ADC_SR_EOC))
         ;

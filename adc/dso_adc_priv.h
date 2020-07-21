@@ -19,9 +19,17 @@
 #ifndef ADC_CR1_FASTINT
     #define ADC_CR1_FASTINT (7<<16)
 #endif ADC_CR1_FASTINT
+
 #ifndef ADC_CR1_SLOWINT
     #define ADC_CR1_SLOWINT (8<<16)
 #endif ADC_CR1_FASTINT
+
+
+#ifndef ADC_CR1_DUAL_REGULAR_SIMULTANEOUS
+    #define ADC_CR1_DUAL_REGULAR_SIMULTANEOUS (6<<16)
+#endif ADC_CR1_FASTINT
+
+
 #define ADC_CR1_DUALMASK (0xf<<16)
 
 #include "fancyLock.h"

@@ -69,8 +69,8 @@ public:
   enum ADC_CAPTURE_MODE
   {
       ADC_CAPTURE_MODE_NORMAL=0,
-      ADC_CAPTURE_FAST_INTERLEAVED=1,
-      ADC_CAPTURE_SLOW_INTERLEAVED=2
+      ADC_CAPTURE_FAST_INTERLEAVED=1,      
+      ADC_CAPTURE_DUAL_SIMULTANEOUS=3
   };
   enum ADC_TRIGGER_SOURCE
   {
@@ -108,20 +108,24 @@ public:
             bool    prepareDMASampling (adc_smp_rate rate,DSOADC::Prescaler scale);
             bool    prepareFastDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale);
             bool    prepareSlowDualDMASampling (int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale);
+            bool    prepareDualTimeSampling (int fq,int otherPin, adc_smp_rate rate,DSOADC::Prescaler  scale);
             bool    startDualDMASampling (const int otherPin, const int count);
             bool    prepareTimerSampling (int fq,bool overSampling,adc_smp_rate rate,DSOADC::Prescaler  scale );
+            bool    prepareTimerSampling (int timerScale, int ovf,bool overSampling,adc_smp_rate rate , DSOADC::Prescaler scale)  ;          
+            bool    prepareDualTimerSampling(int timerScale, int timerOvf,bool overSampling,adc_smp_rate adcRate , DSOADC::Prescaler adcScale);
             int     pollingRead();
             bool    startDMA();
             bool    startDMATime();
             bool    startDualDMA();
+            bool    startDualTime();
             bool    getSamples(FullSampleSet &fullSet)           ;
             bool    getSamples(uint16_t **samples, int  &nbSamples);
-            void    clearSemaphore() ;
-            bool     setSlowMode(int fqInHz);
+            void    clearSemaphore() ;            
             bool     readCalibrationValue();
     static  uint32_t getVCCmv(); // this one is cached
     static  float    readVCCmv();    
     static float     adcToVolt(float adc);
+    static bool     frequencyToRateScale (int fq, DSOADC::Prescaler &scaler, adc_smp_rate &rate); // compute rate & scale so that it is faster than frequency/2
             bool     setTriggerMode(TriggerMode mode);
             TriggerMode getTriggerMode() {return _triggerMode;};
             TriggerMode getActualTriggerMode() 
@@ -137,6 +141,8 @@ public:
             bool startDMATriggeredSampling (const int count, int ADCTriggerValue);
             bool commonTrigger (int count,uint32_t triggerValueADC);
             bool startTimerSampling (int count);
+            bool startDualTimeSampling (const int otherPin,int count,int preload=0);
+            
             bool startTriggeredTimerSampling (int count,uint32_t triggerADC);
     static  void clearSamples();
     static  void adc_dma_disable(const adc_dev * dev) ;            
@@ -147,7 +153,7 @@ public:
             bool fastSampleUp(int threshold1,int threshold2,int &value1,int &value2, int &timeUs1,int &timeUs2)  ;
             
 protected:            
-            bool setSourceInternal();
+            bool setSourceInternal(adc_dev *dev=ADC1);
     static  void DMA1_CH1_Event();
     static  void DMA1_CH1_TriggerEvent() ;
             void captureComplete(SampleSet &one, SampleSet &two);
@@ -156,10 +162,11 @@ protected:
             bool startInternalDmaSampling ();
             
             bool validateAverageSample(uint32_t &avg);    
+            bool programTimer(int overFlow, int scaler);
 public:        
     static void setupAdcDmaTransfer(   int count,uint16_t *buffer, void (*handler)(void),bool circular );
     static void nextAdcDmaTransfer( int count,uint16_t *buffer);
-
+    static void allAdcsOnOff(bool onOff);
     static void enableDisableIrqSource(bool onoff, int interruptMask);
     static void enableDisableIrq(bool onoff);
     static void defaultAdcIrqHandler();
@@ -173,6 +180,7 @@ public:
     static  void getRegisters();
             void resetStats();
             bool setupTimerSampling(); // this is to be called once when switching from DMA to timer
+            bool setupDualTimerSampling();
             bool setupDmaSampling();   // same when switching back
 protected:
             int             _pin;
@@ -189,7 +197,7 @@ protected:
             adc_smp_rate       _timerSamplingRate;
             DSOADC::Prescaler  _timerScale;
 public:            
-static      uint16_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE];            
+static      uint16_t adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE+16];            
 };
 
 

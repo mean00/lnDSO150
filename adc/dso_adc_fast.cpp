@@ -31,7 +31,7 @@ adc_reg_map *adc_Register;
 volatile uint32_t cr2;
 
 
-uint16_t DSOADC::adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE] __attribute__ ((aligned (8)));;;
+uint16_t DSOADC::adcInternalBuffer[ADC_INTERNAL_BUFFER_SIZE+16] __attribute__ ((aligned (8)));;;
 
 int dmaSpuriousInterrupt=0;
 extern HardwareTimer Timer4;
@@ -154,6 +154,7 @@ bool DSOADC::startDMASampling (const int count)
   enableDisableIrqSource(false,ADC_AWD);
   enableDisableIrq(true);  
   setupAdcDmaTransfer( requestedSamples,adcInternalBuffer, DMA1_CH1_Event,false );
+  allAdcsOnOff(true);
   startDMA();
   return true;
 }
@@ -168,11 +169,7 @@ bool DSOADC::startDualDMASampling (const int otherPin, const int count)
   enableDisableIrqSource(false,ADC_AWD);
   enableDisableIrq(true);
   setupAdcDualDmaTransfer( otherPin, requestedSamples,(uint32_t *)adcInternalBuffer, DMA1_CH1_Event,false );
-#if 1
   startDualDMA();
-#else
-  ADC1->regs->CR2 |= ADC_CR2_SWSTART;   
-#endif
   return true;
 }
 
@@ -196,6 +193,7 @@ void DSOADC::stopDmaCapture(void)
     enableDisableIrqSource(false,ADC_AWD);
     // Stop dma
     adc_dma_disable(ADC1);
+    allAdcsOnOff(false);
 }
 
 

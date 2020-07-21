@@ -29,6 +29,7 @@ extern uint32_t cr2;
  */
 bool    DSOADC::fastSampleDown(int threshold,int &value, int &timeUs)  
 {
+    setupDmaSampling();
     setTimeScale(ADC_SMPR_13_5, ADC_PRESCALER_6); // about 2 us sampling fq
     adc_dev *dev = PIN_MAP[_pin].adc_device;
     adc_reg_map *regs = dev->regs;           
@@ -81,7 +82,7 @@ bool    DSOADC::fastSampleDown(int threshold,int &value, int &timeUs)
  */
 bool    DSOADC::fastSampleUp(int threshold1,int threshold2,int &value1,int &value2, int &timeUs1,int &timeUs2)
 {
-    
+    setupDmaSampling();
     setTimeScale(ADC_SMPR_13_5, ADC_PRESCALER_6); // about 2 us sampling fq
     adc_dev *dev = PIN_MAP[_pin].adc_device;
     adc_reg_map *regs = dev->regs;           
