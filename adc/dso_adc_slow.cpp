@@ -9,7 +9,7 @@
 #include "dso_adc.h"
 #include "dso_adc_priv.h"
 #include "fancyLock.h"
-
+#include "myPwm.h"
 /**
  */
 uint32_t lastStartedCR2=0;
@@ -256,10 +256,14 @@ bool DSOADC::setupDualTimerSampling()
  */
 bool DSOADC::programTimer(int overFlow, int scaler)
 {
+#if 1
+    pwmFromScalerAndOverflow(&ADC_TIMER, ADC_TIMER_CHANNEL,scaler,overFlow);
+#else    
     ADC_TIMER.setPrescaleFactor(scaler);
     ADC_TIMER.setOverflow(overFlow);
     ADC_TIMER.setCompare(ADC_TIMER_CHANNEL,overFlow/2);
     timer_cc_enable(ADC_TIMER.c_dev(), ADC_TIMER_CHANNEL);
+#endif    
     return true;
 }
 
