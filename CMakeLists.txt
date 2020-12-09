@@ -85,6 +85,7 @@ include_directories(captureEngine)
 
 # FreeRTOS
 SET(PORTNAME Stm32duino)
+SET(USE_TRIGGER True)
 ADD_SUBDIRECTORY(adc) 
 ADD_SUBDIRECTORY(MapleFreeRTOS1000/)
 ADD_SUBDIRECTORY(testFunc/)
