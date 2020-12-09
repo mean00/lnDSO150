@@ -7,14 +7,9 @@
 #   - Use GD32F303 as another MCU (much faster, better ADC, more memory)
 #
 #-----------------------------------------------------------------------------
-
-
-OPTION(USE_VANILLA_HW "Use vanilla DSO HW" FALSE)  # Use PB14/PB15 for rotary encoder
-OPTION(USE_GD32F303   "Use GD303 MCU" TRUE)        # Else it is STM32F103
-# Select platform and installation for extra arduino files AND toolchain (compiler...)
-SET(PLATFORM_ARCHITECTURE "STM32F1")
-# Do we have patch around ?
-include(cmake_utils/FindPatch.cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+include(select_mcu_stm32)
+include(FindPatch)
 #
 # Patch Arduino_stm32 if needed to add gd32f303 support
 #
@@ -27,39 +22,16 @@ ENDIF(NOT EXISTS "${PLATFORM_PATH}/patched")
 
 
 cmake_minimum_required(VERSION 2.8)
-# Must be named arduino
-#  else the cmake code will look for ARDUINO
-# while the name will be the name of the folder
-# and here we go
-IF(USE_GD32F303)
-    SET(MCU_SPEED             96000000)                 # Max speed, above 96M USB will not work (?)
-                                                        # 96 gives us exact sampling frequencies, 120 does not
-ENDIF(USE_GD32F303)
-
 #
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 SET(CMAKE_TOOLCHAIN_FILE cmake/ArduinoToolchain.cmake)
 Project("dso_stm32" C CXX ASM)
 
-# Board setup
-IF(USE_GD32F303)
-    SET(EXTENSION             "_GD32F303")
-    set(ARDUINO_DEFAULT_BOARD genericGD32F303C)        # Default Board ID, when not specified
-    set(ARDUINO_CPU           GD32F303C8)
-    ADD_DEFINITIONS("-DHIGH_SPEED_ADC")
-ELSE(USE_GD32F303)
-    SET(EXTENSION             "_STM32F103")
-    set(ARDUINO_DEFAULT_BOARD genericSTM32F103C)        # Default Board ID, when not specified
-    set(ARDUINO_CPU           STM32F103C8)
-ENDIF(USE_GD32F303)
-
-
-
-# Common stuff, we allow update through USB/DFU
-
+set(ARDUINO_DEFAULT_BOARD ${X_ARDUINO_DEFAULT_BOARD})        # Default Board ID, when not specified
+set(ARDUINO_CPU           ${X_ARDUINO_CPU})
+SET(ARDUINO_UPLOAD_METHOD ${X_ARDUINO_UPLOAD_METHOD}) # Use blackmagic link, if you comment it out you'll use DFU => 8kB flash
 set(ARDUINO_DEFAULT_PORT ttyACM0) # Default Port, when not specified
-SET(ARDUINO_UPLOAD_METHOD DFUUpload)
-set(ARDUINO_CPUMENU .menu.cpu.${ARDUINO_CPU})
+
+
 SET(libPrefix ${ARDUINO_DEFAULT_BOARD}_)
 
 
@@ -112,10 +84,4 @@ else(USE_VANILLA_HW)
     MESSAGE(STATUS "\tUsing rotary encoder modification (PB14/PB15) ")
 endif(USE_VANILLA_HW)
 #
-if(USE_GD32F303)
-    MESSAGE(STATUS "\tUsing GD32F303 MCU ")
-else(USE_GD32F303)
-    MESSAGE(STATUS "\tUsing STM32F103 MCU ")
-endif(USE_GD32F303)
-# EOF
-# EOF
+MESSAGE(STATUS "\tUsing ${EXTENSION} MCU ")
