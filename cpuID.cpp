@@ -3,8 +3,7 @@
 #include "cpuID.h"
 #include "scb.h"
 static uint32_t family , designer;
-
-static uint32_t _cpuId=0;
+uint32_t _cpuId=0;
 static int      _flashSize=0;
 static int      _ramSize=0;
 static MCU_IDENTIFICATION _chipId;
@@ -23,12 +22,19 @@ void cpuID::identify()
     // Partno :  0xC23 => Cortex M3
     // Rev=1
     
+    // GD32F3
+    // 0x41 0 f c24 1
+    // ARM
+    // variant 0
+    // C24 cortex m4
+    // Rev 1
     
     // STM32F1 : 0x41 1 f c23 1
     // Variant 1
     // Architecture C -> ARM V6
     // Partno : C23  => Cortex M3
     // Rev=1
+    
     
     // 2nd part ram & flash size
     uint32_t density=*(uint32_t *)0x1FFFF7E0;
