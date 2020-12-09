@@ -16,3 +16,6 @@
 [submodule "embedded_printf"]
 	path = embedded_printf
 	url = https://github.com/mpaland/printf
+[submodule "adc"]
+	path = adc
+	url = https://github.com/mean00/stm32duino_adc.git
