@@ -16,11 +16,7 @@
 /**************************************************************************/
 #include <Wire.h>
 #include "MapleFreeRTOS1000.h"
-#include "Adafruit_GFX.h"
-#include "Adafruit_TFTLCD_8bit_STM32.h"
-#include "MapleFreeRTOS1000.h"
 #include "EEPROM.h"
-
 extern void mySetup();
 extern void myLoop();
 

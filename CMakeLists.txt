@@ -50,29 +50,32 @@ include_directories(MapleFreeRTOS1000//Source/include)
 include_directories(MapleFreeRTOS1000//)
 include_directories(Adafruit_TFTLCD_8bit_STM32)
 include_directories(.)
-link_directories( ${CUSTOM_LIB_DIR})
 include_directories(adc)
 include_directories(captureEngine)
+include_directories(src)
 
 # FreeRTOS
 SET(PORTNAME Stm32duino)
 SET(USE_TRIGGER True)
+# Other modules
 ADD_SUBDIRECTORY(adc) 
 ADD_SUBDIRECTORY(MapleFreeRTOS1000/)
 ADD_SUBDIRECTORY(testFunc/)
 ADD_SUBDIRECTORY(captureEngine/)
+ADD_SUBDIRECTORY(src)
+ADD_SUBDIRECTORY(Adafruit_TFTLCD_8bit_STM32)
 #
 generate_arduino_firmware(Dso150${EXTENSION} 
                 SKETCH dso150.ino
-                SRCS    myCode.cpp  dso_test_signal.cpp dso_control.cpp   dso_eeprom.cpp dso_calibrate.cpp dso_display.cpp   stopWatch.cpp dso_frequency.cpp 
-                dso_menu.cpp dso_menuEngine.cpp  dso_mainUI.cpp dso_menuButton.cpp dso_autoSetup.cpp  dso_gfx.cpp dso_adc_gain.cpp cpuID.cpp embedded_printf/printf.c 
-                helpers/helper_pwm.cpp
+                SRCS    myCode.cpp     stopWatch.cpp  cpuID.cpp embedded_printf/printf.c helpers/helper_pwm.cpp
                 PORT ${ARDUINO_DEFAULT_PORT}
                 BOARD_CPU ${ARDUINO_CPU}
                 )
 TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}FreeRTOS)
 TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}captureEngine)
 TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}adc)
+TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}TFT)
+TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}src)
 TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}tests)
 
 # Summary
