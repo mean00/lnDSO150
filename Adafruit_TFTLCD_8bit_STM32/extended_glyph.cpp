@@ -66,7 +66,7 @@ int Adafruit_TFTLCD_8bit_STM32::myDrawChar(int x, int y, unsigned char c,  int c
         int adv=glyph->xAdvance;
         int top=infos.maxHeight;
          mySquare(x,y-top,
-                  infos.maxWidth,
+                  adv, //Fix!
                   top+2,bg);
          return adv;
     }
