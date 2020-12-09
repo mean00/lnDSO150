@@ -9,9 +9,9 @@ SET(SRCS
     dso_frequency.cpp
     dso_gfx.cpp
     dso_mainUI.cpp
-    dso_menuButton.cpp
-    dso_menu.cpp
-    dso_menuEngine.cpp
+    ui/dso_menuButton.cpp
+    ui/dso_menu.cpp
+    ui/dso_menuEngine.cpp
     dso_test_signal.cpp
     ) 
 generate_arduino_library(${libPrefix}src 
