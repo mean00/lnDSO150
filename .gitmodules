@@ -6,10 +6,6 @@
 	path = cmake
 	url = https://github.com/mean00/arduino-cmake-stm32.git
 	branch = master
-[submodule "Adafruit_GFX"]
-	path = Adafruit_GFX
-	url = https://github.com/adafruit/Adafruit-GFX-Library.git
-	branch = master
 [submodule "Arduino_STM32"]
 	path = Arduino_STM32
 	url = https://github.com/rogerclarkmelbourne/Arduino_STM32

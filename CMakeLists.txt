@@ -48,7 +48,6 @@ ENDIF(USE_VANILLA_HW)
  
 include_directories(MapleFreeRTOS1000//Source/include)
 include_directories(MapleFreeRTOS1000//)
-include_directories(Adafruit_GFX)
 include_directories(Adafruit_TFTLCD_8bit_STM32)
 include_directories(.)
 link_directories( ${CUSTOM_LIB_DIR})
