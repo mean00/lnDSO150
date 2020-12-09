@@ -67,7 +67,7 @@ ADD_SUBDIRECTORY(Adafruit_TFTLCD_8bit_STM32)
 #
 generate_arduino_firmware(Dso150${EXTENSION} 
                 SKETCH dso150.ino
-                SRCS    myCode.cpp     stopWatch.cpp  cpuID.cpp embedded_printf/printf.c helpers/helper_pwm.cpp
+                SRCS    myCode.cpp     stopWatch.cpp  cpuID.cpp embedded_printf/printf.c helpers/helper_pwm.cpp i2c_stubs.c
                 PORT ${ARDUINO_DEFAULT_PORT}
                 BOARD_CPU ${ARDUINO_CPU}
                 )
