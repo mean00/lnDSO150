@@ -1,6 +1,6 @@
 #
 SET(SRCS 
-Adafruit_GFX.cpp  Adafruit_TFTLCD_8bit_STM32.cpp  extended.cpp  extended_glyph.cpp  hx8347g.cpp  hx8357x.cpp  ili932x.cpp  ili9341.cpp  st7789.cpp
+Adafruit_GFX.cpp  Adafruit_TFTLCD_8bit_STM32.cpp  extended.cpp  extended_glyph.cpp    ili9341.cpp  st7789.cpp
 ) 
 #add_library(${libPrefix}adc STATIC ${SRCS})
 generate_arduino_library(${libPrefix}TFT 
