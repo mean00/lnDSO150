@@ -13,6 +13,7 @@
 #include "cpuID.h"
 #include "pinConfiguration.h"
 #include "helpers/helper_pwm.h"
+#include "dso_debug.h"
 static void MainTask( void *a );
 void splash(void);
 //--
@@ -55,10 +56,13 @@ void mySetup()
     r|=AFIO_DEBUG_SW_ONLY;
     *mapr=r;
 #endif
-#ifdef     USE_RXTX_PIN_FOR_ROTARY // Use Serial only if we have USB
-    Serial.begin(115200);
-    Serial.println("Init"); 
-#endif
+  Serial.end();
+  Serial1.begin(115200);  //Wire.begin();
+  Serial.end();
+  Serial1.begin(115200);  
+    
+  Logger("Init"); 
+
     
     
      // Ok let's go, switch to FreeRTOS
