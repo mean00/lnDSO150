@@ -3,6 +3,12 @@
  *
  * Original author "lanchon" from ST forums, with modifications by LeafLabs.
  */
+/* Provide memory region aliases for common.inc */
+REGION_ALIAS("REGION_TEXT", rom);
+REGION_ALIAS("REGION_DATA", ram);
+REGION_ALIAS("REGION_BSS", ram);
+REGION_ALIAS("REGION_RODATA", rom);
+REGION_ALIAS("REGION_EEPROM", rom);
 
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 
@@ -41,7 +47,6 @@ EXTERN(main)
 /* Initial stack pointer value. */
 EXTERN(__msp_init)
 PROVIDE(__msp_init = ORIGIN(ram) + LENGTH(ram));
-
 /* Reset vector and chip reset entry point */
 EXTERN(__start__)
 ENTRY(__start__)
@@ -168,6 +173,10 @@ SECTIONS
         _lm_heap_start = DEFINED(_lm_heap_start) ? _lm_heap_start : _end;
         _lm_heap_end   = DEFINED(_lm_heap_end) ? _lm_heap_end : __msp_init;
       } > REGION_RODATA
+    .eeprom eeprom_begin :
+      {
+        . = eeprom_size;
+      } > REGION_EEPROM
 
     /*
      * .bss
