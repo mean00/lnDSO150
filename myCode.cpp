@@ -89,7 +89,7 @@ void MainTask( void *a )
     tft=Adafruit_TFTLCD_8bit_STM32::spawn(displayIdentifier);   
     if(!tft)
     {
-        while(1) {};
+        xAssert(0);
     }
     interrupts();
     tft->begin();
