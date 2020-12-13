@@ -7,6 +7,7 @@ SET(SRCS
     dso_display.cpp
     dso_eeprom.cpp
     dso_frequency.cpp
+    dso_logger.cpp
     dso_gfx.cpp
     dso_mainUI.cpp
     ui/dso_menuButton.cpp
