@@ -27,7 +27,7 @@ MEMORY
 /**
     we allocate 2 pages at the end of the flash for eeprom
 */
-PROVIDE(eeprom_size = 1*1024);
+PROVIDE(eeprom_size = 4*1024);
 PROVIDE(eeprom_begin = ORIGIN(rom) + LENGTH(rom)-eeprom_size);
 
 
