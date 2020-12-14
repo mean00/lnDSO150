@@ -19,10 +19,20 @@ extern uint16_t calibrationHash;
  * 
  * @return 
  */
-bool  DSOEeprom::read()
+extern void *eeprom_begin;
+static void addressInit(EEPROMClass &e2)
+{
+    uint32 pageBase0=(uint32_t)&eeprom_begin;    
+    e2.init(pageBase0,pageBase0+2*1024,2*1024);
+}
+/**
+ * 
+ * @return 
+ */
+bool DSOEeprom::read()
 {
     EEPROMClass e2;
-    e2.init();
+    addressInit(e2);
     calibrationHash=e2.read(0);
     if(calibrationHash!=CURRENT_HASH)
     {
@@ -43,7 +53,7 @@ bool  DSOEeprom::read()
 bool  DSOEeprom::readFineVoltage()
 {
     EEPROMClass e2;
-    e2.init();
+    addressInit(e2);
     for(int i=0;i<DSO_NB_GAIN_RANGES;i++)
         voltageFineTune[i]=0;
     int hasFineVoltage=e2.read(FINE_TUNE_OFFSET);
@@ -72,7 +82,7 @@ bool  DSOEeprom::readFineVoltage()
 bool  DSOEeprom::write()
 {
     EEPROMClass e2;
-    e2.init();
+    addressInit(e2);
     e2.format();
     e2.write(0,CURRENT_HASH);
     calibrationHash=e2.read(0);
@@ -98,7 +108,7 @@ bool  DSOEeprom::write()
 bool  DSOEeprom::wipe()
 {
     EEPROMClass e2;
-    e2.init();
+    addressInit(e2);
     e2.format();
     e2.write(0,0);
     e2.write(FINE_TUNE_OFFSET,0);
