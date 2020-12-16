@@ -9,16 +9,12 @@
 #-----------------------------------------------------------------------------
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(select_mcu_stm32)
-include(FindPatch)
+include(applyPatch)
 #
 # Patch Arduino_stm32 if needed to add gd32f303 support
 #
 include(./platformConfig.cmake)
-IF(NOT EXISTS "${PLATFORM_PATH}/patched")
-    MESSAGE(STATUS "Patching file in ${PLATFORM_PATH} to add gd32f303 support")
-    patch_file_p(2 "${PLATFORM_PATH}" "${CMAKE_SOURCE_DIR}/patches/gd32_patch.diff")
-    file(WRITE "${PLATFORM_PATH}/patched" "patched")
-ENDIF(NOT EXISTS "${PLATFORM_PATH}/patched")
+APPLY_PATCH_IF_NEEDED(patched gd32_patch.diff              "add gd32f303 support") 
 
 
 cmake_minimum_required(VERSION 2.8)
