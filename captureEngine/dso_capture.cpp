@@ -252,6 +252,7 @@ int DSOCapturePriv::triggeredCapture(int count,float *volt,CaptureStats &stats)
  * @param waveForm
  * @return 
  */
+#if 0 // this one takes ~ 2ms for full sample
 bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
 {    
     float gain=vSettings[DSOCapturePriv::currentVoltageRange].displayGain;
@@ -266,6 +267,28 @@ bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
         }
     return true;
 }
+#else // that one takes ~ 600 us for full samples
+bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
+{    
+    float gain=vSettings[DSOCapturePriv::currentVoltageRange].displayGain;
+    //uint32_t before=micros();
+    float offset=DSO_WAVEFORM_HEIGHT/2-((float)DSOCapturePriv::voltageOffset*gain*8.)/10.;
+    float gain8=(gain*8.)/10.;
+    for(int j=0;j<count;j++)
+        {
+            float v=samples[j];
+            v*=gain8;
+            v=offset-v;             
+            if(v>DSO_WAVEFORM_HEIGHT) v=DSO_WAVEFORM_HEIGHT;
+            if(v<0) v=0;           
+            waveForm[j]=(uint8_t)v;
+        }
+    //uint32_t duration=micros()-before;
+    //capcapcap[capIndex]=duration;
+    //capIndex=(capIndex+1)&0xf;
+    return true;
+}
+#endif
 
 /**
  * 
