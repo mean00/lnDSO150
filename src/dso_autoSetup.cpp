@@ -9,7 +9,7 @@
 #include "stopWatch.h"
 extern float test_samples[256];
 
-static bool autoSetupVoltage();
+static bool autoSetupVoltage(bool setTrigger);
 static bool autoSetupFrequency();
 
 /**
@@ -27,14 +27,14 @@ void        autoSetup()
     DSOCapture::setTimeBase(timeBase);
     // voltage range
     
-    if(!autoSetupVoltage())         
+    if(!autoSetupVoltage(false))         
         goto end; // failed 
     DSODisplay::drawAutoSetupStep(1);    
     if(!autoSetupFrequency()) 
         goto end;
     DSODisplay::drawAutoSetupStep(2);    
     // redo voltage in case it was wrong the 1st time due to too high/too low fq
-    if(!autoSetupVoltage()) 
+    if(!autoSetupVoltage(true)) 
         goto end; // failed
     DSODisplay::drawAutoSetupStep(3);    
 end:    
@@ -47,7 +47,7 @@ end:
  * 
  * @return 
  */
-bool autoSetupVoltage()
+bool autoSetupVoltage(bool setTrigger)
 {
     int voltage=DSOCapture::DSO_VOLTAGE_5V;
     DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)voltage);
@@ -86,6 +86,14 @@ bool autoSetupVoltage()
             DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)voltage);
             continue;
         }    
+        // Set the trigger
+        float med=(stats.xmin+stats.xmax)/2;
+        if(setTrigger)
+        {
+            DSOCapture::setTriggerValue(med);
+          //  DSOCapture::setTriggerMode(DSOCapture::Trigger_Rising);
+        }
+        
         return true;
     } 
     return false;
@@ -120,7 +128,7 @@ bool autoSetupFrequency()
         {
             // Try to get fq = 4 square
             int fq=DSOCapture::timeBaseToFrequency((DSOCapture::DSO_TIME_BASE)timeBase);
-            if(1 || stats.frequency<= fq*4)
+            if(0 || stats.frequency<= fq*4)
             {
                 //
                 // Readjust trigger
