@@ -17,9 +17,10 @@ static bool autoSetupFrequency();
  */
 void        autoSetup()
 {
-    DSODisplay::drawAutoSetup();
-    // swith to free running mode
     DSOCapture::stopCapture();
+    DSODisplay::drawAutoSetup();
+    // switch to free running mode
+    
     DSOCapture::setTriggerMode(DSOCapture::Trigger_Run);
        
     DSOCapture::DSO_TIME_BASE timeBase=DSOCapture::DSO_TIME_BASE_1MS;
