@@ -58,7 +58,7 @@ static const char *fq2Text(int fq)
     STEP(1000,"K")
     {}
     
-    sprintf(buff,"%3.1f%sH",f,suff);
+    sprintf(buff,"%3.1f%s",f,suff);
     return buff;
 }
 /**
@@ -254,7 +254,7 @@ void DSODisplay::drawStatsBackGround()
     AND_ONE_A("Min",0);   
     AND_ONE_A("Max",2);   
     AND_ONE_A("Avrg",4);
-    AND_ONE_A("Freq",6);
+    AND_ONE_A("Freq(H)",6);
     AND_ONE_A("Trigg",8);
     AND_ONE_A("Offst",10);
     tft->setTextColor(BG_COLOR,BLACK);
