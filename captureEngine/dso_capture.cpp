@@ -271,7 +271,7 @@ bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
         // 590 with qfp
         // 260 with qfp and cast to int
 
-#if 0
+#if 1
     #define DBG(x) x
 #else
     #define DBG(...) 
@@ -291,7 +291,7 @@ bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
         {
             float v=samples[j];
             v=QMUL(v,gain8);
-            v=QADD(offset,-v);     
+            v=QSUB(offset,v);     
             int vint=(int)v;
             if(vint>DSO_WAVEFORM_HEIGHT) vint=DSO_WAVEFORM_HEIGHT;
             if(vint<0) vint=0;           

@@ -9,6 +9,7 @@
 #include "dso_capture_priv.h"
 #include "DSO_config.h"
 #include "dso_adc_gain.h"
+#include  "qfp.h"
 static void swapADCs_c(int nb, uint16_t *data)
 {    
     int nbWord=nb/2;   
@@ -175,8 +176,8 @@ int transformDmaExact(int dc0_ac1,int16_t *in, float *out,int count, CaptureStat
     {
 
         f=*(in+dex);
-        f-=offset;
-        f*=multiplier;
+        f=QSUB(f,offset);
+        f=QMUL(f,multiplier);
         if(f>stats.xmax) stats.xmax=f;
         if(f<stats.xmin) stats.xmin=f;       
         out[i]=f; // Unit is now in volt
@@ -189,7 +190,7 @@ int transformDmaExact(int dc0_ac1,int16_t *in, float *out,int count, CaptureStat
                  if(out[i-1]>triggerValue&&out[i]<=triggerValue) stats.trigger=i;
         }
 
-        stats.avg+=f;
+        stats.avg=QADD(stats.avg,f);
         dex++;
     }   
    }
@@ -223,12 +224,12 @@ static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expan
        if(v<swing) stats.saturation=true;
        if(v>(4096-swing)) stats.saturation=true;
        f=(float)v; 
-       f-=offset;
-       f*=multiplier;       
+       f=QSUB(f,offset);
+       f=QMUL(f,multiplier);
        if(f>stats.xmax) stats.xmax=f;
        if(f<stats.xmin) stats.xmin=f;       
        out[0]=f; // Unit is now in volt
-       stats.avg+=f;
+       stats.avg=QADD(stats.avg,f);
        dex+=expand;
    }
    
@@ -239,8 +240,8 @@ static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expan
     {
 
         f=*(in+(dex/4096));
-        f-=offset;
-        f*=multiplier;
+        f=QSUB(f,offset);
+        f=QMUL(f,multiplier);
         if(f>stats.xmax) stats.xmax=f;
         if(f<stats.xmin) stats.xmin=f;       
         out[i]=f; // Unit is now in volt
@@ -253,7 +254,7 @@ static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expan
                  if(out[i-1]>triggerValue&&out[i]<=triggerValue) stats.trigger=i;
         }
 
-        stats.avg+=f;
+        stats.avg=QADD(stats.avg,f);
         dex+=expand;
     }   
    }
