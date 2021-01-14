@@ -10,7 +10,7 @@
 
 #include "DSO_config.h"
 #include "stopWatch.h"
-
+#include "qfp.h"
 
  
 
@@ -267,25 +267,39 @@ bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
         }
     return true;
 }
-#else // that one takes ~ 600 us for full samples
+#else // that one takes ~ 640 us for full samples
+        // 590 with qfp
+        // 260 with qfp and cast to int
+
+#if 0
+    #define DBG(x) x
+#else
+    #define DBG(...) 
+#endif
+DBG(uint32_t capcapcap[16];)
+DBG(uint32_t capIndex;)
+  
+        
 bool DSOCapture::captureToDisplay(int count,float *samples,uint8_t *waveForm)
 {    
+    DBG(uint32_t before=micros());
     float gain=vSettings[DSOCapturePriv::currentVoltageRange].displayGain;
     //uint32_t before=micros();
-    float offset=DSO_WAVEFORM_HEIGHT/2-((float)DSOCapturePriv::voltageOffset*gain*8.)/10.;
-    float gain8=(gain*8.)/10.;
+    float offset=(float)(DSO_WAVEFORM_HEIGHT/2)-((float)DSOCapturePriv::voltageOffset*gain*8.)/10.;
+    float gain8=QMUL(gain,.8);
     for(int j=0;j<count;j++)
         {
             float v=samples[j];
-            v*=gain8;
-            v=offset-v;             
-            if(v>DSO_WAVEFORM_HEIGHT) v=DSO_WAVEFORM_HEIGHT;
-            if(v<0) v=0;           
-            waveForm[j]=(uint8_t)v;
+            v=QMUL(v,gain8);
+            v=QADD(offset,-v);     
+            int vint=(int)v;
+            if(vint>DSO_WAVEFORM_HEIGHT) vint=DSO_WAVEFORM_HEIGHT;
+            if(vint<0) vint=0;           
+            waveForm[j]=(uint8_t)vint;
         }
-    //uint32_t duration=micros()-before;
-    //capcapcap[capIndex]=duration;
-    //capIndex=(capIndex+1)&0xf;
+    DBG(uint32_t duration=micros()-before);
+    DBG(capcapcap[capIndex]=duration);
+    DBG(capIndex=(capIndex+1)&0xf);
     return true;
 }
 #endif

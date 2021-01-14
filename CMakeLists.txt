@@ -49,6 +49,7 @@ include_directories(.)
 include_directories(adc)
 include_directories(captureEngine)
 include_directories(src)
+include_directories(qfp)
 
 # FreeRTOS
 SET(PORTNAME Stm32duino)
@@ -59,6 +60,7 @@ ADD_SUBDIRECTORY(MapleFreeRTOS1000/)
 ADD_SUBDIRECTORY(testFunc/)
 ADD_SUBDIRECTORY(captureEngine/)
 ADD_SUBDIRECTORY(src)
+ADD_SUBDIRECTORY(qfp)
 ADD_SUBDIRECTORY(Adafruit_TFTLCD_8bit_STM32)
 #
 generate_arduino_firmware(Dso150${EXTENSION} 
@@ -72,6 +74,7 @@ TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}captureEngine)
 TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}adc)
 TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}TFT)
 TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}src)
+TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}qfpm3)
 TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}tests)
 
 # Summary
