@@ -7,7 +7,8 @@
 #include "Fonts/Targ56.h"
 #include "Fonts/digitLcd56.h"
 #include "Fonts/FreeSansBold12pt7b.h"
-#include "gfx/dso_small_compressed.h"
+//#include "gfx/dso_small_compressed.h"
+#include "gfx/dso150nb_compressed.h"
 #include "cpuID.h"
 
 extern void  autoSetup();
@@ -41,7 +42,8 @@ void drawBackground();
 void splash(void)
 {
         tft->fillScreen(BLACK);   
-        tft->drawRLEBitmap(dso_small_width,dso_small_height,20,64,WHITE,BLACK,dso_small);
+        //tft->drawRLEBitmap(dso_small_width,dso_small_height,20,64,WHITE,BLACK,dso_small);
+        tft->drawRLEBitmap(dso150nb_width,dso150nb_height,20,64,WHITE,BLACK,dso150nb);
         tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::SmallFont);        
         
         tft->setTextColor(WHITE,BLACK);        
