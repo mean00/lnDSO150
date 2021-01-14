@@ -50,7 +50,7 @@ static const uint16_t *getBackGround(int line)
 static const char *fq2Text(int fq)
 {
     static char buff[16];
-    float f=fq;
+    int  f=fq;
     const char *suff="";
 #define STEP(x,t)  if(f>x)     {suff=t;f/=x;}else
 
@@ -58,7 +58,7 @@ static const char *fq2Text(int fq)
     STEP(1000,"K")
     {}
     
-    sprintf(buff,"%3.1f%s",f,suff);
+    sprintf(buff,"%3d%s",f,suff);
     return buff;
 }
 /**
