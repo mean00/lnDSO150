@@ -85,4 +85,4 @@ else(USE_VANILLA_HW)
     MESSAGE(STATUS "\tUsing rotary encoder modification (PB14/PB15) ")
 endif(USE_VANILLA_HW)
 #
-MESSAGE(STATUS "\tUsing ${EXTENSION} MCU ")
+MESSAGE(STATUS "\tUsing ${EXTENSION} MCU at ${MCU_SPEED} Hz")
