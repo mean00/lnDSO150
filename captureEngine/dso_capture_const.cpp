@@ -40,26 +40,22 @@ VoltageSettings vSettings[NB_CAPTURE_VOLTAGE]= {
  *  */
 const TimeSettings tSettings[]
 {
-#ifdef       HIGH_SPEED_ADC        
-// !!  96 Mhz clock !!
-    #if F_CPU==96000000
-#warning FIXME
-    {DSOADC::ADC_CAPTURE_FAST_INTERLEAVED,"5us",      DSOADC::ADC_PRESCALER_2,  ADC_SMPR_1_5,    5850,  6857100 }, // Seems buggy !
-    {DSOADC::ADC_CAPTURE_MODE_NORMAL,     "10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    5606,  2400000},
-  
- 
-   #elif F_CPU==120000000 
-#error : We have to drop / duplicate too many samples at 120 Mhz, use 96!
-    {false,"10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,    4096,  2564103},
-  
-         
-    #else
-        #error unsupported MCU frequency
-    #endif
-    
-#else // 72 Mhz clock
-    {DSOADC::ADC_CAPTURE_FAST_INTERLEAVED, "5us",      DSOADC::ADC_PRESCALER_2,ADC_SMPR_1_5,   4390,   2564100*2},
-    {DSOADC::ADC_CAPTURE_MODE_NORMAL,      "10us",     DSOADC::ADC_PRESCALER_2,ADC_SMPR_1_5,   4390,   2564100},
+   
+
+ // 72 Mhz clock
+#if   F_CPU==72000000     
+    {DSOADC::ADC_CAPTURE_FAST_INTERLEAVED, "5us",      DSOADC::ADC_PRESCALER_2, ADC_SMPR_1_5,   4390,   2564100*2},
+    {DSOADC::ADC_CAPTURE_MODE_NORMAL,      "10us",     DSOADC::ADC_PRESCALER_2, ADC_SMPR_1_5,   4390,   2564100},
+// !!  96 Mhz clock !!    
+#elif F_CPU==96000000
+    {DSOADC::ADC_CAPTURE_FAST_INTERLEAVED,"5us",      DSOADC::ADC_PRESCALER_2,  ADC_SMPR_1_5,   5850,  6857100 }, // Seems buggy !
+    {DSOADC::ADC_CAPTURE_MODE_NORMAL,     "10us",     DSOADC::ADC_PRESCALER_2,  ADC_SMPR_7_5,   5606,  2400000},          
+#elif F_CPU==128000000
+    //{DSOADC::ADC_CAPTURE_MODE_NORMAL, "5us",      DSOADC::ADC_PRESCALER_2, ADC_SMPR_1_5,   3901,    4571429},
+    {DSOADC::ADC_CAPTURE_FAST_INTERLEAVED,      "5us",     DSOADC::ADC_PRESCALER_4, ADC_SMPR_1_5,  1950*2,    2285714*2},
+    {DSOADC::ADC_CAPTURE_MODE_NORMAL,      "10us",     DSOADC::ADC_PRESCALER_2, ADC_SMPR_13_5,  4201,    2461538},
+#else
+#error unsupported MCU frequency
  #endif
 };
 
