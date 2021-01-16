@@ -61,6 +61,9 @@ void splash(void)
         tft->myDrawString(bf);       
         tft->setCursor(140, 64+20*4);
         tft->myDrawString(cpuID::getIdAsString());         
+        tft->setCursor(140, 64+20*5);
+        sprintf(bf,"%d Mhz",F_CPU/1000000);
+        tft->myDrawString(bf);         
 }
 
 
