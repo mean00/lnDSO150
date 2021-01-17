@@ -477,7 +477,7 @@ float        DSOCapture::getMinVoltageValue()
     // Same but for 2 blocks i.e. 2*24=48 pixel
    
     float gain=vSettings[DSOCapturePriv::currentVoltageRange].displayGain;
-    float v=40./gain;
+    float v=44./gain;
     return v;
 }
 /**
