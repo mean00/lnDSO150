@@ -253,7 +253,7 @@ int transformDmaExact(int dc0_ac1,int16_t *in, float *out,int count, CaptureStat
    return count;
 }
 
-#if 1
+#if 0
     #define DBG2(x) x;
 #else
     #define DBG2(x)
@@ -264,6 +264,7 @@ DBG2(uint32_t poppopIndex=0)
 
 //  STM32 @ 128 M : Native      : 867 us
 //  STM32 @ 128 M : reorganize  : 465 us
+//                  trigger       450 us        
 
 static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode,int swing)
 {    
@@ -298,18 +299,39 @@ static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expan
         f=QSUB(f,offset);
         f=QMUL(f,multiplier);
         out[i]=f; // Unit is now in volt
-
-        if(stats.trigger==-1)
-        {
-             if(mode!=DSOADC::Trigger_Rising)
-                 if(out[i-1]<triggerValue&&out[i]>=triggerValue) stats.trigger=i;
-        // The else is ***NOT** Missing here             
-             if(mode!=DSOADC::Trigger_Falling)
-                 if(out[i-1]>triggerValue&&out[i]<=triggerValue) stats.trigger=i;
-        }   
         dex+=expand;
     }   
    }
+   // Search for trigger
+     // Search for trigger
+     if(stats.trigger==-1)
+     {
+         float t=triggerValue;
+         t=t/multiplier;
+         t+=offset;
+         
+         int tint=(int)t; // Check it in integer, faster
+          if(mode!=DSOADC::Trigger_Rising)
+          {
+               for(int i=1;i<ocount && stats.trigger==-1;i++)
+                    if(in[i-1]<tint&&in[i]>=tint) stats.trigger=i;
+          }
+         // The else is ***NOT** Missing here
+          if(mode!=DSOADC::Trigger_Falling)
+          {
+               for(int i=1;i<ocount && stats.trigger==-1;i++)
+                   if(in[i-1]>tint&&in[i]<=tint) stats.trigger=i;
+          }
+     }
+   // The trigger needs to be compensated for expand
+   if(stats.trigger!=-1)
+   {
+       float f=stats.trigger;
+       f*=expand;
+       f/=4096.;
+       stats.trigger=(int)f;
+   }
+   
    DBG2(poppop[poppopIndex]=micros()-start);
    DBG2(poppopIndex=(poppopIndex+1)&15);
    return ocount;
