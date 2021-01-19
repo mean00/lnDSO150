@@ -262,7 +262,8 @@ int transformDmaExact(int dc0_ac1,int16_t *in, float *out,int count, CaptureStat
 DBG2(uint32_t poppop[16])
 DBG2(uint32_t poppopIndex=0)
 
-//  STM32 @ 128 M : Native : 867 us
+//  STM32 @ 128 M : Native      : 867 us
+//  STM32 @ 128 M : reorganize  : 465 us
 
 static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode,int swing)
 {    
@@ -286,35 +287,16 @@ static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expan
    multiplier=DSOInputGain::getMultiplier();
    
    // search min/max, take all the samples
-   
-   
-   // First
-   float f;
-   {
-       int v=in[0];
-       if(v<swing) stats.saturation=true;
-       if(v>(4096-swing)) stats.saturation=true;
-       f=(float)v; 
-       f=QSUB(f,offset);
-       f=QMUL(f,multiplier);
-       if(f>stats.xmax) stats.xmax=f;
-       if(f<stats.xmin) stats.xmin=f;       
-       out[0]=f; // Unit is now in volt
-       stats.avg=QADD(stats.avg,f);
-       dex+=expand;
-   }
-   
-   // med
-   //if(stats.trigger==-1)
+   checkAvgMinMax(count,in,stats,swing,offset,multiplier);
+ 
    {   
-    for(int i=1;i<ocount;i++)
+    float f;
+    for(int i=0;i<ocount;i++)
     {
-
+        
         f=*(in+(dex/4096));
         f=QSUB(f,offset);
         f=QMUL(f,multiplier);
-        if(f>stats.xmax) stats.xmax=f;
-        if(f<stats.xmin) stats.xmin=f;       
         out[i]=f; // Unit is now in volt
 
         if(stats.trigger==-1)
@@ -324,13 +306,10 @@ static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expan
         // The else is ***NOT** Missing here             
              if(mode!=DSOADC::Trigger_Falling)
                  if(out[i-1]>triggerValue&&out[i]<=triggerValue) stats.trigger=i;
-        }
-
-        stats.avg=QADD(stats.avg,f);
+        }   
         dex+=expand;
     }   
    }
-   stats.avg/=(float)ocount;
    DBG2(poppop[poppopIndex]=micros()-start);
    DBG2(poppopIndex=(poppopIndex+1)&15);
    return ocount;
