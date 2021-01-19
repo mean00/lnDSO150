@@ -58,7 +58,7 @@ public:
 public:
     static const char *getTimeBaseAsTextDma();
     static const char *getTimeBaseAsTextTimer();
-    static bool        taskletDma();
+    static bool        taskletDmaTrigger();
     static bool        taskletDmaRunning();
     static bool        taskletDmaCommon(const bool trigger);
     static bool        taskletTimerCommon(bool trigger);

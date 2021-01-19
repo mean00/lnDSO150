@@ -34,7 +34,7 @@ const CaptureFunctionTable DmaTableTrigger=
     DSOCapturePriv::prepareSamplingDma,
     DSOCapturePriv::getTimeBaseAsTextDma,
     DSOCapturePriv::startCaptureDmaTrigger,
-    DSOCapturePriv::taskletDma,
+    DSOCapturePriv::taskletDmaTrigger,
     DSOCapturePriv::nextCaptureDmaTrigger,
     DSOCapturePriv::initOnceDmaTrigger,
 };

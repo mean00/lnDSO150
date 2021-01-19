@@ -507,6 +507,9 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
     
     set->stats.trigger=-1;     
     set->stats.frequency=-1;
+    
+    // We have XX*expand/4096 sample in and XX samples out
+    
     int     expand=tSettings[currentTime].expand4096;
     int needed=(expand*lastAskedSampleCount)/4096;
     int window=0;
@@ -554,7 +557,7 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
  * 
  * @return 
  */
-bool DSOCapturePriv::taskletDma()
+bool DSOCapturePriv::taskletDmaTrigger()
 {
     
     return taskletDmaCommon(true);
