@@ -313,13 +313,13 @@ static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expan
          int tint=(int)t; // Check it in integer, faster
           if(mode!=DSOADC::Trigger_Rising)
           {
-               for(int i=1;i<ocount && stats.trigger==-1;i++)
+               for(int i=1;i<count && stats.trigger==-1;i++)
                     if(in[i-1]<tint&&in[i]>=tint) stats.trigger=i;
           }
          // The else is ***NOT** Missing here
           if(mode!=DSOADC::Trigger_Falling)
           {
-               for(int i=1;i<ocount && stats.trigger==-1;i++)
+               for(int i=1;i<count && stats.trigger==-1;i++)
                    if(in[i-1]>tint&&in[i]<=tint) stats.trigger=i;
           }
      }
