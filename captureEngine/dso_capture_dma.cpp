@@ -142,9 +142,106 @@ bool DSOCapturePriv::refineCapture(FullSampleSet &set,int needed)
  * @param swing
  * @return 
  */
+
+/**
+ STM32F1 / 128 Mhz => 
+ * Normal : 240 cycle =             880 us
+ * Taking min max out of the loop : 570 us
+ * Taking avg out of the loop       460 us
+ 
+ */
+
+
+#if 1
+    #define DBG(x) x;
+#else
+    #define DBG(x)
+#endif
+DBG(uint32_t poppop[16])
+DBG(uint32_t poppopIndex=0)
 int transformDmaExact(int dc0_ac1,int16_t *in, float *out,int count, CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode,int swing)
 {    
    if(!count) return false;
+   DBG(uint32_t start=micros());
+   stats.xmin=200;
+   stats.xmax=-200;
+   stats.saturation=false;
+   stats.avg=0;
+   int dex=0;
+   float offset,multiplier;   
+   float f;   
+   offset=DSOInputGain::getOffset(dc0_ac1);
+   multiplier=DSOInputGain::getMultiplier();
+   
+   // Search min/max
+   int xmin=4096*2;
+   int xmax=-1;
+   int sum=0;
+   for(int i=0;i<count;i++)
+   {
+       int v=in[i];
+       sum+=v;
+       if(v>xmax) xmax=v;
+       if(v<xmin) xmin=v;
+       if(v<swing)        stats.saturation=true;
+       if(v>(4096-swing)) stats.saturation=true;
+   }
+   // compute avg
+   f=(float)sum;
+   f/=count;
+   f-=offset;
+   f*=multiplier;     
+   stats.avg=f;
+   
+   // Compute min max
+   f=(float)xmax;
+   f=QSUB(f,offset);
+   f=QMUL(f,multiplier);
+   stats.xmax=f;
+     
+   f=(float)xmin;
+   f=QSUB(f,offset);
+   f=QMUL(f,multiplier);
+    stats.xmin=f;
+            
+   // First
+
+   {
+       int v=in[0];       
+       f=(float)v; 
+       f=QSUB(f,offset);
+       f=QMUL(f,multiplier); 
+       out[0]=f; // Unit is now in volt       
+   }
+   
+   // med
+   //if(stats.trigger==-1)
+   {   
+    for(int i=1;i<count;i++)
+    {
+
+        f=*(in+i);
+        f=QSUB(f,offset);
+        f=QMUL(f,multiplier);
+        out[i]=f; // Unit is now in volt
+        if(stats.trigger==-1)
+        {
+             if(mode!=DSOADC::Trigger_Rising)
+                 if(out[i-1]<triggerValue&&out[i]>=triggerValue) stats.trigger=i;
+             if(mode!=DSOADC::Trigger_Falling)
+                 if(out[i-1]>triggerValue&&out[i]<=triggerValue) stats.trigger=i;
+        }
+    }   
+   }
+   
+   DBG(poppop[poppopIndex]=micros()-start);
+   DBG(poppopIndex=(poppopIndex+1)&15);
+   return count;
+}
+int transformDmaExact2(int dc0_ac1,int16_t *in, float *out,int count, CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode,int swing)
+{    
+   if(!count) return false;
+   DBG(uint32_t start=micros());
    stats.xmin=200;
    stats.xmax=-200;
    stats.saturation=false;
@@ -195,9 +292,10 @@ int transformDmaExact(int dc0_ac1,int16_t *in, float *out,int count, CaptureStat
     }   
    }
    stats.avg/=(float)count;
+   DBG(poppop[poppopIndex]=micros()-start);
+   DBG(poppopIndex=(poppopIndex+1)&15);
    return count;
 }
-
 static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expand,CaptureStats &stats, float triggerValue, DSOADC::TriggerMode mode,int swing)
 {    
    if(!count) return false;
