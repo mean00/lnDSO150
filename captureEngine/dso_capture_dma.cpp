@@ -85,7 +85,7 @@ int DSOCapturePriv::refineCapture(FullSampleSet &set,int needed)
          // Try to find the trigger, we have ADC_INTERNAL_BUFFER_SIZE samples coming in, we want requestSample out..
         uint16_t *p=(uint16_t *)set.set1.data;
         int count=set.set1.samples;        
-        static int found=-1;
+        int found=-1;
         int start=needed/2;  // try to center the output if we can
         int end=count-needed/2;
         xAssert(end>start);
@@ -480,7 +480,7 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
             return false;
         }  
 #warning This is slightly wrong due to expand        
-        set->stats.trigger=triggerFound; 
+        set->stats.trigger=(triggerFound*4096)/expand; 
     }else
     {
         set->stats.trigger=120; // right in the middle        
