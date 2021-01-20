@@ -282,36 +282,7 @@ static int transformDma(int dc0_ac1,int16_t *in, float *out,int count, int expan
         out[i]=f; // Unit is now in volt
         dex+=expand;
     }   
-   }
-   // Search for trigger
-     // Search for trigger
-     if(stats.trigger==-1)
-     {
-         float t=triggerValue;
-         t=t/multiplier;
-         t+=offset;
-         
-         int tint=(int)t; // Check it in integer, faster
-          if(mode!=DSOADC::Trigger_Rising)
-          {
-               for(int i=1;i<count && stats.trigger==-1;i++)
-                    if(in[i-1]<tint&&in[i]>=tint) stats.trigger=i;
-          }
-         // The else is ***NOT** Missing here
-          if(mode!=DSOADC::Trigger_Falling)
-          {
-               for(int i=1;i<count && stats.trigger==-1;i++)
-                   if(in[i-1]>tint&&in[i]<=tint) stats.trigger=i;
-          }
-     }
-   // The trigger needs to be compensated for expand
-   if(stats.trigger!=-1)
-   {
-       float f=stats.trigger;
-       f*=expand;
-       f/=4096.;
-       stats.trigger=(int)f;
-   }
+   }   
    
    DBG2(poppop[poppopIndex]=micros()-start);
    DBG2(poppopIndex=(poppopIndex+1)&15);
@@ -495,21 +466,25 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
     int needed=(expand*lastAskedSampleCount)/4096;
     int window=0;
     float *data=set->data;    
-    p=((int16_t *)fset.set1.data);
     
+    p=((int16_t *)fset.set1.data);    
     if(IS_CAPTURE_DUAL() )
         swapADCs(fset.set1.samples,(uint16_t *)p);
     
     if(trigger)
     {
-        bool triggerFound=refineCapture(fset,needed);
-        if(!triggerFound)
+        int triggerFound=refineCapture(fset,needed);
+        if(triggerFound<0)
         {
             nextCapture();                
             return false;
-        }        
+        }  
+#warning This is slightly wrong due to expand        
+        set->stats.trigger=triggerFound; 
+    }else
+    {
+        set->stats.trigger=120; // right in the middle        
     }
-    set->stats.trigger=120; // right in the middle
     p=((int16_t *)fset.set1.data);
     set->samples=transformDma(      INDEX_AC1_DC0(),
                                     p,
