@@ -80,7 +80,7 @@ static void swapADCs(int nb, uint16_t *data)
  * 
  * @param set
  */
-bool DSOCapturePriv::refineCapture(FullSampleSet &set,int needed)
+int DSOCapturePriv::refineCapture(FullSampleSet &set,int needed)
 {
          // Try to find the trigger, we have ADC_INTERNAL_BUFFER_SIZE samples coming in, we want requestSample out..
         uint16_t *p=(uint16_t *)set.set1.data;
@@ -122,13 +122,13 @@ bool DSOCapturePriv::refineCapture(FullSampleSet &set,int needed)
         if(found==-1)
         {     
             set.set1.samples=needed; // just grab the N first 
-            return false;
+            return -1;
         }
         // center on the trigger
         int offset=(found-needed/2)&0xfffe;
         set.set1.data+=offset; // must be even, else we'll swap them wrong
         set.set1.samples=needed;        
-        return true;
+        return found-offset;
 }
 /**
  * 
@@ -227,26 +227,7 @@ int transformDmaExact(int dc0_ac1,int16_t *in, float *out,int count, CaptureStat
         out[i]=f; // Unit is now in volt        
     }   
    }
-    // Search for trigger
-     if(stats.trigger==-1)
-     {
-         float t=triggerValue;
-         t=t/multiplier;
-         t+=offset;
-         
-         int tint=(int)t; // Check it in integer, faster
-          if(mode!=DSOADC::Trigger_Rising)
-          {
-               for(int i=1;i<count && stats.trigger==-1;i++)
-                    if(in[i-1]<tint&&in[i]>=tint) stats.trigger=i;
-          }
-         // The else is ***NOT** Missing here
-          if(mode!=DSOADC::Trigger_Falling)
-          {
-               for(int i=1;i<count && stats.trigger==-1;i++)
-                   if(in[i-1]>tint&&in[i]<=tint) stats.trigger=i;
-          }
-     }
+  
         
    DBG(poppop[poppopIndex]=micros()-start);
    DBG(poppopIndex=(poppopIndex+1)&15);

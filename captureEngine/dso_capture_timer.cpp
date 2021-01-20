@@ -104,14 +104,18 @@ bool DSOCapturePriv::taskletTimerCommon(bool trigger)
     if(trigger)
     {
         int needed=lastAskedSampleCount;
-        bool triggerFound=refineCapture(fset,needed);
-        if(!triggerFound)
+        int triggerFound=refineCapture(fset,needed);
+        if(triggerFound<0)
         {
             nextCapture();                
             return false;
-        }        
+        }  
+        // If we have a trigger, reuse it
+        set->stats.trigger=triggerFound;
+    }else
+    {
+        set->stats.trigger=120; // right in the middle
     }
-    set->stats.trigger=120; // right in the middle
     p=((int16_t *)fset.set1.data);
     set->samples=transformDmaExact(      INDEX_AC1_DC0(),
                                     p,
@@ -129,7 +133,6 @@ bool DSOCapturePriv::taskletTimerCommon(bool trigger)
             float f=fint;
             f=((float)timerBases[currentTimeBase].fq)*1000./f;
             set->stats.frequency=f;
-            set->stats.trigger=120;
 
     }else  
     {
