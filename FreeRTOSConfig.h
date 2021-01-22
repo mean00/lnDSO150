@@ -28,7 +28,7 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
-#define uxTopReadyPriority uxTopUsedPriority // Makes openOCD happy 
+// FX #define uxTopReadyPriority uxTopUsedPriority // Makes openOCD happy 
 
 /* Library includes. */
 // MEANX Not needed for stm32duino #include "stm32f10x_lib.h"
