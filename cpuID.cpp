@@ -7,7 +7,12 @@ uint32_t _cpuId=0;
 static int      _flashSize=0;
 static int      _ramSize=0;
 static MCU_IDENTIFICATION _chipId;
+ uint32_t MVFR0;
+ uint32_t MVFR1;
 
+ extern float testFpu(float f, float g);
+ 
+ 
 /**
  * 
  */
@@ -35,6 +40,26 @@ void cpuID::identify()
     // Partno : C23  => Cortex M3
     // Rev=1
     
+    // cortex M4, do we have FPU ?
+    if(  ((_cpuId>>4)&0xfff)==0xc24)
+    { 
+        //  https://developer.arm.com/documentation/100166/0001/Floating-Point-Unit/FPU-programmers-model/Enabling-the-FPU?lang=en
+        uint32_t *fp=(uint32_t *)0xE000EF40;
+        MVFR0=fp[0];
+        MVFR1=fp[1]; 
+        if(((MVFR0>>16)&0xff)==0x11) // hw multiply & divide
+        {
+            // Yes, activate FPU
+            volatile uint32_t *cpacr=(uint32_t *)0xE000ED88;
+            uint32_t c=cpacr[0];
+            c|=(3<<20)+(3<<22); // enable priviledged & unpriviledged https://interrupt.memfault.com/blog/cortex-m-rtos-context-switching
+            cpacr[0]=c;
+            float f=testFpu(2.0,3.0);
+           
+            
+            
+        }
+    }
     
     // 2nd part ram & flash size
     uint32_t density=*(uint32_t *)0x1FFFF7E0;
@@ -62,7 +87,7 @@ void cpuID::identify()
                 xAssert(0);         
         _ramSize=20;
     }
-
+  
 
 }
 /**

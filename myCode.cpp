@@ -63,12 +63,11 @@ void mySetup()
     
   Logger("Init"); 
 
+  cpuID::identify(); // enable FPU ASAP
     
-    
-     // Ok let's go, switch to FreeRTOS
-    xTaskCreate( MainTask, "MainTask", 250, NULL, DSO_MAIN_TASK_PRIORITY, NULL );
-   
-    vTaskStartScheduler();      
+  // Ok let's go, switch to FreeRTOS
+  xTaskCreate( MainTask, "MainTask", 250, NULL, DSO_MAIN_TASK_PRIORITY, NULL );   
+  vTaskStartScheduler();      
 }
 /**
  * 
@@ -83,7 +82,7 @@ void vApplicationDaemonTaskStartupHook()
  */
 void MainTask( void *a )
 {    
-    cpuID::identify();
+    
     displayIdentifier = tft->readID();
     if(!displayIdentifier) displayIdentifier=0x7789;
     tft=Adafruit_TFTLCD_8bit_STM32::spawn(displayIdentifier);   
@@ -177,5 +176,9 @@ void dummyForwardReference()
    mainDSOUI();
 }
 
+ float testFpu(float f, float g)
+ {
+     return f*g-1.1;
+ }
 //-
 
