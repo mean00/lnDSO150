@@ -150,6 +150,11 @@ int DSOCapturePriv::refineCapture(FullSampleSet &set,int needed)
  * Taking avg out of the loop       460 us
  * Searching trigger in integer     440 us
  
+ * 
+ * GD32F3 @ 96 MHz
+ *      With FPU        83 us
+ *      Without FPU     350 us
+ * 
  */
 
 
