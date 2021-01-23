@@ -39,27 +39,22 @@ static void swapADCs_asm(int nb, uint16_t *data)
             "   rev16 r2,r2     \n"
             "   str r2,[r1]     \n"    
     
-            "   add r1,r1,#4    \n"
-            "   ldr r2,[r1]     \n"
+            "   ldr r2,[r1,#4]     \n"
             "   rev r2,r2       \n"
             "   rev16 r2,r2     \n"
-            "   str r2,[r1]     \n"    
-
-                "   add r1,r1,#4    \n"
-            "   ldr r2,[r1]     \n"
+            
+            "   str r2,[r1,#4]     \n"    
+            "   ldr r2,[r1,#8]     \n"
             "   rev r2,r2       \n"
             "   rev16 r2,r2     \n"
-            "   str r2,[r1]     \n"    
+            "   str r2,[r1,#8]     \n"    
 
-            "   add r1,r1,#4    \n"
-            "   ldr r2,[r1]     \n"
+            "   ldr r2,[r1,#12]     \n"
             "   rev r2,r2       \n"
             "   rev16 r2,r2     \n"
-            "   str r2,[r1]     \n"    
-
+            "   str r2,[r1,#12]     \n"    
     
-    
-            "   add r1,r1,#4    \n"
+            "   add r1,r1,#16    \n"
             "   sub r0,r0,#1    \n"
             "   cmp r0,#0       \n"
             "   bne nxt         \n" 
