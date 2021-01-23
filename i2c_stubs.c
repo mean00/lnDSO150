@@ -57,4 +57,8 @@ void _i2c_irq_handler(i2c_dev *dev)
 void _i2c_irq_error_handler(i2c_dev *dev)
 {
 }
+// This disables USB altogether
+void __irq_usb_lp_can_rx0()
+{
+}
 
