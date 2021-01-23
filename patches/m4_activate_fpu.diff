@@ -1,0 +1,17 @@
+--- a/STM32F1/variants/generic_gd32f303c/wirish/boards_setup.cpp	2021-01-23 10:40:52.302219033 +0100
++++ b/STM32F1/variants/generic_gd32f303c/wirish/boards_setup.cpp	2021-01-21 18:21:33.188439887 +0100
+@@ -98,6 +98,14 @@
+                 #elif F_CPU == 48000000
+ 			rcc_set_prescaler(RCC_PRESCALER_USB, RCC_USB_SYSCLK_DIV_1);			
+                 #endif	
++
++        // Activate FPU Here, asap !
++        uint32_t    *cpacr=(uint32_t *) 0xE000ED88;
++        uint32_t v=cpacr[0];
++        v|=0xF<<20;
++        cpacr[0]=v;
++
++
+         }
+ 
+         __weak void board_setup_gpio(void) {

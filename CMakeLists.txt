@@ -15,6 +15,7 @@ include(applyPatch)
 #
 include(./platformConfig.cmake)
 APPLY_PATCH_IF_NEEDED(patched gd32_patch.diff              "add gd32f303 support") 
+APPLY_PATCH_IF_NEEDED(patchedm4 m4_activate_fpu.diff       "activate m4 fpu (gd32f303)") 
 
 
 cmake_minimum_required(VERSION 2.8)
