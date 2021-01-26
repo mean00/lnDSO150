@@ -22,7 +22,7 @@ testSignal *myTestSignal;
 DSOControl *controlButtons;
 DSOADC    *adc;
 uint16_t displayIdentifier=0;
-
+xMutex   *adc2Lock;
 
 // Globals
 uint16_t calibrationHash=0;
@@ -75,7 +75,23 @@ void mySetup()
 void vApplicationDaemonTaskStartupHook()
 {
 }
-
+int adcLockCount=0;
+void useAdc2(bool use)
+{
+    if(use)
+    {             
+        adc2Lock->lock();        
+        xAssert(!adcLockCount);        
+        adcLockCount++;
+        
+    }
+    else
+    {
+        xAssert(adcLockCount==1);        
+        adcLockCount--;
+        adc2Lock->unlock();
+    }
+}
 /**
  * 
  * @param a
@@ -97,6 +113,9 @@ void MainTask( void *a )
     tft->fillScreen(BLACK);
     
     splash();
+    
+    adc2Lock=new xMutex;
+    
     delay(500);
     myTestSignal=new testSignal(  PIN_TEST_SIGNAL,PIN_TEST_SIGNAL_AMP);
     myTestSignal->setAmplitude(true);

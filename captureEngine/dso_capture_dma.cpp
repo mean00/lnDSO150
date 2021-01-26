@@ -10,6 +10,9 @@
 #include "DSO_config.h"
 #include "dso_adc_gain.h"
 #include  "qfp.h"
+
+extern void useAdc2(bool use);
+
 static void swapADCs_c(int nb, uint16_t *data)
 {    
     int nbWord=nb/2;   
@@ -63,6 +66,28 @@ static void swapADCs_asm(int nb, uint16_t *data)
             : : : "memory");
 }
 
+bool adc2InUse=false;
+// we filter out multiple call to stop()
+void captureAdc2(bool use)
+{
+    if(use)
+    {
+        if(!adc2InUse) //xAssert(!adc2InUse);
+        {
+            adc2InUse=true;
+            useAdc2(true);
+        }
+    }else
+    {
+        if(adc2InUse)
+        {
+             useAdc2(false);
+             adc2InUse=false;
+        }
+    }
+    
+    
+}
 static void swapADCs(int nb, uint16_t *data)
 {    
     int ex=nb&7;
@@ -384,6 +409,7 @@ void DSOCapturePriv::stopCaptureDma()
 {
     
     adc->stopDmaCapture();
+    captureAdc2(false);
     
 }
 /**
@@ -406,6 +432,7 @@ bool       DSOCapturePriv:: startCaptureDma (int count)
     int ex=count*tSettings[currentTimeBase].expand4096;
     lastRequested=ex/4096;
     lastAskedSampleCount=count;
+    captureAdc2(true);
     if(IS_CAPTURE_DUAL())
         return adc->startDualDMASampling (DSO_INPUT_PIN, lastRequested);
     else
@@ -424,6 +451,7 @@ bool       DSOCapturePriv:: startCaptureDmaTrigger (int count)
     lastAskedSampleCount=count;
     xAssert(lastRequested>0);
     xAssert(lastRequested<ADC_INTERNAL_BUFFER_SIZE);
+    captureAdc2(true);
     return adc->startDMATriggeredSampling(lastRequested,triggerValueADC);
 }
 /**

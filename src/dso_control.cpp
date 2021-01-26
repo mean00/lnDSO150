@@ -162,7 +162,7 @@ static int state;  // rotary state
 static int counter; // rotary counter
 
 static TaskHandle_t taskHandle;
-
+extern void useAdc2(bool use);
 int ints=0;
 /**
  * \brief This one is for left/right
@@ -209,7 +209,9 @@ int DSOControl::getRawCoupling()
  */
 static DSOControl::DSOCoupling couplingFromAdc2()
 {
+    useAdc2(true);
     rawCoupling= directADC2Read(COUPLING_PIN);    
+    useAdc2(false);
     if(rawCoupling>3200)      
         return DSOControl::DSO_COUPLING_AC;
     if(rawCoupling<1000)       
