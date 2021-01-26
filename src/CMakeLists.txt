@@ -1,4 +1,5 @@
 
+
 SET(SRCS 
     dso_adc_gain.cpp
     dso_autoSetup.cpp
@@ -21,3 +22,6 @@ generate_arduino_library(${libPrefix}src
                         )
 target_include_directories(${libPrefix}src PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
+IF(FULL_ROTARY_STEP)
+    TARGET_COMPILE_DEFINITIONS(${libPrefix}src PRIVATE "ROTARY_FULL_STEP")
+ENDIF(FULL_ROTARY_STEP)

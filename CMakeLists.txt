@@ -10,6 +10,9 @@
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(select_mcu_stm32)
 include(applyPatch)
+
+OPTION(FULL_ROTARY_STEP "Use full step for rotary encoder" FALSE)
+
 #
 # Patch Arduino_stm32 if needed to add gd32f303 support
 #
