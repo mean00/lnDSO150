@@ -34,10 +34,9 @@ typedef struct TimerTimeBase
   DSOCapture::DSO_TIME_BASE timeBase;
   const char    *name;
   int           fq;  
-  bool          overSampling;
+  int           overSampling; // Oversampling ratio, only on GD32!
   adc_smp_rate  rate ;
   DSOADC::Prescaler scale;
-  DSOADC::Prescaler scaleGD32;
   
 };
 
