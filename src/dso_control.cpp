@@ -263,13 +263,19 @@ static void trampoline(void *a)
 }
 
 /**
- *  Use the ADC to sample coupling pin
- *  No need to hurry, it is a single sample done whenever the ADC is free
- *  So analogRead is fine
+ * Read the coupling pin every 300 ms or so
+ * It's value depends on the coupling selector
+ * ~ 0 / ~ 2000 / ~ 4000
  */
+static uint32_t lastUpdate=0;
 void          DSOControl::updateCouplingState()
 {
-    couplingState=couplingFromAdc2();
+    uint32_t now=millis();
+    if(now>lastUpdate+300)
+    {
+        couplingState=couplingFromAdc2();
+        lastUpdate=now;
+    }
 }
 
 /**
