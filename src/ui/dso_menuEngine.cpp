@@ -50,6 +50,14 @@ void MenuManager::printMenuTitle(const char *text)
     tft->setCursor(80,40-24);
     tft->myDrawString(text);
 }
+
+void MenuManager::printBackHint()
+{
+    tft->setTextColor(BLACK,GREEN); 
+    tft->setCursor(320-12*6,240-24);
+    tft->myDrawString("Back");
+    tft->setTextColor(GREEN,BLACK); 
+}
 /**
  * 
  */
@@ -68,7 +76,8 @@ void MenuManager::redraw(const char *title, int n,const MenuItem *xtop, int curr
     for(int i=0;i<n;i++)
     {
         printMenuEntry(current==i,i,xtop[i].menuText);
-    }        
+    }     
+    printBackHint();
 }
 
 void MenuManager::blink(int current, const char *text)
@@ -109,9 +118,15 @@ next:
         while(1)
         { 
                   xDelay(10); // dont busy loop
+                  
+                  int okEvent=controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_OK);
+                  if(okEvent&EVENT_SHORT_PRESS)
+                      return;
+                  
                   int event=controlButtons->getButtonEvents(USE_MENU_BUTTON);
                   if( event & EVENT_LONG_PRESS)
                     return;
+                  if(event & EVENT_SHORT_PRESS)
                   if(event & EVENT_SHORT_PRESS)
                   {
                    //   Serial.print("Menu \n");
