@@ -66,7 +66,7 @@ void mySetup()
   cpuID::identify(); // enable FPU ASAP
     
   // Ok let's go, switch to FreeRTOS
-  xTaskCreate( MainTask, "MainTask", 250, NULL, DSO_MAIN_TASK_PRIORITY, NULL );   
+  xTaskCreate( MainTask, "MainTask", 350, NULL, DSO_MAIN_TASK_PRIORITY, NULL );   
   vTaskStartScheduler();      
 }
 /**
