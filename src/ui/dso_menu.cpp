@@ -9,6 +9,7 @@
 #include "dso_global.h"
 #include "dso_calibrate.h"
 extern testSignal *myTestSignal;
+
 extern void buttonTest(void);
 
 void updateFrequency(int fq)
@@ -22,6 +23,15 @@ MKFQ(1000,1000)
 MKFQ(10000,10000)
 MKFQ(100000,100000)
         
+void range0()
+{
+    myTestSignal->setAmplitude(false);
+}        
+void range1()
+{
+    myTestSignal->setAmplitude(true);
+}        
+        
 #define FQ_MENU(x,y)     {MenuItem::MENU_CALL, x,(void *)fq##y},     
 const MenuItem  fqMenu[]=
 {
@@ -33,18 +43,26 @@ const MenuItem  fqMenu[]=
     {MenuItem::MENU_BACK, "Back",NULL},
     {MenuItem::MENU_END, NULL,NULL}
 };
-
+#define RANGE_MENU(x,y)     {MenuItem::MENU_CALL, x,(void *)range##y},     
+const MenuItem  amplitudeMenu[]=
+{
+    {MenuItem::MENU_TITLE, "Range",NULL},
+    RANGE_MENU("3.3v" ,1)
+    RANGE_MENU("100mv" ,0)
+    {MenuItem::MENU_BACK, "Back",NULL},
+    {MenuItem::MENU_END, NULL,NULL}
+};
 const MenuItem  signalMenu[]=
 {
     {MenuItem::MENU_TITLE, "Test Signal",NULL},
-    {MenuItem::MENU_TOGGLE, "3v signal",NULL},
+    {MenuItem::MENU_SUBMENU, "Range",(const void *)&amplitudeMenu},
     {MenuItem::MENU_SUBMENU, "Frequency",(const void *)&fqMenu},
     {MenuItem::MENU_BACK, "Back",NULL},
     {MenuItem::MENU_END, NULL,NULL}
 };
 const MenuItem  calibrationMenu[]=
 {
-    {MenuItem::MENU_TITLE, "Calbration",NULL},
+    {MenuItem::MENU_TITLE, "Calibration",NULL},
     {MenuItem::MENU_CALL, "Basic Calibrate",(const void *)DSOCalibrate::zeroCalibrate},    
     {MenuItem::MENU_CALL, "Fine Calibrate",(const void *)DSOCalibrate::voltageCalibrate},
     {MenuItem::MENU_CALL, "Wipe Calibration",(const void *)DSOCalibrate::decalibrate},
