@@ -32,7 +32,7 @@ int       nbRefrsh=0;
 static    int lastTrigger=-1;
 static    DSOControl::DSOCoupling oldCoupling;
 static    int triggered=0; // 0 means not trigger, else it is the # of samples in the buffer
-DSO_ArmingMode armingMode=DSO_UI_CONTINUOUS; // single shot or repeat capture
+DSO_ArmingMode armingMode=DSO_CAPTURE_CONTINUOUS; // single shot or repeat capture
 
 static void initMainUI(void);
 void drawBackground();
@@ -165,7 +165,7 @@ static void buttonManagement()
                     int v=(int)armingMode;
                     v+=inc;
                     if(v<0) v=0;
-                    if(v>DSO_ArmingMode::DSO_UI_CONTINUOUS) v=DSO_ArmingMode::DSO_UI_CONTINUOUS;
+                    if(v>DSO_ArmingMode::DSO_CAPTURE_CONTINUOUS) v=DSO_ArmingMode::DSO_CAPTURE_CONTINUOUS;
                     STOP_CAPTURE();
                     armingMode=(DSO_ArmingMode)v;
                     triggered=0;
@@ -276,6 +276,80 @@ void initMainUI(void)
     DSODisplay::drawVoltageTrigger(true,lastTrigger);
     
 }
+/**
+ *  called when nothing was captured, just in case the trigger value was changed
+ */
+int triggerLine;
+void refreshTriggerIfNeedBe()
+{
+    float lastVoltageTrigger=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();            
+    buttonManagement();
+    float f=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();
+    // did it change ?
+    if(f!=lastVoltageTrigger)
+    {
+        triggerLine=DSOCapture::voltageToPixel(lastVoltageTrigger);            
+        DSODisplay::drawVoltageTrigger(false,triggerLine);   
+        lastVoltageTrigger=f;                
+        triggerLine=DSOCapture::voltageToPixel(lastVoltageTrigger);     
+        if(triggered)
+            DSODisplay::drawWaveForm(triggered,waveForm);
+        DSODisplay::drawVoltageTrigger(true,triggerLine);   
+    }    
+}
+/**
+ * 
+ * @param count
+ * @param stats
+ */
+void processCapture(int count, CaptureStats &stats)
+{
+    static uint32_t lastRefresh=0;
+    // So we captured something
+    // refresh the display
+
+    DSOCapture::captureToDisplay(count,test_samples,waveForm);  
+    // Remove trigger
+    DSODisplay::drawVoltageTrigger(false,triggerLine);        
+    DSODisplay::drawWaveForm(count,waveForm);
+
+    if(armingMode==DSO_CAPTURE_SINGLE )
+    {
+        triggered=count; // remember the last #of samples in screen buffer
+                        // in case we need to redraw it later
+    }
+    DSODisplay::drawTriggeredState(armingMode,triggered);        
+    if(lastTrigger!=-1)
+    {
+         DSODisplay::drawVerticalTrigger(false,lastTrigger);
+         lastTrigger=-1;
+    }
+
+    if(stats.trigger!=-1)
+    {
+        lastTrigger=stats.trigger;
+        DSODisplay::drawVerticalTrigger(true,lastTrigger);
+    }
+    buttonManagement();        
+
+    float f=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();
+    triggerLine=DSOCapture::voltageToPixel(f);
+    DSODisplay::drawVoltageTrigger(true,triggerLine);
+
+    // refresh the stats once in a while        
+    uint32_t m=millis();
+    if(m<lastRefresh)
+    {
+        m=lastRefresh+101;
+    }
+    if((m-lastRefresh)>250)
+    {
+        lastRefresh=m;
+        DSODisplay::drawStats(stats);
+        refrshDuration+=(millis()-m);
+        nbRefrsh++;
+    }
+}        
 
 /**
  * 
@@ -283,17 +357,10 @@ void initMainUI(void)
 extern void testCoupling();
 void mainDSOUI(void)
 {
- 
     //testCoupling();
     CaptureStats stats;    
-
-    int triggerLine;
-    
     DSODisplay::init();
     initMainUI();
-   
-    uint32_t lastRefresh=millis();
-
     float f=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();
     triggerLine=DSOCapture::voltageToPixel(f);
     DSOControl::DSOCoupling oldCoupling=controlButtons->getCouplingState();
@@ -301,83 +368,60 @@ void mainDSOUI(void)
     while(1)
     {        
         int count=0;  
-        
-        bool wait = (armingMode== DSO_CAPTURE_SINGLE) && triggered;
-        if(  !wait)
+        switch(armingMode)
         {
-            count=DSOCapture::capture(240,test_samples,stats);  
-            controlButtons->updateCouplingState();
-        }
-        
-        // Nothing captured, refresh screen
-        if(!count) 
-        {            
-            float lastVoltageTrigger=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();            
-            buttonManagement();
-            float f=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();
-            
-            if(f!=lastVoltageTrigger)
-            {
-                triggerLine=DSOCapture::voltageToPixel(lastVoltageTrigger);            
-                DSODisplay::drawVoltageTrigger(false,triggerLine);   
-                lastVoltageTrigger=f;                
-                triggerLine=DSOCapture::voltageToPixel(lastVoltageTrigger);     
+            case DSO_CAPTURE_MULTI:
+            case DSO_CAPTURE_CONTINUOUS:
+                count=DSOCapture::capture(240,test_samples,stats);  // this will retrigger a capture automatically if needed                
+                if(!count) // Nothing captured, i.e. no trigger
+                {     
+                    refreshTriggerIfNeedBe(); // this will call button management
+                    // do we need to call that everytime ?
+#warning FIXME
+                    DSODisplay::drawTriggeredState(armingMode,triggered);
+                    continue;
+                }
+                // only update coupling when we have no capture running (i.e. we got something)
+                controlButtons->updateCouplingState();
+                // display it
+                processCapture(count,stats);
+                break;
+            case DSO_CAPTURE_SINGLE:                
+                // if triggered >0, it means we got a capture and wait to be rearmed
                 if(triggered)
-                    DSODisplay::drawWaveForm(triggered,waveForm);
-                DSODisplay::drawVoltageTrigger(true,triggerLine);   
-            }
-            
-            DSODisplay::drawTriggeredState(armingMode,triggered);
-            continue;
+                {
+                    refreshTriggerIfNeedBe(); // this will call button management
+                    // do we need to call that everytime ?
+#warning FIXME
+                    
+                    DSODisplay::drawTriggeredState(armingMode,triggered);
+                    // no need to redraw the actual capture
+                    continue;
+                }else
+                { // We are waiting for a valid capture in single mode
+                    count=DSOCapture::capture(240,test_samples,stats);   // this will do nothing if a capture is already running                    
+                    if(!count) // Nothing captured, i.e. no trigger
+                    {     
+                        refreshTriggerIfNeedBe(); // this will call button management
+                    // do we need to call that everytime ?
+#warning FIXME
+                        
+                        DSODisplay::drawTriggeredState(armingMode,triggered);
+                        continue;
+                    }
+                    //
+                    controlButtons->updateCouplingState();
+                    triggered=count; // got something, switch to waiting to be rearmed mode
+                    processCapture(count,stats);
+                    break;
+                }
+                break;
+            default:
+                xAssert(0);
+                break;
         }
-        
-        DSOCapture::captureToDisplay(count,test_samples,waveForm);  
-        // Remove trigger
-        DSODisplay::drawVoltageTrigger(false,triggerLine);
-        
-        DSODisplay::drawWaveForm(count,waveForm);
-        
-        if(armingMode==DSO_CAPTURE_SINGLE )
-        {
-            triggered=count;
-        }
-        DSODisplay::drawTriggeredState(armingMode,triggered);
-        
-        if(lastTrigger!=-1)
-        {
-             DSODisplay::drawVerticalTrigger(false,lastTrigger);
-             lastTrigger=-1;
-        }
-        
-        if(stats.trigger!=-1)
-        {
-            lastTrigger=stats.trigger;
-            DSODisplay::drawVerticalTrigger(true,lastTrigger);
-        }
-        buttonManagement();        
-        
-        float f=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();
-        triggerLine=DSOCapture::voltageToPixel(f);
-        DSODisplay::drawVoltageTrigger(true,triggerLine);
-        
-        uint32_t m=millis();
-        if(m<lastRefresh)
-        {
-            m=lastRefresh+101;
-        }
-        if((m-lastRefresh)>250)
-        {
-            lastRefresh=m;
-            DSODisplay::drawStats(stats);
-            refrshDuration+=(millis()-m);
-            nbRefrsh++;
-        }
-                
-      
-    }
-        
+     
+    }        
 } 
-
-
 // EOF    
 

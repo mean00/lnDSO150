@@ -388,7 +388,7 @@ void  DSODisplay::drawArmingMode(DSO_ArmingMode arming)
     {
         case DSO_CAPTURE_SINGLE: armingString="SING";break;
         case DSO_CAPTURE_MULTI: armingString="REPT";break;
-        case DSO_UI_CONTINUOUS: armingString="CONT";break;
+        case DSO_CAPTURE_CONTINUOUS: armingString="CONT";break;
             default:            xAssert(0);            break;
     }    
     HIGHER_BAR_PRINT(armingString,0);

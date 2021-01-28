@@ -65,7 +65,7 @@ DSOCapture::DSO_VOLTAGE_RANGE DSOCapture::getVoltageRange()
  */
 bool DSOCapturePriv::getSamples(CapturedSet **set, int timeoutMs)
 {
-    if(!captureSemaphore->take(10)) 
+    if(!captureSemaphore->take(30)) 
     {
         return false;
     }
@@ -217,7 +217,7 @@ int DSOCapturePriv::triggeredCapture(int count,float *volt,CaptureStats &stats)
         if(!startCapture(count)) 
             return 0;
     }
-                   
+    // did we capture something ?
     CapturedSet *set;
     bool r=    getSamples(&set,0);
     if(!r) 
@@ -226,6 +226,7 @@ int DSOCapturePriv::triggeredCapture(int count,float *volt,CaptureStats &stats)
         {
          //   xAssert(0);
         }
+        // nope
         return 0;
     }
     watch.ok();
