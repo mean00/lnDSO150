@@ -127,7 +127,6 @@ next:
                   if( event & EVENT_LONG_PRESS)
                     return;
                   if(event & EVENT_SHORT_PRESS)
-                  if(event & EVENT_SHORT_PRESS)
                   {
                    //   Serial.print("Menu \n");
                    //   Serial.print(xtop[current].type);
