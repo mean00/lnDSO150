@@ -134,7 +134,7 @@ const char *DSOCapture::getTimeBaseAsText()
 bool       DSOCapturePriv:: startCapture (int count)
 {
   DSOCapturePriv::triggerValueADC=DSOCapturePriv::voltToADCValue(DSOCapturePriv::triggerValueFloat);
-  controlButtons->updateCouplingState();
+  
   xAssert(DSOCapturePriv::taskletMode==DSOCapturePriv::Tasklet_Idle);
   
   // clear semaphore if needed

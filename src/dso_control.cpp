@@ -207,10 +207,16 @@ int DSOControl::getRawCoupling()
  * @param v
  * @return 
  */
+extern void Logger(const char *fmt...);
 static DSOControl::DSOCoupling couplingFromAdc2()
 {
+    
     useAdc2(true);
+    pinMode(COUPLING_PIN,INPUT_ANALOG);
     rawCoupling= directADC2Read(COUPLING_PIN);    
+    
+    //Logger("Coupling=%d\n",rawCoupling);
+    
     useAdc2(false);
     if(rawCoupling>3200)      
         return DSOControl::DSO_COUPLING_AC;
@@ -271,9 +277,10 @@ static uint32_t lastUpdate=0;
 void          DSOControl::updateCouplingState()
 {
     uint32_t now=millis();
-    if(now>lastUpdate+300)
+    if(now>lastUpdate+500)
     {
         couplingState=couplingFromAdc2();
+        
         lastUpdate=now;
     }
 }

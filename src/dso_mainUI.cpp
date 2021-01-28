@@ -280,8 +280,11 @@ void initMainUI(void)
 /**
  * 
  */
+extern void testCoupling();
 void mainDSOUI(void)
 {
+ 
+    //testCoupling();
     CaptureStats stats;    
 
     int triggerLine;
@@ -301,7 +304,10 @@ void mainDSOUI(void)
         
         bool wait = (armingMode== DSO_CAPTURE_SINGLE) && triggered;
         if(  !wait)
+        {
             count=DSOCapture::capture(240,test_samples,stats);  
+            controlButtons->updateCouplingState();
+        }
         
         // Nothing captured, refresh screen
         if(!count) 

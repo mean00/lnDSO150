@@ -12,7 +12,12 @@
 #include  "qfp.h"
 
 extern void useAdc2(bool use);
-
+#if 1
+#define VERBOSE(...) {}
+#else
+void Logger(const char *fmt...);
+#define VERBOSE Logger
+#endif
 static void swapADCs_c(int nb, uint16_t *data)
 {    
     int nbWord=nb/2;   
@@ -70,13 +75,14 @@ bool adc2InUse=false;
 // we filter out multiple call to stop()
 void captureAdc2(bool use)
 {
+    return;
     if(use)
     {
         if(!adc2InUse) //xAssert(!adc2InUse);
         {
             adc2InUse=true;
             useAdc2(true);
-        }
+        }else xAssert(0);
     }else
     {
         if(adc2InUse)
@@ -84,6 +90,7 @@ void captureAdc2(bool use)
              useAdc2(false);
              adc2InUse=false;
         }
+        //else xAssert(0);
     }
     
     
@@ -382,7 +389,7 @@ static int transformDma2(int dc0_ac1,int16_t *in, float *out,int count, int expa
  */
 bool DSOCapturePriv::prepareSamplingDma()
 {
-  //     
+  //         
     const TimeSettings *set= tSettings+currentTimeBase;
     switch(set->dual)
     {
@@ -407,9 +414,8 @@ DSOCapture::DSO_TIME_BASE DSOCapturePriv::getTimeBaseDma()
  */
 void DSOCapturePriv::stopCaptureDma()
 {
-    
-    adc->stopDmaCapture();
-    captureAdc2(false);
+    VERBOSE("Dma stop\n");
+    adc->stopDmaCapture();    
     
 }
 /**
@@ -445,13 +451,13 @@ bool       DSOCapturePriv:: startCaptureDma (int count)
  */
 bool       DSOCapturePriv:: startCaptureDmaTrigger (int count)
 {
-    
+    VERBOSE("Dma start\n");
     // ask for  ~ the full buffer
+    captureAdc2(true);
     lastRequested=ADC_INTERNAL_BUFFER_SIZE-2;
     lastAskedSampleCount=count;
     xAssert(lastRequested>0);
     xAssert(lastRequested<ADC_INTERNAL_BUFFER_SIZE);
-    captureAdc2(true);
     return adc->startDMATriggeredSampling(lastRequested,triggerValueADC);
 }
 /**
@@ -482,7 +488,7 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
         nextCapture();
         return false;
     }
-
+    captureAdc2(false); // ok we can unlock the adc2
     CapturedSet *set=captureSet;
     
     set->stats.trigger=-1;     
@@ -550,6 +556,7 @@ bool DSOCapturePriv::taskletDmaTrigger()
 //--
 bool        DSOCapturePriv::nextCaptureDmaTrigger(int count)
 {
+    VERBOSE("Dma next\n");
     return startCaptureDmaTrigger(count);
 }
 bool        DSOCapturePriv::nextCaptureDma(int count)

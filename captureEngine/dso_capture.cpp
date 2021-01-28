@@ -184,7 +184,7 @@ void        DSOCapture::stopCapture()
     dummy=ADC1->regs->DR;
     ADC1->regs->SR=0;
     
-    controlButtons->updateCouplingState();
+    
     
 }
 
