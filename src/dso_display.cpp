@@ -397,8 +397,15 @@ void  DSODisplay::drawArmingMode(DSO_ArmingMode arming)
  * 
  * @param triggered
  */
+DSO_ArmingMode lastMode=DSO_CAPTURE_MODE_INVALIDE;
+bool lastTriggered=false;
+
 void  DSODisplay::drawTriggeredState(DSO_ArmingMode mode, bool triggered)
 {
+    if(lastMode==mode && lastTriggered==triggered) return; // nothing to do
+    lastMode=mode;
+    lastTriggered=triggered;
+    
     if(mode!=DSO_CAPTURE_SINGLE)
     {
        tft->setTextColor(BLACK,BLACK);  
