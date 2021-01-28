@@ -378,9 +378,7 @@ void mainDSOUI(void)
                 if(!count) // Nothing captured, i.e. no trigger
                 {     
                     refreshTriggerIfNeedBe(); // this will call button management
-                    // do we need to call that everytime ?
-#warning FIXME
-                    DSODisplay::drawTriggeredState(armingMode,triggered);
+                    DSODisplay::drawTriggeredState(armingMode,triggered); // does nothing if no change
                     continue;
                 }
                 // capture successful !
@@ -393,10 +391,9 @@ void mainDSOUI(void)
                 // if triggered >0, it means we got a capture and wait to be rearmed
                 if(triggered)
                 {
+                    controlButtons->updateCouplingState(); // no capture running, we can update
                     refreshTriggerIfNeedBe(); // this will call button management
-                    // do we need to call that everytime ?
-#warning FIXME
-                                        
+                    DSODisplay::drawTriggeredState(armingMode,triggered); // does nothing if no change
                     // no need to redraw the actual capture
                     continue;
                 }else
@@ -405,16 +402,13 @@ void mainDSOUI(void)
                     if(!count) // Nothing captured, i.e. no trigger
                     {     
                         refreshTriggerIfNeedBe(); // this will call button management
-                    // do we need to call that everytime ?
-#warning FIXME
-                        
-                        DSODisplay::drawTriggeredState(armingMode,triggered);
+                        DSODisplay::drawTriggeredState(armingMode,triggered); // does nothing if no change
                         continue;
                     }
                     //
                     controlButtons->updateCouplingState();
                     triggered=count; // got something, switch to waiting to be rearmed mode
-                    DSODisplay::drawTriggeredState(armingMode,triggered);
+                    DSODisplay::drawTriggeredState(armingMode,triggered); // does nothing if no change
                     processCapture(count,stats);
                     break;
                 }
