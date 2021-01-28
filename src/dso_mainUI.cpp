@@ -372,7 +372,9 @@ void mainDSOUI(void)
         {
             case DSO_CAPTURE_MULTI:
             case DSO_CAPTURE_CONTINUOUS:
-                count=DSOCapture::capture(240,test_samples,stats);  // this will retrigger a capture automatically if needed                
+                // this will retrigger a capture automatically if needed                
+                // and does nothing if a capture is already running
+                count=DSOCapture::capture(240,test_samples,stats);  
                 if(!count) // Nothing captured, i.e. no trigger
                 {     
                     refreshTriggerIfNeedBe(); // this will call button management
@@ -381,6 +383,7 @@ void mainDSOUI(void)
                     DSODisplay::drawTriggeredState(armingMode,triggered);
                     continue;
                 }
+                // capture successful !
                 // only update coupling when we have no capture running (i.e. we got something)
                 controlButtons->updateCouplingState();
                 // display it
@@ -393,8 +396,7 @@ void mainDSOUI(void)
                     refreshTriggerIfNeedBe(); // this will call button management
                     // do we need to call that everytime ?
 #warning FIXME
-                    
-                    DSODisplay::drawTriggeredState(armingMode,triggered);
+                                        
                     // no need to redraw the actual capture
                     continue;
                 }else
@@ -412,6 +414,7 @@ void mainDSOUI(void)
                     //
                     controlButtons->updateCouplingState();
                     triggered=count; // got something, switch to waiting to be rearmed mode
+                    DSODisplay::drawTriggeredState(armingMode,triggered);
                     processCapture(count,stats);
                     break;
                 }
