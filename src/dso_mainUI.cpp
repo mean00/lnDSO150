@@ -312,13 +312,8 @@ void processCapture(int count, CaptureStats &stats)
     // Remove trigger
     DSODisplay::drawVoltageTrigger(false,triggerLine);        
     DSODisplay::drawWaveForm(count,waveForm);
-
-    if(armingMode==DSO_CAPTURE_SINGLE )
-    {
-        triggered=count; // remember the last #of samples in screen buffer
-                        // in case we need to redraw it later
-    }
     DSODisplay::drawTriggeredState(armingMode,triggered);        
+    
     if(lastTrigger!=-1)
     {
          DSODisplay::drawVerticalTrigger(false,lastTrigger);
