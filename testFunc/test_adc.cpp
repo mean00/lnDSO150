@@ -117,7 +117,7 @@ void testCoupling()
             rawCoupling+=data[i];
         rawCoupling/=nb;
 #else
-        rawCoupling=directADC2Read(COUPLING_PIN);
+        rawCoupling=directADC1Read(COUPLING_PIN);
 #if 0        
         //--
         int length=1;

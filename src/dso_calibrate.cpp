@@ -13,7 +13,7 @@
 extern DSOADC                     *adc;
 
 #define SHORT_PRESS(x) (controlButtons->getButtonEvents(DSOControl::x)&EVENT_SHORT_PRESS)
-static uint16_t directADC2Read(int pin);
+
 /**
  * 
  */
