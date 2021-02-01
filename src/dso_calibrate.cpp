@@ -88,7 +88,7 @@ static int averageADCRead()
 {
     // Start Capture
     adc->setupTimerSampling(); // switch to time
-    adc->prepareTimerSampling(1000,false,ADC_SMPR_28_5, DSOADC::ADC_PRESCALER_6); // 1Khz
+    adc->prepareTimerSampling(1000,1,ADC_SMPR_28_5, DSOADC::ADC_PRESCALER_6); // 1Khz
     adc->startTimerSampling(200);
     FullSampleSet fset;
     while(!adc->getSamples(fset))
