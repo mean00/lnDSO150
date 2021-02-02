@@ -88,7 +88,7 @@ static int averageADCRead()
 {
     // Start Capture
     adc->setupTimerSampling(); // switch to time
-    adc->prepareTimerSampling(1000,1,ADC_SMPR_28_5, DSOADC::ADC_PRESCALER_6); // 1Khz
+    adc->prepareTimerSampling(1000,1,ADC_SMPR_239_5, DSOADC::ADC_PRESCALER_8); // 1Khz
     adc->startTimerSampling(200);
     FullSampleSet fset;
     while(!adc->getSamples(fset))
@@ -242,6 +242,14 @@ static void fineHeader(const char *title)
     
 }
 
+
+void printInt(int x , int y, int value)
+{
+    char str[20];
+    sprintf(str,"%d   ",value);
+    tft->setCursor(x, y);
+    tft->myDrawString(str);
+}
 /**
  * 
  * @param title
@@ -265,15 +273,10 @@ float performVoltageCalibration(const char *title, float expected,float defalt,f
         if(!sum) f=0;
         else
                  f=expected/sum;        
-                      
-        tft->setCursor(200, 90);
-        tft->print(sum); tft->print("   ");
-        tft->setCursor(10, 90);
-        tft->print(f*SCALEUP);tft->print("   ");
-        tft->setCursor(10, 130);
-        tft->print(defalt*SCALEUP);tft->print("   ");
-        tft->setCursor(10, 160);
-        tft->print(previous*SCALEUP);tft->print("   ");
+        printInt      (200,90,sum);
+        printInt      (10,90,f*SCALEUP);
+        printInt      (10,130,defalt*SCALEUP);
+        printInt      (10,160,previous*SCALEUP);
         
          
         if( SHORT_PRESS(DSO_BUTTON_OK))
