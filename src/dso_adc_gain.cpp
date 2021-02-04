@@ -115,7 +115,7 @@ bool DSOInputGain::readCalibrationValue()
     computeMultiplier(multipliers,1+6,G1b*G2*G4);
     
 
-    float mu=fvcc/4096000.;
+    float mu=fvcc/(4095.*1000.);
     for(int i=0;i<DSO_NB_GAIN_RANGES;i++)
         multipliers[i]=multipliers[i]*mu;
     return true;

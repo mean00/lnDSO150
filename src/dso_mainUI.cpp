@@ -352,10 +352,12 @@ void processCapture(int count, CaptureStats &stats)
 extern void testCoupling();
 void mainDSOUI(void)
 {
+   // DSOCalibrate::voltageCalibrate();
     //testCoupling();
     CaptureStats stats;    
     DSODisplay::init();
     initMainUI();
+    DSOADC::readVCCmv();
     float f=DSOCapture::getTriggerValue()+DSOCapture::getVoltageOffset();
     triggerLine=DSOCapture::voltageToPixel(f);
     DSOControl::DSOCoupling oldCoupling=controlButtons->getCouplingState();

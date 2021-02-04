@@ -129,6 +129,7 @@ void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupl
  */
 bool DSOCalibrate::zeroCalibrate()
 {    
+    DSOADC::readVCCmv();
     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);  
     tft->setTextColor(WHITE,BLACK);
           
@@ -188,7 +189,7 @@ float performVoltageCalibration(const char *title, float expected,float defalt,f
  */
 bool DSOCalibrate::voltageCalibrate()
 {
-    float fvcc=DSOADC::getVCCmv();
+    float fvcc= DSOADC::readVCCmv();
     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);  
     
     
@@ -207,19 +208,20 @@ bool DSOCalibrate::voltageCalibrate()
         DSOInputGain::setGainRange(range);
         float expected=myCalibrationVoltage[i].expected;        
         int dex=(int)range;
-        float previous=(voltageFineTune[dex]*fvcc)/4096000.;
+        float previous=(voltageFineTune[dex]*fvcc)/4095000.;
         float f=performVoltageCalibration(myCalibrationVoltage[i].title,
                                           expected,
                                           DSOInputGain::getMultiplier(),
                                           previous,
                                           DSOInputGain::getOffset(0));
         if(f)
-            voltageFineTune[dex]=(f*4096000.)/fvcc;
+            voltageFineTune[dex]=(f*4095000.)/fvcc;
         else
             voltageFineTune[dex]=0;
     }    
     // If we have both 100mv and 2v
-    DSOEeprom::write();         
+    DSOEeprom::write();     
+    DSOEeprom::readFineVoltage    ();
     tft->fillScreen(0);
     return true;         
 }
@@ -228,11 +230,20 @@ bool DSOCalibrate::voltageCalibrate()
  * 
  * @param expected
  */
+
+#define LOWER_BAR_PRINT(y,x) { tft->setCursor(y*64, 240-18); tft->myDrawString((char *)x,64);}    
+
 static void fineHeader(const char *title)
 {          
     
     DSO_GFX::newPage("VOLTAGE CALIBRATION");        
-    DSO_GFX::bottomLine(" @VOLT@:Default,@TRIG@:Keep,@OK@:Set");    
+    //DSO_GFX::bottomLine(" @VOLT@:Default,@TRIG@:Keep,@OK@:Set");    
+    // VOLT time trigger OK
+    LOWER_BAR_PRINT(0,"DEFAULT"); // volt
+    LOWER_BAR_PRINT(3,"KEEP");    // trig
+    LOWER_BAR_PRINT(4,"SET");     // ok
+    
+    
     
     DSO_GFX::center("Set input to ",36);
     tft->setTextColor(GREEN,BLACK);
@@ -262,9 +273,17 @@ float performVoltageCalibration(const char *title, float expected,float defalt,f
     fineHeader(title);
     
     DSO_GFX::printxy(200,70,"@  ADC  @");
-    DSO_GFX::printxy(10,70, "@ Scale @");
+    DSO_GFX::printxy(10,70, "@ Mult  @");
     DSO_GFX::printxy(10,110,"@Default@");
     DSO_GFX::printxy(10,140,"@PrevVal@s");
+    
+    // clear button statae
+     SHORT_PRESS(DSO_BUTTON_OK);
+     SHORT_PRESS(DSO_BUTTON_VOLTAGE);
+     SHORT_PRESS(DSO_BUTTON_TRIGGER);
+     
+     xDelay(100);
+    
     while(1)
     {   // Raw read
         int sum=averageADCRead();        

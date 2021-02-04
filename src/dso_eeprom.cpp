@@ -83,8 +83,6 @@ bool  DSOEeprom::write()
 {
     EEPROMClass e2;
     addressInit(e2);
-    e2.format();
-    e2.write(0,CURRENT_HASH);
     calibrationHash=e2.read(0);
     for(int i=0;i<DSO_NB_GAIN_RANGES;i++)
         e2.write(2+i,calibrationDC[i]);
