@@ -160,6 +160,7 @@ void MainTask( void *a )
     //
     if(!DSOEeprom::read())
     {  
+        DSOEeprom::format();
         DSOCalibrate::zeroCalibrate();         
     }
     DSOEeprom::readFineVoltage();

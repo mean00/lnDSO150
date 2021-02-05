@@ -11,4 +11,5 @@ public:
         static bool readFineVoltage();
         static bool write();
         static bool wipe();  
+        static bool format(); 
 };

@@ -83,7 +83,7 @@ bool  DSOEeprom::write()
 {
     EEPROMClass e2;
     addressInit(e2);
-    calibrationHash=e2.read(0);
+    
     for(int i=0;i<DSO_NB_GAIN_RANGES;i++)
         e2.write(2+i,calibrationDC[i]);
     for(int i=0;i<DSO_NB_GAIN_RANGES;i++)
@@ -97,6 +97,7 @@ bool  DSOEeprom::write()
             e2.write(FINE_TUNE_OFFSET+2+i*2+0,adr[0]);
             e2.write(FINE_TUNE_OFFSET+2+i*2+1,adr[1]);            
     }
+    calibrationHash=e2.write(0,CURRENT_HASH);
     return true;
 }
 /**
@@ -112,4 +113,10 @@ bool  DSOEeprom::wipe()
     e2.write(FINE_TUNE_OFFSET,0);
     return true;
 }
-
+bool  DSOEeprom::format()
+{
+    EEPROMClass e2;
+    addressInit(e2);
+    e2.format();
+    return true;
+}
