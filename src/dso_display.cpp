@@ -225,9 +225,9 @@ void DSODisplay::drawStats(CaptureStats &stats)
     {
            tft->setTextColor(GREEN,BLACK);
     }
-    AND_ONE_F(stats.xmin,1);
-    AND_ONE_F(stats.xmax,3);
-    AND_ONE_F(stats.avg,5);      
+    AND_ONE_F(stats.xmin,3);
+    AND_ONE_F(stats.xmax,5);
+    AND_ONE_F(stats.avg,1);      
     tft->setTextColor(GREEN,BLACK);
     if(stats.frequency>0)
     {
@@ -250,9 +250,9 @@ void DSODisplay::drawStatsBackGround()
         
 
     tft->setTextColor(BLACK,BG_COLOR);
-    AND_ONE_A("Min",0);   
-    AND_ONE_A("Max",2);   
-    AND_ONE_A("Avrg",4);
+    AND_ONE_A("Min",2);   
+    AND_ONE_A("Max",4);   
+    AND_ONE_A("Avrg",0);
     AND_ONE_A("Freq(H)",6);
     AND_ONE_A("Trigg",8);
     AND_ONE_A("Offst",10);
