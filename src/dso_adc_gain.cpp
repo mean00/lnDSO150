@@ -107,7 +107,7 @@ static void computeMultiplier(float *mul,int offset,float sta)
  */
 bool DSOInputGain::readCalibrationValue()
 {
-    float fvcc=DSOADC::readVCCmv();            
+    float fvcc=DSOADC::getVCCmv();            
 
     float stat;
     multipliers[0]=0;

@@ -129,7 +129,7 @@ void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupl
  */
 bool DSOCalibrate::zeroCalibrate()
 {    
-    DSOADC::readVCCmv();
+    
     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);  
     tft->setTextColor(WHITE,BLACK);
           
@@ -189,7 +189,10 @@ float performVoltageCalibration(const char *title, float expected,float defalt,f
  */
 bool DSOCalibrate::voltageCalibrate()
 {
-    float fvcc= DSOADC::readVCCmv();
+    
+    // reset completely the adc
+    
+    float fvcc= DSOADC::getVCCmv();
     tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::MediumFont);  
     
     
