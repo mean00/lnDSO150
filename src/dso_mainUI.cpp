@@ -23,7 +23,7 @@ extern DSOControl *controlButtons;
 extern testSignal *myTestSignal;
 extern DSOADC   *adc;
 //
-extern float test_samples[256];
+float test_samples[256];
 static uint8_t waveForm[256]; // take a bit more, we have rounding issues
 
 uint32_t  refrshDuration=0;
@@ -33,6 +33,8 @@ static    int lastTrigger=-1;
 static    DSOControl::DSOCoupling oldCoupling;
 static    int triggered=0; // 0 means not trigger, else it is the # of samples in the buffer
 DSO_ArmingMode armingMode=DSO_CAPTURE_CONTINUOUS; // single shot or repeat capture
+
+extern "C" void dsoUsb_init();
 
 static void initMainUI(void);
 void drawBackground();
@@ -362,6 +364,7 @@ void mainDSOUI(void)
     triggerLine=DSOCapture::voltageToPixel(f);
     DSOControl::DSOCoupling oldCoupling=controlButtons->getCouplingState();
     float lastVoltageTrigger=-999;
+    dsoUsb_init();
     while(1)
     {        
         int count=0;  
