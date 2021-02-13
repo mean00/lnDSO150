@@ -183,8 +183,8 @@ void MainTask( void *a )
 
     //testI2c();
     mainDSOUI();
-    testTrigger();
-    testCapture();
+    //testTrigger();
+    //testCapture();
     //testAdcWatchdog();
     
     while(1)
