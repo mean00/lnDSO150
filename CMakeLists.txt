@@ -67,13 +67,19 @@ ADD_SUBDIRECTORY(adc)
 ADD_SUBDIRECTORY(MapleFreeRTOS1000/)
 ADD_SUBDIRECTORY(testFunc/)
 ADD_SUBDIRECTORY(captureEngine/)
-ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(qfp)
 ADD_SUBDIRECTORY(Adafruit_TFTLCD_8bit_STM32)
+IF(USE_USB)
+    ADD_DEFINITIONS(-DUSE_USB)
+    SET(USB_SRCS )
+ELSE(USE_USB)
+    SET(USB_SRCS usb_stubs.c)
+ENDIF(USE_USB)
+ADD_SUBDIRECTORY(src)
 #
 generate_arduino_firmware(Dso150${EXTENSION} 
                 SKETCH dso150.ino
-                SRCS    myCode.cpp     stopWatch.cpp  cpuID.cpp embedded_printf/printf.c helpers/helper_pwm.cpp i2c_stubs.c
+                SRCS    myCode.cpp     stopWatch.cpp  cpuID.cpp embedded_printf/printf.c helpers/helper_pwm.cpp  i2c_stubs.c ${USB_SRCS}
                 PORT ${ARDUINO_DEFAULT_PORT}
                 BOARD_CPU ${ARDUINO_CPU}
                 )
