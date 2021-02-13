@@ -56,3 +56,7 @@ void __irq_usb_lp_can_rx0()
 {
 }
 
+void dsoUsb_init()
+{
+    
+}
