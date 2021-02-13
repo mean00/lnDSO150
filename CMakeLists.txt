@@ -69,9 +69,11 @@ ADD_SUBDIRECTORY(testFunc/)
 ADD_SUBDIRECTORY(captureEngine/)
 ADD_SUBDIRECTORY(qfp)
 ADD_SUBDIRECTORY(Adafruit_TFTLCD_8bit_STM32)
+#
 IF(USE_USB)
     ADD_DEFINITIONS(-DUSE_USB)
-    SET(USB_SRCS )
+    SET(USB_SRCS src/dso_usb.cpp Arduino_STM32/STM32F1/libraries/USBComposite/USBComposite.cpp Arduino_STM32/STM32F1/libraries/USBComposite/USBCompositeSerial.cpp)
+    include_directories(Arduino_STM32/STM32F1/libraries/USBComposite)
 ELSE(USE_USB)
     SET(USB_SRCS usb_stubs.c)
 ENDIF(USE_USB)
@@ -79,7 +81,7 @@ ADD_SUBDIRECTORY(src)
 #
 generate_arduino_firmware(Dso150${EXTENSION} 
                 SKETCH dso150.ino
-                SRCS    myCode.cpp     stopWatch.cpp  cpuID.cpp embedded_printf/printf.c helpers/helper_pwm.cpp  i2c_stubs.c ${USB_SRCS}
+                SRCS    myCode.cpp     stopWatch.cpp  cpuID.cpp embedded_printf/printf.c helpers/helper_pwm.cpp  i2c_stubs.c ${USB_SRCS} src/dso_memory.cpp
                 PORT ${ARDUINO_DEFAULT_PORT}
                 BOARD_CPU ${ARDUINO_CPU}
                 )
@@ -89,7 +91,7 @@ TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}adc)
 TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}TFT)
 TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}src)
 TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}qfpm3)
-TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}tests)
+#TARGET_LINK_LIBRARIES( Dso150${EXTENSION}  ${libPrefix}tests)
 
 
 # Summary
