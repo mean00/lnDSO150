@@ -34,7 +34,7 @@ static    DSOControl::DSOCoupling oldCoupling;
 static    int triggered=0; // 0 means not trigger, else it is the # of samples in the buffer
 DSO_ArmingMode armingMode=DSO_CAPTURE_CONTINUOUS; // single shot or repeat capture
 
-extern "C" void dsoUsb_init();
+void dso_usbInit();
 
 static void initMainUI(void);
 void drawBackground();
@@ -364,7 +364,7 @@ void mainDSOUI(void)
     triggerLine=DSOCapture::voltageToPixel(f);
     DSOControl::DSOCoupling oldCoupling=controlButtons->getCouplingState();
     float lastVoltageTrigger=-999;
-    dsoUsb_init();
+    dso_usbInit();
     while(1)
     {        
         int count=0;  
