@@ -254,6 +254,16 @@ void uiSetVoltage(int v)
     capture->setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)v);                          
     redraw();
 }
+void uiSetTimeBase(int v)
+{
+    if(v<0) v=0;
+    if(v>DSOCapture::DSO_TIME_BASE_MAX) v=DSOCapture::DSO_TIME_BASE_MAX;
+    DSOCapture::DSO_TIME_BASE  t=(DSOCapture::DSO_TIME_BASE )v;
+    DSOCapture::clearCapturedData();
+    STOP_CAPTURE();
+    capture->setTimeBase( t);
+    redraw();
+}
 
 /**
  * 

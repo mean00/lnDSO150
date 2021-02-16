@@ -32,6 +32,7 @@ public:
 extern USBCompositeSerial CompositeSerial;
 UsbCommands *usbTask;
 void uiSetVoltage(int v);
+void uiSetTimeBase(int v);
 /**
  * 
  */
@@ -129,8 +130,8 @@ void dsoUsb_processNextCommand()
             {           
 
                 case DSOUSB::VOLTAGE:    uiSetVoltage(value); usbTask->replyOk(0);return;
-#if 0                                
-                case DSOUSB::TIMEBASE:    usbTask->replyOk(capture->getTimeBase());return;
+                case DSOUSB::TIMEBASE:    uiSetTimeBase(value);usbTask->replyOk(0);return;
+#if 0                            
                 case DSOUSB::FIRMWARE:    usbTask->replyOk((DSO_VERSION_MAJOR<<8)+(DSO_VERSION_MINOR));return;
                 case DSOUSB::TRIGGER:
                 case DSOUSB::CAPTUREMODE:

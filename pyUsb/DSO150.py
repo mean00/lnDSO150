@@ -111,6 +111,11 @@ class DSO150:
     def GetVoltage(self):
         return self.DsoVoltage(self.Get(self.DsoTarget.VOLTAGE))
 
+   # Helper function
+    def SetTimeBase(self,value):
+        return self.Set(self.DsoTarget.TIMEBASE,value.value)
+    def GetTimeBase(self):
+        return self.DsoTimeBase(self.Get(self.DsoTarget.TIMEBASE))
 
 #
 # EOF
