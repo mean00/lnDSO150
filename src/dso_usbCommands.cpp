@@ -21,6 +21,10 @@ public:
         {
 
         }
+        void replyOk(int val)
+        {
+             write32(((DSOUSB::ACK<<24)+(val&0xffff)));
+        }
         virtual void    processCommand(uint32_t command);    
 //protected:
         xQueueEvent _q;
@@ -106,9 +110,9 @@ void dsoUsb_processNextCommand()
         case DSOUSB::GET:
             switch(target)
             {
-                case DSOUSB::VOLTAGE:     usbTask->write32((DSOUSB::ACK<<24+capture->getVoltageRange()));return;
-                case DSOUSB::TIMEBASE:    usbTask->write32((DSOUSB::ACK<<24+capture->getTimeBase()));return;
-                case DSOUSB::FIRMWARE:    usbTask->write32((DSOUSB::ACK<<24+ (DSO_VERSION_MAJOR<<8)+(DSO_VERSION_MINOR)));return;
+                case DSOUSB::VOLTAGE:     usbTask->replyOk(capture->getVoltageRange());return;
+                case DSOUSB::TIMEBASE:    usbTask->replyOk(capture->getTimeBase());return;
+                case DSOUSB::FIRMWARE:    usbTask->replyOk((DSO_VERSION_MAJOR<<8)+(DSO_VERSION_MINOR));return;
                 case DSOUSB::TRIGGER:
                 case DSOUSB::CAPTUREMODE:
                 case DSOUSB::DATA:
@@ -123,8 +127,6 @@ void dsoUsb_processNextCommand()
             break;
             
     }
-    
-    
     return ;
 }
 
