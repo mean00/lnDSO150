@@ -1,50 +1,86 @@
-#include "USBComposite.h"
-#include "USBCompositeSerial.h"
-#include "MapleFreeRTOS1000_pp.h"
+#include "dso_debug.h"
+#include "dso_usb.h"
+
 USBCompositeSerial CompositeSerial;
-/**
- * 
- */
-class UsbTask : public xTask
-{
-public:
-                UsbTask(const char *name,  int priority=2, int taskSize=100): xTask(name,priority,taskSize)
-                {
-                    
-                }
-        void    run();
-    
-};
 
-UsbTask *usbTask;
 
-/**
- * 
- */
-void dso_usbInit()
-{    
-  //Reset the USB interface on generic boards - developed by Victor PV
-  gpio_set_mode(PIN_MAP[PA12].gpio_device, PIN_MAP[PA12].gpio_bit, GPIO_OUTPUT_PP);
-  gpio_write_bit(PIN_MAP[PA12].gpio_device, PIN_MAP[PA12].gpio_bit,0);
 
-  for(volatile unsigned int i=0;i<512;i++);// Only small delay seems to be needed, and USB pins will get configured in Serial.begin
-    gpio_set_mode(PIN_MAP[PA12].gpio_device, PIN_MAP[PA12].gpio_bit, GPIO_INPUT_FLOATING);
-
-    USBComposite.setManufacturerString("MEAN00");
-    USBComposite.setManufacturerString("DSO150DUINO");
-    USBComposite.setSerialString("01234");        
-    CompositeSerial.begin(115200);  
-    
-    usbTask=new UsbTask("UsbControl",2,200);
-}
+#define MKFCC(a,b,c,d) ( (a<<24)+(b<<16)+(c<<8)+d)
 /**
  * 
  */
 void UsbTask::run()
 {
+    uint32_t magicWord;
+    int      magicCount;
     while(1)
     {
-        xDelay(10);
+        switch(_connected)
+        {
+            case Disconnected:
+                if(CompositeSerial.isConnected())
+                {
+                    _connected=Handshaking;
+                    magicWord=0;
+                    Logger("Plugged\n");
+                    continue;
+                }
+                xDelay(100);
+                break;     
+            case Handshaking:
+                if(!CompositeSerial.isConnected()) {   _connected=Disconnected;Logger("Disconnected\n");continue;   }
+                if(CompositeSerial.available())
+                {
+                    int n=CompositeSerial.read();
+                    magicWord=(magicWord<<8)+n;
+                    if(magicWord==MKFCC('D','S','O','0'))
+                    {
+                        write32(MKFCC('O','S','D','0'));
+                         Logger("Connected\n");
+                        _connected=Connected;
+                        magicWord=0;
+                        magicCount=0;
+                        continue;
+                    }
+                }
+                xDelay(100);
+                break;
+            case Connected:
+                if(!CompositeSerial.isConnected()) {   _connected=Disconnected;Logger("Disconnected\n");continue;   }
+                
+                if(CompositeSerial.available())
+                {
+                    int n=CompositeSerial.read();
+                    magicWord=(magicWord<<8)+n;
+                    magicCount++;
+                    if(magicCount==4)
+                    {
+                        processCommand(magicWord);
+                        magicWord=0;
+                        magicCount=0;
+                    }
+                    
+                }
+                
+                xDelay(100);
+                break;
+            default:
+                xAssert(0);
+                break;
+        }
     }
+}
+/**
+ * 
+ * @param v
+ */
+void UsbTask::write32(uint32_t v)
+{
+    uint8_t c[4];
+    c[0]=v>>24;
+    c[1]=v>>16;
+    c[2]=v>>8;
+    c[3]=v;
+    CompositeSerial.write(c,4);
 }
 // EOF
