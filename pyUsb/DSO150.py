@@ -1,6 +1,7 @@
 import serial
 import serial.tools.list_ports;
 from enum import Enum, unique
+import struct
  
 #
 class DSO150:
@@ -158,7 +159,10 @@ class DSO150:
             if(len(ret)!=4):
                 print("Error in data at offset "+str(i) +" size="+str(len(ret)))
                 exit(-1)
-            data.append(i)
+            #it=(ret[0]<<24)+(ret[1]<<16)+(ret[2]<<8)+(ret[3])
+            it=(ret[3]<<24)+(ret[2]<<16)+(ret[1]<<8)+(ret[0])
+            f=struct.unpack('f', struct.pack('I', it))[0]
+            data.append(f)
         return data
 
 #
