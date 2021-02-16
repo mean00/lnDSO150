@@ -31,6 +31,7 @@ public:
 };
 extern USBCompositeSerial CompositeSerial;
 UsbCommands *usbTask;
+void uiSetVoltage(int v);
 /**
  * 
  */
@@ -122,6 +123,23 @@ void dsoUsb_processNextCommand()
                      break;
             }
             return;
+            break;
+        case DSOUSB::SET:
+            switch(target)
+            {           
+
+                case DSOUSB::VOLTAGE:    uiSetVoltage(value); usbTask->replyOk(0);return;
+#if 0                                
+                case DSOUSB::TIMEBASE:    usbTask->replyOk(capture->getTimeBase());return;
+                case DSOUSB::FIRMWARE:    usbTask->replyOk((DSO_VERSION_MAJOR<<8)+(DSO_VERSION_MINOR));return;
+                case DSOUSB::TRIGGER:
+                case DSOUSB::CAPTUREMODE:
+#endif                
+                default:
+                    usbTask->write32((DSOUSB::NACK<<24));
+                    break;
+            }
+            break;
         default:
             usbTask->write32((DSOUSB::NACK<<24));
             break;

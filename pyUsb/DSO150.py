@@ -97,14 +97,20 @@ class DSO150:
         return returnCode
     #
     def Set(self,target,value):
-        self.sendCommand(self.DsoCommand.SET,target,value.value)
+        self.sendCommand(self.DsoCommand.SET,target,value)
         ret=self.ser.read(4)
         if(len(ret)!=4):
             print("no reply to Command Set  to "+target.name)
             exit(-1)
         if(ret[0]!=3):
-            print("Command Set to "+target.name+"failed")
+            print("Command Get to "+target.name+"failed r="+str(ret[0]))
             exit(-1)
+    # Helper function
+    def SetVoltage(self,value):
+        return self.Set(self.DsoTarget.VOLTAGE,value.value)
+    def GetVoltage(self):
+        return self.DsoVoltage(self.Get(self.DsoTarget.VOLTAGE))
+
 
 #
 # EOF

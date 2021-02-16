@@ -245,6 +245,16 @@ static void buttonManagement()
         redraw();
     }
 }
+
+void uiSetVoltage(int v)
+{
+    if(v<0) v=0;
+    if(v>DSOCapture::DSO_VOLTAGE_MAX) v=DSOCapture::DSO_VOLTAGE_MAX;
+    STOP_CAPTURE();
+    capture->setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)v);                          
+    redraw();
+}
+
 /**
  * 
  */

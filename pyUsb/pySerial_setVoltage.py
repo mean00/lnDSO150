@@ -1,10 +1,12 @@
 from DSO150 import DSO150
-
+import time
 dso=DSO150()
-v=dso.Get( DSO150.DsoTarget.VOLTAGE)
-print("Voltage = "+str(v))
-t=dso.Get( DSO150.DsoTarget.TIMEBASE)
-print("timebase = "+str(t))
-dso.Set( DSO150.DsoTarget.VOLTAGE,DSO150.DsoVoltage.V1) # Set 1v
-dso.Set( DSO150.DsoTarget.TIMEBASE,DSO150.DsoTimeBase.u500) # Set 500u /div
+
+for v in DSO150.DsoVoltage:
+    print("Setting "+v.name)
+    dso.SetVoltage( v)
+    volt=dso.GetVoltage() 
+    print("Getting "+volt.name)
+    time.sleep(2)
+    
 
