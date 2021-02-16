@@ -17,7 +17,7 @@ extern void  menuManagement(void);
 extern void splash(void);
 static void drawGrid(void);
 extern void dsoUsb_processNextCommand();
-
+extern void dsoUsb_sendData(int count,float *data, CaptureStats &stats);
 //--
 extern Adafruit_TFTLCD_8bit_STM32 *tft;
 extern DSOControl *controlButtons;
@@ -34,11 +34,17 @@ static    int lastTrigger=-1;
 static    DSOControl::DSOCoupling oldCoupling;
 static    int triggered=0; // 0 means not trigger, else it is the # of samples in the buffer
 DSO_ArmingMode armingMode=DSO_CAPTURE_CONTINUOUS; // single shot or repeat capture
-
+bool      usbCaptureRequested=false;
 void dso_usbInit();
 
 static void initMainUI(void);
 void drawBackground();
+
+void uiRequestCapture(bool v )
+{
+    usbCaptureRequested=true;
+}
+
 /**
  * 
  */
@@ -350,6 +356,12 @@ void processCapture(int count, CaptureStats &stats)
     // So we captured something
     // refresh the display
 
+    if(usbCaptureRequested)
+    {
+        usbCaptureRequested=false;
+        dsoUsb_sendData(count,test_samples,stats);
+    }
+    
     DSOCapture::captureToDisplay(count,test_samples,waveForm);  
     // Remove trigger
     DSODisplay::drawVoltageTrigger(false,triggerLine);        

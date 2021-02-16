@@ -24,11 +24,16 @@ public:
         }
         void replyOk(int val)
         {
+            _usbLock.lock();
              write32(((DSOUSB::ACK<<24)+(val&0xffff)));
+             _usbLock.unlock();
         }
         virtual void    processCommand(uint32_t command);    
+        void lock() {_usbLock.lock();}
+        void unlock() {_usbLock.unlock();}
 //protected:
         xQueueEvent _q;
+        xMutex _usbLock;
 };
 extern USBCompositeSerial CompositeSerial;
 UsbCommands *usbTask;
@@ -36,6 +41,7 @@ void uiSetVoltage(int v);
 void uiSetTimeBase(int v);
 void uiSetTriggerMode(int v);
 void uiSetArmingMode(int v);
+void uiRequestCapture(bool );
 /**
  * 
  */
@@ -135,8 +141,7 @@ void dsoUsb_processNextCommand()
                 case DSOUSB::TIMEBASE:    uiSetTimeBase(value);usbTask->replyOk(0);return;
                 case DSOUSB::TRIGGER:     uiSetTriggerMode(value);usbTask->replyOk(0);return;
                 case DSOUSB::ARMINGMODE:  uiSetArmingMode(value);usbTask->replyOk(0);return;               
-#if 0                         
-#endif                
+                case DSOUSB::DATA:        uiRequestCapture(true);usbTask->replyOk(0);return;               
                 default:
                     usbTask->write32((DSOUSB::NACK<<24));
                     break;
@@ -149,5 +154,16 @@ void dsoUsb_processNextCommand()
     }
     return ;
 }
-
+void dsoUsb_sendData(int count,float *data, CaptureStats &stats)
+{
+    usbTask->lock();
+    usbTask->write32(    (DSOUSB::EVENT<<24)+(DSOUSB::DATA<<16)+count);
+    for(int i=0;i<count;i++)
+    {
+        usbTask->writeFloat(  data[i]);
+    }
+    
+    usbTask->unlock();
+    
+}
 // EOF

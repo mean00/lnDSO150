@@ -83,4 +83,10 @@ void UsbTask::write32(uint32_t v)
     c[3]=v;
     CompositeSerial.write(c,4);
 }
+void UsbTask::writeFloat(const float f)
+{
+    uint8_t *c=(uint8_t *)&f;   
+    CompositeSerial.write(c,4);
+}
+
 // EOF

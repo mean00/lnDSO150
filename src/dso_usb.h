@@ -20,6 +20,7 @@ public:
                 }
         void    run();
         void    write32(uint32_t v);
+        void    writeFloat(const float f);
         virtual void    processCommand(uint32_t command)=0;
 
         

@@ -64,3 +64,7 @@ void dsoUsb_processNextCommand()
 {
     return ;
 }
+extern void dsoUsb_sendData(int count,float *data, CaptureStats &stats)
+{
+    
+}

@@ -138,6 +138,28 @@ class DSO150:
         return self.Set(self.DsoTarget.ARMINGMODE,value.value)
     def GetArmingMode(self):
         return self.DsoArmingMode(self.Get(self.DsoTarget.ARMINGMODE))
+    # capture
+    def GetData(self):
+        # Ask for a capture
+        self.Set(self.DsoTarget.DATA,1)
+        loop=True
+        while loop:
+            ret=self.ser.read(4)
+            if(len(ret)==4):
+                loop=False
+        # 
+        if(ret[0]!= 5):
+            print("Not an event! "+str(ret[3]))
+            exit(-1)
+        count=ret[2]*256+ret[3]
+        data=[]
+        for i in range(0,count):
+            ret=self.ser.read(4)
+            if(len(ret)!=4):
+                print("Error in data at offset "+str(i) +" size="+str(len(ret)))
+                exit(-1)
+            data.append(i)
+        return data
 
 #
 # EOF
