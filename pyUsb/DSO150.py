@@ -5,6 +5,18 @@ from enum import Enum, unique
 #
 class DSO150:
     @unique
+    class DsoArmingMode(Enum):
+        SINGLE=0
+        MULTI=1
+        CONTINUOUS=2
+    @unique
+    class DsoTrigger(Enum):
+      RISING=0
+      FALLING=1
+      BOTH=2
+      RUN=3
+
+    @unique
     class DsoCommand(Enum):
       GET=1
       SET=2
@@ -17,7 +29,7 @@ class DSO150:
       VOLTAGE=1
       TIMEBASE=2
       TRIGGER=3
-      CAPTUREMODE=4
+      ARMINGMODE=4
       DATA=5
       FIRMWARE=10
 
@@ -69,7 +81,7 @@ class DSO150:
             print("No DSO found\n")
             exit -1
         # Then go
-        self.ser = serial.Serial(device,115200,timeout=1)  # open serial port
+        self.ser = serial.Serial(device,115200,timeout=2)  # open serial port
         # Handshake
         self.ser.write(b'DSO0')     # write a string
         handshake=self.ser.read(4)
@@ -105,17 +117,27 @@ class DSO150:
         if(ret[0]!=3):
             print("Command Get to "+target.name+"failed r="+str(ret[0]))
             exit(-1)
-    # Helper function
+    # Voltage Helper function
     def SetVoltage(self,value):
         return self.Set(self.DsoTarget.VOLTAGE,value.value)
     def GetVoltage(self):
         return self.DsoVoltage(self.Get(self.DsoTarget.VOLTAGE))
 
-   # Helper function
+   # Timebase Helper function
     def SetTimeBase(self,value):
         return self.Set(self.DsoTarget.TIMEBASE,value.value)
     def GetTimeBase(self):
         return self.DsoTimeBase(self.Get(self.DsoTarget.TIMEBASE))
+    # Trigger Helper function
+    def SetTrigger(self,value):
+        return self.Set(self.DsoTarget.TRIGGER,value.value)
+    def GetTrigger(self):
+        return self.DsoTrigger(self.Get(self.DsoTarget.TRIGGER))
+    # Arming mode
+    def SetArmingMode(self,value):
+        return self.Set(self.DsoTarget.ARMINGMODE,value.value)
+    def GetArmingMode(self):
+        return self.DsoArmingMode(self.Get(self.DsoTarget.ARMINGMODE))
 
 #
 # EOF
