@@ -7,7 +7,8 @@ enum DSOUSB_Command
     SET=2,
     ACK=3,
     NACK=4,
-    EVENT=5            
+    EVENT=5,
+    COMMAND_LAST  
 };
 enum DSOUSB_Target
 {
@@ -16,7 +17,8 @@ enum DSOUSB_Target
     TRIGGER=3,
     CAPTUREMODE=4,
     DATA=5,
-    FIRMWARE=10
+    FIRMWARE=10,
+    TARGET_LAST
 };
 
 enum DSOUSB_VOLTAGE

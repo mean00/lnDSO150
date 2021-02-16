@@ -1,7 +1,11 @@
 #include "dso_usb.h"
 #include "dso_debug.h"
+#include "MapleFreeRTOS1000_pp.h"
 #include "USBCompositeSerial.h"
 #include "dso_usbCommands.h"
+
+#define ZDEBUG Logger
+
 /**
  * 
  * @param command
@@ -9,15 +13,17 @@
 class UsbCommands : public UsbTask
 {
 public:
-        UsbCommands(const char *name,  int priority=2, int taskSize=100): 
-                UsbTask(name,priority,taskSize) 
+        UsbCommands(const char *name,  int priority=2, int taskSize=100) :
+                UsbTask(name,priority,taskSize) ,_q(10)
         {
 
         }
         virtual void    processCommand(uint32_t command);    
+//protected:
+        xQueueEvent _q;
 };
 extern USBCompositeSerial CompositeSerial;
-UsbTask *usbTask;
+UsbCommands *usbTask;
 /**
  * 
  */
@@ -62,7 +68,32 @@ void UsbCommands::processCommand(uint32_t command)
     int type=command>>24;
     int target=(command>>16)&0Xff;
     int value=(command&0xFFFF);
-    Logger("Received command 0x%x type=%x target=%x value=%x\n",command,type,target,value);
-    write32((DSOUSB::ACK<<24)+6);
+    ZDEBUG("Received command 0x%x type=%x target=%x value=%x\n",command,type,target,value);
+    bool valid=true;
+    if(type>=DSOUSB::COMMAND_LAST) valid=false;
+    if(target>=DSOUSB::TARGET_LAST) valid=false;
+    if(!valid)
+    {
+        ZDEBUG("Invalid command received\n");
+        write32((DSOUSB::NACK<<24));
+    }else
+    {
+        _q.post(command);
+    }
     
 }
+/**
+ * 
+ * @param cmd
+ * @return 
+ */
+bool dsoUsb_getNextCommand()
+{
+    if(!usbTask) return false;
+    if(usbTask->_q.empty()) return false;
+    uint32_t cmd;
+    usbTask->_q.get(0,cmd);
+    return true;
+}
+
+// EOF
