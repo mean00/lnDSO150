@@ -9,3 +9,4 @@ build*
 *.bin
 .vscode
 pyUsb/__pycache__/
+bins
