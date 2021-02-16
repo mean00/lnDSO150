@@ -8,4 +8,4 @@ build
 build*
 *.bin
 .vscode
-
+pyUsb/__pycache__/
