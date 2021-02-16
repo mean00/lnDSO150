@@ -16,6 +16,7 @@ extern void  menuManagement(void);
 
 extern void splash(void);
 static void drawGrid(void);
+extern void dsoUsb_processNextCommand();
 
 //--
 extern Adafruit_TFTLCD_8bit_STM32 *tft;
@@ -368,6 +369,7 @@ void mainDSOUI(void)
     while(1)
     {        
         int count=0;  
+        dsoUsb_processNextCommand();
         switch(armingMode)
         {
             case DSO_CAPTURE_MULTI:
