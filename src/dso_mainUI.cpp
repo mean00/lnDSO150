@@ -264,6 +264,25 @@ void uiSetTimeBase(int v)
     capture->setTimeBase( t);
     redraw();
 }
+void uiSetTriggerMode(int v)
+{
+    DSOCapture::TriggerMode t=(DSOCapture::TriggerMode)v;
+    capture->setTriggerMode(t);                   
+    capture->setTimeBase( capture->getTimeBase()); // this will refresh the internal indirection table
+    redraw();
+}
+
+void uiSetArmingMode(int v)
+{
+ 
+    if(v<0) v=0;
+    if(v>DSO_ArmingMode::DSO_CAPTURE_CONTINUOUS) v=DSO_ArmingMode::DSO_CAPTURE_CONTINUOUS;
+    DSO_ArmingMode mode=(DSO_ArmingMode)v;
+    STOP_CAPTURE();
+    armingMode=mode;
+    triggered=0; 
+    redraw();
+}
 
 /**
  * 
@@ -417,14 +436,17 @@ void mainDSOUI(void)
                     refreshTriggerIfNeedBe(); // this will call button management
                     DSODisplay::drawTriggeredState(armingMode,triggered); // does nothing if no change
                     // no need to redraw the actual capture
+                    xDelay(10); // yield a bit
                     continue;
                 }else
                 { // We are waiting for a valid capture in single mode
+                    xDelay(1); // yield a bit
                     count=DSOCapture::capture(240,test_samples,stats);   // this will do nothing if a capture is already running                    
                     if(!count) // Nothing captured, i.e. no trigger
                     {     
                         refreshTriggerIfNeedBe(); // this will call button management
                         DSODisplay::drawTriggeredState(armingMode,triggered); // does nothing if no change
+                        xDelay(1); // yield a bit
                         continue;
                     }
                     //

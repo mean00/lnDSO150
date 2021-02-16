@@ -15,7 +15,7 @@ enum DSOUSB_Target
     VOLTAGE=1,
     TIMEBASE=2,
     TRIGGER=3,
-    CAPTUREMODE=4,
+    ARMINGMODE=4,
     DATA=5,
     FIRMWARE=10,
     TARGET_LAST

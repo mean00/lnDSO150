@@ -5,8 +5,9 @@
 #include "dso_usbCommands.h"
 #include "dso_capture.h"
 #include "DSO_config.h"
+#include "dso_display.h"
 extern DSOCapture                 *capture;
-
+extern DSO_ArmingMode armingMode;
 #define ZDEBUG Logger
 
 /**
@@ -33,6 +34,8 @@ extern USBCompositeSerial CompositeSerial;
 UsbCommands *usbTask;
 void uiSetVoltage(int v);
 void uiSetTimeBase(int v);
+void uiSetTriggerMode(int v);
+void uiSetArmingMode(int v);
 /**
  * 
  */
@@ -115,10 +118,9 @@ void dsoUsb_processNextCommand()
                 case DSOUSB::VOLTAGE:     usbTask->replyOk(capture->getVoltageRange());return;
                 case DSOUSB::TIMEBASE:    usbTask->replyOk(capture->getTimeBase());return;
                 case DSOUSB::FIRMWARE:    usbTask->replyOk((DSO_VERSION_MAJOR<<8)+(DSO_VERSION_MINOR));return;
-                case DSOUSB::TRIGGER:
-                case DSOUSB::CAPTUREMODE:
-                case DSOUSB::DATA:
-                
+                case DSOUSB::TRIGGER:     usbTask->replyOk( (int) DSOCapture::getTriggerMode());return;                
+                case DSOUSB::ARMINGMODE:  usbTask->replyOk(armingMode );return;       
+                case DSOUSB::DATA:                
                 default:
                      usbTask->write32((DSOUSB::NACK<<24));
                      break;
@@ -129,12 +131,11 @@ void dsoUsb_processNextCommand()
             switch(target)
             {           
 
-                case DSOUSB::VOLTAGE:    uiSetVoltage(value); usbTask->replyOk(0);return;
+                case DSOUSB::VOLTAGE:     uiSetVoltage(value); usbTask->replyOk(0);return;
                 case DSOUSB::TIMEBASE:    uiSetTimeBase(value);usbTask->replyOk(0);return;
-#if 0                            
-                case DSOUSB::FIRMWARE:    usbTask->replyOk((DSO_VERSION_MAJOR<<8)+(DSO_VERSION_MINOR));return;
-                case DSOUSB::TRIGGER:
-                case DSOUSB::CAPTUREMODE:
+                case DSOUSB::TRIGGER:     uiSetTriggerMode(value);usbTask->replyOk(0);return;
+                case DSOUSB::ARMINGMODE:  uiSetArmingMode(value);usbTask->replyOk(0);return;               
+#if 0                         
 #endif                
                 default:
                     usbTask->write32((DSOUSB::NACK<<24));
