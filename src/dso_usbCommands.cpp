@@ -3,6 +3,9 @@
 #include "MapleFreeRTOS1000_pp.h"
 #include "USBCompositeSerial.h"
 #include "dso_usbCommands.h"
+#include "dso_capture.h"
+#include "DSO_config.h"
+extern DSOCapture                 *capture;
 
 #define ZDEBUG Logger
 
@@ -87,13 +90,42 @@ void UsbCommands::processCommand(uint32_t command)
  * @param cmd
  * @return 
  */
-bool dsoUsb_getNextCommand()
+void dsoUsb_processNextCommand()
 {
-    if(!usbTask) return false;
-    if(usbTask->_q.empty()) return false;
+    if(!usbTask) return  ;
+    if(usbTask->_q.empty()) return  ;
     uint32_t cmd;
     usbTask->_q.get(0,cmd);
-    return true;
+    
+    int type=cmd>>24;
+    int target=(cmd>>16)&0Xff;
+    int value=(cmd&0xFFFF);
+  
+    switch(type)
+    {
+        case DSOUSB::GET:
+            switch(target)
+            {
+                case DSOUSB::VOLTAGE:     usbTask->write32((DSOUSB::ACK<<24+capture->getVoltageRange()));return;
+                case DSOUSB::TIMEBASE:    usbTask->write32((DSOUSB::ACK<<24+capture->getTimeBase()));return;
+                case DSOUSB::FIRMWARE:    usbTask->write32((DSOUSB::ACK<<24+ (DSO_VERSION_MAJOR<<8)+(DSO_VERSION_MINOR)));return;
+                case DSOUSB::TRIGGER:
+                case DSOUSB::CAPTUREMODE:
+                case DSOUSB::DATA:
+                
+                default:
+                     usbTask->write32((DSOUSB::NACK<<24));
+                     break;
+            }
+            return;
+        default:
+            usbTask->write32((DSOUSB::NACK<<24));
+            break;
+            
+    }
+    
+    
+    return ;
 }
 
 // EOF

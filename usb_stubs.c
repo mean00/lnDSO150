@@ -60,7 +60,7 @@ void dsoUsb_init()
 {
     
 }
-bool dsoUsb_getNextCommand()
+void dsoUsb_processNextCommand()
 {
-    return false;
+    return ;
 }
