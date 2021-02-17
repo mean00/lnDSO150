@@ -76,7 +76,7 @@ public:
     static int         computeFrequency(int samples,uint16_t *data);
     static void        stopCaptureDma();
     static void        stopCaptureTimer();
-    static int         refineCapture(FullSampleSet &set, int needed);
+    static int         refineCapture(FullSampleSet &set, int needed,int roundup);
     static bool        prepareSampling ();    
     static int         triggeredCapture(int count,float *voltage,CaptureStats &stats);        
     

@@ -104,7 +104,7 @@ bool DSOCapturePriv::taskletTimerCommon(bool trigger)
     if(trigger)
     {
         int needed=lastAskedSampleCount;
-        int triggerFound=refineCapture(fset,needed);
+        int triggerFound=refineCapture(fset,needed,0);
         if(triggerFound<0)
         {
             nextCapture();                

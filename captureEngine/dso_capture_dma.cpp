@@ -107,7 +107,7 @@ static void swapADCs(int nb, uint16_t *data)
  * 
  * @param set
  */
-int DSOCapturePriv::refineCapture(FullSampleSet &set,int needed)
+int DSOCapturePriv::refineCapture(FullSampleSet &set,int needed, int roundup)
 {
          // Try to find the trigger, we have ADC_INTERNAL_BUFFER_SIZE samples coming in, we want requestSample out..
         uint16_t *p=(uint16_t *)set.set1.data;
@@ -152,7 +152,7 @@ int DSOCapturePriv::refineCapture(FullSampleSet &set,int needed)
             return -1;
         }
         // center on the trigger
-        int offset=(found-needed/2)&0xfffe;
+        int offset=(found-needed/2)&(~roundup);
         set.set1.data+=offset; // must be even, else we'll swap them wrong
         set.set1.samples=needed;        
         return found-offset;
@@ -503,11 +503,13 @@ bool DSOCapturePriv::taskletDmaCommon(const bool trigger)
     
     p=((int16_t *)fset.set1.data);    
     if(IS_CAPTURE_DUAL() )
+    {
         swapADCs(fset.set1.samples,(uint16_t *)p);
+    }
     
     if(trigger)
     {
-        int triggerFound=refineCapture(fset,needed);
+        int triggerFound=refineCapture(fset,needed,0);
         if(triggerFound<0)
         {
             nextCapture();                
