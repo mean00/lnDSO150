@@ -7,13 +7,14 @@ dso=DSO150()
 
 
 # 
-dsoWidth=320
+dsoWidth=240
 dsoHeight=240
+border=120
 yOffset=int(dsoHeight/2)
 # Create a black image
 print("Asking for a capture ")
 data=dso.GetData() 
-img = np.zeros((dsoWidth+1,dsoHeight+1,3), np.uint8)
+img = np.zeros((dsoWidth+1,dsoHeight+1+border,3), np.uint8)
 # Draw gris
 for x in range(0,dsoWidth+1,24):
     cv.line(img,(x,0),(x,dsoHeight-1),(0,128,0),1)
@@ -21,10 +22,11 @@ for y in range(0,dsoHeight+1,24):
     cv.line(img,(0,y),(dsoWidth-1,y),(0,128,0),1)
 
 cv.line(img,(0,yOffset),(dsoWidth-1,yOffset),(0,255,0),1)
-cv.line(img,(int(dsoWidth/2),0),(int(dsoWidth/2),dsoHeight-1),(0,255,0),1)
+cv.line(img,(120,0),(120,dsoHeight-1),(0,255,0),1)
 
 # 
-scale=-24.
+volt=dso.GetVoltage().asFloat()
+scale=-24./volt
 #
 l=len(data)
 last=int(data[0]*scale)

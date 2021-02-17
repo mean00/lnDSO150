@@ -46,7 +46,15 @@ class DSO150:
         mV200=6
         mV500=7
         V1=8
-        V5=9
+        V2=9
+        V5=10
+        def asFloat(self):
+            if(self.name.startswith("G")):
+                return 0.
+            if(self.name.startswith("mV")):
+                v=self.name[2:]
+                return float(v)/1000.
+            return float(self.name[1:])
     
     @unique
     class DsoTimeBase(Enum):
