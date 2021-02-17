@@ -17,6 +17,7 @@ enum DSOUSB_Target
     TRIGGER=3,
     ARMINGMODE=4,
     DATA=5,
+    TRIGGERVALUE=6,
     FIRMWARE=10,
     TARGET_LAST
 };

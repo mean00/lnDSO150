@@ -251,7 +251,13 @@ static void buttonManagement()
         redraw();
     }
 }
-
+void uiSetTriggerValue(int v)
+{
+    float f=(float)v;
+    f/=1000.; // in volt
+    capture->setTriggerValue(f);    
+    redraw();
+}
 void uiSetVoltage(int v)
 {
     if(v<0) v=0;

@@ -42,6 +42,7 @@ void uiSetTimeBase(int v);
 void uiSetTriggerMode(int v);
 void uiSetArmingMode(int v);
 void uiRequestCapture(bool );
+void uiSetTriggerValue(int v);
 /**
  * 
  */
@@ -126,6 +127,7 @@ void dsoUsb_processNextCommand()
                 case DSOUSB::FIRMWARE:    usbTask->replyOk((DSO_VERSION_MAJOR<<8)+(DSO_VERSION_MINOR));return;
                 case DSOUSB::TRIGGER:     usbTask->replyOk( (int) DSOCapture::getTriggerMode());return;                
                 case DSOUSB::ARMINGMODE:  usbTask->replyOk(armingMode );return;       
+                case DSOUSB::TRIGGERVALUE: usbTask->replyOk(capture->getTriggerValue()*1000. );return;    
                 case DSOUSB::DATA:                
                 default:
                      usbTask->write32((DSOUSB::NACK<<24));
@@ -141,7 +143,8 @@ void dsoUsb_processNextCommand()
                 case DSOUSB::TIMEBASE:    uiSetTimeBase(value);usbTask->replyOk(0);return;
                 case DSOUSB::TRIGGER:     uiSetTriggerMode(value);usbTask->replyOk(0);return;
                 case DSOUSB::ARMINGMODE:  uiSetArmingMode(value);usbTask->replyOk(0);return;               
-                case DSOUSB::DATA:        uiRequestCapture(true);usbTask->replyOk(0);return;               
+                case DSOUSB::DATA:        uiRequestCapture(true);usbTask->replyOk(0);return;   
+                case DSOUSB::TRIGGERVALUE:uiSetTriggerValue(value); usbTask->replyOk(0);return;
                 default:
                     usbTask->write32((DSOUSB::NACK<<24));
                     break;

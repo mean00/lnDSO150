@@ -32,6 +32,7 @@ class DSO150:
       TRIGGER=3
       ARMINGMODE=4
       DATA=5
+      TRIGGERLEVEL=6
       FIRMWARE=10
 
     @unique
@@ -139,7 +140,14 @@ class DSO150:
         return self.Set(self.DsoTarget.ARMINGMODE,value.value)
     def GetArmingMode(self):
         return self.DsoArmingMode(self.Get(self.DsoTarget.ARMINGMODE))
-    # capture
+     # TriggerLevel 
+    def SetTriggerLevel(self,value):
+        level=int(value*1000)
+        return self.Set(self.DsoTarget.TRIGGERLEVEL,value)
+    def GetTriggerLevel(self):
+        i= self.DsoArmingMode(self.Get(self.DsoTarget.TRIGGERLEVEL))
+        return float(i)/1000.;
+# capture
     def GetData(self):
         # Ask for a capture
         self.Set(self.DsoTarget.DATA,1)
