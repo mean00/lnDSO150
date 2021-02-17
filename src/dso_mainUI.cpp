@@ -254,7 +254,8 @@ static void buttonManagement()
 void uiSetTriggerValue(int v)
 {
     float f=(float)v;
-    f/=1000.; // in volt
+    f-=32768;
+    f/=100.; // in volt
     capture->setTriggerValue(f);    
     redraw();
 }

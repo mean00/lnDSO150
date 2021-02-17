@@ -3,10 +3,12 @@ import time
 dso=DSO150()
 
 # For 
-for v in range(-2.,2.,0.200):
+for i in range(-2000,2000,200):
+    v=float(i)
+    v/=1000.
     print("Setting "+str(v))
-    dso.SetTriggerValue( v)
-    tb=dso.GetTriggerValue() 
+    dso.SetTriggerLevel( v)
+    tb=dso.GetTriggerLevel() 
     print("Getting "+str(tb))
     time.sleep(2)
     

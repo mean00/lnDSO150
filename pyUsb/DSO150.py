@@ -142,11 +142,12 @@ class DSO150:
         return self.DsoArmingMode(self.Get(self.DsoTarget.ARMINGMODE))
      # TriggerLevel 
     def SetTriggerLevel(self,value):
-        level=int(value*1000)
-        return self.Set(self.DsoTarget.TRIGGERLEVEL,value)
+        value1000=(value*100.)
+        thousand=int(value1000)+32768
+        return self.Set(self.DsoTarget.TRIGGERLEVEL,thousand)
     def GetTriggerLevel(self):
-        i= self.DsoArmingMode(self.Get(self.DsoTarget.TRIGGERLEVEL))
-        return float(i)/1000.;
+        i= self.Get(self.DsoTarget.TRIGGERLEVEL)
+        return float(i-32768)/100.;
 # capture
     def GetData(self):
         # Ask for a capture

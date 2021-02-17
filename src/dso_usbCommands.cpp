@@ -127,7 +127,7 @@ void dsoUsb_processNextCommand()
                 case DSOUSB::FIRMWARE:    usbTask->replyOk((DSO_VERSION_MAJOR<<8)+(DSO_VERSION_MINOR));return;
                 case DSOUSB::TRIGGER:     usbTask->replyOk( (int) DSOCapture::getTriggerMode());return;                
                 case DSOUSB::ARMINGMODE:  usbTask->replyOk(armingMode );return;       
-                case DSOUSB::TRIGGERVALUE: usbTask->replyOk(capture->getTriggerValue()*1000. );return;    
+                case DSOUSB::TRIGGERVALUE: usbTask->replyOk(capture->getTriggerValue()*100.+32768 );return;    
                 case DSOUSB::DATA:                
                 default:
                      usbTask->write32((DSOUSB::NACK<<24));
