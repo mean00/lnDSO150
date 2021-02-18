@@ -29,7 +29,7 @@ static uint8_t waveForm[256]; // take a bit more, we have rounding issues
 
 uint32_t  refrshDuration=0;
 int       nbRefrsh=0;
-
+CaptureStats stats;    
 static    int lastTrigger=-1;
 static    DSOControl::DSOCoupling oldCoupling;
 static    int triggered=0; // 0 means not trigger, else it is the # of samples in the buffer
@@ -42,7 +42,15 @@ void drawBackground();
 
 void uiRequestCapture(bool v )
 {
-    usbCaptureRequested=true;
+    if(v) // ask captured data
+    {
+        usbCaptureRequested=false;
+#warning fixme : get the # of samples        
+        dsoUsb_sendData(240,test_samples,stats);
+    }else
+    {
+        usbCaptureRequested=true;
+    }
 }
 
 /**
@@ -415,7 +423,6 @@ void mainDSOUI(void)
 {
    // DSOCalibrate::voltageCalibrate();
     //testCoupling();
-    CaptureStats stats;    
     DSODisplay::init();
     initMainUI();
     DSOADC::readVCCmv();

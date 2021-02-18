@@ -157,9 +157,9 @@ class DSO150:
         i= self.Get(self.DsoTarget.TRIGGERLEVEL)
         return float(i-32768)/100.;
 # capture
-    def GetData(self):
+    def GetDataInternal(self,wait):
         # Ask for a capture
-        self.Set(self.DsoTarget.DATA,1)
+        self.Set(self.DsoTarget.DATA,wait)
         loop=True
         while loop:
             ret=self.ser.read(4)
@@ -181,6 +181,12 @@ class DSO150:
             f=struct.unpack('f', struct.pack('I', it))[0]
             data.append(f)
         return data
+    # Ask for a new capture
+    def GetData(self):
+        return self.GetDataInternal(0)
+    # Returns already captured data
+    def GetCurrentData(self):
+        return self.GetDataInternal(1)
 
 #
 # EOF

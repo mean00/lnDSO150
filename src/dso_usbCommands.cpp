@@ -143,7 +143,7 @@ void dsoUsb_processNextCommand()
                 case DSOUSB::TIMEBASE:    uiSetTimeBase(value);usbTask->replyOk(0);return;
                 case DSOUSB::TRIGGER:     uiSetTriggerMode(value);usbTask->replyOk(0);return;
                 case DSOUSB::ARMINGMODE:  uiSetArmingMode(value);usbTask->replyOk(0);return;               
-                case DSOUSB::DATA:        uiRequestCapture(true);usbTask->replyOk(0);return;   
+                case DSOUSB::DATA:        usbTask->replyOk(0);uiRequestCapture(value);return;   
                 case DSOUSB::TRIGGERVALUE:uiSetTriggerValue(value); usbTask->replyOk(0);return;
                 default:
                     usbTask->write32((DSOUSB::NACK<<24));
