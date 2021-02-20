@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QtDSO</class>
+ <widget class="QMainWindow" name="QtDSO">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>473</width>
+    <height>393</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QGraphicsView" name="graphicsView">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>10</y>
+      <width>242</width>
+      <height>242</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>242</width>
+      <height>242</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>242</width>
+      <height>242</height>
+     </size>
+    </property>
+    <property name="verticalScrollBarPolicy">
+     <enum>Qt::ScrollBarAlwaysOff</enum>
+    </property>
+    <property name="horizontalScrollBarPolicy">
+     <enum>Qt::ScrollBarAlwaysOff</enum>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonReq">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>10</y>
+      <width>88</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>NewCapture</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonCurrent">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>50</y>
+      <width>88</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Current</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelVoltage">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>170</y>
+      <width>58</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>..</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelTimeBase">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>190</y>
+      <width>58</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>..</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonSave">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>90</y>
+      <width>88</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>SaveImg</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>473</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuVoltage">
+    <property name="title">
+     <string>Voltage</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuTimeBase">
+    <property name="title">
+     <string>TimeBase</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuTrigger">
+    <property name="title">
+     <string>Trigger</string>
+    </property>
+   </widget>
+   <addaction name="menuVoltage"/>
+   <addaction name="menuTimeBase"/>
+   <addaction name="menuTrigger"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="action5ms">
+   <property name="text">
+    <string>5ms</string>
+   </property>
+  </action>
+  <action name="action10mV">
+   <property name="text">
+    <string>10mV</string>
+   </property>
+  </action>
+  <action name="action20mV">
+   <property name="text">
+    <string>20mV</string>
+   </property>
+  </action>
+  <action name="action50mV">
+   <property name="text">
+    <string>50mV</string>
+   </property>
+  </action>
+  <action name="action100mV">
+   <property name="text">
+    <string>100mV</string>
+   </property>
+  </action>
+  <action name="action200mV">
+   <property name="text">
+    <string>200mV</string>
+   </property>
+  </action>
+  <action name="action500mV">
+   <property name="text">
+    <string>500mV</string>
+   </property>
+  </action>
+  <action name="action1v">
+   <property name="text">
+    <string>1v</string>
+   </property>
+  </action>
+  <action name="action2v">
+   <property name="text">
+    <string>2v</string>
+   </property>
+  </action>
+  <action name="action5V">
+   <property name="text">
+    <string>5V</string>
+   </property>
+  </action>
+  <action name="action5us">
+   <property name="text">
+    <string>5us</string>
+   </property>
+  </action>
+  <action name="action10us">
+   <property name="text">
+    <string>10us</string>
+   </property>
+  </action>
+  <action name="action25us">
+   <property name="text">
+    <string>25us</string>
+   </property>
+  </action>
+  <action name="action50us">
+   <property name="text">
+    <string>50us</string>
+   </property>
+  </action>
+  <action name="action100us">
+   <property name="text">
+    <string>100us</string>
+   </property>
+  </action>
+  <action name="action200us">
+   <property name="text">
+    <string>200us</string>
+   </property>
+  </action>
+  <action name="action500us">
+   <property name="text">
+    <string>500us</string>
+   </property>
+  </action>
+  <action name="action1ms">
+   <property name="text">
+    <string>1ms</string>
+   </property>
+  </action>
+  <action name="action2ms">
+   <property name="text">
+    <string>2ms</string>
+   </property>
+  </action>
+  <action name="action5ms_2">
+   <property name="text">
+    <string>5ms</string>
+   </property>
+  </action>
+  <action name="action10ms">
+   <property name="text">
+    <string>10ms</string>
+   </property>
+  </action>
+  <action name="action20ms">
+   <property name="text">
+    <string>20ms</string>
+   </property>
+  </action>
+  <action name="action50ms">
+   <property name="text">
+    <string>50ms</string>
+   </property>
+  </action>
+  <action name="action100ms">
+   <property name="text">
+    <string>100ms</string>
+   </property>
+  </action>
+  <action name="action200ms">
+   <property name="text">
+    <string>200ms</string>
+   </property>
+  </action>
+  <action name="actionNone">
+   <property name="text">
+    <string>None</string>
+   </property>
+  </action>
+  <action name="actionRising">
+   <property name="text">
+    <string>Rising</string>
+   </property>
+  </action>
+  <action name="actionFalling">
+   <property name="text">
+    <string>Falling</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
