@@ -75,7 +75,7 @@ IF(USE_USB)
     SET(USB_SRCS Arduino_STM32/STM32F1/libraries/USBComposite/USBComposite.cpp Arduino_STM32/STM32F1/libraries/USBComposite/USBCompositeSerial.cpp)
     include_directories(Arduino_STM32/STM32F1/libraries/USBComposite)
 ELSE(USE_USB)
-    SET(USB_SRCS usb_stubs.c)
+    SET(USB_SRCS usb_stubs.cpp)
 ENDIF(USE_USB)
 ADD_SUBDIRECTORY(src)
 #

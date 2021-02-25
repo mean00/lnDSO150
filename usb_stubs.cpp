@@ -53,11 +53,8 @@
 #include <string.h>
 #include "dso_capture.h"
 // This disables USB altogether
-extern "C"
-{
 void __irq_usb_lp_can_rx0()
 {
-}
 }
 
 void dsoUsb_init()
@@ -68,7 +65,7 @@ void dsoUsb_processNextCommand()
 {
     return ;
 }
-void dsoUsb_sendData(int count,float *data, CaptureStats &stats)
+extern void dsoUsb_sendData(int count,float *data, CaptureStats &stats)
 {
     
 }
