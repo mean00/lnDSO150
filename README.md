@@ -27,6 +27,7 @@ That mod **REALLY** makes the overall experience better.
 
 ![screenshot](gfx/front.jpg?raw=true "front")
 
+[Small Youtube demo ](https://youtu.be/3X-XcUKmUwo "Youtube")
 
 The code is using parts derived from pig-o-scope and other projects for the ADC management
 Open DSO150 was used as documentation for the circuit.
