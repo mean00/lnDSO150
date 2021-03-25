@@ -5,6 +5,9 @@ This is a new firmware for the DSO 150/DSO shell cheap oscilloscope.
 It is using the framework provided by the  (very nice) STM32duino project, R Clark version.
 Please note that it is using cmake-arduino-stm32 as a build system.
 
+![screenshot](wiki/yt.png?raw=true "front")
+[Small Youtube demo ](https://youtu.be/3X-XcUKmUwo "Youtube")
+
 __Features__ :
 
 * Screen support for both  ST7789 and ILI9341, autodetected
@@ -27,7 +30,6 @@ That mod **REALLY** makes the overall experience better.
 
 ![screenshot](gfx/front.jpg?raw=true "front")
 
-[Small Youtube demo ](https://youtu.be/3X-XcUKmUwo "Youtube")
 
 The code is using parts derived from pig-o-scope and other projects for the ADC management
 Open DSO150 was used as documentation for the circuit.
