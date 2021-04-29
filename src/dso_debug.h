@@ -4,4 +4,4 @@
     void Logger(int val);
 #else
     #define Logger(...) {}
-#endif²
+#endif
