@@ -48,6 +48,14 @@ class DSO150:
         V1=8
         V2=9
         V5=10
+        def friendlyName(self):
+            if(self.name.startswith("G")):
+                return "Gnd"
+            if(self.name.startswith("mV")):
+                v=self.name[2:]
+                return str(v)+"mV"
+            return self.name[1:]+"V"
+    
         def asFloat(self):
             if(self.name.startswith("G")):
                 return 0.
@@ -75,6 +83,12 @@ class DSO150:
         m200=14
         m500=15
         s1=16
+        def friendlyName(self):
+            if(self.name.startswith("u")):
+              return self.name[1:]+"us"
+            if(self.name.startswith("m")):
+              return self.name[1:]+"ms"
+            return self.name+"s"
 
     def close(self):
         self.ser.close()             # close port

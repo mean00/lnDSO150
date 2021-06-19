@@ -106,21 +106,23 @@ class Ui(QtWidgets.QMainWindow):
         
     def onSave(self):
         yOffset=120
-        img = np.zeros((360+1,320+1+2,3), np.uint8)
+        zoom=2
+        img = np.zeros((240*zoom+1+10,320*zoom+1+2+96,3), np.uint8)
         for x in range(0,240+1,24):
-            cv.line(img,(x,0),(x,240-1),(0,128,0),1)
+            cv.line(img,(x*zoom,0),(x*zoom,240*zoom-1),(0,128,0),1)
         for y in range(0,240+1,24):
-            cv.line(img,(0,y),(240-1,y),(0,128,0),1)
+            cv.line(img,(0,y*zoom),(240*zoom-1,y*zoom),(0,128,0),1)
 
-        cv.line(img,(0,yOffset),(240-1,yOffset),(0,255,0),1)
-        cv.line(img,(120,0),(120,240-1),(0,255,0),1)
-        cv.putText(img,self.voltage.name, (240+2,20), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
-        cv.putText(img,self.timebase.name, (240+2,60), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
+        cv.line(img,(0,yOffset*zoom),(240*zoom-1,yOffset*zoom),(0,255,0),1)
+        cv.line(img,(120*zoom,0),(120*zoom,240*zoom-1),(0,255,0),1)
+        # add legend
+        cv.putText(img,"Volt:"+self.voltage.friendlyName()+"/div", (240*zoom+10,24), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
+        cv.putText(img,"Time:"+self.timebase.friendlyName()+"/div", (240*zoom+10,64), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
         l=len(self.data)
         last=int(self.data[0]*self.scale)
         for x in range(0,l):
             y=int(self.data[x]*self.scale)
-            cv.line(img,(x,y+yOffset),(x,last+yOffset),(0,255,255),1)
+            cv.line(img,(x*zoom,(y+yOffset)*zoom),(x*zoom,(last+yOffset)*zoom),(0,255,255),1)
             last=y
         cv.imwrite("output.png",img)
         #cv.imshow("dso", img)
