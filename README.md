@@ -19,7 +19,7 @@ __Features__ :
 * Auto setup : Press "OK" for 3 seconds 
 * Settable test signal. Press the rotary encoder for 3 sec to enter the menu.
 * Single shot or repeat mode
-* USB support  (not really used as of today)
+* USB support : for version >= 1.0.7 you can control / retrieve data over usb (python samples scripts in the source tree)
 * Multithreaded so that it should be relatively responsive
 * Using ADC in  ADC clock or Timer mode  depending on the time scale
 * Frequency down to 5us / division using dual ADC capture mode
