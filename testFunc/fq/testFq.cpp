@@ -1,15 +1,9 @@
-/***************************************************
- STM32 duino based firmware for DSO SHELL/150
- *  * GPL v2
- * (c) mean 2019 fixounet@free.fr
- ****************************************************/
-#include "dso_global.h"
-#include "dso_adc.h"
-#include "dso_capture.h"
-#include "dso_capture_priv.h"
+#include "stdio.h"
+#include "stdint.h"
+#include "stdlib.h"
+#include "math.h"
 
-#include "DSO_config.h"
-#define DEFAULT_VALUE  0x400*0x10000
+
 static int fdelta[16];
 static int dex=0;
 
@@ -34,7 +28,7 @@ static void getMinMax(int xsamples, uint16_t *data, int *xmi, int *xma)
  * @param data
  * @return 
  */
-int DSOCapturePriv::computeFrequency(int xsamples,uint16_t *data)
+int computeFrequency(int xsamples,uint16_t *data)
 {
     int xmin,xmax;
     getMinMax(xsamples, data, &xmin,&xmax);
@@ -52,7 +46,9 @@ int DSOCapturePriv::computeFrequency(int xsamples,uint16_t *data)
     int old=    (int)(ptr[1])-(int)(ptr[0]);        
     ptr+=1;
     bool lookingForMax=false;
-     
+   
+    //printf("Threshold %d %d\n",lowThreshold,highThreshold);
+ 
     for(int i=1;i<samples && nbSample<15;i++)
     {
         //printf("i:%d old=%d new=%d val=%d\n",i,old,xnew,ptr[0]); 
@@ -77,17 +73,47 @@ int DSOCapturePriv::computeFrequency(int xsamples,uint16_t *data)
             continue;
         }
     }
-
-    if(nbSample<3) return 0; // not enough points
+    if(nbSample<2) return 0; // not enough points
     int sum=0;
-    int *v=fdelta;
     for(int i=1;i<nbSample;i++)
     {
-        sum+=v[1]-v[0];
-        v++;
+        sum+=fdelta[i]-fdelta[i-1];
     }
-    sum=(1000*sum)/nbSample;
+    sum=(1000*sum+nbSample/2)/nbSample;
  
     return sum;
 }
-// EOF
+#define NB_SAMPLES 240
+#define cycles 10.
+int main(int a, char **b)
+{
+   uint16_t samples[NB_SAMPLES]; 
+
+    for(int i=0;i<NB_SAMPLES;i++)
+    {
+        float f=sin((i*2.*3.1415*cycles)/NB_SAMPLES);
+        int noise=rand()&0xff;
+        noise>>=4;
+        samples[i]=f*150+2048+noise;
+    }
+   printf("1:%d\n",  computeFrequency(NB_SAMPLES,samples));
+    int halfcycle=NB_SAMPLES/cycles;
+    for(int i=0;i<NB_SAMPLES;i++)
+    {
+        int h=i%halfcycle;
+        if(h<(halfcycle/2)) h=0;
+            else h=1;
+        int noise=rand()&0xff;
+        noise>>=4;
+        samples[i]=h*150+2048+noise;
+    }
+/*
+    for(int i=0;i<NB_SAMPLES;i++)
+      printf("%d: %d\n",i,samples[i]);
+*/
+   printf("2:%d\n",  computeFrequency(NB_SAMPLES,samples));
+   return 0;
+}
+
+
+
