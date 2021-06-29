@@ -43,39 +43,29 @@ int DSOCapturePriv::computeFrequency(int xsamples,uint16_t *data)
     int lowThreshold=xmin+third;
     int highThreshold=xmax-third;
     
-    
-   
     int samples=xsamples-1;
     int nbSample=0;
  
-    uint16_t *ptr=(uint16_t *)data;
-    int old=    (int)(ptr[1])-(int)(ptr[0]);        
-    ptr+=1;
+    uint16_t *ptr=(uint16_t *)data;    
     bool lookingForMax=false;
      
-    for(int i=1;i<samples && nbSample<15;i++)
+    for(int i=0;i<samples && nbSample<15;i++)
     {
-        //printf("i:%d old=%d new=%d val=%d\n",i,old,xnew,ptr[0]); 
-        ptr+=1;
         if(!lookingForMax) // looking for min
         {
             if(ptr[0]>lowThreshold && ptr[1]<=lowThreshold)
             {
-            //printf("MIN AT %d\n",i);
-            lookingForMax=true;
-            continue;
+                lookingForMax=true;
             }
         }else
         {
             if(ptr[0] <= highThreshold && ptr[1]>highThreshold)
             {
                 fdelta[nbSample++]=i;
-                //printf("MAX at %d\n",i);
                 lookingForMax=false;
             }
-
-            continue;
         }
+        ptr++;
     }
 
     if(nbSample<3) return 0; // not enough points
@@ -87,8 +77,7 @@ int DSOCapturePriv::computeFrequency(int xsamples,uint16_t *data)
         sum+=v[1]-v[0];
         v++;
     }
-    sum=(1000*sum)/usableSamples;
- 
+    sum=(1000*sum)/usableSamples; 
     return sum;
 }
 // EOF
