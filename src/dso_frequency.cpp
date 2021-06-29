@@ -81,12 +81,13 @@ int DSOCapturePriv::computeFrequency(int xsamples,uint16_t *data)
     if(nbSample<3) return 0; // not enough points
     int sum=0;
     int *v=fdelta;
-    for(int i=1;i<nbSample;i++)
+    int usableSamples=nbSample-1;
+    for(int i=0;i<usableSamples;i++)
     {
         sum+=v[1]-v[0];
         v++;
     }
-    sum=(1000*sum)/nbSample;
+    sum=(1000*sum)/usableSamples;
  
     return sum;
 }
