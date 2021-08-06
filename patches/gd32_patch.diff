@@ -1363,7 +1363,7 @@ index 0000000..53f3469
 +    flash_enable_features(FLASH_PREFETCH | FLASH_ICACHE | FLASH_DCACHE);
 +    // Configure the wait states, assuming we're operating at "close
 +    // enough" to 3.3V.
-+    flash_set_latency(FLASH_SAFE_WAIT_STATES);
++    flash_set_latency(0); // FX: No latency on gd32 chip
 +}
 +
 +static void setup_clocks(void) {
@@ -3101,7 +3101,7 @@ index 0000000..53f3469
 +    flash_enable_features(FLASH_PREFETCH | FLASH_ICACHE | FLASH_DCACHE);
 +    // Configure the wait states, assuming we're operating at "close
 +    // enough" to 3.3V.
-+    flash_set_latency(FLASH_SAFE_WAIT_STATES);
++    flash_set_latency(0); // FX : no latency on gd32 chip
 +}
 +
 +static void setup_clocks(void) {
