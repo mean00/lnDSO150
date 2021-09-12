@@ -15,3 +15,6 @@
 [submodule "adc"]
 	path = adc
 	url = https://github.com/mean00/stm32duino_adc.git
+[submodule "lnArduino"]
+	path = lnArduino
+	url = https://github.com/mean00/lnArduino.git
