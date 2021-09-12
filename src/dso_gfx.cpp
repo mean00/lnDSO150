@@ -1,4 +1,4 @@
-
+#if 0
 #include "dso_global.h"
 #include "dso_gfx.h"
 
@@ -85,3 +85,5 @@ void DSO_GFX::bottomLine(const char *title)
 {
     center(title,240-2*FONT_SIZE_Y);
 }
+
+#endif

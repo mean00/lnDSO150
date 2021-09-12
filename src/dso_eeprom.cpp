@@ -3,6 +3,7 @@
  *  * GPL v2
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
+#if 0
 #include "EEPROM.h"
 #include "dso_global.h"
 #include "dso_eeprom.h"
@@ -120,3 +121,4 @@ bool  DSOEeprom::format()
     e2.format();
     return true;
 }
+#endif

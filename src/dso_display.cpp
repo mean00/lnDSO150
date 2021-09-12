@@ -8,6 +8,7 @@
  * 
  * 
  ****************************************************/
+#if 0
 #include "dso_global.h"
 #include "dso_display.h"
 #include "pattern.h"
@@ -431,5 +432,5 @@ void  DSODisplay::drawTriggeredState(DSO_ArmingMode mode, bool triggered)
     tft->setTextColor(fg,bg);
 }
 
-
+#endif
 // EOF

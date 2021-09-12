@@ -1,9 +1,11 @@
+#if 0 // BOOM
 
 #include "dso_global.h"
 #include "dso_adc_gain.h"
 #include "dso_control.h"
 #include "dso_adc.h"
 #include "dso_adc_gain_priv.h"
+
 // Compute default gain/attenuration depending on the scale
 // G1a/B is driven by SENSEL3
 
@@ -120,3 +122,5 @@ bool DSOInputGain::readCalibrationValue()
         multipliers[i]=multipliers[i]*mu;
     return true;
 }
+
+#endif

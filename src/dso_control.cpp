@@ -5,7 +5,7 @@
 // Rotary encoder part : Derived from  Rotary encoder handler for arduino * Copyright 2011 Ben Buxton. Licenced under the GNU GPL Version 3. * Contact: bb@cactii.net
 // Debounce part derived from http://www.kennethkuhn.com/electronics/debounce.c
 
-
+#if 0
 #include <Wire.h>
 #include "MapleFreeRTOS1000_pp.h"
 #include "dso_control.h"
@@ -467,5 +467,5 @@ int  DSOControl::setInputGain(int val)
     GPIOA->regs->BRR=(unset<<1);
     return 0;
 }
-
+#endif
 //

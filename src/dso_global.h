@@ -4,16 +4,7 @@
  */
 #pragma once
 
-#include "Arduino.h"
-#include "SPI.h"
-#include "MapleFreeRTOS1000.h"
-#include "MapleFreeRTOS1000_pp.h"
-#include "dso_adc_ext.h"
-#include "dso_calibrate.h"
-#include "Adafruit_GFX.h"
-#include "Adafruit_TFTLCD_8bit_STM32.h"
-#include "dso_control.h"
-#include "dso_capture.h"
+#include "lnArduino.h"
 #include "embedded_printf/printf.h"
 
 

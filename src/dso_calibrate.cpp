@@ -3,7 +3,7 @@
  *  * GPL v2
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
-
+#if 0
 #include "dso_global.h"
 #include "dso_adc.h"
 #include "dso_eeprom.h"
@@ -309,3 +309,4 @@ float performVoltageCalibration(const char *title, float expected,float defalt,f
              return previous;
     }    
 }
+#endif

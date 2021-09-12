@@ -5,6 +5,7 @@
  *  * GPL v2
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
+#if 0
 #include "dso_includes.h"
 #include "stopWatch.h"
 extern float test_samples[256];
@@ -144,3 +145,5 @@ bool autoSetupFrequency()
     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_1MS);
     return false;
 }
+
+#endif

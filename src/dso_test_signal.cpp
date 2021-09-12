@@ -1,14 +1,12 @@
+#if 0
 /***************************************************
   DSO-stm32duino test signal driver
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
 
-#include <Wire.h>
-#include "SPI.h"
+#include "lnArduino.h"
 #include "dso_test_signal.h"
 #include "helpers/helper_pwm.h"
-#include "MapleFreeRTOS1000.h"
-#include "MapleFreeRTOS1000_pp.h"
 
 /**
  */
@@ -68,3 +66,4 @@ testSignal::testSignal(int pin,int pinAmp)
  }
  
  // EOF
+#endif

@@ -1,3 +1,4 @@
+#if 0
 #include "dso_debug.h"
 #include "dso_usb.h"
 
@@ -88,5 +89,5 @@ void UsbTask::writeFloat(const float f)
     uint8_t *c=(uint8_t *)&f;   
     CompositeSerial.write(c,4);
 }
-
+#endif
 // EOF

@@ -1,3 +1,4 @@
+#if 0
 /***************************************************
  STM32 duino based firmware for DSO SHELL/150
  *  * GPL v2
@@ -72,3 +73,4 @@ void buttonTest(void)
 }
 
 //-
+#endif

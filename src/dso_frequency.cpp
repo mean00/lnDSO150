@@ -1,3 +1,4 @@
+#if 0
 /***************************************************
  STM32 duino based firmware for DSO SHELL/150
  *  * GPL v2
@@ -81,3 +82,5 @@ int DSOCapturePriv::computeFrequency(int xsamples,uint16_t *data)
     return sum;
 }
 // EOF
+
+#endif

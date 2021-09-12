@@ -1,3 +1,4 @@
+#if 0
 #include "Arduino.h"
 #include "stdarg.h"
 #include "embedded_printf/printf.h"
@@ -18,3 +19,4 @@ void Logger(int val)
     Serial1.print(val);
     
 }
+#endif
