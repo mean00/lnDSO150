@@ -1,3 +1,4 @@
+#if 0
 #ifndef _ADAFRUIT_GFX_H
 #define _ADAFRUIT_GFX_H
 
@@ -355,3 +356,4 @@ private:
 };
 
 #endif // _ADAFRUIT_GFX_H
+#endif

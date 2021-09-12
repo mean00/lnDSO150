@@ -20,6 +20,7 @@ enable_language(C CXX ASM) # this is important too!
 include_directories(${CMAKE_SOURCE_DIR})        
 add_subdirectory(${AF_FOLDER})
 
+include(${AF_FOLDER}/setup.cmake)
 
 MESSAGE(STATUS "Starting dso-stm32")
 
@@ -59,16 +60,17 @@ IF(USE_USB)
 ELSE(USE_USB)
     SET(USB_SRCS usb_stubs.cpp)
 ENDIF(USE_USB)
-ADD_SUBDIRECTORY(src)
+#ADD_SUBDIRECTORY(src)
 #
 GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION}
-                myCode.cpp     stopWatch.cpp  cpuID.cpp helpers/helper_pwm.cpp  i2c_stubs.c ${USB_SRCS} src/dso_memory.cpp
+                src/main.cpp
+                #myCode.cpp     stopWatch.cpp   helpers/helper_pwm.cpp  i2c_stubs.c ${USB_SRCS} src/dso_memory.cpp
                 )
-TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}captureEngine)
-TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}adc)
-TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}TFT)
-TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}src)
-TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}qfpm3)
+#TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}captureEngine)
+#TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}adc)
+##TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}TFT)
+#TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}src)
+#TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}qfpm3)
 #TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}tests)
 
 

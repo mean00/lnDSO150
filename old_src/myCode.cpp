@@ -1,3 +1,4 @@
+#if 0
 /***************************************************
  STM32 duino based firmware for DSO SHELL/150
  *  * GPL v2
@@ -10,7 +11,7 @@
 #include "dso_test_signal.h"
 #include "dso_eeprom.h"
 #include "dso_adc_gain.h"
-#include "cpuID.h"
+#include "lnCpuID.h"
 #include "pinConfiguration.h"
 #include "helpers/helper_pwm.h"
 #include "dso_debug.h"
@@ -202,3 +203,4 @@ void dummyForwardReference()
  }
 //-
 
+#endif
