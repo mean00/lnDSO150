@@ -20,9 +20,8 @@ IF(USE_USB)
     SET(SRCS ${SRCS} dso_usb.cpp dso_usbCommands.cpp)
 ENDIF(USE_USB)
 
-generate_arduino_library(${libPrefix}src 
-                            SRCS ${SRCS}
-                            BOARD ${ARDUINO_DEFAULT_BOARD}
+add_library(${libPrefix}src 
+                            ${SRCS}
                         )
 target_include_directories(${libPrefix}src PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 

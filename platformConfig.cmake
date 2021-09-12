@@ -1,14 +1,23 @@
-SET(ARDUINO_USE_NEWLIB 1)
-SET(PLATFORM_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Arduino_STM32/STM32F1/")
-
-# Warning the paths are mingw i.e. c:\dev becomes /c/dev
-IF(WIN32)
-    SET(ARDUINO_SDK_PATH "/c/dev/Arduino")
-    SET(PLATFORM_TOOLCHAIN_PATH  "/c/dev/arm83/bin")
-ELSE(WIN32)
-    # ARDUINO_SDK_PATH should be autodetected
-    #SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/Arduino_stm32/arm-none-eabi-gcc/download/gcc-arm-none-eabi-8.2.1-1.7/bin")
-    #SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/Arduino_stm32/arm_gcc_9.3/bin")
-    #SET(PLATFORM_TOOLCHAIN_PATH "/usr/bin")
-    SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/Arduino_stm32/arm-gcc-2020q2/bin")
+IF(WIN32)    
+    SET(PLATFORM_TOOLCHAIN_SUFFIX ".exe")
 ENDIF(WIN32)
+
+IF("${LN_ARCH}" STREQUAL "RISCV") # RISCV
+  SET(PLATFORM_PREFIX riscv32-unknown-elf-)
+  SET(PLATFORM_C_FLAGS "-march=rv32imac -mabi=ilp32 -mcmodel=medlow")
+  IF(WIN32)    
+    SET(PLATFORM_TOOLCHAIN_PATH /c/gd32/toolchain/bin/) # Use /c/foo or c:\foo depending if you use mingw cmake or win32 cmake
+  ELSE(WIN32)
+    SET(PLATFORM_TOOLCHAIN_PATH /opt/gd32/toolchain2/bin/)
+  ENDIF(WIN32)
+ELSE()
+   SET(PLATFORM_PREFIX arm-none-eabi-)
+   SET(PLATFORM_C_FLAGS " ")
+   IF(WIN32)
+      SET(PLATFORM_TOOLCHAIN_PATH  "/c/dev/arm83/bin")
+   ELSE()
+      #SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/Arduino_stm32/arm-gcc-2020q2/bin")
+      SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/Arduino_stm32/arm-gcc-2020q4/bin")
+   ENDIF()
+ENDIF()
+
