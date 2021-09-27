@@ -18,3 +18,6 @@
 [submodule "lnArduino"]
 	path = lnArduino
 	url = https://github.com/mean00/lnArduino.git
+[submodule "externals/simplerILI9341"]
+	path = externals/simplerILI9341
+	url = https://github.com/mean00/simplerILI9341.git
