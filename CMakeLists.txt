@@ -1,10 +1,9 @@
 #-----------------------------------------------------------------------------
 #
-# CMAkeLists for lnDSO
+# CMakeLists for lnDSO
 # An opensource firmware for the DSO SHELL 150
 # With optional hardware mods :
-#   - Alterntive rotary encoder wiring : MUCH Better, almost mandatory
-#   - Use GD32F303 as another MCU (much faster, better ADC, more memory)
+#   - Alternative rotary encoder wiring : MUCH Better, almost mandatory
 #
 #-----------------------------------------------------------------------------
 
@@ -24,12 +23,14 @@ include(${AF_FOLDER}/setup.cmake)
 
 MESSAGE(STATUS "Starting dso-stm32")
 
+OPTION(USE_VANILLA_HW   "Use unmodified rotary encoder" FALSE)
+OPTION(USE_USB          "Enable USB support" FALSE)
 
 IF(USE_VANILLA_HW)    
     SET(EXTENSION "${EXTENSION}_vanilla")
 ELSE(USE_VANILLA_HW)    
     ADD_DEFINITIONS("-DUSE_RXTX_PIN_FOR_ROTARY")
-    SET(EXTENSION "${EXTENSION}_usb")
+    SET(EXTENSION "${EXTENSION}_rotary")
 ENDIF(USE_VANILLA_HW)
 
 math(EXPR MCU_SPEED_M "${LN_MCU_SPEED}/1000000")
@@ -47,6 +48,10 @@ include_directories(qfp)
 # FreeRTOS
 SET(USE_TRIGGER True)
 # Other modules
+include_directories(externals/simplerILI9341/platformExample/longanNano)
+SET(ILI9341_DRIVER  platformExample/longanNano/gd32_8bits.cpp)
+ADD_SUBDIRECTORY(externals/simplerILI9341) 
+include_directories(externals/simplerILI9341)
 #ADD_SUBDIRECTORY(adc) 
 #AADD_SUBDIRECTORY(testFunc/)
 #AADD_SUBDIRECTORY(captureEngine/)
@@ -66,7 +71,7 @@ GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION}
                 src/main.cpp
                 #myCode.cpp     stopWatch.cpp   helpers/helper_pwm.cpp  i2c_stubs.c ${USB_SRCS} src/dso_memory.cpp
                 )
-#TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}captureEngine)
+TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341)
 #TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}adc)
 ##TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}TFT)
 #TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}src)
@@ -76,10 +81,13 @@ GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION}
 
 # Summary
 MESSAGE(STATUS "Configuration:")
+MESSAGE(STATUS "\tUsing ${LN_MCU} based MCU")
 if(USE_VANILLA_HW)
     MESSAGE(STATUS "\tUsing vanilla HW")
 else(USE_VANILLA_HW)
     MESSAGE(STATUS "\tUsing rotary encoder modification (PB14/PB15) ")
 endif(USE_VANILLA_HW)
+    
+
 #
-MESSAGE(STATUS "\tUsing ${EXTENSION} MCU at ${MCU_SPEED} Hz")
+MESSAGE(STATUS "\tUsing ${EXTENSION} MCU at ${LN_MCU_SPEED} Hz")
