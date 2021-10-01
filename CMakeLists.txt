@@ -68,7 +68,7 @@ ENDIF(USE_USB)
 #ADD_SUBDIRECTORY(src)
 #
 GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION}
-                src/main.cpp
+                src/main.cpp src/dso_gfx.cpp
                 #myCode.cpp     stopWatch.cpp   helpers/helper_pwm.cpp  i2c_stubs.c ${USB_SRCS} src/dso_memory.cpp
                 )
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341)
