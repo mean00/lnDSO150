@@ -4,8 +4,6 @@
 #include "simpler9341.h"
 #define FONT_SIZE_X 12
 #define FONT_SIZE_Y 16
-#define BLACK 0
-#define WHITE (0x7f) // 15 bits ?
 
 static ili9341 *tft=NULL;
 
@@ -57,7 +55,15 @@ void DSO_GFX::center(const char *p,int y)
     tft->setCursor(xcenter, y);
     markup(p);
 }
-
+/**
+ * 
+ * @param fg
+ * @param bg
+ */
+void DSO_GFX::setTextColor(int fg,int bg)
+{
+    tft->setTextColor(fg,bg);
+}
 /**
  * 
  * @param array
@@ -67,6 +73,15 @@ void DSO_GFX::printxy(int x, int y, const char *t)
     tft->setCursor(x, y);
     markup(t);
 }
+/**
+ * 
+ * @param color
+ */
+void DSO_GFX::clear(int color)
+{
+    tft->fillScreen(color);
+}
+
 /**
  * 
  * @param title

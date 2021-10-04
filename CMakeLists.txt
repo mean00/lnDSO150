@@ -36,7 +36,10 @@ ENDIF(USE_VANILLA_HW)
 math(EXPR MCU_SPEED_M "${LN_MCU_SPEED}/1000000")
 SET(EXTENSION "${EXTENSION}_${MCU_SPEED_M}M")
 
- 
+IF("${LN_ARCH}" STREQUAL "RISCV")
+    MESSAGE(STATUS "Using PB8 instead of PB3 for LCD")
+    ADD_DEFINITIONS("-DUSE_PB8_INSTEAD_OF_PB3")
+ENDIF()
  
 include_directories(Adafruit_TFTLCD_8bit_STM32)
 include_directories(.)
@@ -69,6 +72,7 @@ ENDIF(USE_USB)
 #
 GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION}
                 src/main.cpp src/dso_gfx.cpp
+                src/ui/dso_menu.cpp src/ui/dso_menuButton.cpp src/ui/dso_menuEngine.cpp src/dso_display.cpp
                 #myCode.cpp     stopWatch.cpp   helpers/helper_pwm.cpp  i2c_stubs.c ${USB_SRCS} src/dso_memory.cpp
                 )
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341)
