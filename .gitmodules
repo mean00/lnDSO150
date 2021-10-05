@@ -1,5 +1,5 @@
 [submodule "adc"]
-	path = adc
+	path = externals/adc
 	url = https://github.com/mean00/stm32duino_adc.git
 [submodule "lnArduino"]
 	path = lnArduino

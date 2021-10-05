@@ -1,13 +1,16 @@
 #include "lnArduino.h"
 #include "gd32_8bits.h"
 #include "lnStopWatch.h"
-#include "Fonts/FreeSansBold12pt7b.h"
 #include "gfx/dso150nb_compressed.h"
 #include "dso_gfx.h"
 #include "dso_menuEngine.h"
 #include "dso_display.h"
 
 extern void  menuManagement(void);
+extern const GFXfont *smallFont();
+extern const GFXfont *mediumFont();
+extern const GFXfont *bigFont();
+
 
 void setup()
 {
@@ -28,7 +31,7 @@ void loop()
     ili->setRotation(1);
     
     ili->fillScreen(0);
-    ili->setFontFamily(&FreeSansBold12pt7b,&FreeSansBold12pt7b,&FreeSansBold12pt7b);
+    ili->setFontFamily(smallFont(),mediumFont(),bigFont());
     ili->setFontSize(ili9341::SmallFont);
     ili->setTextColor(GREEN,BLACK);
     

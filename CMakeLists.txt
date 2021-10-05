@@ -55,6 +55,7 @@ include_directories(externals/simplerILI9341/platformExample/longanNano)
 SET(ILI9341_DRIVER  platformExample/longanNano/gd32_8bits.cpp)
 ADD_SUBDIRECTORY(externals/simplerILI9341) 
 include_directories(externals/simplerILI9341)
+ADD_SUBDIRECTORY(assets) 
 #ADD_SUBDIRECTORY(adc) 
 #AADD_SUBDIRECTORY(testFunc/)
 #AADD_SUBDIRECTORY(captureEngine/)
@@ -75,7 +76,7 @@ GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION}
                 src/ui/dso_menu.cpp src/ui/dso_menuButton.cpp src/ui/dso_menuEngine.cpp src/dso_display.cpp
                 #myCode.cpp     stopWatch.cpp   helpers/helper_pwm.cpp  i2c_stubs.c ${USB_SRCS} src/dso_memory.cpp
                 )
-TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341)
+TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341 assets)
 #TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}adc)
 ##TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}TFT)
 #TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}src)
