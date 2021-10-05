@@ -1,17 +1,3 @@
-[submodule "MapleFreeRTOS1000"]
-	path = MapleFreeRTOS1000
-	url = https://github.com/mean00/MapleFreeRTOS1000.git
-	branch = master
-[submodule "cmake"]
-	path = cmake
-	url = https://github.com/mean00/arduino-cmake-stm32.git
-	branch = master
-[submodule "Arduino_STM32"]
-	path = Arduino_STM32
-	url = https://github.com/rogerclarkmelbourne/Arduino_STM32
-[submodule "embedded_printf"]
-	path = embedded_printf
-	url = https://github.com/mpaland/printf
 [submodule "adc"]
 	path = adc
 	url = https://github.com/mean00/stm32duino_adc.git
