@@ -16,7 +16,8 @@ SET(CMAKE_TOOLCHAIN_FILE ${AF_FOLDER}/lnArduino.cmake)
 PROJECT(lnDSO NONE) # the NONE is very important !
 
 enable_language(C CXX ASM) # this is important too!
-include_directories(${CMAKE_SOURCE_DIR})        
+include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/include)
 add_subdirectory(${AF_FOLDER})
 
 include(${AF_FOLDER}/setup.cmake)

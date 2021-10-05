@@ -1,7 +1,7 @@
 #include "lnArduino.h"
 #include "gd32_8bits.h"
 #include "lnStopWatch.h"
-#include "gfx/dso150nb_compressed.h"
+#include "assets/gfx/dso150nb_compressed.h"
 #include "dso_gfx.h"
 #include "dso_menuEngine.h"
 #include "dso_display.h"

@@ -11,7 +11,7 @@
 #include "dso_global.h"
 #include "dso_display.h"
 #include "pattern.h"
-#include "stopWatch.h"
+//#include "stopWatch.h"
 #include "simpler9341.h"
 #include "math.h"
 #include "dso_colors.h"
@@ -28,7 +28,7 @@ static ili9341 *tft;
 
 static DSO_ArmingMode oldMode=DSO_CAPTURE_MODE_INVALIDE;
 
-StopWatch triggerWatch;
+//StopWatch triggerWatch;
 
 static DSODisplay::MODE_TYPE mode=DSODisplay::VOLTAGE_MODE;
 /**
