@@ -5,6 +5,8 @@
 #include "dso_gfx.h"
 #include "dso_menuEngine.h"
 #include "dso_display.h"
+#include "dso_test_signal.h"
+#include "pinConfiguration.h"
 
 extern void  menuManagement(void);
 extern const GFXfont *smallFont();
@@ -42,13 +44,16 @@ void loop()
     
     DSODisplay::drawGrid();
     DSODisplay::drawStatsBackGround();
-    while(1)
-    {
-        xDelay(100);
-    }
+   
     
     
     lnCycleClock clk;
+    int fq[4]={100,1000,10000,100000};
+    int fqIndex=0;
+    testSignal *ts=new testSignal(PIN_TEST_SIGNAL,PIN_TEST_SIGNAL_AMP);
+    
+    
+    
     
     while(1)
     {
@@ -60,6 +65,8 @@ void loop()
         ili->fillScreen(0x1f);
         Logger("FillScreen rng %d us \n",lnGetUs()-micro);
         xDelay(1000);
+        ts->setFrequency(fq[fqIndex]);
+        fqIndex=(fqIndex+1)%4;
     }
     
     xDelay(2000);

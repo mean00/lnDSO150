@@ -73,7 +73,7 @@ ENDIF(USE_USB)
 #ADD_SUBDIRECTORY(src)
 #
 GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION}
-                src/main.cpp src/dso_gfx.cpp
+                src/main.cpp src/dso_gfx.cpp src/dso_test_signal.cpp
                 src/ui/dso_menu.cpp src/ui/dso_menuButton.cpp src/ui/dso_menuEngine.cpp src/dso_display.cpp
                 #myCode.cpp     stopWatch.cpp   helpers/helper_pwm.cpp  i2c_stubs.c ${USB_SRCS} src/dso_memory.cpp
                 )
