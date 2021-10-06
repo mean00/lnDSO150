@@ -13,10 +13,11 @@ extern const GFXfont *smallFont();
 extern const GFXfont *mediumFont();
 extern const GFXfont *bigFont();
 
+xMutex *PortBMutex;
 
 void setup()
 {
-
+    PortBMutex=new xMutex;
 }
 uint32_t chipId;
 void loop()
@@ -118,3 +119,13 @@ void loop()
     }
 
 }
+
+
+uint16_t directADC2Read(int pin)
+{
+    return 0;
+}
+ void useAdc2(bool use)
+ {
+     
+ }

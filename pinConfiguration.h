@@ -32,12 +32,12 @@
 #if 0 // Use TX/RX pin for rotary encoder
 #define ALT_ROTARY_LEFT   PA9
 #define ALT_ROTARY_RIGHT  PA10
-#define ROTARY_GPIO       GPIOA
+#define ROTARY_GPIO       0  // port A
 #define ROTATY_SHIFT      9  
 #else  // Use Pb14 & PB15 for rotary encoder
 #define ALT_ROTARY_LEFT   PB14
 #define ALT_ROTARY_RIGHT  PB15
-#define ROTARY_GPIO       GPIOB  
+#define ROTARY_GPIO       1   // port B
 #define ROTATY_SHIFT      14  
 #endif
 
