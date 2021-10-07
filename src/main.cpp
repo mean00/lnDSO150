@@ -7,22 +7,49 @@
 #include "dso_display.h"
 #include "dso_test_signal.h"
 #include "pinConfiguration.h"
+#include "dso_control.h"
+#include "DSO_portBArbitrer.h"
 
 extern void  menuManagement(void);
 extern const GFXfont *smallFont();
 extern const GFXfont *mediumFont();
 extern const GFXfont *bigFont();
+extern void testFunc();
+extern void testFunc2();
 
-xMutex *PortBMutex;
 
+DSOControl *control;
+DSO_portArbitrer *arbitrer;
+/**
+ * 
+ * @param evt
+ */
+ void ControlCb(DSOControl::DSOEvent evt)
+ {
+     
+ }
+
+
+
+/**
+ * 
+ */
 void setup()
 {
-    PortBMutex=new xMutex;
+    xMutex *PortBMutex=new xMutex;
+    arbitrer=new DSO_portArbitrer(1,PortBMutex);
+    control=new DSOControl(ControlCb);
+    control->setup();
 }
 uint32_t chipId;
+/**
+ * 
+ */
 void loop()
 {
+    
     Logger("Starting DSO...\n");
+    testFunc();
     ln8bit9341 *ili=new ln8bit9341( 240, 320,
                                     1,          // port B
                                     PC14,       // DC/RS
@@ -33,15 +60,18 @@ void loop()
     ili->init();    
     ili->setRotation(1);
     
-    ili->fillScreen(0);
+    ili->fillScreen(GREEN);
     ili->setFontFamily(smallFont(),mediumFont(),bigFont());
     ili->setFontSize(ili9341::SmallFont);
     ili->setTextColor(GREEN,BLACK);
+    
+    
     
     DSO_GFX::init(ili);
     DSODisplay::init(ili);
     
     
+    testFunc2();
     
     DSODisplay::drawGrid();
     DSODisplay::drawStatsBackGround();

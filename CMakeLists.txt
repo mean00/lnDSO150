@@ -16,6 +16,10 @@ SET(CMAKE_TOOLCHAIN_FILE ${AF_FOLDER}/lnArduino.cmake)
 PROJECT(lnDSO NONE) # the NONE is very important !
 
 enable_language(C CXX ASM) # this is important too!
+
+
+OPTION(USE_VANILLA_HW "user unmodified pins for rotary encoder" FALSE)
+
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/include)
 add_subdirectory(${AF_FOLDER})
@@ -26,6 +30,8 @@ MESSAGE(STATUS "Starting dso-stm32")
 
 OPTION(USE_VANILLA_HW   "Use unmodified rotary encoder" FALSE)
 OPTION(USE_USB          "Enable USB support" FALSE)
+
+SET(EXTENSION "_${LN_MCU}")
 
 IF(USE_VANILLA_HW)    
     SET(EXTENSION "${EXTENSION}_vanilla")
@@ -75,6 +81,8 @@ ENDIF(USE_USB)
 GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION}
                 src/main.cpp src/dso_gfx.cpp src/dso_test_signal.cpp src/dso_control.cpp
                 src/ui/dso_menu.cpp src/ui/dso_menuButton.cpp src/ui/dso_menuEngine.cpp src/dso_display.cpp
+                src/DSO_portBArbitrer.cpp 
+                testFunc/testFunc.cpp testFunc/testControl.cpp testFunc/testMenu.cpp
                 #myCode.cpp     stopWatch.cpp   helpers/helper_pwm.cpp  i2c_stubs.c ${USB_SRCS} src/dso_memory.cpp
                 )
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341 assets)
@@ -96,4 +104,5 @@ endif(USE_VANILLA_HW)
     
 
 #
-MESSAGE(STATUS "\tUsing ${EXTENSION} MCU at ${LN_MCU_SPEED} Hz")
+MESSAGE(STATUS "\tUsing ${LN_MCU} MCU at ${LN_MCU_SPEED} Hz")
+MESSAGE(STATUS "\tFinal name is ${EXTENSION}")

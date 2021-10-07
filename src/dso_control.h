@@ -9,12 +9,20 @@
 #define EVENT_LONG_PRESS  1
 #define EVENT_SHORT_PRESS 2
 
+
+
 /**
  */
 class DSOControl
 {
 public:
  
+  enum DSOEvent
+  {
+      
+      DSOEventControl
+  };
+    
   enum DSOButton
   {
     DSO_BUTTON_UP=0,
@@ -32,9 +40,10 @@ public:
     DSO_COUPLING_DC=1,
     DSO_COUPLING_AC=2
   };
-  
+  typedef void ControlEventCb(DSOControl::DSOEvent evt);
 
-         DSOControl();
+         DSOControl(ControlEventCb *cb);
+    bool changeCb(ControlEventCb *newCb);
     bool setup();
     bool getButtonState(DSOButton button);
     int  getButtonEvents(DSOButton button);
@@ -51,5 +60,6 @@ public:
 protected:
     int         couplingValue;
     DSOCoupling couplingState;
+    ControlEventCb *_cb;
 };
 // EOF

@@ -1,15 +1,19 @@
 /*
- 
- STM32duino info here : http://wiki.stm32duino.com/index.php?title=Generic_pin_mapping
+ * In alt mode the rotary encoder is using interrupt
+ * Other buttons are polled
+ * 
+ * 
+ Rotary encoder part : Derived from  Rotary encoder handler for arduino * Copyright 2011 Ben Buxton. Licenced under the GNU GPL Version 3. * Contact: bb@cactii.net
+ Debounce part derived from http://www.kennethkuhn.com/electronics/debounce.c
+ * 
  */
-// Rotary encoder part : Derived from  Rotary encoder handler for arduino * Copyright 2011 Ben Buxton. Licenced under the GNU GPL Version 3. * Contact: bb@cactii.net
-// Debounce part derived from http://www.kennethkuhn.com/electronics/debounce.c
 
 #include "lnArduino.h"
 #include "dso_control.h"
 #include "dso_control_internal.h"
 #include "pinConfiguration.h"
 #include "dso_config.h"
+#include "DSO_portBArbitrer.h"
 
 #define TICK                  10 // 10 ms
 #define LONG_PRESS_THRESHOLD (1000/TICK) // 1s
@@ -19,8 +23,11 @@
 
 extern uint16_t directADC2Read(int pin);
 
+extern DSO_portArbitrer *arbitrer;
+
 int debugUp=0;
 int debugDown=0;
+
 
 int ampMapping[16]=
 {
@@ -52,98 +59,101 @@ int ampMapping[16]=
     StateHoldOff=3
   };
 #define ButtonToPin(x)    (PB0+x)
-#define pinAsInput(x)     pinMode(ButtonToPin(x),INPUT_PULLUP);
+#define pinAsInput(x)     lnPinMode(ButtonToPin(x),lnINPUT_PULLUP);
 #define attachRE(x)       lnExtiAttachInterrupt(ButtonToPin(x),LN_EDGE_FALLING,_myInterruptRE,(void *)x );
 
 #define NB_BUTTONS 8
 
   
-extern xMutex *PortBMutex; // lock against LCD  
+
 static int rawCoupling;  
 /**
  */
 class singleButton
 {
 public:
-                    singleButton()
-                    {
-                        _state=StateIdle;
-                        _events=0;
-                        _holdOffCounter=0;
-                        _pinState=0;
-                        _pinCounter=0;
-                    }
-                    bool holdOff() // Return true if in holdoff mode
-                    {
-                        if(_state!=StateHoldOff)
-                            return false;
-                        _holdOffCounter++;
-                        if(_holdOffCounter>HOLDOFF_THRESHOLD)
-                        {
-                            _state=StateIdle;
-                            return false;
-                        }
-                        return true;
-                    }
-                    void goToHoldOff()
-                    {
-                        _state=StateHoldOff;
-                        _holdOffCounter=0;
-                    }
-                    void integrate(bool k)
-                    {         
-                        // Integrator part
-                        if(k)
-                        {
-                            _pinCounter++;
-                        }else
-                        {
-                            if(_pinCounter) 
-                            {
-                                if(_pinCounter>COUNT_MAX) _pinCounter=COUNT_MAX;
-                                else
-                                    _pinCounter--;
-                            }
-                        }
-                    }
-                    
-                    void runMachine(int oldCount)
-                    {
-                        
-                        int oldPin=_pinState;
-                        int newPin=_pinCounter>(COUNT_MAX-1);
+    singleButton()
+    {
+        _state=StateIdle;
+        _events=0;
+        _holdOffCounter=0;
+        _pinState=0;
+        _pinCounter=0;
+    }
+    bool holdOff() // Return true if in holdoff mode
+    {
+        if(_state!=StateHoldOff)
+            return false;
+        _holdOffCounter++;
+        if(_holdOffCounter>HOLDOFF_THRESHOLD)
+        {
+            _state=StateIdle;
+            return false;
+        }
+        return true;
+    }
+    void goToHoldOff()
+    {
+        _state=StateHoldOff;
+        _holdOffCounter=0;
+    }
+    void integrate(bool k)
+    {         
+        // Integrator part
+        if(k)
+        {
+            _pinCounter++;
+        }else
+        {
+            if(_pinCounter) 
+            {
+                if(_pinCounter>COUNT_MAX) _pinCounter=COUNT_MAX;
+                else
+                    _pinCounter--;
+            }
+        }
+    }
 
-                        int s=oldPin+oldPin+newPin;
-                        switch(s)
-                        {
-                            default:
-                            case 0: // flat
-                                break;
-                            case 2:
-                            { // released
-                                if(_state==StatePressed)
-                                {                        
-                                    if(oldCount>SHORT_PRESS_THRESHOLD)
-                                    {
-                                        _events|=EVENT_SHORT_PRESS;
-                                    }
-                                }
-                                goToHoldOff();
-                                break;
-                            }
-                            case 1: // Pressed
-                                _state=StatePressed;
-                                break;
-                            case 3: // Still pressed
-                                if(_pinCounter>LONG_PRESS_THRESHOLD && _state==StatePressed) // only one long
-                                {
-                                    _state=StateLongPressed;
-                                    _events|=EVENT_LONG_PRESS;                                    
-                                }
-                                break;
-                        }                       
-                        _pinState=newPin;
-                    }        
+    int runMachine(int oldCount)
+    {
+
+        int oldPin=_pinState;
+        int newPin=_pinCounter>(COUNT_MAX-1);
+        int r=0;
+        int s=oldPin+oldPin+newPin;
+        switch(s)
+        {
+            default:
+            case 0: // flat
+                break;
+            case 2:
+            { // released
+                if(_state==StatePressed)
+                {                        
+                    if(oldCount>SHORT_PRESS_THRESHOLD)
+                    {
+                        _events|=EVENT_SHORT_PRESS;
+                        r++;
+                    }
+                }
+                goToHoldOff();
+                break;
+            }
+            case 1: // Pressed
+                _state=StatePressed;
+                break;
+            case 3: // Still pressed
+                if(_pinCounter>LONG_PRESS_THRESHOLD && _state==StatePressed) // only one long
+                {
+                    _state=StateLongPressed;
+                    _events|=EVENT_LONG_PRESS;   
+                    r++;
+                }
+                break;
+        }                       
+        _pinState=newPin;
+        return r;
+    }        
                     
     DSOButtonState _state;
     int            _events;
@@ -225,21 +235,17 @@ static DSOControl::DSOCoupling couplingFromAdc2()
 /**
  * 
  */
-DSOControl::DSOControl()
+DSOControl::DSOControl(ControlEventCb *c)
 {
     state = R_START;
     instance=this;
     counter=0;
+    _cb=c;
     
-#ifdef USE_RXTX_PIN_FOR_ROTARY
-    pinMode(ALT_ROTARY_LEFT,OUTPUT); // ok
-    digitalWrite(ALT_ROTARY_LEFT,1);
-    
-    pinMode(ALT_ROTARY_RIGHT,OUTPUT); // ok
-    digitalWrite(ALT_ROTARY_RIGHT,1);    
-    
-    pinMode(ALT_ROTARY_LEFT,INPUT_PULLUP); // ok
-    pinMode(ALT_ROTARY_RIGHT,INPUT_PULLUP);
+#ifdef USE_RXTX_PIN_FOR_ROTARY    
+    #define PREPARE_PIN(x)  lnPinMode(x,lnOUTPUT);  digitalWrite(x,1);lnPinMode(x,lnINPUT_PULLUP);     
+    PREPARE_PIN(ALT_ROTARY_LEFT)
+    PREPARE_PIN(ALT_ROTARY_RIGHT)
 #else    
     pinAsInput(DSO_BUTTON_UP);
     pinAsInput(DSO_BUTTON_DOWN);
@@ -252,14 +258,30 @@ DSOControl::DSOControl()
     pinAsInput(DSO_BUTTON_OK);
     
     for(int i=0;i<4;i++)    
-        pinMode(SENSEL_PIN+i,OUTPUT); // SENSEL
+        lnPinMode(SENSEL_PIN+i,lnOUTPUT); // SENSEL
     
-    pinMode(COUPLING_PIN,lnADC_MODE);
-    couplingState=couplingFromAdc2();
+    lnPinMode(COUPLING_PIN,lnADC_MODE);
+    couplingState=couplingFromAdc2();    
+    // Ok now the direction is correct, memorize it
+    arbitrer->setInputDirectionValue(arbitrer->currentDirection());
     
 }
-
-
+/**
+ * 
+ * @param newCb
+ * @return 
+ */
+bool DSOControl::changeCb(ControlEventCb *newCb)
+{
+    noInterrupts();
+    _cb=newCb;
+    interrupts();
+    return true;
+}
+/**
+ * 
+ * @param a
+ */
 static void trampoline(void *a)
 {
     DSOControl *ctrl=(DSOControl*)a;
@@ -314,6 +336,9 @@ void DSOControl::runLoop()
 {
     xDelay(5);
     int base=millis()&0xffff;
+#ifdef USE_RXTX_PIN_FOR_ROTARY    
+    lnExtiEnableInterrupt(ALT_ROTARY_LEFT); lnExtiEnableInterrupt(ALT_ROTARY_RIGHT);
+#endif    
     while(1)
     {
         static int next=(base+TICK) & 0xffff;;
@@ -329,11 +354,12 @@ void DSOControl::runLoop()
             xAssert(wait<=TICK);         
             xDelay(wait);
         }
+        arbitrer->beginInput();        
+        uint32_t val= lnReadPort(1); // read all bits from portB        
+        arbitrer->endInput();
         
-        PortBMutex->lock(); // make sure we have control over GPIOB
         
-        uint32_t val= lnReadPort(1); // read all bits from portB
-        PortBMutex->unlock();
+        int changed=0;
         for(int i=DSO_BUTTON_ROTARY;i<=DSO_BUTTON_OK;i++)
         {
             singleButton &button=_buttons[i];
@@ -344,9 +370,14 @@ void DSOControl::runLoop()
             
             int oldCount=button._pinCounter;
             button.integrate(k);
-            button.runMachine(oldCount);
-          
-        }        
+            changed+=button.runMachine(oldCount);          
+        }    
+        if(counter)
+            changed++;
+        if(changed) 
+        {
+            _cb(DSOControl::DSOEventControl);
+        }
     }
 }
 
@@ -357,8 +388,9 @@ void DSOControl::runLoop()
 bool DSOControl::setup()
 {
 #ifdef USE_RXTX_PIN_FOR_ROTARY         
-     lnExtiAttachInterrupt(ALT_ROTARY_LEFT,LN_EDGE_BOTH,_myInterruptRE,(void *)DSO_BUTTON_UP);
-     lnExtiAttachInterrupt(ALT_ROTARY_RIGHT,LN_EDGE_BOTH,_myInterruptRE,(void *)DSO_BUTTON_DOWN);
+#define ROT_EDGE LN_EDGE_FALLING //LN_EDGE_BOTH
+     lnExtiAttachInterrupt(ALT_ROTARY_LEFT, ROT_EDGE,_myInterruptRE,(void *)DSO_BUTTON_UP);
+     lnExtiAttachInterrupt(ALT_ROTARY_RIGHT,ROT_EDGE,_myInterruptRE,(void *)DSO_BUTTON_DOWN);
 #else
     attachRE(DSO_BUTTON_UP);
     attachRE(DSO_BUTTON_DOWN);
@@ -466,5 +498,4 @@ int  DSOControl::setInputGain(int val)
     *portA=set+(unset<<16);
     return 0;
 }
-
 //

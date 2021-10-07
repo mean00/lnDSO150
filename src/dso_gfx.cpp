@@ -1,23 +1,41 @@
-
+/**
+ * This is a little helper class to make menus easier
+ * Just a wrapper on top of ili
+ */
 #include "dso_global.h"
 #include "dso_gfx.h"
 #include "simpler9341.h"
+#include "DSO_portBArbitrer.h"
 #define FONT_SIZE_X 12
 #define FONT_SIZE_Y 16
 
 static ili9341 *tft=NULL;
+extern DSO_portArbitrer *arbitrer;
 
 void DSO_GFX::init(ili9341 *i)
 {
     tft=i;
 }
-
+class AutoLcd
+{
+public:
+    AutoLcd()
+    {
+        arbitrer->beginLCD();
+    }
+    ~AutoLcd()
+    {
+        arbitrer->endLCD();
+    }
+};
 /**
  * 
  * @param array
  */
 void DSO_GFX::markup(const char *t)
 {
+    AutoLcd autolcd;
+    
     bool inverted=false;    
     while(1)
     {
@@ -70,6 +88,8 @@ void DSO_GFX::setTextColor(int fg,int bg)
  */
 void DSO_GFX::printxy(int x, int y, const char *t)
 {
+    AutoLcd autolcd;
+    
     tft->setCursor(x, y);
     markup(t);
 }
@@ -79,6 +99,7 @@ void DSO_GFX::printxy(int x, int y, const char *t)
  */
 void DSO_GFX::clear(int color)
 {
+    AutoLcd autolcd;
     tft->fillScreen(color);
 }
 
@@ -88,6 +109,7 @@ void DSO_GFX::clear(int color)
  */
 void DSO_GFX::newPage(const char *title)
 {
+    AutoLcd autolcd;
     tft->fillScreen(BLACK);  
     tft->square(WHITE,0,0,320,FONT_SIZE_Y+4);
     tft->setTextColor(BLACK,WHITE);
@@ -102,6 +124,7 @@ void DSO_GFX::newPage(const char *title)
  */
 void DSO_GFX::subtitle(const char *title)
 {
+    AutoLcd autolcd;
     center(title,FONT_SIZE_X*(2+1));    
 }
 
@@ -112,5 +135,7 @@ void DSO_GFX::subtitle(const char *title)
  */
 void DSO_GFX::bottomLine(const char *title)
 {
+    AutoLcd autolcd;
     center(title,240-2*FONT_SIZE_Y);
 }
+// EOF
