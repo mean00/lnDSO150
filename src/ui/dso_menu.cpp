@@ -97,11 +97,11 @@ const MenuItem  topMenu[]={
 
 /**
  */
-void  menuManagement(void)
+void  menuManagement(DSOControl *control)
 {
     DSO_GFX::clear(BLACK);
      const MenuItem *tem=topMenu;
-     MenuManager man(tem);
+     MenuManager man(control, tem);
      man.run();
 }
 // EOF

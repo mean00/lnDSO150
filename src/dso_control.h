@@ -44,6 +44,7 @@ public:
 
          DSOControl(ControlEventCb *cb);
     bool changeCb(ControlEventCb *newCb);
+    ControlEventCb *getCb() {return _cb;}
     bool setup();
     bool getButtonState(DSOButton button);
     int  getButtonEvents(DSOButton button);

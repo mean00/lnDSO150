@@ -32,9 +32,9 @@ public:
  * 
  * @param array
  */
-void DSO_GFX::markup(const char *t)
+void DSO_GFX_markup(const char *t)
 {
-    AutoLcd autolcd;
+   
     
     bool inverted=false;    
     while(1)
@@ -65,13 +65,13 @@ void DSO_GFX::markup(const char *t)
  * @param p
  * @param y
  */
-void DSO_GFX::center(const char *p,int y)
+void DSO_GFX_center(const char *p,int y)
 {
     int l=strlen(p)*FONT_SIZE_X;
     int xcenter=(320-l)/2;    
     if(xcenter<0) xcenter=0;
     tft->setCursor(xcenter, y);
-    markup(p);
+    DSO_GFX_markup(p);
 }
 /**
  * 
@@ -84,6 +84,18 @@ void DSO_GFX::setTextColor(int fg,int bg)
 }
 /**
  * 
+ * @param big
+ */
+void DSO_GFX::setBigFont(bool big)
+{
+    if(big)
+        tft->setFontSize(ili9341::BigFont);
+    else
+        tft->setFontSize(ili9341::MediumFont);
+}
+
+/**
+ * 
  * @param array
  */
 void DSO_GFX::printxy(int x, int y, const char *t)
@@ -91,7 +103,7 @@ void DSO_GFX::printxy(int x, int y, const char *t)
     AutoLcd autolcd;
     
     tft->setCursor(x, y);
-    markup(t);
+    DSO_GFX_markup(t);
 }
 /**
  * 
@@ -113,7 +125,7 @@ void DSO_GFX::newPage(const char *title)
     tft->fillScreen(BLACK);  
     tft->square(WHITE,0,0,320,FONT_SIZE_Y+4);
     tft->setTextColor(BLACK,WHITE);
-    center(title,2);    
+    DSO_GFX_center(title,2);    
     tft->setTextColor(WHITE,BLACK);
 }
 
@@ -125,7 +137,7 @@ void DSO_GFX::newPage(const char *title)
 void DSO_GFX::subtitle(const char *title)
 {
     AutoLcd autolcd;
-    center(title,FONT_SIZE_X*(2+1));    
+    DSO_GFX_center(title,FONT_SIZE_X*(2+1));    
 }
 
 
@@ -136,6 +148,6 @@ void DSO_GFX::subtitle(const char *title)
 void DSO_GFX::bottomLine(const char *title)
 {
     AutoLcd autolcd;
-    center(title,240-2*FONT_SIZE_Y);
+    DSO_GFX_center(title,240-2*FONT_SIZE_Y);
 }
 // EOF

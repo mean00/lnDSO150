@@ -15,6 +15,7 @@
 DSO_portArbitrer::DSO_portArbitrer(int port,  xMutex *tex)
 {
     _directionPort=lnGetGpioDirectionRegister(port);
+    _valuePort=lnGetGpioValueRegister(port);
     _tex=tex;
 }
 /**
@@ -24,18 +25,31 @@ void DSO_portArbitrer::setInputDirectionValue(uint32_t v)
     _inputDirection=v;
 }
 /**
+ * 
+ * @param v
+ */
+void DSO_portArbitrer::setInputValue(uint32_t v)
+{
+    _intputValue=v;
+}
+
+
+/**
  */
 void DSO_portArbitrer::beginInput()
 {
     _tex->lock();
     _oldDirection=*_directionPort;
+    _oldInput=*_valuePort;
     *_directionPort=_inputDirection;
+    *_valuePort=_intputValue;
 }
 /**
  */
 void DSO_portArbitrer::endInput()
 {
     *_directionPort=_oldDirection;
+    *_valuePort=_oldInput;
     _tex->unlock();
 }
 /**

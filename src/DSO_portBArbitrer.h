@@ -8,6 +8,7 @@ class DSO_portArbitrer
 public:
                      DSO_portArbitrer(int port,  xMutex *tex);
                 void setInputDirectionValue(uint32_t v);
+                void setInputValue(uint32_t v);
                 void beginInput();
                 void endInput();
                 void beginLCD();
@@ -18,4 +19,6 @@ protected:
     volatile uint32_t    *_directionPort;
     uint32_t    _oldDirection;
     uint32_t    _inputDirection;
+    volatile uint32_t *_valuePort;
+    uint32_t    _intputValue,_oldInput;
 };

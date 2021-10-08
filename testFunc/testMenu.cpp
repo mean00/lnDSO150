@@ -54,20 +54,11 @@ static const MenuItem  topMenu[]={
 
 /**
  * 
- * @param evt
- */
-void thisCb(DSOControl::DSOEvent evt)
-{
-    Logger("Event");
-}
-/**
- * 
  */
 void testMenu()
-{
-    control->changeCb(thisCb);
+{    
     const MenuItem *tem=topMenu;
-    MenuManager man(tem);
+    MenuManager man(control, tem);
     man.run();
     while(1)
     {

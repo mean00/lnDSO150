@@ -1,5 +1,5 @@
 #pragma once
-
+#include "lnArduino.h"
 /**
  */
 class MenuItem
@@ -23,12 +23,16 @@ public:
  * 
  * @param menu
  */
+class DSOControl;
 class MenuManager
 {
 public:
-    MenuManager(const MenuItem *menu);
+    MenuManager(DSOControl *ctl, const MenuItem *menu);
     ~MenuManager();
     void run(void);
+    
+public:
+          void controlEvent();
 protected:
     const MenuItem *_menu;
           void runOne(const MenuItem *xtop);    
@@ -37,5 +41,10 @@ protected:
           void redraw(const char *title, int n,const MenuItem *xtop, int current);
           void blink(int current, const char *text);
           void printBackHint();
+       
+protected:
+          void runOne_( const MenuItem *xtop);
+          xBinarySemaphore _sem;
+          DSOControl *_control;
     
 };

@@ -376,7 +376,10 @@ void DSOControl::runLoop()
             changed++;
         if(changed) 
         {
-            _cb(DSOControl::DSOEventControl);
+            if(_cb)
+            {
+                _cb(DSOControl::DSOEventControl);
+            }
         }
     }
 }
@@ -388,7 +391,7 @@ void DSOControl::runLoop()
 bool DSOControl::setup()
 {
 #ifdef USE_RXTX_PIN_FOR_ROTARY         
-#define ROT_EDGE LN_EDGE_FALLING //LN_EDGE_BOTH
+#define ROT_EDGE LN_EDGE_BOTH //LN_EDGE_FALLING //LN_EDGE_BOTH
      lnExtiAttachInterrupt(ALT_ROTARY_LEFT, ROT_EDGE,_myInterruptRE,(void *)DSO_BUTTON_UP);
      lnExtiAttachInterrupt(ALT_ROTARY_RIGHT,ROT_EDGE,_myInterruptRE,(void *)DSO_BUTTON_DOWN);
 #else

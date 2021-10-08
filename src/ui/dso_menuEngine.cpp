@@ -7,8 +7,9 @@
 #include "dso_gfx.h"
 #include "dso_menuEngine.h"
 #include "dso_global.h"
+#include "dso_control.h"
 
-
+static MenuManager *_instance;
 #define USE_MENU_BUTTON DSOControl::DSO_BUTTON_ROTARY
 //#define USE_MENU_BUTTON DSOControl::DSO_BUTTON_OK
 
@@ -16,9 +17,11 @@
  * 
  * @param menu
  */
-MenuManager::MenuManager(const MenuItem *menu)
+MenuManager::MenuManager(DSOControl *ctl, const MenuItem *menu)
 {
     _menu=menu;
+    _instance=this;
+    _control=ctl;
 }
 /**
  * 
@@ -26,6 +29,8 @@ MenuManager::MenuManager(const MenuItem *menu)
 MenuManager::~MenuManager()
 {
     _menu=NULL;
+    _instance=NULL;
+    _control=NULL;
 }
 /**
  * 
@@ -61,8 +66,7 @@ void MenuManager::printBackHint()
 void MenuManager::run(void)
 {
      DSO_GFX::clear(BLACK);
-#warning     
-     //tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::BigFont);
+     DSO_GFX::setBigFont(true);
      runOne(_menu);     
 };
 /**
@@ -88,14 +92,46 @@ void MenuManager::blink(int current, const char *text)
            xDelay(80);
     }     
 }
-
+/**
+ * 
+ * @param e
+ * @return 
+ */
+void MenuManager_controlEvent(DSOControl::DSOEvent e)
+{
+    xAssert(_instance);
+    _instance->controlEvent();
+}
 /**
  */
 void MenuManager::runOne( const MenuItem *xtop)
 {
      DSO_GFX::clear(BLACK);
-     const char *title=xtop->menuText;
+     
      xtop=xtop+1;
+     DSOControl::ControlEventCb *oldCb=_control->getCb();
+     Logger("Entering menu\n");
+     _control->changeCb( MenuManager_controlEvent);
+     runOne_(xtop);
+     _control->changeCb(oldCb);
+     Logger("Exiting menu\n");
+}
+/**
+ * 
+ * @param evt
+ */
+void MenuManager::controlEvent()
+{
+    _sem.give();
+}
+
+/**
+ * 
+ * @param xtop
+ */
+void MenuManager::runOne_( const MenuItem *xtop)
+{
+     const char *title=xtop->menuText;
      int n=0;
      {
         const MenuItem  *top=xtop;
@@ -105,9 +141,6 @@ void MenuManager::runOne( const MenuItem *xtop)
             n++;
         }
      }
-     
-     
-     
      // draw them 
      // 0 to N-1
      int current=0;    
@@ -115,13 +148,12 @@ next:
         redraw(title,n,xtop,current);
         while(1)
         { 
-                  xDelay(10); // dont busy loop
-#if 0                  
-                  int okEvent=controlButtons->getButtonEvents(DSOControl::DSO_BUTTON_OK);
+                  _sem.take(200);
+                  int okEvent=_control->getButtonEvents(DSOControl::DSO_BUTTON_OK);
                   if(okEvent&EVENT_SHORT_PRESS)
-                      return;
+                    return;
                   
-                  int event=controlButtons->getButtonEvents(USE_MENU_BUTTON);
+                  int event=_control->getButtonEvents(USE_MENU_BUTTON);
                   if( event & EVENT_LONG_PRESS)
                     return;
                   if(event & EVENT_SHORT_PRESS)
@@ -145,8 +177,7 @@ next:
                                 cb *c=(cb *)xtop[current].cookie;
                                 blink(current,xtop[current].menuText);
                                 c();
-#warning FIXME                                
-//                                tft->setFontSize(Adafruit_TFTLCD_8bit_STM32::BigFont);
+                                DSO_GFX::setBigFont(true);
                                 goto next;
                             }
                           break;
@@ -156,15 +187,14 @@ next:
                       }
                       break;
                   }
-                  int inc=controlButtons->getRotaryValue();
+                  int inc=_control->getRotaryValue();
                   if(inc)
                   {
                     current+=inc;
                     while(current<0) current+=n;
                     while(current>=n) current-=n;
                     goto next;
-                  }
-#endif                  
+                  }     
         }
 };
 // EOF
