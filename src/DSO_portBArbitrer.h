@@ -21,4 +21,6 @@ protected:
     uint32_t    _inputDirection;
     volatile uint32_t *_valuePort;
     uint32_t    _intputValue,_oldInput;
+    
+    uint32_t    _oldTime, _maxLockOut;
 };

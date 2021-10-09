@@ -17,6 +17,7 @@ DSO_portArbitrer::DSO_portArbitrer(int port,  xMutex *tex)
     _directionPort=lnGetGpioDirectionRegister(port);
     _valuePort=lnGetGpioValueRegister(port);
     _tex=tex;
+    _maxLockOut=0;
 }
 /**
  */
@@ -59,12 +60,19 @@ void DSO_portArbitrer::endInput()
 void DSO_portArbitrer::beginLCD()
 {
     _tex->lock(); 
+    _oldTime=lnGetUs();
 }
 /**
  */
 void DSO_portArbitrer::endLCD()
 {
+    uint32_t nw=lnGetUs();
     _tex->unlock();
+    nw-=_oldTime;
+    if(nw<50000)
+    {
+        if(nw>_maxLockOut) _maxLockOut=nw;
+    }
 }
 // EOF
 
