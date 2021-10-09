@@ -17,13 +17,15 @@ PROJECT(lnDSO NONE) # the NONE is very important !
 
 enable_language(C CXX ASM) # this is important too!
 
-
+#____________________
+# Options
+#____________________
 OPTION(USE_VANILLA_HW "user unmodified pins for rotary encoder"             FALSE)
 OPTION(USE_ROTARY_FULL_STEP "Use full step for rotary encoder, else half step"  FALSE)
 OPTION(USE_VANILLA_HW   "Use unmodified rotary encoder"                     FALSE)
 OPTION(USE_USB          "Enable USB support"                                FALSE)
 
-
+#
 
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -31,7 +33,7 @@ add_subdirectory(${AF_FOLDER})
 
 include(${AF_FOLDER}/setup.cmake)
 
-MESSAGE(STATUS "Starting dso-stm32")
+MESSAGE(STATUS "Starting lnDSO")
 
 
 SET(EXTENSION "_${LN_MCU}")
@@ -59,49 +61,29 @@ IF("${LN_ARCH}" STREQUAL "RISCV")
     ADD_DEFINITIONS("-DUSE_PB8_INSTEAD_OF_PB3")
 ENDIF()
  
-include_directories(Adafruit_TFTLCD_8bit_STM32)
-include_directories(.)
-include_directories(adc)
-include_directories(captureEngine)
 include_directories(src)
 include_directories(qfp)
 
 # FreeRTOS
 SET(USE_TRIGGER True)
-# Other modules
+#_______________________
+#  Display
+#_______________________
 include_directories(externals/simplerILI9341/platformExample/longanNano)
 SET(ILI9341_DRIVER  platformExample/longanNano/gd32_8bits.cpp)
 ADD_SUBDIRECTORY(externals/simplerILI9341) 
 include_directories(externals/simplerILI9341)
+#
 ADD_SUBDIRECTORY(assets) 
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(testFunc)
-#ADD_SUBDIRECTORY(adc) 
-#AADD_SUBDIRECTORY(testFunc/)
-#AADD_SUBDIRECTORY(captureEngine/)
-#AADD_SUBDIRECTORY(qfp)
-#AADD_SUBDIRECTORY(Adafruit_TFTLCD_8bit_STM32)
 #
-IF(USE_USB)
-    ADD_DEFINITIONS(-DUSE_USB)
-    SET(USB_SRCS Arduino_STM32/STM32F1/libraries/USBComposite/USBComposite.cpp Arduino_STM32/STM32F1/libraries/USBComposite/USBCompositeSerial.cpp)
-    include_directories(Arduino_STM32/STM32F1/libraries/USBComposite)
-ELSE(USE_USB)
-    SET(USB_SRCS usb_stubs.cpp)
-ENDIF(USE_USB)
-#ADD_SUBDIRECTORY(src)
-#
-
-GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION}
-                )
+#____________________
+# Build
+#____________________
+GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION})
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  sourceLib testLib)
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341 assets)
-#TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}adc)
-##TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}TFT)
-#TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}src)
-#TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}qfpm3)
-#TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  ${libPrefix}tests)
-
 
 # Summary
 MESSAGE(STATUS "Configuration:")
