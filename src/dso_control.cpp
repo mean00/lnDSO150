@@ -460,8 +460,10 @@ bool DSOControl::getButtonState(DSOControl::DSOButton button)
  */
 int  DSOControl::getButtonEvents(DSOButton button)
 {
-    // Avoid disabling interrupts    
-    int evt = __atomic_exchange_n( &(_buttons[button]._events), 0, __ATOMIC_SEQ_CST);
+    noInterrupts();
+    int evt=_buttons[button]._events;
+    _buttons[button]._events=0;
+    interrupts();
     return evt;
 }
 
@@ -471,9 +473,11 @@ int  DSOControl::getButtonEvents(DSOButton button)
  */
 int  DSOControl::getRotaryValue()
 {
-    // Avoid disabling interrupts    
-    int evt = __atomic_exchange_n( &(counter), 0, __ATOMIC_SEQ_CST);
-    return evt;
+    noInterrupts();
+    int evt=counter;
+    counter=0;
+    interrupts();
+    return evt;    
 }
 
 /**

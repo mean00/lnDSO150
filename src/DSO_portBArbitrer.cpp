@@ -33,12 +33,13 @@ void DSO_portArbitrer::setInputValue(uint32_t v)
     _intputValue=v;
 }
 
-
+#define WAIT_A_BIT asm("nop");asm("nop");asm("nop");
 /**
  */
 void DSO_portArbitrer::beginInput()
 {
     _tex->lock();
+    WAIT_A_BIT
     _oldDirection=*_directionPort;
     _oldInput=*_valuePort;
     *_directionPort=_inputDirection;
@@ -50,13 +51,14 @@ void DSO_portArbitrer::endInput()
 {
     *_directionPort=_oldDirection;
     *_valuePort=_oldInput;
+    WAIT_A_BIT
     _tex->unlock();
 }
 /**
  */
 void DSO_portArbitrer::beginLCD()
 {
-    _tex->lock();    
+    _tex->lock(); 
 }
 /**
  */

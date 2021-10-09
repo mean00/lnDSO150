@@ -102,7 +102,7 @@ void DSO_GFX::printxy(int x, int y, const char *t)
 {
     AutoLcd autolcd;
     
-    tft->setCursor(x, y);
+    tft->setCursor(x, y+4);
     DSO_GFX_markup(t);
 }
 /**

@@ -18,7 +18,12 @@ PROJECT(lnDSO NONE) # the NONE is very important !
 enable_language(C CXX ASM) # this is important too!
 
 
-OPTION(USE_VANILLA_HW "user unmodified pins for rotary encoder" FALSE)
+OPTION(USE_VANILLA_HW "user unmodified pins for rotary encoder"             FALSE)
+OPTION(USE_ROTARY_FULL_STEP "Use full step for rotary encoder, else half step"  FALSE)
+OPTION(USE_VANILLA_HW   "Use unmodified rotary encoder"                     FALSE)
+OPTION(USE_USB          "Enable USB support"                                FALSE)
+
+
 
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -28,8 +33,6 @@ include(${AF_FOLDER}/setup.cmake)
 
 MESSAGE(STATUS "Starting dso-stm32")
 
-OPTION(USE_VANILLA_HW   "Use unmodified rotary encoder" FALSE)
-OPTION(USE_USB          "Enable USB support" FALSE)
 
 SET(EXTENSION "_${LN_MCU}")
 
@@ -37,8 +40,16 @@ IF(USE_VANILLA_HW)
     SET(EXTENSION "${EXTENSION}_vanilla")
 ELSE(USE_VANILLA_HW)    
     ADD_DEFINITIONS("-DUSE_RXTX_PIN_FOR_ROTARY")
-    SET(EXTENSION "${EXTENSION}_rotary")
+    SET(EXTENSION "${EXTENSION}_mod")
 ENDIF(USE_VANILLA_HW)
+
+IF(USE_ROTARY_FULL_STEP)    
+    SET(EXTENSION "${EXTENSION}_fstep")
+ELSE(USE_ROTARY_FULL_STEP)    
+    ADD_DEFINITIONS("-DDSO_ROTARY_FULL_STEP")
+    SET(EXTENSION "${EXTENSION}_hstep")
+ENDIF(USE_ROTARY_FULL_STEP)
+
 
 math(EXPR MCU_SPEED_M "${LN_MCU_SPEED}/1000000")
 SET(EXTENSION "${EXTENSION}_${MCU_SPEED_M}M")
@@ -78,6 +89,7 @@ ELSE(USE_USB)
 ENDIF(USE_USB)
 #ADD_SUBDIRECTORY(src)
 #
+
 GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION}
                 src/main.cpp src/dso_gfx.cpp src/dso_test_signal.cpp src/dso_control.cpp
                 src/ui/dso_menu.cpp src/ui/dso_menuButton.cpp src/ui/dso_menuEngine.cpp src/dso_display.cpp
@@ -101,7 +113,11 @@ if(USE_VANILLA_HW)
 else(USE_VANILLA_HW)
     MESSAGE(STATUS "\tUsing rotary encoder modification (PB14/PB15) ")
 endif(USE_VANILLA_HW)
-    
+IF(USE_ROTARY_FULL_STEP)
+     MESSAGE(STATUS "\tUsing rotary encoder Full step ")
+ELSE()
+     MESSAGE(STATUS "\tUsing rotary encoder Half step ")
+ENDIF()
 
 #
 MESSAGE(STATUS "\tUsing ${LN_MCU} MCU at ${LN_MCU_SPEED} Hz")

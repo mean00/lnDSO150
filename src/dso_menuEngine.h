@@ -43,8 +43,7 @@ protected:
           void printBackHint();
        
 protected:
-          void runOne_( const MenuItem *xtop);
-          xBinarySemaphore _sem;
-          DSOControl *_control;
-    
+          void              runOne_( const MenuItem *xtop);
+          xBinarySemaphore  _sem;
+          DSOControl        *_control;    
 };

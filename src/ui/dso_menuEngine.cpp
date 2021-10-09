@@ -107,8 +107,6 @@ void MenuManager_controlEvent(DSOControl::DSOEvent e)
 void MenuManager::runOne( const MenuItem *xtop)
 {
      DSO_GFX::clear(BLACK);
-     
-     xtop=xtop+1;
      DSOControl::ControlEventCb *oldCb=_control->getCb();
      Logger("Entering menu\n");
      _control->changeCb( MenuManager_controlEvent);
@@ -132,6 +130,7 @@ void MenuManager::controlEvent()
 void MenuManager::runOne_( const MenuItem *xtop)
 {
      const char *title=xtop->menuText;
+     xtop=xtop+1;
      int n=0;
      {
         const MenuItem  *top=xtop;
@@ -167,7 +166,7 @@ next:
                       case MenuItem::MENU_SUBMENU: 
                             {
                                 const MenuItem *sub=(const MenuItem *)xtop[current].cookie;
-                                runOne(sub);
+                                runOne_(sub);
                                 goto next;
                             }
                             break;

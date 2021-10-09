@@ -2,6 +2,7 @@
 #include "lnArduino.h"
 #include "dso_control.h"
 #include "dso_menuEngine.h"
+#include "dso_gfx.h"
 extern DSOControl *control;
 
      
@@ -46,7 +47,7 @@ static const MenuItem  topMenu[]={
     {MenuItem::MENU_TITLE, "Main Menu",NULL},
     {MenuItem::MENU_SUBMENU, "Test signal",(const void *)&signalMenu},
     {MenuItem::MENU_TITLE, "Button Test",NULL},
-    {MenuItem::MENU_SUBMENU, "Calibration",(const void *)&calibrationMenu},
+    {MenuItem::MENU_SUBMENU, "Calib ration",(const void *)&calibrationMenu},
     {MenuItem::MENU_BACK, "Back",NULL},
     {MenuItem::MENU_END, NULL,NULL}
 };
@@ -60,6 +61,7 @@ void testMenu()
     const MenuItem *tem=topMenu;
     MenuManager man(control, tem);
     man.run();
+    DSO_GFX::clear(0x1f);
     while(1)
     {
         xDelay(100);
