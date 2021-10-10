@@ -20,6 +20,7 @@ extern void testFunc2();
 
 DSOControl *control;
 DSO_portArbitrer *arbitrer;
+DSO_testSignal *testSignal;
 /**
  * 
  * @param evt
@@ -40,6 +41,7 @@ void setup()
     arbitrer=new DSO_portArbitrer(1,PortBMutex);
     control=new DSOControl(ControlCb);
     control->setup();
+    testSignal=new DSO_testSignal(PIN_TEST_SIGNAL,PIN_TEST_SIGNAL_AMP);
 }
 uint32_t chipId;
 /**
@@ -81,7 +83,7 @@ void loop()
     lnCycleClock clk;
     int fq[4]={100,1000,10000,100000};
     int fqIndex=0;
-    testSignal *ts=new testSignal(PIN_TEST_SIGNAL,PIN_TEST_SIGNAL_AMP);
+    
     
     
     
@@ -96,7 +98,7 @@ void loop()
         ili->fillScreen(0x1f);
         Logger("FillScreen rng %d us \n",lnGetUs()-micro);
         xDelay(1000);
-        ts->setFrequency(fq[fqIndex]);
+        testSignal->setFrequency(fq[fqIndex]);
         fqIndex=(fqIndex+1)%4;
     }
     
