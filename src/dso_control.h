@@ -23,6 +23,7 @@ public:
       DSOEventControl
   };
     
+#define DSO_EVENT_Q(b,e) ((b+(e<<16)))
   enum DSOButton
   {
     DSO_BUTTON_UP=0,
@@ -52,6 +53,7 @@ public:
     void interruptRE(int button);
     void interruptButton(int button);
     void runLoop();
+    int  getQButtonEvent(); // return 0 if nothing to do, else key + event<<16
     int  setInputGain(int val); // This drives SENSEL... Warning the mapping is not straightforward !
     DSOCoupling   getCouplingState();
     const char    *geCouplingStateAsText();

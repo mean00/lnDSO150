@@ -465,6 +465,23 @@ bool DSOControl::getButtonState(DSOControl::DSOButton button)
 }
 /**
  * 
+ * @return 
+ */
+int DSOControl::getQButtonEvent()
+{
+    for(int i=DSO_BUTTON_UP;i<=DSO_BUTTON_OK;i++)
+    {
+        int evt=_buttons[i]._events;
+        if(evt)
+        {
+            _buttons[i]._events=0; // race is possible here, but we dont care
+            return (evt<<16)+i;
+        }
+    }
+    return 0;
+}
+/**
+ * 
  * @param button
  * @return 
  */

@@ -52,6 +52,7 @@ protected:
           void printBackHint();
        
 protected:
+          bool              handlePress(const char *title,int n,const MenuItem *xtop,int current);
           void              runOne_( const MenuItem *xtop);
           xBinarySemaphore  _sem;
           DSOControl        *_control;    

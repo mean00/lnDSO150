@@ -175,65 +175,21 @@ next:
         while(1)
         { 
                   _sem.take(200);
-                  int okEvent=_control->getButtonEvents(DSOControl::DSO_BUTTON_OK);
-                  if(okEvent&EVENT_SHORT_PRESS)
-                    return;
                   
-                  int event=_control->getButtonEvents(USE_MENU_BUTTON);
-                  if( event & EVENT_LONG_PRESS)
-                    return;
-                  if(event & EVENT_SHORT_PRESS)
+                  int event;
+                  while(event=_control->getQButtonEvent())
                   {
-                   //   Serial.print("Menu \n");
-                   //   Serial.print(xtop[current].type);
-                      switch(xtop[current].type)
-                      {
-                      case MenuItem::MENU_BACK: return; break;
-                      case MenuItem::MENU_SUBMENU: 
-                            {
-                                const MenuItem *sub=(const MenuItem *)xtop[current].cookie;
-                                runOne_(sub);
-                                goto next;
-                            }
-                            break;
-                      case MenuItem::MENU_CALL: 
-                            {
-                                typedef void cb(void);
-                                cb *c=(cb *)xtop[current].cookie;
-                                blink(current,xtop[current].menuText);
-                                c();
-                                DSO_GFX::setBigFont(true);
-                                goto next;
-                            }
-                          break;
-                      case MenuItem::MENU_END: 
-                          return;break;
-                      case MenuItem::MENU_INDEX:
-                      {
-                           
-                          MenuListItem *item=(MenuListItem *)xtop[current].cookie;
-                          *(item->item)=item->thisItem;                          
-                          redraw(title,n,xtop,current);
-                          goto next;
-                      }
-                      break;
-                          
-                      case MenuItem::MENU_TOGGLE: 
-                      {
-                          bool *e=(bool *)xtop[current].cookie;
-                          *e=!*e;
-                          redraw(title,n,xtop,current);
-                          goto next;
-                      }
-                          break;
-
-                          break;
-                      case MenuItem::MENU_TITLE:
-                          goto next;
-                          break;
-                      default: xAssert(0);break;
-                      }
-                      break;
+                    if(event==DSO_EVENT_Q(DSOControl::DSO_BUTTON_OK,EVENT_SHORT_PRESS))
+                        return;
+                    if(event==DSO_EVENT_Q(DSOControl::USE_MENU_BUTTON,EVENT_LONG_PRESS))
+                        return;
+                    if(event==DSO_EVENT_Q(DSOControl::USE_MENU_BUTTON,EVENT_SHORT_PRESS))                    
+                    {
+                        if(handlePress(title,n, xtop,current)) 
+                        {
+                            return;
+                        }
+                    }
                   }
                   int inc=_control->getRotaryValue();
                   if(inc)
@@ -245,4 +201,61 @@ next:
                   }     
         }
 };
+/**
+ * It is just to keep runOne simple
+ * @param xtop
+ * @param current
+ * @return 
+ */
+bool MenuManager::handlePress( const char *title,int n,const MenuItem *xtop,int current)
+{
+    switch(xtop[current].type)
+    {
+        case MenuItem::MENU_BACK: 
+        case MenuItem::MENU_END:             
+                return true; 
+                break;
+        case MenuItem::MENU_SUBMENU: 
+              {
+                  const MenuItem *sub=(const MenuItem *)xtop[current].cookie;
+                  runOne_(sub);
+                  redraw(title,n,xtop,current);
+                  return false;
+              }
+              break;
+        case MenuItem::MENU_CALL: 
+              {
+                  typedef void cb(void);
+                  cb *c=(cb *)xtop[current].cookie;
+                  blink(current,xtop[current].menuText);
+                  c();
+                  DSO_GFX::setBigFont(true);
+                  return true;
+              }
+            break;
+        case MenuItem::MENU_INDEX:
+        {
+            MenuListItem *item=(MenuListItem *)xtop[current].cookie;
+            *(item->item)=item->thisItem;                          
+            redraw(title,n,xtop,current);
+            return false;
+        }
+        break;
+
+        case MenuItem::MENU_TOGGLE: 
+        {
+            bool *e=(bool *)xtop[current].cookie;
+            *e=!*e;
+            redraw(title,n,xtop,current);
+            return false;
+        }
+            break;
+        case MenuItem::MENU_TITLE:
+            return false;
+            break;
+        default: xAssert(0);break;
+    }
+    return false;
+}
+
 // EOF
