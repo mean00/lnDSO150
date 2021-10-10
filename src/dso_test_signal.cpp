@@ -10,7 +10,7 @@
 /**
  */
 
-testSignal::testSignal(lnPin pin,lnPin pinAmp)
+DSO_testSignal::DSO_testSignal(lnPin pin,lnPin pinAmp)
 {
     this->pinAmp=pinAmp;
     this->pinSignal=pin;  
@@ -24,7 +24,7 @@ testSignal::testSignal(lnPin pin,lnPin pinAmp)
 }
 /**
  */
- bool testSignal::setFrequency(int fq)
+ bool DSO_testSignal::setFrequency(int fq)
  {     
      _timer->disable();
      _timer->setPwmFrequency(fq);
@@ -41,7 +41,7 @@ testSignal::testSignal(lnPin pin,lnPin pinAmp)
   * 
   * 
   */
- bool testSignal::setAmplitude(bool  large)
+ bool DSO_testSignal::setAmplitude(bool  large)
  {
      if(large)
      {

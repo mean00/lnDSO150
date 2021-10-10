@@ -5,10 +5,10 @@
  */
 class lnTimer;
 
-class testSignal
+class DSO_testSignal
 {
 public:
-                 testSignal(lnPin pin,lnPin pinAmp);
+                 DSO_testSignal(lnPin pin,lnPin pinAmp);
             bool setFrequency(int fq);
             bool setAmplitude(bool large);
             
