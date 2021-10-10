@@ -18,5 +18,7 @@ public:
   static void clear(int color);
   static void setTextColor(int fg,int bg);  
   static void setBigFont(bool big);
+  static void printMenuTitle(const char *text);
+  static void clearBody(int color);
   
 };

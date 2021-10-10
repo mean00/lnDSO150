@@ -6,8 +6,9 @@
 #include "dso_gfx.h"
 #include "simpler9341.h"
 #include "DSO_portBArbitrer.h"
-#define FONT_SIZE_X 12
-#define FONT_SIZE_Y 16
+
+#define FONT_SIZE_X 8
+#define FONT_SIZE_Y 28
 
 static ili9341 *tft=NULL;
 extern DSO_portArbitrer *arbitrer;
@@ -101,8 +102,14 @@ void DSO_GFX::setBigFont(bool big)
 void DSO_GFX::printxy(int x, int y, const char *t)
 {
     AutoLcd autolcd;
+    int l,w;
+    if(y<0) l=240+FONT_SIZE_Y*y;
+    else l=FONT_SIZE_Y*y+FONT_SIZE_Y;
     
-    tft->setCursor(x, y+4);
+    if(x<0) w=320+FONT_SIZE_X*x;
+    else w=FONT_SIZE_X*x;
+    
+    tft->setCursor(w, l+4);
     DSO_GFX_markup(t);
 }
 /**
@@ -114,7 +121,17 @@ void DSO_GFX::clear(int color)
     AutoLcd autolcd;
     tft->fillScreen(color);
 }
-
+/**
+ * 
+ * @param color
+ */
+void DSO_GFX::clearBody(int color)
+{
+      AutoLcd autolcd;
+      tft->square(color,
+            0, FONT_SIZE_Y+8,
+            320,240-FONT_SIZE_Y*3-8);
+}
 /**
  * 
  * @param title
@@ -150,4 +167,19 @@ void DSO_GFX::bottomLine(const char *title)
     AutoLcd autolcd;
     DSO_GFX_center(title,240-2*FONT_SIZE_Y);
 }
+/**
+ * 
+ * @param text
+ */
+void DSO_GFX::printMenuTitle(const char *text)
+{
+    int fg,bg;
+    tft->getTextColor(fg,bg);
+    DSO_GFX::setTextColor(BLACK,BLUE); 
+    tft->square(BLUE,0,0+8,320,FONT_SIZE_Y);
+    DSO_GFX::printxy(13,0,text);
+    DSO_GFX::setTextColor(fg,bg); 
+}
+
+
 // EOF
