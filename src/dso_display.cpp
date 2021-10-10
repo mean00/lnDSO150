@@ -11,15 +11,32 @@
 #include "dso_global.h"
 #include "dso_display.h"
 #include "pattern.h"
-//#include "stopWatch.h"
 #include "simpler9341.h"
 #include "math.h"
 #include "dso_colors.h"
+#include "DSO_portBArbitrer.h"
 
 #define XMAX(x, y) (((x) > (y)) ? (x) : (y))
 #define XMIN(x, y) (((x) < (y)) ? (x) : (y))
 
+#define LIGHT_GREEN          ILI_MK_COLOR(0,0x2f,0); // careful the colors are also in genpattern.py
+#define DARK_GREEN           ILI_MK_COLOR(0,0x1f,0);
+
 static ili9341 *tft;
+extern DSO_portArbitrer *arbitrer;
+
+class AutoGfx
+{
+public:
+    AutoGfx()
+    {
+        arbitrer->beginLCD();
+    }
+    ~AutoGfx()
+    {
+        arbitrer->endLCD();
+    }
+};
 
 #define AUTOCAL_BOX_WIDTH   200
 #define AUTOCAL_BOX_HEIGHT  80
@@ -48,6 +65,8 @@ static const uint16_t *getBackGround(int line)
     const uint16_t *bg=(uint16_t *)defaultPattern;
     if(!(line%SCALE_STEP)) 
             bg=(uint16_t *)darkGreenPattern;
+    if(line==DSO_WAVEFORM_WIDTH/2)
+            bg=(uint16_t *)lightGreenPattern;
     return bg;
 }
 
@@ -88,37 +107,48 @@ void DSODisplay::init(ili9341 *d)
  */
 void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
 {
+    AutoGfx autogfx;
+    
     //tft->fillScreen(0);
     int last=data[0];
-    if(!last) last=1;
-    if(last>DSO_WAVEFORM_HEIGHT) last=DSO_WAVEFORM_HEIGHT;
+    last=XMIN(last,DSO_WAVEFORM_HEIGHT-1);
     int next;
     int start,sz;
     
     if(count<3) return;
     for(int j=1;j<count-1;j++)
     {
+        
+        int color=YELLOW;
         int next=data[j]; // in pixel
-        sz=abs(next-last);        
-        start=XMIN(last,next);
-                
-        if(!sz)
+        if(next==0)
         {
-            if(next>=(DSO_WAVEFORM_HEIGHT)) next=DSO_WAVEFORM_HEIGHT;
-            sz=1;
+            next=1;
+            color=RED;
         }
-        if(!start)
+        if(next>DSO_WAVEFORM_HEIGHT-1)
         {
-            start=1;
+            next=DSO_WAVEFORM_HEIGHT-1;
+            color=RED;
+        }
+        start=XMIN(last,next);                
+        sz=next-last;
+        if(sz<0) sz=-sz;
+        if(!sz)
+        {            
+            sz=1;
         }
 
         const uint16_t *bg=getBackGround(j);
         // cleanup prev draw
         tft->setAddress(    j,
                             prevPos[j]+DSO_WAVEFORM_OFFSET,
-                            1,DSO_WAVEFORM_HEIGHT-prevPos[j]+1);        
+                            1,
+                            prevSize[j]);        
         tft->pushColors(prevSize[j],((uint16_t *)bg)+prevPos[j]);
-        tft->VLine(j,start+DSO_WAVEFORM_OFFSET,sz,YELLOW);
+        // Now draw the real one
+        
+        tft->VLine(j,start+DSO_WAVEFORM_OFFSET,sz,color);
         prevSize[j]=sz;
         prevPos[j]=start;
         last=next;
@@ -129,20 +159,24 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
  */
 void DSODisplay::drawGrid(void)
 {
-    uint16_t fgColor=(0xF)<<5;
-    uint16_t hiLight=(0x1F)<<5;
+    AutoGfx autogfx;
+    uint16_t fgColor=DARK_GREEN;
+    uint16_t hiLight=LIGHT_GREEN;
     for(int i=0;i<=C_Y;i++)
     {
-        tft->HLine(0,SCALE_STEP*i+DSO_WAVEFORM_OFFSET,SCALE_STEP*(C_X),fgColor);
+        tft->HLine(0,
+                SCALE_STEP*i+DSO_WAVEFORM_OFFSET,
+                SCALE_STEP*(C_X),
+                fgColor);
     }
     for(int i=0;i<=C_X;i++)
     {
 
         tft->VLine(SCALE_STEP*i,DSO_WAVEFORM_OFFSET,SCALE_STEP*C_Y,fgColor);
     }
-
+    // Draw internal + cross in bright green
     tft->HLine(0,DSO_WAVEFORM_OFFSET,SCALE_STEP*C_X,hiLight);    
-    tft->HLine(0,DSO_WAVEFORM_OFFSET+DSO_WAVEFORM_HEIGHT+2,SCALE_STEP*C_X,hiLight);
+    tft->HLine(0,DSO_WAVEFORM_OFFSET+DSO_WAVEFORM_HEIGHT-1,SCALE_STEP*C_X,hiLight);
     tft->HLine(0,DSO_WAVEFORM_OFFSET+DSO_WAVEFORM_HEIGHT/2,SCALE_STEP*C_X,hiLight);
     
     

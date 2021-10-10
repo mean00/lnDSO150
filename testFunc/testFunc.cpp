@@ -4,6 +4,7 @@
 extern void testControl();
 extern void testMenu();
 extern void testTestSignal();
+extern void testDrawGfx();
 
 void testFunc()
 {
@@ -15,5 +16,6 @@ void testFunc2()
 {
     //testControl();
     //testMenu();
-    testTestSignal();
+    //testTestSignal();
+    testDrawGfx();
 }

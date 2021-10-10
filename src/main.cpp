@@ -18,9 +18,9 @@ extern void testFunc();
 extern void testFunc2();
 
 
-DSOControl *control;
-DSO_portArbitrer *arbitrer;
-DSO_testSignal *testSignal;
+DSOControl          *control;
+DSO_portArbitrer    *arbitrer;
+DSO_testSignal      *testSignal;
 /**
  * 
  * @param evt
@@ -71,6 +71,7 @@ void loop()
     
     DSO_GFX::init(ili);
     DSODisplay::init(ili);
+    
     
     
     testFunc2();
