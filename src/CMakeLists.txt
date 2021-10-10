@@ -1,3 +1,4 @@
+include_directories(ui)
 ADD_LIBRARY(  sourceLib
                 main.cpp dso_gfx.cpp dso_test_signal.cpp dso_control.cpp
                 dso_settingMenu.cpp  ui/dso_menuEngine.cpp dso_display.cpp

@@ -1,7 +1,6 @@
 /***************************************************
- STM32 duino based firmware for DSO SHELL/150
- *  * GPL v2
- * (c) mean 2019 fixounet@free.fr
+ * This is a very basic settings menu helper class
+ * It is designed to be dwelling in flash, not in ram
  ****************************************************/
 
 #include "dso_gfx.h"
@@ -48,6 +47,16 @@ void MenuManager::printMenuEntry(bool onoff, int line,const char *text)
         DSO_GFX::setTextColor(BG_COLOR,BLACK);
     DSO_GFX::printxy(13,1+line,text);
 }
+void MenuManager::printPrefix(bool onoff, int line,const char *text)
+{
+    #define BG_COLOR GREEN    
+    if(onoff)
+        DSO_GFX::setTextColor(BLACK,BG_COLOR); 
+    else  
+        DSO_GFX::setTextColor(BG_COLOR,BLACK);
+    DSO_GFX::printxy(11,1+line,text);
+}
+
 void MenuManager::printMenuTitle(const char *text)
 {
     DSO_GFX::printMenuTitle(text); 
@@ -55,7 +64,7 @@ void MenuManager::printMenuTitle(const char *text)
 
 void MenuManager::printBackHint()
 {
-    DSO_GFX::setTextColor(BLACK,GREEN); 
+    DSO_GFX::setTextColor(BLACK,BLUE); 
     DSO_GFX::printxy(-8,-1,"Back");
     DSO_GFX::setTextColor(GREEN,BLACK); 
 }
@@ -65,7 +74,7 @@ void MenuManager::printBackHint()
 void MenuManager::run(void)
 {
      DSO_GFX::clear(BLACK);
-     DSO_GFX::setBigFont(true);
+     DSO_GFX::setBigFont(true);     
      runOne(_menu);     
 };
 /**
@@ -76,6 +85,24 @@ void MenuManager::redraw(const char *title, int n,const MenuItem *xtop, int curr
     printMenuTitle(title); 
     for(int i=0;i<n;i++)
     {
+        bool mark=false;
+        switch(xtop[i].type)
+        {
+            case MenuItem::MENU_TOGGLE :
+                if(*(bool *) xtop[i].cookie) 
+                    mark=true;
+                break; 
+            case MenuItem::MENU_INDEX:
+            {
+                MenuListItem *tem=(MenuListItem *)xtop[i].cookie;
+                if(tem->thisItem==*(tem->item)) mark=true;
+            }
+                break;
+            default:
+                break;
+        }
+        if(mark)
+            printPrefix(current==i,i,"v");
         printMenuEntry(current==i,i,xtop[i].menuText);
     }         
 }
@@ -109,6 +136,7 @@ void MenuManager::runOne( const MenuItem *xtop)
      DSOControl::ControlEventCb *oldCb=_control->getCb();
      Logger("Entering menu\n");
      _control->changeCb( MenuManager_controlEvent);
+     //xDelay(100); // wait for bouncing to go off
      runOne_(xtop);
      _control->changeCb(oldCb);
      Logger("Exiting menu\n");
@@ -142,17 +170,8 @@ void MenuManager::runOne_( const MenuItem *xtop)
      // draw them 
      // 0 to N-1
      int current=0;    
-next:         
-#if 1          
+next:            
         redraw(title,n,xtop,current);
-#else
-        while(1)
-        {
-            uint32_t old=lnGetUs();
-            redraw(title,n,xtop,current);
-            Logger("Redraw=%d us\n",lnGetUs()-old);
-        }
-#endif
         while(1)
         { 
                   _sem.take(200);
@@ -170,7 +189,6 @@ next:
                       switch(xtop[current].type)
                       {
                       case MenuItem::MENU_BACK: return; break;
-                      case MenuItem::MENU_KEY_VALUE:  break;
                       case MenuItem::MENU_SUBMENU: 
                             {
                                 const MenuItem *sub=(const MenuItem *)xtop[current].cookie;
@@ -188,8 +206,31 @@ next:
                                 goto next;
                             }
                           break;
-                      case MenuItem::MENU_END: return;break;
-                      case MenuItem::MENU_TOGGLE: break;
+                      case MenuItem::MENU_END: 
+                          return;break;
+                      case MenuItem::MENU_INDEX:
+                      {
+                           
+                          MenuListItem *item=(MenuListItem *)xtop[current].cookie;
+                          *(item->item)=item->thisItem;                          
+                          redraw(title,n,xtop,current);
+                          goto next;
+                      }
+                      break;
+                          
+                      case MenuItem::MENU_TOGGLE: 
+                      {
+                          bool *e=(bool *)xtop[current].cookie;
+                          *e=!*e;
+                          redraw(title,n,xtop,current);
+                          goto next;
+                      }
+                          break;
+
+                          break;
+                      case MenuItem::MENU_TITLE:
+                          goto next;
+                          break;
                       default: xAssert(0);break;
                       }
                       break;

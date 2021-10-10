@@ -97,6 +97,12 @@ public:
         _state=StateHoldOff;
         _holdOffCounter=0;
     }
+    void reset()
+    {
+        _pinCounter=0;
+        _events=0;
+        _pinState=0;
+    }
     void integrate(bool k)
     {         
         // Integrator part
@@ -275,6 +281,10 @@ bool DSOControl::changeCb(ControlEventCb *newCb)
 {
     noInterrupts();
     _cb=newCb;
+    // clear events when switching callback
+    for(int button=DSO_BUTTON_UP;button<= DSO_BUTTON_OK;button++)
+        _buttons[button].reset();
+    counter=0;
     interrupts();
     return true;
 }
