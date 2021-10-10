@@ -3,6 +3,7 @@
 
 extern void testControl();
 extern void testMenu();
+extern void testTestSignal();
 
 void testFunc()
 {
@@ -13,5 +14,6 @@ void testFunc()
 void testFunc2()
 {
     //testControl();
-    testMenu();
+    //testMenu();
+    testTestSignal();
 }
