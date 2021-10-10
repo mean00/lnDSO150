@@ -8,6 +8,9 @@
 #-----------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.0)
+MESSAGE(STATUS "===============")
+MESSAGE(STATUS "Starting lnDSO")
+MESSAGE(STATUS "===============")
 
 SET(AF_FOLDER  ${CMAKE_SOURCE_DIR}/lnArduino/)
 include(./mcuSelect.cmake)
@@ -33,8 +36,6 @@ add_subdirectory(${AF_FOLDER})
 
 include(${AF_FOLDER}/setup.cmake)
 
-MESSAGE(STATUS "Starting lnDSO")
-
 
 SET(EXTENSION "_${LN_MCU}")
 
@@ -56,10 +57,6 @@ ENDIF(USE_ROTARY_FULL_STEP)
 math(EXPR MCU_SPEED_M "${LN_MCU_SPEED}/1000000")
 SET(EXTENSION "${EXTENSION}_${MCU_SPEED_M}M")
 
-IF("${LN_ARCH}" STREQUAL "RISCV")
-    MESSAGE(STATUS "Using PB8 instead of PB3 for LCD")
-    ADD_DEFINITIONS("-DUSE_PB8_INSTEAD_OF_PB3")
-ENDIF()
  
 include_directories(src)
 include_directories(qfp)
