@@ -46,18 +46,17 @@ void MenuManager::printMenuEntry(bool onoff, int line,const char *text)
         DSO_GFX::setTextColor(BLACK,BG_COLOR); 
     else  
         DSO_GFX::setTextColor(BG_COLOR,BLACK);
-    DSO_GFX::printxy(100,40+24*line,text);
+    DSO_GFX::printxy(13,1+line,text);
 }
 void MenuManager::printMenuTitle(const char *text)
 {
-    DSO_GFX::setTextColor(GREEN,BLACK); 
-    DSO_GFX::printxy(80,40-24,text);
+    DSO_GFX::printMenuTitle(text); 
 }
 
 void MenuManager::printBackHint()
 {
     DSO_GFX::setTextColor(BLACK,GREEN); 
-    DSO_GFX::printxy(320-12*6,240-24,"Back");
+    DSO_GFX::printxy(-8,-1,"Back");
     DSO_GFX::setTextColor(GREEN,BLACK); 
 }
 /**
@@ -73,13 +72,12 @@ void MenuManager::run(void)
  */
 void MenuManager::redraw(const char *title, int n,const MenuItem *xtop, int current)
 {
-    DSO_GFX::clear(BLACK);
+    DSO_GFX::clearBody(BLACK);
     printMenuTitle(title); 
     for(int i=0;i<n;i++)
     {
         printMenuEntry(current==i,i,xtop[i].menuText);
-    }     
-    printBackHint();
+    }         
 }
 
 void MenuManager::blink(int current, const char *text)
@@ -107,6 +105,7 @@ void MenuManager_controlEvent(DSOControl::DSOEvent e)
 void MenuManager::runOne( const MenuItem *xtop)
 {
      DSO_GFX::clear(BLACK);
+     printBackHint();
      DSOControl::ControlEventCb *oldCb=_control->getCb();
      Logger("Entering menu\n");
      _control->changeCb( MenuManager_controlEvent);
@@ -144,7 +143,16 @@ void MenuManager::runOne_( const MenuItem *xtop)
      // 0 to N-1
      int current=0;    
 next:         
+#if 1          
         redraw(title,n,xtop,current);
+#else
+        while(1)
+        {
+            uint32_t old=lnGetUs();
+            redraw(title,n,xtop,current);
+            Logger("Redraw=%d us\n",lnGetUs()-old);
+        }
+#endif
         while(1)
         { 
                   _sem.take(200);
