@@ -2,7 +2,8 @@
 #include "lnArduino.h"
 #include "dso_display.h"
 #include "dso_gfx.h"
-
+#include "lnStopWatch.h"
+extern "C" uint32_t xTickCount;
 void testDrawGfx()
 {
     DSO_GFX::clear(0);
@@ -17,11 +18,18 @@ void testDrawGfx()
     for(int i=100;i<110;i++)
         data[i]=100;
     int offset=0;
+    
+    uint32_t old=lnGetMs();
+    int round=0;
     while(1)
     {
-        uint32_t old=lnGetUs();
+        
         DSODisplay::drawWaveForm(240,data+offset);
-        Logger("Draw time : %d us\n",lnGetUs()-old);
         offset=(offset+1)&255;
+        round++;
+        if((round%10)==9)
+        {
+            Logger("Round=%d avg=%d\n",round,(lnGetMs()-old)/round);
+        }
     }
 }
