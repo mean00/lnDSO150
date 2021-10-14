@@ -17,5 +17,5 @@ void testFunc2()
     //testControl();
     //testMenu();
     //testTestSignal();
-    testDrawGfx();
+    //testDrawGfx();
 }

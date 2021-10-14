@@ -38,6 +38,7 @@ public:
             
 public:
             static void  init(ili9341 *d);
+            static void  cleanup();
             static void  drawWaveForm(int count,const uint8_t *data);
             static void  drawGrid(void);
             static void  drawVerticalTrigger(bool drawOrErase,int column);

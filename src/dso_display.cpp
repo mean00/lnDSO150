@@ -19,8 +19,8 @@
 #define XMAX(x, y) (((x) > (y)) ? (x) : (y))
 #define XMIN(x, y) (((x) < (y)) ? (x) : (y))
 
-#define LIGHT_GREEN          ILI_MK_COLOR(0,0x2f,0); // careful the colors are also in genpattern.py
-#define DARK_GREEN           ILI_MK_COLOR(0,0x1f,0);
+#define LIGHT_GREEN          ILI_MK_COLOR(0,0x2f,0) // careful the colors are also in genpattern.py
+#define DARK_GREEN           ILI_MK_COLOR(0,0x1f,0)
 
 static ili9341 *tft;
 extern DSO_portArbitrer *arbitrer;
@@ -154,6 +154,17 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
         last=next;
     }    
 } 
+
+/**
+ * 
+ */
+void DSODisplay::cleanup()
+{
+     AutoGfx autogfx;
+     tft->setTextColor(LIGHT_GREEN,0);
+     tft->fillScreen(0);
+}
+
 /**
  * 
  */
@@ -258,9 +269,9 @@ static void prettyPrint(float x,int mx)
 }
 char tmpBuf[10];
     
-#define AND_ONE_A(x,y) { tft->print(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT,x/*,DSO_INFO_MAX_WIDTH*/);}        
-#define AND_ONE_T(x,y) { tft->print(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT,x/*,DSO_INFO_MAX_WIDTH*/);}    
-#define AND_ONE_F(x,y) { snprintf(tmpBuf,9,"%2.2f",x);tft->print(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+y*DSO_CHAR_HEIGHT,tmpBuf/*,DSO_INFO_MAX_WIDTH*/);}    
+#define AND_ONE_A(x,y) { tft->print(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(y+1)*DSO_CHAR_HEIGHT,x/*,DSO_INFO_MAX_WIDTH*/);}        
+#define AND_ONE_T(x,y) { tft->print(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+(y+1)*DSO_CHAR_HEIGHT,x/*,DSO_INFO_MAX_WIDTH*/);}    
+#define AND_ONE_F(x,y) { snprintf(tmpBuf,9,"%2.2f",x);tft->print(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+(y+1)*DSO_CHAR_HEIGHT,tmpBuf/*,DSO_INFO_MAX_WIDTH*/);}    
 #if 0
 void DSODisplay::drawStats(CaptureStats &stats)
 {

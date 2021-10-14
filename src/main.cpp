@@ -21,14 +21,6 @@ extern void testFunc2();
 DSOControl          *control;
 DSO_portArbitrer    *arbitrer;
 DSO_testSignal      *testSignal;
-/**
- * 
- * @param evt
- */
- void ControlCb(DSOControl::DSOEvent evt)
- {
-     
- }
 
 
 
@@ -39,11 +31,12 @@ void setup()
 {
     xMutex *PortBMutex=new xMutex;
     arbitrer=new DSO_portArbitrer(1,PortBMutex);
-    control=new DSOControl(ControlCb);
+    control=new DSOControl(NULL);
     control->setup();
     testSignal=new DSO_testSignal(PIN_TEST_SIGNAL,PIN_TEST_SIGNAL_AMP);
 }
 uint32_t chipId;
+extern void mainLoop();
 /**
  * 
  */
@@ -75,81 +68,8 @@ void loop()
     
     
     testFunc2();
-    
-    DSODisplay::drawGrid();
-    DSODisplay::drawStatsBackGround();
    
-    
-    
-    lnCycleClock clk;
-    int fq[4]={100,1000,10000,100000};
-    int fqIndex=0;
-    
-    
-    
-    
-    
-    while(1)
-    {
-        uint32_t micro=lnGetUs();
-        ili->fillScreen(0xffff);
-        Logger("FillScreen white %d us \n",lnGetUs()-micro);
-        xDelay(1000);
-        micro=lnGetUs();
-        ili->fillScreen(0x1f);
-        Logger("FillScreen rng %d us \n",lnGetUs()-micro);
-        xDelay(1000);
-        testSignal->setFrequency(fq[fqIndex]);
-        fqIndex=(fqIndex+1)%4;
-    }
-    
-    xDelay(2000);
-    ili->fillScreen(0xf);
-    xDelay(2000);
-    ili->fillScreen(0xf<<5);
-    
-    while(1)
-    {
-        clk.restart();
-        uint32_t micro=lnGetUs();
-        
-        ili->print(20,100,"This is a hello world program 123\n");
-        micro=lnGetUs()-micro;
-        uint32_t calibration=clk.elapsed();
-        
-        Logger("FillScreen %d ticks, %d us \n",calibration,micro);
-        clk.restart();
-        xDelay(10);
-        calibration=clk.elapsed();
-        Logger("10 ms  %d ticks\n",calibration);            
-    }
-    
-    clk.restart();
-    xDelay(10);
-    clk.restart();
-    xDelay(10);
-    uint32_t calibration=clk.elapsed();
-    Logger("10ms is %d ticks\n",calibration);
-    uint32_t bf;
-    
-  //  menuManagement();
-    
-   
-    while(1)
-    {
-        bf=lnGetUs();
-        //ili->fillScreen(1*0x1f);
-          Logger("Sending Hello\n");
-          xDelay(2000);
-
-        ili->print(10,60,"Hi there, this is hello world");
-        //ili->drawRLEBitmap(96,96,60,60,0xfff,0,dso150nb); //7.5 ms
-        Logger("Fill Screen : %d us \n",lnGetUs()-bf);
-    }
-    while(1)
-    {
-        xDelay(100);
-    }
+    mainLoop();       
 
 }
 
