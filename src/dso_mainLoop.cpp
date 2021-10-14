@@ -9,9 +9,9 @@
 
 xFastEventGroup *evtGroup;
 extern DSOControl          *control;
+extern void processUiEvent();
 
 #define DSO_EVT_UI (1<<0)
-
 /**
  * 
  * @param evt
@@ -21,23 +21,6 @@ extern DSOControl          *control;
      evtGroup->setEvents(DSO_EVT_UI);
  }
 
- /**
-  * 
-  */
- void processUiEvent()
- {
-     while(1)
-     {
-            int ev=control->getQButtonEvent();
-            if(!ev) break;
-            int kind=ev>>16;
-            int key=ev&0xffff;
-            Logger("Got event %d on key %d\n",kind,key);
-            
-     }
-     Logger("Rot=%d\n",control->getRotaryValue());
-     
- }
 /**
  * 
  */

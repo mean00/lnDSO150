@@ -3,7 +3,7 @@ ADD_LIBRARY(  sourceLib
                 main.cpp dso_gfx.cpp dso_test_signal.cpp dso_control.cpp
                 dso_settingMenu.cpp  ui/dso_menuEngine.cpp dso_display.cpp
                 DSO_portBArbitrer.cpp 
-                dso_display.cpp dso_mainLoop.cpp
+                dso_display.cpp dso_mainLoop.cpp dso_uiFunctions.cpp
                 )
 
         
