@@ -4,6 +4,8 @@ ADD_LIBRARY(  sourceLib
                 dso_settingMenu.cpp  ui/dso_menuEngine.cpp dso_display.cpp
                 DSO_portBArbitrer.cpp 
                 dso_display.cpp dso_mainLoop.cpp dso_uiFunctions.cpp
+                dso_capture_const.cpp
+               # dso_calibrate.cpp
                 )
 
         

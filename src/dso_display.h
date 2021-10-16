@@ -41,6 +41,13 @@ public:
             static void  cleanup();
             static void  drawWaveForm(int count,const uint8_t *data);
             static void  drawGrid(void);
+            // individual item on the screen 
+            static void  drawVolt(const char *v, bool highlight);
+            static void  drawTrigger(const char *v, bool highlight);
+            static void  drawTime(const char *v, bool highlight);            
+            static void  drawCoupling(const char *v, bool highlight);            
+            // /// individual item on the screen 
+            
             static void  drawVerticalTrigger(bool drawOrErase,int column);
             static void  drawVoltageTrigger(bool drawOrErase, int line);
   

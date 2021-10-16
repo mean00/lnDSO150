@@ -51,13 +51,6 @@ int ampMapping[16]=
 };
 
 
- enum DSOButtonState
-  {
-    StateIdle=0,
-    StatePressed=1,
-    StateLongPressed=2,
-    StateHoldOff=3
-  };
 #define ButtonToPin(x)    (PB0+x)
 #define pinAsInput(x)     lnPinMode(ButtonToPin(x),lnINPUT_PULLUP);
 #define attachRE(x)       lnExtiAttachInterrupt(ButtonToPin(x),LN_EDGE_FALLING,_myInterruptRE,(void *)x );
@@ -74,7 +67,7 @@ class singleButton
 public:
     singleButton()
     {
-        _state=StateIdle;
+        _state=DSOControl::StateIdle;
         _events=0;
         _holdOffCounter=0;
         _pinState=0;
@@ -82,19 +75,19 @@ public:
     }
     bool holdOff() // Return true if in holdoff mode
     {
-        if(_state!=StateHoldOff)
+        if(_state!=DSOControl::StateHoldOff)
             return false;
         _holdOffCounter++;
         if(_holdOffCounter>HOLDOFF_THRESHOLD)
         {
-            _state=StateIdle;
+            _state=DSOControl::StateIdle;
             return false;
         }
         return true;
     }
     void goToHoldOff()
     {
-        _state=StateHoldOff;
+        _state=DSOControl::StateHoldOff;
         _holdOffCounter=0;
     }
     void reset()
@@ -134,7 +127,7 @@ public:
                 break;
             case 2:
             { // released
-                if(_state==StatePressed)
+                if(_state==DSOControl::StatePressed)
                 {                        
                     if(oldCount>SHORT_PRESS_THRESHOLD)
                     {
@@ -146,12 +139,12 @@ public:
                 break;
             }
             case 1: // Pressed
-                _state=StatePressed;
+                _state=DSOControl::StatePressed;
                 break;
             case 3: // Still pressed
-                if(_pinCounter>LONG_PRESS_THRESHOLD && _state==StatePressed) // only one long
+                if(_pinCounter>LONG_PRESS_THRESHOLD && _state==DSOControl::StatePressed) // only one long
                 {
-                    _state=StateLongPressed;
+                    _state=DSOControl::StateLongPressed;
                     _events|=EVENT_LONG_PRESS;   
                     r++;
                 }
@@ -161,7 +154,7 @@ public:
         return r;
     }        
                     
-    DSOButtonState _state;
+    DSOControl::DSOButtonState _state;
     int            _events;
     int            _holdOffCounter;
     int            _pinState;
@@ -366,6 +359,7 @@ void DSOControl::runLoop()
         }
         arbitrer->beginInput();        
         uint32_t val= lnReadPort(1); // read all bits from portB        
+        val=0xffff^val;
         arbitrer->endInput();
         
         
@@ -376,8 +370,10 @@ void DSOControl::runLoop()
             if(button.holdOff()) 
                 continue;
             
-            int k=!(val&(1<<i));
-            
+            int k=(val&(1<<i));
+#if 0
+            if(k) Logger("Button %i down \n",i);
+#endif            
             int oldCount=button._pinCounter;
             button.integrate(k);
             changed+=button.runMachine(oldCount);          

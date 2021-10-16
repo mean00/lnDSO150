@@ -8,7 +8,7 @@
  * 
  * 
  ****************************************************/
-#include "dso_global.h"
+#include "lnArduino.h"
 #include "dso_display.h"
 #include "pattern.h"
 #include "simpler9341.h"
@@ -22,8 +22,26 @@
 #define LIGHT_GREEN          ILI_MK_COLOR(0,0x2f,0) // careful the colors are also in genpattern.py
 #define DARK_GREEN           ILI_MK_COLOR(0,0x1f,0)
 
+#define AUTOCAL_BOX_WIDTH   200
+#define AUTOCAL_BOX_HEIGHT  80
+#define AUTOCAL_BORDER      10
+#define AUTOCAL_COLOR       WHITE
+
+#define SCALE_STEP 24
+#define C_X 10
+#define C_Y 8
+#define CENTER_CROSS 1
+
 static ili9341 *tft;
 extern DSO_portArbitrer *arbitrer;
+static DSO_ArmingMode oldMode=DSO_CAPTURE_MODE_INVALIDE;
+static DSODisplay::MODE_TYPE mode=DSODisplay::VOLTAGE_MODE;
+/**
+ */
+uint8_t prevPos[256];
+uint8_t prevSize[256];
+static char textBuffer[24];
+//
 
 class AutoGfx
 {
@@ -37,28 +55,7 @@ public:
         arbitrer->endLCD();
     }
 };
-
-#define AUTOCAL_BOX_WIDTH   200
-#define AUTOCAL_BOX_HEIGHT  80
-#define AUTOCAL_BORDER      10
-#define AUTOCAL_COLOR       WHITE
-
-static DSO_ArmingMode oldMode=DSO_CAPTURE_MODE_INVALIDE;
-
-//StopWatch triggerWatch;
-
-static DSODisplay::MODE_TYPE mode=DSODisplay::VOLTAGE_MODE;
-/**
- */
-uint8_t prevPos[256];
-uint8_t prevSize[256];
-static char textBuffer[24];
-
 //-
-#define SCALE_STEP 24
-#define C_X 10
-#define C_Y 8
-#define CENTER_CROSS 1
 
 static const uint16_t *getBackGround(int line)
 {
@@ -218,7 +215,7 @@ void  DSODisplay::drawVerticalTrigger(bool drawOrErase,int column)
  * @param drawOrErase
  * @param line
  */
-extern int debugUp, debugDown;
+
 void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
 {
     if(line<1) line=1;
@@ -233,11 +230,6 @@ void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
                             DSO_WAVEFORM_WIDTH, 1);
         tft->pushColors(DSO_WAVEFORM_WIDTH,((uint16_t *)bg));
     }
-#if 0    
-     tft->setCursor(240,16);tft->print(debugUp);
-     tft->setCursor(240,36);tft->print(debugDown);
-#endif
-      
 }
 
 
@@ -299,22 +291,31 @@ void DSODisplay::drawStats(CaptureStats &stats)
 /**
  * 
  */
+static void drawInfoHeader(int line, const char *info,int color)
+{
+#define LINE_OFFSET 4
+    tft->square(color,
+            DSO_INFO_START_COLUMN,             DSO_HEIGHT_OFFSET+(line)*DSO_CHAR_HEIGHT+3-LINE_OFFSET,
+            320-DSO_INFO_START_COLUMN,         DSO_CHAR_HEIGHT);
+    tft->print(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(line+1)*DSO_CHAR_HEIGHT-LINE_OFFSET,info/*,DSO_INFO_MAX_WIDTH*/);
+}
+
 void DSODisplay::drawStatsBackGround()
 {
     
 
-#define BG_COLOR GREEN    
-        tft->VLine(DSO_INFO_START_COLUMN, 0,240,BG_COLOR);
-        tft->VLine(319, 0,240,BG_COLOR);
+#define BG_COLOR LIGHT_GREEN    
+    tft->VLine(DSO_INFO_START_COLUMN, 0,240,BG_COLOR);
+    tft->VLine(319, 0,240,BG_COLOR);
         
 
     tft->setTextColor(BLACK,BG_COLOR);
-    AND_ONE_A("Min",2);   
-    AND_ONE_A("Max",4);   
-    AND_ONE_A("Avrg",0);
-    AND_ONE_A("Freq(H)",6);
-    AND_ONE_A("Trigg",8);
-    AND_ONE_A("Offst",10);
+     drawInfoHeader(0,"Avrg",BG_COLOR);
+    drawInfoHeader(2,"Min",BG_COLOR);
+    drawInfoHeader(4,"Max",BG_COLOR);  
+    drawInfoHeader(6,"Freq",BG_COLOR);
+    drawInfoHeader(8,"Trigg",BG_COLOR);
+    drawInfoHeader(10,"Offst",BG_COLOR);
     tft->setTextColor(BG_COLOR,BLACK);
     oldMode=DSO_CAPTURE_MODE_INVALIDE;
     
@@ -340,7 +341,13 @@ void DSODisplay::printTriggerValue( float volt)
     AND_ONE_F(volt,9);      
 }
 
-#define LOWER_BAR_PRINT(x,y) { tft->setCursor(y*64, 240-18); tft->myDrawString(x,64);}            
+void lowBarPrint(int column, const char *st)
+{
+    tft->setCursor((column-1)*64+1, 240-4); 
+    tft->square(0,(column-1)*64+1, 240-22,64,20);
+    tft->print(st);
+}
+#define LOWER_BAR_PRINT(x,y) { tft->setCursor(x*64, 240-18); tft->print(y); /*myDrawString(x,64);*/}            
 #define LOWER_BAR_PRINT_NCHARS(x,y,n) { tft->setCursor(y*64, 240-18); tft->myDrawString(x,n*18);}            
     
 #define HIGHER_BAR_PRINT(x,y) { tft->print(y*64, 1,x/*,64*/);}            
@@ -351,6 +358,27 @@ void DSODisplay::printTriggerValue( float volt)
    
 #define HIGHER_BAR(mode,st,column) {SELECT(mode);HIGHER_BAR_PRINT(st,column);}
 
+static void genericDraw(int column,const char *v,bool highlight)
+{
+    if(highlight)
+    {
+       tft->setTextColor(BLACK, LIGHT_GREEN );
+    }else
+    {
+        tft->setTextColor(LIGHT_GREEN,BLACK);
+    }    
+    lowBarPrint(column,v);
+}
+
+/**
+ * 
+ * @param v
+ * @param highlight
+ */
+void DSODisplay::drawVolt(const char *v, bool highlight)    { genericDraw(VOLTAGE_MODE,v,highlight);}
+void DSODisplay::drawTrigger(const char *v, bool highlight) { genericDraw(TRIGGER_MODE,v,highlight);}
+void DSODisplay::drawTime(const char *v, bool highlight)    { genericDraw(TIME_MODE,   v,highlight);}
+void DSODisplay::drawCoupling(const char *v, bool highlight){ genericDraw(ARMING_MODE, v,highlight);}
 /**
  * 
  */

@@ -3,9 +3,8 @@
  *  * GPL v2
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
-
+#include "lnArduino.h"
 #include "dso_menuEngine.h"
-#include "dso_global.h"
 #include "dso_gfx.h"
 //#include "dso_calibrate.h"
 

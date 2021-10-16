@@ -10,6 +10,7 @@
 xFastEventGroup *evtGroup;
 extern DSOControl          *control;
 extern void processUiEvent();
+extern void initUiEvent();
 
 #define DSO_EVT_UI (1<<0)
 /**
@@ -32,7 +33,7 @@ void mainLoop()
 
     evtGroup=new xFastEventGroup;
     control->changeCb(ControlCb);
-    
+    initUiEvent();
     while(1)
     {
         int evt=evtGroup->waitEvents(0xff,10000);
@@ -41,6 +42,5 @@ void mainLoop()
             processUiEvent();
         }
     }
-    
-    
 }
+// EOF

@@ -10,6 +10,7 @@
 #define EVENT_SHORT_PRESS 2
 
 
+ 
 
 /**
  */
@@ -34,7 +35,13 @@ public:
     DSO_BUTTON_TRIGGER=6,
     DSO_BUTTON_OK=7
   };
-  
+  enum DSOButtonState
+  {
+    StateIdle=0,
+    StatePressed=1,
+    StateLongPressed=2,
+    StateHoldOff=3
+  };
   enum DSOCoupling
   {
     DSO_COUPLING_GND=0,

@@ -2,7 +2,7 @@
  * This is a little helper class to make menus easier
  * Just a wrapper on top of ili
  */
-#include "dso_global.h"
+#include "lnArduino.h"
 #include "dso_gfx.h"
 #include "simpler9341.h"
 #include "DSO_portBArbitrer.h"

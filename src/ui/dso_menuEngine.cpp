@@ -2,10 +2,9 @@
  * This is a very basic settings menu helper class
  * It is designed to be dwelling in flash, not in ram
  ****************************************************/
-
+#include "lnArduino.h"
 #include "dso_gfx.h"
 #include "dso_menuEngine.h"
-#include "dso_global.h"
 #include "dso_control.h"
 
 static MenuManager *_instance;
