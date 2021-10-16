@@ -32,6 +32,7 @@ struct UI_eventCallbacks;
  void voltMenu_incdec(int inc)
  {
      currentVolt=(currentVolt+DSOInputGain::MAX_VOLTAGE_MAX+inc)%DSOInputGain::MAX_VOLTAGE_MAX;
+     control->setInputGain(currentVolt);
      Logger("VolMenu : %d\n",inc);
  }
 // Volt / Offset

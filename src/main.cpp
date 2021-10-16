@@ -9,6 +9,7 @@
 #include "pinConfiguration.h"
 #include "dso_control.h"
 #include "DSO_portBArbitrer.h"
+#include "dso_capture_stub.h"
 
 extern void  menuManagement(void);
 extern const GFXfont *smallFont();
@@ -21,6 +22,7 @@ extern void testFunc2();
 DSOControl          *control;
 DSO_portArbitrer    *arbitrer;
 DSO_testSignal      *testSignal;
+demoCapture         *capture;
 
 
 
@@ -31,9 +33,13 @@ void setup()
 {
     xMutex *PortBMutex=new xMutex;
     arbitrer=new DSO_portArbitrer(1,PortBMutex);
-    control=new DSOControl(NULL);
+    
+    control=new DSOControl(NULL); // control must be initialised after ili !
     control->setup();
+
+    
     testSignal=new DSO_testSignal(PIN_TEST_SIGNAL,PIN_TEST_SIGNAL_AMP);
+    capture=new demoCapture(PA0);
 }
 uint32_t chipId;
 extern void mainLoop();
@@ -60,7 +66,7 @@ void loop()
     ili->setFontSize(ili9341::SmallFont);
     ili->setTextColor(GREEN,BLACK);
     
-    
+
     
     DSO_GFX::init(ili);
     DSODisplay::init(ili);

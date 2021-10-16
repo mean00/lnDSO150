@@ -14,6 +14,7 @@
 #include "pinConfiguration.h"
 #include "dso_config.h"
 #include "DSO_portBArbitrer.h"
+#include "lnADC.h"
 
 #define TICK                  10 // 10 ms
 #define LONG_PRESS_THRESHOLD (1000/TICK) // 1s
@@ -215,16 +216,17 @@ int DSOControl::getRawCoupling()
  * @return 
  */
 extern void Logger(const char *fmt...);
+/**
+ * 
+ * @return 
+ */
 static DSOControl::DSOCoupling couplingFromAdc2()
 {
+    return DSOControl::DSO_COUPLING_DC;
+    lnSimpleADC *coupling=new  lnSimpleADC(1, COUPLING_PIN);
+    int rawCoupling=coupling->simpleRead();
+    delete coupling;
     
-    useAdc2(true);
-    lnPinMode(COUPLING_PIN,lnADC_MODE);
-    rawCoupling= directADC2Read(COUPLING_PIN);    
-    
-    //Logger("Coupling=%d\n",rawCoupling);
-    
-    useAdc2(false);
     if(rawCoupling>3200)      
         return DSOControl::DSO_COUPLING_AC;
     if(rawCoupling<1000)       
@@ -259,11 +261,12 @@ DSOControl::DSOControl(ControlEventCb *c)
     for(int i=0;i<4;i++)    
         lnPinMode(SENSEL_PIN+i,lnOUTPUT); // SENSEL
     
-    lnPinMode(COUPLING_PIN,lnADC_MODE);
-    couplingState=couplingFromAdc2();    
     // Ok now the direction is correct, memorize it
     arbitrer->setInputDirectionValue(arbitrer->currentDirection());
-    
+    // 
+    lnPinMode(COUPLING_PIN,lnADC_MODE);
+    couplingState=couplingFromAdc2();    
+        
 }
 /**
  * 
@@ -357,6 +360,17 @@ void DSOControl::runLoop()
             xAssert(wait<=TICK);         
             xDelay(wait);
         }
+        
+        // check coupling...
+        DSOControl::DSOCoupling newCoupling=couplingFromAdc2();
+        bool couplingChanged=false;
+        if(newCoupling!=couplingState) 
+        {
+            couplingChanged=true;
+            couplingState=newCoupling;
+        }
+        if(couplingChanged)    _cb(DSOControl::DSOEventCoupling);
+        
         arbitrer->beginInput();        
         uint32_t val= lnReadPort(1); // read all bits from portB        
         val=0xffff^val;

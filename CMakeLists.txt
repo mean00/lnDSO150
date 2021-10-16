@@ -71,14 +71,18 @@ SET(ILI9341_DRIVER  platformExample/longanNano/gd32_8bits.cpp)
 ADD_SUBDIRECTORY(externals/simplerILI9341) 
 include_directories(externals/simplerILI9341)
 #
+include_directories(capture)
+
 ADD_SUBDIRECTORY(assets) 
 ADD_SUBDIRECTORY(src)
+ADD_SUBDIRECTORY(capture)
 ADD_SUBDIRECTORY(testFunc)
 #
 #____________________
 # Build
 #____________________
 GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION})
+TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  captureLib )
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  sourceLib testLib)
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341 assets)
 

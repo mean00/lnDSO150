@@ -21,7 +21,8 @@ public:
   enum DSOEvent
   {
       
-      DSOEventControl
+      DSOEventControl,
+      DSOEventCoupling
   };
     
 #define DSO_EVENT_Q(b,e) ((b+(e<<16)))
