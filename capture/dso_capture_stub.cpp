@@ -7,8 +7,6 @@ lnTimingAdc *_adc;
 
 uint16_t internalAdcBuffer[1024];
 
-uint16_t calibrationDC[DSO_NB_GAIN_RANGES+1];
-uint16_t calibrationAC[DSO_NB_GAIN_RANGES+1];
 
 demoCapture::demoCapture(lnPin pin)
 {

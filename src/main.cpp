@@ -77,7 +77,7 @@ void loop()
     testFunc2();
    
     
-   // DSOCalibrate::zeroCalibrate();
+    DSOCalibrate::zeroCalibrate();
     
     mainLoop();       
 

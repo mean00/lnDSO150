@@ -5,6 +5,7 @@ extern void testControl();
 extern void testMenu();
 extern void testTestSignal();
 extern void testDrawGfx();
+extern void testCoupling();
 
 void testFunc()
 {
@@ -14,8 +15,10 @@ void testFunc()
 
 void testFunc2()
 {
+    testCoupling();
     //testControl();
-    testMenu();
+    //testMenu();
     //testTestSignal();
     //testDrawGfx();
 }
+
