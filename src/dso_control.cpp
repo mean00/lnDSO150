@@ -25,6 +25,7 @@
 extern uint16_t directADC2Read(int pin);
 
 extern DSO_portArbitrer *arbitrer;
+lnSimpleADC *couplingAdc;
 
 int debugUp=0;
 int debugDown=0;
@@ -220,13 +221,13 @@ extern void Logger(const char *fmt...);
  * 
  * @return 
  */
-static DSOControl::DSOCoupling couplingFromAdc2()
+DSOControl::DSOCoupling couplingFromAdc2()
 {
+#if 0
     return DSOControl::DSO_COUPLING_DC;
-    lnSimpleADC *coupling=new  lnSimpleADC(1, COUPLING_PIN);
-    int rawCoupling=coupling->simpleRead();
-    delete coupling;
+#endif
     
+    int rawCoupling=couplingAdc->simpleRead();
     if(rawCoupling>3200)      
         return DSOControl::DSO_COUPLING_AC;
     if(rawCoupling<1000)       
@@ -265,6 +266,7 @@ DSOControl::DSOControl(ControlEventCb *c)
     arbitrer->setInputDirectionValue(arbitrer->currentDirection());
     // 
     lnPinMode(COUPLING_PIN,lnADC_MODE);
+    couplingAdc=new  lnSimpleADC(1, COUPLING_PIN);
     couplingState=couplingFromAdc2();    
         
 }
@@ -353,7 +355,11 @@ void DSOControl::runLoop()
             couplingChanged=true;
             couplingState=newCoupling;
         }
-        if(couplingChanged)    _cb(DSOControl::DSOEventCoupling);
+        if(couplingChanged)   
+        {
+            if(_cb)
+                _cb(DSOControl::DSOEventCoupling);
+        }
         
         arbitrer->beginInput();        
         uint32_t val= lnReadPort(1); // read all bits from portB        
