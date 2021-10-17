@@ -32,6 +32,7 @@ ln8bit9341          *ili;
  */
 void setup()
 {
+    Logger("Setuping up DSO...\n");
     xMutex *PortBMutex=new xMutex;
     arbitrer=new DSO_portArbitrer(1,PortBMutex);
     
