@@ -15,7 +15,7 @@ void testFunc()
 
 void testFunc2()
 {
-    testCoupling();
+    //testCoupling();
     //testControl();
     //testMenu();
     //testTestSignal();

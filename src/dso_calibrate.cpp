@@ -62,13 +62,13 @@ bool DSOCalibrate::zeroCalibrate_()
     DSO_GFX::setBigFont(false);
     DSO_GFX::setTextColor(WHITE,BLACK);
               
-    printCalibrationTemplate("Connect the 2 crocs","together");
+    printCalibrationTemplate("Connect the probe to","ground");
     waitOk();    
     doCalibrate(calibrationDC,YELLOW,"",DSOControl::DSO_COUPLING_DC);       
     doCalibrate(calibrationAC,GREEN, "",DSOControl::DSO_COUPLING_AC);    
           
     DSO_GFX::clear(0);    
-    DSO_GFX::printxy(20,100,"Restart the unit.");
+    DSO_GFX::printxy(5,4,"Restart the unit.");
     while(1) {};
     return true;        
 }
@@ -88,7 +88,7 @@ void printCalibrationTemplate( const char *st1, const char *st2)
  */
 static void printCoupling(DSOControl::DSOCoupling cpl)
 {
-    static const char *coupling[3]={"currently : GND","currently : DC ","currently : AC "};    
+    static const char *coupling[3]={"currently : GND  ","currently : DC   ","currently : AC   "};    
     DSO_GFX::center(coupling[cpl],5);      
 }
 /**
