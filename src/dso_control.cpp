@@ -294,22 +294,6 @@ static void trampoline(void *a)
     ctrl->runLoop();
 }
 
-/**
- * Read the coupling pin every 300 ms or so
- * It's value depends on the coupling selector
- * ~ 0 / ~ 2000 / ~ 4000
- */
-static uint32_t lastUpdate=0;
-void          DSOControl::updateCouplingState()
-{
-    uint32_t now=millis();
-    if(now>lastUpdate+500)
-    {
-        couplingState=couplingFromAdc2();
-        
-        lastUpdate=now;
-    }
-}
 
 /**
  * 

@@ -7,14 +7,13 @@
 #include "dso_menuEngine.h"
 #include "dso_gfx.h"
 //#include "dso_calibrate.h"
-
+#if 0
 class testSignal
 {
 public:
     void setFrequency(int x) {};
     void setAmplitude(bool t) {};
 };
-testSignal zzzzz;
 class DSOCalibrate
 {
 public:
@@ -22,8 +21,11 @@ public:
     static void voltageCalibrate(void) {};
     static void decalibrate(void) {};
     
+protected:
+    static bool voltageCalibrate_()    ;
+    
 };
-extern testSignal *myTestSignal=&zzzzz;
+extern testSignal *myTestSignal;
 
 extern void buttonTest(void);
 
@@ -92,15 +94,17 @@ const MenuItem  topMenu[]={
     {MenuItem::MENU_BACK, "Back",NULL},
     {MenuItem::MENU_END, NULL,NULL}
 };
-
+#endif
 
 /**
  */
 void  menuManagement(DSOControl *control)
 {
+#if 0
     DSO_GFX::clear(BLACK);
      const MenuItem *tem=topMenu;
      MenuManager man(control, tem);
      man.run();
+#endif
 }
 // EOF

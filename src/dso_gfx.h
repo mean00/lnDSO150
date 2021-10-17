@@ -20,5 +20,9 @@ public:
   static void setBigFont(bool big);
   static void printMenuTitle(const char *text);
   static void clearBody(int color);
+  static void center(const char *text, int line);
+
+protected:  
+  static void markup(const char *t);
   
 };

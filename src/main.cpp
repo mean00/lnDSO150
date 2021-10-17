@@ -10,6 +10,7 @@
 #include "dso_control.h"
 #include "DSO_portBArbitrer.h"
 #include "dso_capture_stub.h"
+#include "dso_calibrate.h"
 
 extern void  menuManagement(void);
 extern const GFXfont *smallFont();
@@ -23,7 +24,7 @@ DSOControl          *control;
 DSO_portArbitrer    *arbitrer;
 DSO_testSignal      *testSignal;
 demoCapture         *capture;
-
+ln8bit9341          *ili;
 
 
 /**
@@ -51,7 +52,7 @@ void loop()
     
     Logger("Starting DSO...\n");
     testFunc();
-    ln8bit9341 *ili=new ln8bit9341( 240, 320,
+    ili=new ln8bit9341( 240, 320,
                                     1,          // port B
                                     PC14,       // DC/RS
                                     PC13,       // CS
@@ -75,6 +76,9 @@ void loop()
     
     testFunc2();
    
+    
+   // DSOCalibrate::zeroCalibrate();
+    
     mainLoop();       
 
 }

@@ -72,6 +72,7 @@ ADD_SUBDIRECTORY(externals/simplerILI9341)
 include_directories(externals/simplerILI9341)
 #
 include_directories(capture)
+USE_LIBRARY(NeVerMind)
 
 ADD_SUBDIRECTORY(assets) 
 ADD_SUBDIRECTORY(src)

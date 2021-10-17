@@ -44,7 +44,7 @@ void MenuManager::printMenuEntry(bool onoff, int line,const char *text)
         DSO_GFX::setTextColor(BLACK,BG_COLOR); 
     else  
         DSO_GFX::setTextColor(BG_COLOR,BLACK);
-    DSO_GFX::printxy(13,1+line,text);
+    DSO_GFX::printxy(8,1+line,text);
 }
 void MenuManager::printPrefix(bool onoff, int line,const char *text)
 {
@@ -53,7 +53,7 @@ void MenuManager::printPrefix(bool onoff, int line,const char *text)
         DSO_GFX::setTextColor(BLACK,BG_COLOR); 
     else  
         DSO_GFX::setTextColor(BG_COLOR,BLACK);
-    DSO_GFX::printxy(11,1+line,text);
+    DSO_GFX::printxy(6,1+line,text);
 }
 
 void MenuManager::printMenuTitle(const char *text)
@@ -64,7 +64,7 @@ void MenuManager::printMenuTitle(const char *text)
 void MenuManager::printBackHint()
 {
     DSO_GFX::setTextColor(BLACK,BLUE); 
-    DSO_GFX::printxy(-8,-1,"Back");
+    DSO_GFX::printxy(-5,-1,"Back");
     DSO_GFX::setTextColor(GREEN,BLACK); 
 }
 /**

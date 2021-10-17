@@ -7,7 +7,7 @@
 #include "simpler9341.h"
 #include "DSO_portBArbitrer.h"
 
-#define FONT_SIZE_X 8
+#define FONT_SIZE_X 13
 #define FONT_SIZE_Y 28
 
 static ili9341 *tft=NULL;
@@ -35,23 +35,22 @@ public:
  */
 void DSO_GFX_markup(const char *t)
 {
-   
-    
     bool inverted=false;    
     while(1)
     {
         const char *next=strstr(t,"@");
         if(!next)
         {
-             tft->print(t);             
-             return;             
+            tft->print(t);
+            tft->setTextColor(WHITE,BLACK);
+            return;             
         }
         // Else just print the part till the @
         if(next!=t)
         {
-#warning FIXME            
-            //tft->myDrawStringN(t,(int)(next-t));
-            tft->print(t);
+            const char *c=t;
+            for(;c<next;c++)
+                tft->writeChar(*c);
         }
         t=next+1;
         inverted=!inverted;
@@ -68,10 +67,12 @@ void DSO_GFX_markup(const char *t)
  */
 void DSO_GFX_center(const char *p,int y)
 {
-    int l=strlen(p)*FONT_SIZE_X;
-    int xcenter=(320-l)/2;    
-    if(xcenter<0) xcenter=0;
-    tft->setCursor(xcenter, y);
+    int colx,coly;
+    colx=(320-strlen(p)*FONT_SIZE_X)/2;
+    if(y<0) coly=240+y*FONT_SIZE_Y;
+    else coly=y*FONT_SIZE_Y;
+
+    tft->setCursor(colx,coly);
     DSO_GFX_markup(p);
 }
 /**
@@ -142,7 +143,7 @@ void DSO_GFX::newPage(const char *title)
     tft->fillScreen(BLACK);  
     tft->square(WHITE,0,0,320,FONT_SIZE_Y+4);
     tft->setTextColor(BLACK,WHITE);
-    DSO_GFX_center(title,2);    
+    DSO_GFX_center(title,1);    
     tft->setTextColor(WHITE,BLACK);
 }
 
@@ -165,7 +166,7 @@ void DSO_GFX::subtitle(const char *title)
 void DSO_GFX::bottomLine(const char *title)
 {
     AutoLcd autolcd;
-    DSO_GFX_center(title,240-2*FONT_SIZE_Y);
+    DSO_GFX_center(title,-1);
 }
 /**
  * 
@@ -173,13 +174,30 @@ void DSO_GFX::bottomLine(const char *title)
  */
 void DSO_GFX::printMenuTitle(const char *text)
 {
+    AutoLcd autolcd;
     int fg,bg;
     tft->getTextColor(fg,bg);
     DSO_GFX::setTextColor(BLACK,BLUE); 
     tft->square(BLUE,0,0+8,320,FONT_SIZE_Y);
-    DSO_GFX::printxy(13,0,text);
+    DSO_GFX_center(text,1);    
     DSO_GFX::setTextColor(fg,bg); 
 }
-
+/**
+ * 
+ * @param text
+ * @param line
+ */
+void DSO_GFX::center(const char *text, int line)
+{
+    DSO_GFX_center(text,line);
+}
+/**
+ * 
+ * @param t
+ */
+void DSO_GFX::markup(const char *t)
+{
+    DSO_GFX_markup(t);
+}
 
 // EOF
