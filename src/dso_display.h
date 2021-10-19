@@ -66,6 +66,6 @@ public:
             static void  drawTriggeredState(DSO_ArmingMode mode,bool triggered);
 };
 
-#define DSO_WAVEFORM_WIDTH  240  // 24 pixel / unit, 10 square => 240 pixel
-#define DSO_WAVEFORM_HEIGHT 192  // 8 square : 192 pixel
+#define DSO_WAVEFORM_WIDTH  240  // 20 pixel / unit, 12 square => 240 pixel
+#define DSO_WAVEFORM_HEIGHT 200  // 10 square : 200 pixel
 #define DSO_WAVEFORM_OFFSET ((240-DSO_WAVEFORM_HEIGHT)/2)

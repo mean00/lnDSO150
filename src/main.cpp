@@ -11,6 +11,8 @@
 #include "DSO_portBArbitrer.h"
 #include "dso_capture_stub.h"
 #include "dso_calibrate.h"
+#include "gd32/nvm_gd32.h"
+#include "dso_adc_gain.h"
 
 extern void  menuManagement(void);
 extern const GFXfont *smallFont();
@@ -25,7 +27,7 @@ DSO_portArbitrer    *arbitrer;
 DSO_testSignal      *testSignal;
 demoCapture         *capture;
 ln8bit9341          *ili;
-
+lnNvm               *nvm;
 
 /**
  * 
@@ -42,9 +44,17 @@ void setup()
     
     testSignal=new DSO_testSignal(PIN_TEST_SIGNAL,PIN_TEST_SIGNAL_AMP);
     capture=new demoCapture(PA0);
+    
+    nvm=new lnNvmGd32();
+    if(!nvm->begin())
+    {
+        Logger("Nvm not operational, reformating... \n");
+        nvm->format();
+    }
 }
 uint32_t chipId;
 extern void mainLoop();
+
 /**
  * 
  */
@@ -76,9 +86,11 @@ void loop()
     
     
     testFunc2();
-   
+    Logger("Loading calibration data\n");
+    if(!DSOCalibrate::loadCalibrationData())
+        DSOCalibrate::zeroCalibrate();
     
-    DSOCalibrate::zeroCalibrate();
+    DSOInputGain::readCalibrationValue();
     
     mainLoop();       
 

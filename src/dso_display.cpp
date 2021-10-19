@@ -27,9 +27,9 @@
 #define AUTOCAL_BORDER      10
 #define AUTOCAL_COLOR       WHITE
 
-#define SCALE_STEP 24
-#define C_X 10
-#define C_Y 8
+#define SCALE_STEP 20
+#define C_X 12
+#define C_Y 10
 #define CENTER_CROSS 1
 
 static ili9341 *tft;
@@ -343,8 +343,8 @@ void DSODisplay::printTriggerValue( float volt)
 
 void lowBarPrint(int column, const char *st)
 {
-    tft->setCursor((column-1)*64+1, 240-4); 
-    tft->square(0,(column-1)*64+1, 240-22,64,20);
+    tft->setCursor((column-1)*64+1, 240-2); 
+    tft->square(0,(column-1)*64+1, 240-20,64,20);
     tft->print(st);
 }
 #define LOWER_BAR_PRINT(x,y) { tft->setCursor(x*64, 240-18); tft->print(y); /*myDrawString(x,64);*/}            

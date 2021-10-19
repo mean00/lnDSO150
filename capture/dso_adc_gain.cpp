@@ -7,7 +7,7 @@
 
 extern DSOControl *control;
 
-// Compute default gain/attenuration depending on the scale
+// Compute default gain/attenuation depending on the scale
 // G1a/B is driven by SENSEL3
 
 const float G1a=10./11.;
@@ -18,42 +18,41 @@ const float G4=1.+1000./130.; // 130 for new board, 150 for old boards, R14 and 
 // G3 is driven by SENSEL0/1/2
 const float G3[6]={1.,2.,4.,10.,20.,40.};
 
-
-
 /**
  */
 static DSOInputGain::InputGainRange currentRange;
 
-static const int gainMapping[16]=
+static const int gainMapping[DSO_NB_GAIN_RANGES]=
 {
-    1 , // GND          [0]
+    1 , // GND             [0]
     
-    8+4, // x14   20mv   [1]    
+    8+4, // x14   20mv     [1]    
     8+6, // x7    40       [2]
-    8+7, // x3.5  80      [3]
+    8+7, // x3.5  80       [3]
     8+0, // x1.4  200      [4]
-    8+5, // x0.7  400      [5]
-    8+3, // x0.35 800      [6]
+    8+5, // x0.7  250/400  [5]
+    //8+3, // x0.35 800      [x]
     
-    4, // /7    2   [7]
-    6, // /14   4   [8]
-    7, // /29   8 v  [9]
-    0, // /71   20      [10]
-    5, // /143  40      [11]
-    3,  // /286 80      [12]
+    4, // /7    2          [6]
+    6, // /14   4          [7]
+    7, // /29   8 v        [8]
+    0, // /71   20        [9]
+    //5, // /143  40        [10]
+    //3,  // /286 80        [11]
     
-    3,3,3 // Filler
+    //3,3,3 // Filler
 };
 uint16_t calibrationDC[  DSO_NB_GAIN_RANGES+1];
 uint16_t calibrationAC[  DSO_NB_GAIN_RANGES+1];
 float    voltageFineTune[DSO_NB_GAIN_RANGES+1];
 float    multipliers[    DSO_NB_GAIN_RANGES+1];
-float    raw_multipliers[    DSO_NB_GAIN_RANGES+1];
+float    raw_multipliers[DSO_NB_GAIN_RANGES+1];
 
 /**
  */
 bool DSOInputGain::setGainRange(DSOInputGain::InputGainRange range)
 {
+    Logger("Setting new GainRange=%d\n",range);
     currentRange=range;
     control->setInputGain(gainMapping[(int)range]);
     return true;
@@ -68,7 +67,7 @@ DSOInputGain::InputGainRange DSOInputGain::getGainRange()
 }
 /**
  */
-int                          DSOInputGain::getOffset(int dc0ac1)
+int    DSOInputGain::getOffset(int dc0ac1)
 {
     if(dc0ac1==0)
         return calibrationDC[(int)currentRange];
@@ -79,7 +78,7 @@ int                          DSOInputGain::getOffset(int dc0ac1)
  * 
  * @return 
  */
-float                        DSOInputGain::getMultiplier()
+float   DSOInputGain::getMultiplier()
 {
     return multipliers[(int)currentRange];
 }

@@ -22,8 +22,11 @@ static void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::D
 //
 extern lnTimingAdc              *_adc;
 extern DSOControl               *control;
+extern lnNvm                    *nvm;
 
-
+#define NVM_CALIBRATION_AC          5
+#define NVM_CALIBRATION_DC          6
+#define NVM_CALIBRATION_VERSION     11
 /**
  * 
  */
@@ -37,6 +40,41 @@ static void waitOk()
             return;
         xDelay(10);
     }
+}
+/**
+ * 
+ * @return 
+ */
+bool DSOCalibrate::loadCalibrationData()
+{
+    uint16_t data[DSO_NB_GAIN_RANGES+1];
+    
+    if(!nvm->read(NVM_CALIBRATION_AC,DSO_NB_GAIN_RANGES*2+2,(uint8_t *)data))
+    {
+        Logger("Cannot load AC calibration\n");
+        return false;
+    }
+    if(data[0]!=NVM_CALIBRATION_VERSION)
+    {
+        Logger("AC:Wrong version %x vs expected %x\n",data[0],NVM_CALIBRATION_VERSION);
+        return false;
+    }
+    for(int i=0;i<DSO_NB_GAIN_RANGES;i++)
+            calibrationAC[i]=data[i+1];
+            
+    if(!nvm->read(NVM_CALIBRATION_DC,DSO_NB_GAIN_RANGES*2+2,(uint8_t *)data))
+    {
+        Logger("Cannot load DC calibration\n");
+        return false;
+    }
+    if(data[0]!=NVM_CALIBRATION_VERSION)
+    {
+        Logger("DC:Wrong version %x vs expected %x\n",data[0],NVM_CALIBRATION_VERSION);
+        return false;
+    }
+    for(int i=0;i<DSO_NB_GAIN_RANGES;i++)
+        calibrationDC[i]=data[i+1];
+    return true;
 }
 
 
@@ -52,7 +90,31 @@ bool DSOCalibrate::zeroCalibrate()
     control->changeCb(oldCb);
     return r;    
 }
-
+/**
+ * 
+ * @return 
+ */
+bool saveCalibrationData()
+{
+     uint16_t data[DSO_NB_GAIN_RANGES+1];
+     
+     data[0]=NVM_CALIBRATION_VERSION;
+     for(int i=0;i<DSO_NB_GAIN_RANGES;i++)
+            data[i+1]=calibrationAC[i];
+    
+     if(!nvm->write(NVM_CALIBRATION_AC,DSO_NB_GAIN_RANGES*2+2,(uint8_t *)data))
+     {
+         return false;
+     }
+    for(int i=0;i<DSO_NB_GAIN_RANGES;i++)
+            data[i+1]=calibrationDC[i];
+    
+     if(!nvm->write(NVM_CALIBRATION_DC,DSO_NB_GAIN_RANGES*2+2,(uint8_t *)data))
+     {
+         return false;
+     }
+    return true;
+}
 /**
  * 
  * @return 
@@ -66,9 +128,14 @@ bool DSOCalibrate::zeroCalibrate_()
     waitOk();    
     doCalibrate(calibrationDC,YELLOW,"",DSOControl::DSO_COUPLING_DC);       
     doCalibrate(calibrationAC,GREEN, "",DSOControl::DSO_COUPLING_AC);    
-          
+    const char *msg="Restart the unit.";
+    
+    if(!saveCalibrationData())
+    {
+        msg="Failed to save cal";
+    }
     DSO_GFX::clear(0);    
-    DSO_GFX::printxy(5,4,"Restart the unit.");
+    DSO_GFX::printxy(5,4,msg);
     while(1) {};
     return true;        
 }
@@ -181,6 +248,9 @@ void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupl
  */
 bool DSOCalibrate::decalibrate()
 {        
+    uint8_t empty[2]={0xff,0xff};
+    nvm->write(NVM_CALIBRATION_DC,2,empty);
+    nvm->write(NVM_CALIBRATION_AC,2,empty);
     return true;        
 }
 // EOF

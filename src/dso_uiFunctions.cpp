@@ -3,6 +3,7 @@
 #include "dso_display.h"
 
 #include "dso_voltTime.h"
+#include "dso_adc_capture.h"
 
 struct UI_eventCallbacks;
  typedef void redrawProto(bool onoff);
@@ -20,19 +21,20 @@ struct UI_eventCallbacks;
      const incdecProto  *incdec;
  };
  
- int currentVolt=0;
+ 
  int currentTrigger=0;
  
 // Volt / Offset
  void voltMenu_redraw(bool on)
  {
      Logger("VolMenu : redraw %d\n",on);
-     DSODisplay::drawVolt(vSettings[currentVolt].name,on);
+     DSODisplay::drawVolt(vSettings[DSOInputGain::getGainRange()].name,on);
  }
  void voltMenu_incdec(int inc)
  {
-     currentVolt=(currentVolt+DSOInputGain::MAX_VOLTAGE_MAX+inc)%DSOInputGain::MAX_VOLTAGE_MAX;
-     control->setInputGain(currentVolt);
+     int  range=DSOCapture::getVoltageRange();
+     range=(range+NB_CAPTURE_VOLTAGE+inc)%NB_CAPTURE_VOLTAGE;
+     DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE )range);
      Logger("VolMenu : %d\n",inc);
  }
 // Volt / Offset

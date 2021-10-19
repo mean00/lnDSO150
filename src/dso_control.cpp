@@ -226,8 +226,9 @@ DSOControl::DSOCoupling couplingFromAdc2()
 #if 0
     return DSOControl::DSO_COUPLING_DC;
 #endif
-    
+    couplingAdc->setPin(COUPLING_PIN);   // Reset ADC1    
     int rawCoupling=couplingAdc->simpleRead();
+    //Logger("C:%d\n",rawCoupling);
     if(rawCoupling>3200)      
         return DSOControl::DSO_COUPLING_AC;
     if(rawCoupling<1000)       
@@ -524,12 +525,12 @@ int  DSOControl::getRotaryValue()
  * @param val
  * @return 
  */
-int  DSOControl::setInputGain(int val)
+void  DSOControl::setInputGain(int val)
 {    
-    int set=val&0xf; // 4 useful bits
-    int unset=(~set)&0x0f;    
+    int set=(val)&0xf; // 4 useful bits
+    int unset=(~set)&0xf;    
     volatile uint32_t *portA=lnGetGpioToggleRegister(0);
-    *portA=set+(unset<<16);
-    return 0;
+    uint32_t v=set+(unset<<16);
+    *portA=v<<1;
 }
 //

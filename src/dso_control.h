@@ -62,7 +62,7 @@ public:
     void interruptButton(int button);
     void runLoop();
     int  getQButtonEvent(); // return 0 if nothing to do, else key + event<<16
-    int  setInputGain(int val); // This drives SENSEL... Warning the mapping is not straightforward !
+    void setInputGain(int val); // This drives SENSEL... Warning the mapping is not straightforward !
     DSOCoupling   getCouplingState();
     const char    *geCouplingStateAsText();    
     int           getRawCoupling();
