@@ -28,7 +28,7 @@ struct UI_eventCallbacks;
  void voltMenu_redraw(bool on)
  {
      Logger("VolMenu : redraw %d\n",on);
-     DSODisplay::drawVolt(vSettings[DSOInputGain::getGainRange()].name,on);
+     DSODisplay::drawVolt( DSOCapture::getVoltageRangeAsTex(),on);
  }
  void voltMenu_incdec(int inc)
  {

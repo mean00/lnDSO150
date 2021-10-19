@@ -30,6 +30,15 @@ bool     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange)
  * 
  * @return 
  */
+const char * DSOCapture::getVoltageRangeAsTex()
+{
+    return  vSettings[DSOCapture::currentVoltageRange].name;
+}
+
+/**
+ * 
+ * @return 
+ */
 DSOCapture::DSO_VOLTAGE_RANGE DSOCapture::getVoltageRange()
 {
      return (DSOCapture::DSO_VOLTAGE_RANGE )DSOCapture::currentVoltageRange;

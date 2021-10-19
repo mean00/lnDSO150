@@ -73,6 +73,7 @@ public:
     static void                            initialize();
     static bool                            setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange);
     static DSOCapture::DSO_VOLTAGE_RANGE   getVoltageRange();
+    static const char *                    getVoltageRangeAsTex();
 protected:
     static int                              currentVoltageRange;
 };

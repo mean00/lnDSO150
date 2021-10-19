@@ -7,7 +7,7 @@
 #include "dso_display.h"
 #include "dso_control.h"
 #include "dso_capture_stub.h"
-#include "dso_adc_gain.h"
+#include "dso_adc_capture.h"
 
 xFastEventGroup            *evtGroup;
 extern DSOControl          *control;
@@ -55,8 +55,7 @@ void mainLoop()
     DSODisplay::drawStatsBackGround();
     
     Logger("Setting 2v max gain\n");
-    //-> BREAK adc1
-    DSOInputGain::setGainRange(DSOInputGain::MAX_VOLTAGE_2V);
+    DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);    
     
     evtGroup=new xFastEventGroup;
     
