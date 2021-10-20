@@ -81,11 +81,15 @@ struct UI_eventCallbacks;
  void time_redraw(bool on)
  {     
      Logger("voltTriggerValue_redraw : redraw %d\n",on);
-     DSODisplay::drawTime("100us",on);
+     DSODisplay::drawTime(DSOCapture::getTimeBaseAsText(),on);
  }
  void time_incdec(int inc)
  {
-     Logger("voltTriggerValue_incdec : %d\n",inc);
+    Logger("voltTriggerValue_incdec : %d\n",inc);
+     
+    int ctime=DSOCapture::getTimeBase();
+    ctime=(ctime+inc+DSO_NB_TIMEBASE)%DSO_NB_TIMEBASE;
+    DSOCapture::setTimeBase((DSOCapture::DSO_TIME_BASE )ctime);
  }
  
  

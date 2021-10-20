@@ -65,9 +65,9 @@ void mainLoop()
     DSODisplay::drawCoupling(control->geCouplingStateAsText(),false);
     
     
-    capture->setCb(CaptureCb);
+    DSOCapture::setCb(CaptureCb);
     int nb=240;
-    capture->startCapture(240);
+    DSOCapture::startCapture(240);
     
     while(1)
     {
@@ -80,7 +80,7 @@ void mainLoop()
         {
             // display
             // next
-            capture->getData(nb,captureBuffer);
+            DSOCapture::getData(nb,captureBuffer);
             
             int   offset=     DSOInputGain::getOffset(0);
             float mul=        DSOInputGain::getMultiplier();
@@ -92,7 +92,7 @@ void mainLoop()
                 displayData[i]=120+f*40;
             }
             DSODisplay::drawWaveForm(nb,displayData);
-            capture->startCapture(240);
+            DSOCapture::startCapture(240);
 //            Logger("*\n");
             
         }

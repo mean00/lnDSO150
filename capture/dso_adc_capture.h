@@ -2,9 +2,12 @@
 #pragma once
 #include "lnADC.h"
 #include "dso_adc_gain.h"
-
+#include "lnGPIO.h"
 #define NB_CAPTURE_VOLTAGE (11)     
+#define DSO_NB_TIMEBASE (11)
 #define SLOWER_FAST_MODE     DSO_TIME_BASE_10US
+
+typedef void (captureCb)();
 
 /**
  */
@@ -33,9 +36,9 @@ public:
     };       
     enum DSO_TIME_BASE 
     {
-      DSO_TIME_BASE_5US=0,DSO_TIME_MIN=0,
-      DSO_TIME_BASE_10US,
-      DSO_TIME_BASE_25US,
+      //DSO_TIME_BASE_5US=0,DSO_TIME_MIN=0,
+      //DSO_TIME_BASE_10US,
+      DSO_TIME_BASE_25US=0,DSO_TIME_MIN=0,
       DSO_TIME_BASE_50US,
       DSO_TIME_BASE_100US,
       DSO_TIME_BASE_200US,
@@ -73,17 +76,29 @@ public:
   
     
 public:
-    static void                            initialize();
+    static void                            initialize(lnPin pin);
     static bool                            setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange);
     static DSOCapture::DSO_VOLTAGE_RANGE   getVoltageRange();
     static const char *                    getVoltageRangeAsText();
+    //
     static void                            setTimeBase(DSO_TIME_BASE timeBase);
     static DSO_TIME_BASE                   getTimeBase();
     static const char *                    getTimeBaseAsText();
+
+    static                                  void setCb(captureCb *cb);
+    static                                  bool getData(int &nb, float *f);
+    static                                  bool startCapture(int nb);
+
     
 protected:
     static int                             currentVoltageRange;
     static DSO_TIME_BASE                   currentTimeBase; 
+    
+
+    static  lnPin                           _pin;
+    static  captureCb                       *_cb;
+    static  int                             _nb;
+    
 };
 
 

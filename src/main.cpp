@@ -9,10 +9,10 @@
 #include "pinConfiguration.h"
 #include "dso_control.h"
 #include "DSO_portBArbitrer.h"
-#include "dso_capture_stub.h"
 #include "dso_calibrate.h"
 #include "gd32/nvm_gd32.h"
 #include "dso_adc_gain.h"
+#include "dso_adc_capture.h"
 
 extern void  menuManagement(void);
 extern const GFXfont *smallFont();
@@ -25,7 +25,6 @@ extern void testFunc2();
 DSOControl          *control;
 DSO_portArbitrer    *arbitrer;
 DSO_testSignal      *testSignal;
-demoCapture         *capture;
 ln8bit9341          *ili;
 lnNvm               *nvm;
 
@@ -43,7 +42,7 @@ void setup()
 
     
     testSignal=new DSO_testSignal(PIN_TEST_SIGNAL,PIN_TEST_SIGNAL_AMP);
-    capture=new demoCapture(PA0);
+    DSOCapture::initialize(PA0);
     
     nvm=new lnNvmGd32();
     if(!nvm->begin())
