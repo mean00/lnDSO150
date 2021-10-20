@@ -3,11 +3,12 @@
  *  * GPL v2
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
-
+#include "lnArduino.h"
 #include "dso_adc_capture.h"
  
 
-int      DSOCapture::currentVoltageRange=0;
+int            DSOCapture::currentVoltageRange=0;
+DSOCapture::DSO_TIME_BASE  DSOCapture::currentTimeBase=DSOCapture::DSO_TIME_BASE_1MS;
 
 /**
  * 
@@ -30,7 +31,7 @@ bool     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange)
  * 
  * @return 
  */
-const char * DSOCapture::getVoltageRangeAsTex()
+const char * DSOCapture::getVoltageRangeAsText()
 {
     return  vSettings[DSOCapture::currentVoltageRange].name;
 }

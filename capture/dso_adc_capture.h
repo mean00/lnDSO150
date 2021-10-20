@@ -1,12 +1,13 @@
 
 #pragma once
-
+#include "lnADC.h"
 #include "dso_adc_gain.h"
 
 #define NB_CAPTURE_VOLTAGE (11)     
 #define SLOWER_FAST_MODE     DSO_TIME_BASE_10US
 
-
+/**
+ */
 struct VoltageSettings
 {
     const char          *name;          /// name of the setting i.e 10 ms/div
@@ -14,10 +15,12 @@ struct VoltageSettings
     float               displayGain;    /// multiply by this to get pixels from volt
     int                 maxSwing;
 };
+//---------------
 
 extern VoltageSettings vSettings[NB_CAPTURE_VOLTAGE];
 
-
+/**
+ */
 class DSOCapture
 {
 public:
@@ -73,9 +76,28 @@ public:
     static void                            initialize();
     static bool                            setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange);
     static DSOCapture::DSO_VOLTAGE_RANGE   getVoltageRange();
-    static const char *                    getVoltageRangeAsTex();
+    static const char *                    getVoltageRangeAsText();
+    static void                            setTimeBase(DSO_TIME_BASE timeBase);
+    static DSO_TIME_BASE                   getTimeBase();
+    static const char *                    getTimeBaseAsText();
+    
 protected:
-    static int                              currentVoltageRange;
+    static int                             currentVoltageRange;
+    static DSO_TIME_BASE                   currentTimeBase; 
 };
 
+
+
+/**
+ */
+struct TimerTimeBase
+{
+  DSOCapture::DSO_TIME_BASE timeBase;
+  const char    *name;
+  int           fq;  
+  int           overSampling; // Oversampling ratio, only on GD32!
+  lnADC_CYCLES  rate ;
+  lnADC_DIVIDER scale;  
+};
+extern const TimerTimeBase timerBases[];
 // EOF
