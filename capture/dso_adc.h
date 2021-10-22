@@ -1,0 +1,39 @@
+/*
+ *  (C) 2021 MEAN00 fixounet@free.fr
+ *  See license file
+ * 
+ *  
+ */
+
+#pragma once
+#include "lnDma.h"
+#include "lnADC.h"
+
+typedef void (adcCb)(int nb);
+
+/**
+ * 
+ * @param instance
+ */
+class lnAdcTimer;
+class lnDSOAdc : public lnBaseAdc
+{
+public:
+                lnDSOAdc(int instance);
+   virtual      ~lnDSOAdc();
+   bool         setSource(int timer, int channel,int fq, lnPin pins);
+   bool         startDmaTransfer(int n,  uint16_t *output) ;
+   void         setCb(adcCb *c) { _cb=c;}
+   void         endCapture();
+public:
+    static void dmaDone_(void *foo, lnDMA::DmaInterruptType typ);
+protected:   
+    void        dmaDone();
+    int         _timer,_channel,_fq;
+    lnDMA       _dma;
+    xBinarySemaphore _dmaSem;
+    lnAdcTimer *_adcTimer;
+    adcCb      *_cb;
+    int         _nbSamples;
+};
+// EOF

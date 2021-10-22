@@ -89,7 +89,7 @@ public:
     static                                  bool getData(int &nb, float *f);
     static                                  bool startCapture(int nb);
 
-    
+    static void                             captureDone(int nb);
 protected:
     static int                             currentVoltageRange;
     static DSO_TIME_BASE                   currentTimeBase; 
