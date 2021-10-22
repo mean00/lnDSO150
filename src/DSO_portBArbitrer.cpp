@@ -55,11 +55,16 @@ void DSO_portArbitrer::endInput()
     WAIT_A_BIT
     _tex->unlock();
 }
+#if 0
+extern
+#endif
+bool lcdHasArbiter;
 /**
  */
 void DSO_portArbitrer::beginLCD()
 {
     _tex->lock(); 
+    lcdHasArbiter=true;
     _oldTime=lnGetUs();
 }
 /**
@@ -67,6 +72,7 @@ void DSO_portArbitrer::beginLCD()
 void DSO_portArbitrer::endLCD()
 {
     uint32_t nw=lnGetUs();
+    lcdHasArbiter=false;
     _tex->unlock();
     nw-=_oldTime;
     if(nw<50000)

@@ -15,7 +15,7 @@ int             DSOCapture::currentVoltageRange=0;
 DSOCapture::DSO_TIME_BASE  DSOCapture::currentTimeBase=DSOCapture::DSO_TIME_BASE_1MS;
 lnDSOAdc *_adc;
 uint16_t internalAdcBuffer[1024];
-
+DSOCapture::captureState DSOCapture::_state=DSOCapture::CAPTURE_STOPPED;
 /**
  * 
  * @param voltRange
@@ -77,6 +77,7 @@ const char *    DSOCapture::getTimeBaseAsText()
 
 void DSOCapture::initialize(lnPin pin)
 {
+    _state=CAPTURE_STOPPED;
     _pin=pin;
     _adc=new lnDSOAdc(0);
     _adc->setSource(3,3,1000,_pin);
@@ -97,6 +98,7 @@ void DSOCapture::setCb(captureCb *cb)
 void DSOCapture::captureDone(int nb)
 {
     xAssert(_cb);
+    _state=CAPTURE_STOPPED;
     _cb( );
 }
 /**
@@ -107,10 +109,24 @@ void DSOCapture::captureDone(int nb)
 bool DSOCapture::startCapture(int nb)
 {
     _nb=nb;
+    if(CAPTURE_RUNNING==_state)
+    {
+        _adc->stopCapture();
+    }
+    _state=CAPTURE_RUNNING;
     _adc->setCb(captureDone);
     return _adc->startDmaTransfer(nb,internalAdcBuffer);
-    return true;
 }
+
+void DSOCapture::stopCapture()
+{
+    if(_state==CAPTURE_RUNNING)
+    {
+        _state=CAPTURE_STOPPED;
+        _adc->stopCapture();
+    }
+}
+
 /**
  * 
  * @param nb

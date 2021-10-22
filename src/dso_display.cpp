@@ -302,7 +302,7 @@ static void drawInfoHeader(int line, const char *info,int color)
 
 void DSODisplay::drawStatsBackGround()
 {
-    
+    AutoGfx autogfx;
 
 #define BG_COLOR LIGHT_GREEN    
     tft->VLine(DSO_INFO_START_COLUMN, 0,240,BG_COLOR);
@@ -343,6 +343,8 @@ void DSODisplay::printTriggerValue( float volt)
 
 void lowBarPrint(int column, const char *st)
 {
+    AutoGfx autogfx;
+    
     tft->setCursor((column-1)*64+1, 240-2); 
     tft->square(0,(column-1)*64+1, 240-20,64,20);
     tft->print(st);

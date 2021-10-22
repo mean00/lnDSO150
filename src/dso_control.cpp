@@ -361,11 +361,14 @@ void DSOControl::runLoop()
             if(_cb)
                 _cb(DSOControl::DSOEventCoupling);
         }
-        
+#if 1        
         arbitrer->beginInput();        
         uint32_t val= lnReadPort(1); // read all bits from portB        
         val=0xffff^val;
         arbitrer->endInput();
+#else
+        uint32_t val=0;
+#endif
         
         
         int changed=0;

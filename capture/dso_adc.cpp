@@ -171,5 +171,11 @@ void      lnDSOAdc::endCapture()
 {
       _dma.endTransfer();    // This is incorrect, should be in its own task
 }
-
+void lnDSOAdc:: stopCapture()
+{
+    LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;      
+    adc->CTL1&=~LN_ADC_CTL1_DMA;
+    adc->CTL1&=~LN_ADC_CTL1_CTN;
+    _dma.endTransfer(); 
+}
 // EOF

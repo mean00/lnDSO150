@@ -23,6 +23,7 @@ public:
    virtual      ~lnDSOAdc();
    bool         setSource(int timer, int channel,int fq, lnPin pins);
    bool         startDmaTransfer(int n,  uint16_t *output) ;
+   void         stopCapture();
    void         setCb(adcCb *c) { _cb=c;}
    void         endCapture();
 public:

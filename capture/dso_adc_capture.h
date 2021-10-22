@@ -88,6 +88,7 @@ public:
     static                                  void setCb(captureCb *cb);
     static                                  bool getData(int &nb, float *f);
     static                                  bool startCapture(int nb);
+    static                                  void stopCapture();
 
     static void                             captureDone(int nb);
 protected:
@@ -99,6 +100,13 @@ protected:
     static  captureCb                       *_cb;
     static  int                             _nb;
     
+public:    
+    enum captureState
+    {
+        CAPTURE_STOPPED=0,
+        CAPTURE_RUNNING=1,
+    };
+    static captureState                     _state;
 };
 
 
