@@ -85,30 +85,16 @@ bool     lnDSOAdc::setSource( int timer, int channel, int fq,lnPin pin)
     // set clock divider as needed
     uint32_t adcClock=lnPeripherals::getClock(pADC0); // ADC1 does not support DMA/Timing
     int divider=adcClock/fq; // nb of clock ticks per conversion
-    divider>>8; // divide by 256, max conversion cycles +239.5+12.5 ~ 256
+    
+    // we need between 14 and 250 cycles for ADC
+    
+#warning Make something better here
+#warning maybe compute this on the fly ?    
     
     lnADC_DIVIDER clockDivider=lnADC_CLOCK_DIV_BY_2;
-    
-#define SET_DIVIDER(x)     if(divider>x) \
-                            { \
-                                clockDivider=lnADC_CLOCK_DIV_BY_##x; \
-                                divider/=x; \
-                            }
-
-    SET_DIVIDER(16) 
-    else
-        SET_DIVIDER(8)
-        else 
-            SET_DIVIDER(4)
-    lnPeripherals::setAdcDivider(clockDivider);
-    
     uint32_t conversionCycle=0;
-    // now # of cycles
-    if(divider>239) conversionCycle=7;
-    else if(divider>70) conversionCycle=6;
-        else if(divider>28) conversionCycle=3;
-            else if(divider>7) conversionCycle=1;
-        
+    
+    lnPeripherals::setAdcDivider(clockDivider);        
     uint32_t  smtp=0;
     smtp |=conversionCycle;
     adc->SAMPT[1]=smtp;
@@ -176,6 +162,6 @@ void lnDSOAdc:: stopCapture()
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;      
     adc->CTL1&=~LN_ADC_CTL1_DMA;
     adc->CTL1&=~LN_ADC_CTL1_CTN;
-    _dma.endTransfer(); 
+    _dma.cancelTransfer(); 
 }
 // EOF

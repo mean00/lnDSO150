@@ -72,9 +72,10 @@ const char *    DSOCapture::getTimeBaseAsText()
 {
     return timerBases[currentTimeBase].name;
 }
-
-
-
+/**
+ * 
+ * @param pin
+ */
 void DSOCapture::initialize(lnPin pin)
 {
     _state=CAPTURE_STOPPED;
@@ -82,7 +83,10 @@ void DSOCapture::initialize(lnPin pin)
     _adc=new lnDSOAdc(0);
     _adc->setSource(3,3,1000,_pin);
 }
-
+/**
+ * 
+ * @param n
+ */
 static void captureDone(int n)
 {
     
@@ -98,7 +102,7 @@ void DSOCapture::setCb(captureCb *cb)
 void DSOCapture::captureDone(int nb)
 {
     xAssert(_cb);
-    _state=CAPTURE_STOPPED;
+    _state=CAPTURE_DONE;
     _cb( );
 }
 /**
@@ -109,22 +113,36 @@ void DSOCapture::captureDone(int nb)
 bool DSOCapture::startCapture(int nb)
 {
     _nb=nb;
-    if(CAPTURE_RUNNING==_state)
+    switch(_state)
     {
-        _adc->stopCapture();
+        case CAPTURE_RUNNING:
+        case CAPTURE_DONE:
+                _adc->stopCapture();
+                break;
+        case CAPTURE_STOPPED:
+            break;
+        default:
+            break;
     }
-    _state=CAPTURE_RUNNING;
     _adc->setCb(captureDone);
+    _state=CAPTURE_RUNNING;
     return _adc->startDmaTransfer(nb,internalAdcBuffer);
 }
-
+/**
+ * 
+ */
 void DSOCapture::stopCapture()
 {
-    if(_state==CAPTURE_RUNNING)
+    switch(_state)
     {
-        _state=CAPTURE_STOPPED;
-        _adc->stopCapture();
-    }
+        case CAPTURE_RUNNING:
+        case CAPTURE_DONE:            
+            _adc->stopCapture();
+            _state=CAPTURE_STOPPED;
+            break;
+        default:
+            break;
+    }    
 }
 
 /**

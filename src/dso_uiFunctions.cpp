@@ -76,37 +76,37 @@ struct UI_eventCallbacks;
      
      
  }
- //-------
- // Volt / Offset
+ /**
+  * 
+  * @param on
+  */
  void time_redraw(bool on)
  {     
      Logger("voltTriggerValue_redraw : redraw %d\n",on);
      DSODisplay::drawTime(DSOCapture::getTimeBaseAsText(),on);
  }
+ /**
+  * 
+  * @param inc
+  */
  void time_incdec(int inc)
  {
     Logger("voltTriggerValue_incdec : %d\n",inc);
      
     int ctime=DSOCapture::getTimeBase();
     ctime=(ctime+inc+DSO_NB_TIMEBASE)%DSO_NB_TIMEBASE;
+    DSOCapture::stopCapture();
     DSOCapture::setTimeBase((DSOCapture::DSO_TIME_BASE )ctime);
+    DSOCapture::startCapture(240);
  }
- 
- 
- 
- 
+
  //---------
- extern  const UI_eventCallbacks voltOffset,voltOkb,triggerValueMenu;
-   const UI_eventCallbacks voltMenu=  {DSOControl::DSO_BUTTON_VOLTAGE,  &voltOffset, &voltMenu_redraw, &voltMenu_incdec};
-   const UI_eventCallbacks voltOffset={DSOControl::DSO_BUTTON_VOLTAGE,  &voltMenu, &voltOffset_redraw, &voltOffset_incdec};
-
-   const UI_eventCallbacks triggerMenu=      {DSOControl::DSO_BUTTON_TRIGGER, &triggerValueMenu,&voltTrigger_redraw,      &voltTrigger_incdec};
-   const UI_eventCallbacks triggerValueMenu= {DSOControl::DSO_BUTTON_TRIGGER, &triggerMenu,     &voltTriggerValue_redraw, &voltTriggerValue_incdec};
-
-   
-      
-   
-   const UI_eventCallbacks timeMenu= {DSOControl::DSO_BUTTON_TIME,NULL, &time_redraw,  &time_incdec};
+extern  const UI_eventCallbacks voltOffset,voltOkb,triggerValueMenu;
+const UI_eventCallbacks voltMenu=  {DSOControl::DSO_BUTTON_VOLTAGE,  &voltOffset, &voltMenu_redraw, &voltMenu_incdec};
+const UI_eventCallbacks voltOffset={DSOControl::DSO_BUTTON_VOLTAGE,  &voltMenu, &voltOffset_redraw, &voltOffset_incdec};
+const UI_eventCallbacks triggerMenu=      {DSOControl::DSO_BUTTON_TRIGGER, &triggerValueMenu,&voltTrigger_redraw,      &voltTrigger_incdec};
+const UI_eventCallbacks triggerValueMenu= {DSOControl::DSO_BUTTON_TRIGGER, &triggerMenu,     &voltTriggerValue_redraw, &voltTriggerValue_incdec};   
+const UI_eventCallbacks timeMenu= {DSOControl::DSO_BUTTON_TIME,NULL, &time_redraw,  &time_incdec};
 
 #define NB_TOP_MENU 8
    

@@ -45,6 +45,7 @@ void DSO_portArbitrer::beginInput()
     _oldInput=*_valuePort;
     *_directionPort=_inputDirection;
     *_valuePort=_intputValue;
+    WAIT_A_BIT
 }
 /**
  */
@@ -55,7 +56,7 @@ void DSO_portArbitrer::endInput()
     WAIT_A_BIT
     _tex->unlock();
 }
-#if 0
+#if 1
 extern
 #endif
 bool lcdHasArbiter;

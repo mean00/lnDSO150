@@ -37,8 +37,8 @@ public:
     enum DSO_TIME_BASE 
     {
       //DSO_TIME_BASE_5US=0,DSO_TIME_MIN=0,
-      //DSO_TIME_BASE_10US,
-      DSO_TIME_BASE_25US=0,DSO_TIME_MIN=0,
+      DSO_TIME_BASE_10US,
+      DSO_TIME_BASE_20US=0,DSO_TIME_MIN=0,
       DSO_TIME_BASE_50US,
       DSO_TIME_BASE_100US,
       DSO_TIME_BASE_200US,
@@ -103,8 +103,9 @@ protected:
 public:    
     enum captureState
     {
-        CAPTURE_STOPPED=0,
+        CAPTURE_STOPPED=0,        
         CAPTURE_RUNNING=1,
+        CAPTURE_DONE=2, // It is done but not cleaned up yet
     };
     static captureState                     _state;
 };
