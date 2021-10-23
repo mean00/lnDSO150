@@ -174,7 +174,7 @@ const UI_eventCallbacks timeMenu= {DSOControl::DSO_BUTTON_TIME,NULL, &time_redra
      }
      int incdec=control->getRotaryValue();
      debug("Rotary: %d\n",incdec);
-     if(currentMenu)   
+     if(incdec && currentMenu)   
      {
          currentMenu->incdec(incdec);     
          currentMenu->redraw(true);

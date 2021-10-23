@@ -1,3 +1,23 @@
+/**
+ Quick explanation how the gain works on the DSO 150
+ 
+ * G1 is 10/11 (PA4=1) or 10/1100 (PA4=0)  aka SENSEL3
+ * G2 is 2
+ * G3 is /1 ... / 40 Depending on PA1/PA2/PA3 aka  SENSEL0/1/2
+ * G4 = 1+1000/150 (1000/130 for newer board)
+
+ * PA1/2/3  G3
+ * 1   GND
+ * 4   /1
+ * 6   /2
+ * 7   /4
+ * 0   /10
+ * 5   /20
+ * 3  /40
+ */
+
+
+
 
 #include "lnArduino.h"
 #include "dso_adc_gain.h"
@@ -94,12 +114,8 @@ static void computeMultiplier(float *mul,int offset,float sta)
     float v;
     for(int i=0;i<6;i++)
     {      
-        v=voltageFineTune[offset+i];
-        raw_multipliers[i+offset]=G3[i]/sta;
-        if(!v)
-        {
-            v=raw_multipliers[i+offset]; // default value, not fine tuned
-        }       
+        
+        v=raw_multipliers[i+offset]=G3[i]/sta;                
         mul[i+offset]=v;
     }
 }
@@ -114,8 +130,7 @@ bool DSOInputGain::readCalibrationValue()
     float stat;
     multipliers[0]=0;
     computeMultiplier(multipliers,1,G1a*G2*G4);
-    computeMultiplier(multipliers,1+6,G1b*G2*G4);
-    
+    computeMultiplier(multipliers,1+6,G1b*G2*G4);    
 
     float mu=fvcc/(4095.*1000.);
     for(int i=0;i<DSO_NB_GAIN_RANGES;i++)

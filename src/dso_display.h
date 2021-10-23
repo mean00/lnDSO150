@@ -64,6 +64,7 @@ public:
             static void  drawAutoSetupStep(int x);
             static void  drawArmingMode(DSO_ArmingMode mode);
             static void  drawTriggeredState(DSO_ArmingMode mode,bool triggered);
+            
 };
 
 #define DSO_WAVEFORM_WIDTH  240  // 20 pixel / unit, 12 square => 240 pixel

@@ -42,7 +42,7 @@ lnDSOAdc::~lnDSOAdc()
  * @param fq
  * @return 
  */
-bool     lnDSOAdc::setSource( int timer, int channel, int fq,lnPin pin)
+bool     lnDSOAdc::setSource( int timer, int channel, int fq,lnPin pin,lnADC_DIVIDER divider,lnADC_CYCLES cycles)
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
     _fq=fq;    
@@ -73,7 +73,7 @@ bool     lnDSOAdc::setSource( int timer, int channel, int fq,lnPin pin)
     //
     if(_adcTimer) delete _adcTimer;
     _adcTimer=new lnAdcTimer(timerId, timerChannel);
-    _adcTimer->setPwmFrequency(fq);
+    _adcTimer->setPwmFrequency(fq); // wtf
     
     // add our channel(s)
     adc->RSQS[0]=0;
@@ -82,22 +82,8 @@ bool     lnDSOAdc::setSource( int timer, int channel, int fq,lnPin pin)
     //
     adc->CTL0|=LN_ADC_CTL0_SM; // scan mode
     
-    // set clock divider as needed
-    uint32_t adcClock=lnPeripherals::getClock(pADC0); // ADC1 does not support DMA/Timing
-    int divider=adcClock/fq; // nb of clock ticks per conversion
-    
-    // we need between 14 and 250 cycles for ADC
-    
-#warning Make something better here
-#warning maybe compute this on the fly ?    
-    
-    lnADC_DIVIDER clockDivider=lnADC_CLOCK_DIV_BY_2;
-    uint32_t conversionCycle=0;
-    
-    lnPeripherals::setAdcDivider(clockDivider);        
-    uint32_t  smtp=0;
-    smtp |=conversionCycle;
-    adc->SAMPT[1]=smtp;
+    lnPeripherals::setAdcDivider(divider);       
+    setSmpt(cycles);    
     // go !
     adc->CTL1|=LN_ADC_CTL1_ADCON;
     return true;

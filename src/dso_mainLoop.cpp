@@ -56,6 +56,7 @@ void mainLoop()
     
     Logger("Setting 2v max gain\n");
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);    
+    DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_1MS);    
     
     evtGroup=new xFastEventGroup;
     
@@ -81,19 +82,20 @@ void mainLoop()
             // display
             // next
             DSOCapture::getData(nb,captureBuffer);
-            
-            int   offset=     DSOInputGain::getOffset(0);
-            float mul=        DSOInputGain::getMultiplier();
+            // convert data to display
+            float displayGain=DSOCapture::getVoltToPix();
             for(int i=0;i<nb;i++)
             {
-                int d=captureBuffer[i];
-                d-=offset;
-                float f=(float)d*mul;
-                displayData[i]=120+f*40;
+                float f=captureBuffer[i];
+                f*=displayGain;
+                int d=100-(int)(f+0.5);
+                if(d>199) d=199;
+                if(d<0) d=0;
+                displayData[i]=d;
             }
-            DSODisplay::drawWaveForm(nb,displayData);
+            // we can ask for the next one now
             DSOCapture::startCapture(240);
-//            Logger("*\n");
+            DSODisplay::drawWaveForm(nb,displayData);
             
         }
         if(evt & DSO_EVT_COUPLING)

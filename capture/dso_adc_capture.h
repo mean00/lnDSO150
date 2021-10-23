@@ -91,6 +91,7 @@ public:
     static                                  void stopCapture();
 
     static void                             captureDone(int nb);
+    static float                            getVoltToPix();
 protected:
     static int                             currentVoltageRange;
     static DSO_TIME_BASE                   currentTimeBase; 

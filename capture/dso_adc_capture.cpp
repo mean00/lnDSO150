@@ -35,7 +35,10 @@ const char * DSOCapture::getVoltageRangeAsText()
 {
     return  vSettings[DSOCapture::currentVoltageRange].name;
 }
-
+float DSOCapture::getVoltToPix()
+{
+     return  vSettings[DSOCapture::currentVoltageRange].displayGain;
+}
 /**
  * 
  * @return 
@@ -52,7 +55,7 @@ DSOCapture::DSO_VOLTAGE_RANGE DSOCapture::getVoltageRange()
 void            DSOCapture::setTimeBase(DSO_TIME_BASE timeBase)
 {    
     currentTimeBase=timeBase;
-    _adc->setSource(3,3,timerBases[currentTimeBase].fq,_pin);
+    _adc->setSource(3,3,timerBases[currentTimeBase].fq,_pin,timerBases[currentTimeBase].scale,timerBases[currentTimeBase].rate);
     Logger("New timebase=%d : %s, fq=%d\n",(int)timeBase,timerBases[timeBase].name,timerBases[timeBase].fq);
     _adc->setSmpt(timerBases[currentTimeBase].rate);
 }
@@ -80,8 +83,9 @@ void DSOCapture::initialize(lnPin pin)
 {
     _state=CAPTURE_STOPPED;
     _pin=pin;
-    _adc=new lnDSOAdc(0);
-    _adc->setSource(3,3,1000,_pin);
+    _adc=new lnDSOAdc(0);    
+    _adc->setSource(3,3,timerBases[currentTimeBase].fq,_pin,timerBases[currentTimeBase].scale,timerBases[currentTimeBase].rate);
+    setTimeBase(DSO_TIME_BASE_20US);
 }
 /**
  * 
@@ -155,9 +159,13 @@ bool DSOCapture::getData(int &nb, float *f)
 {
     _adc->endCapture();
     nb=_nb;
+    int offset=DSOInputGain::getOffset(0);
+    float multiplier=DSOInputGain::getMultiplier();
     for(int i=0;i<_nb;i++)
     {
-        f[i]=(float)internalAdcBuffer[i];
+        int fint=(int)internalAdcBuffer[i]-offset;
+        float z=(float)fint*multiplier;
+        f[i]=z; // now in volt
     }
     return true;       
  }
