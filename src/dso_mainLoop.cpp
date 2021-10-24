@@ -59,7 +59,7 @@ void mainLoop()
     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_1MS);    
     
     evtGroup=new xFastEventGroup;
-    
+    evtGroup->takeOwnership();
     control->changeCb(ControlCb);
     initUiEvent();
     
