@@ -30,7 +30,7 @@ VoltageSettings vSettings[NB_CAPTURE_VOLTAGE]= {
 const TimerTimeBase timerBases[]=
 {   //                                          20 pix/dev => fq*20
     { DSOCapture::DSO_TIME_BASE_10US,   "10us",  DSO_FQ_US(10)   , 1, LN_ADC_SMPT_1_5,    lnADC_CLOCK_DIV_BY_2 }, // 1 us / sample round up, error =0.3%%
-    { DSOCapture::DSO_TIME_BASE_20US,   "20us",  DSO_FQ_US(20)   , 1, LN_ADC_SMPT_1_5,    lnADC_CLOCK_DIV_BY_4 }, // 1 us / sample round up, error =0.3%%
+    { DSOCapture::DSO_TIME_BASE_20US,   "20us",  DSO_FQ_US(20)   , 1, LN_ADC_SMPT_1_5,    lnADC_CLOCK_DIV_BY_2 }, // 1 us / sample round up, error =0.3%%
     //---
     { DSOCapture::DSO_TIME_BASE_50US,   "50us",  DSO_FQ_US(50)   , 1, LN_ADC_SMPT_1_5,    lnADC_CLOCK_DIV_BY_8 }, // 2 us / sample => 0.5 with OS, no oversampling
     { DSOCapture::DSO_TIME_BASE_100US,  "100us", DSO_FQ_US(100)  , 1, LN_ADC_SMPT_41_5,   lnADC_CLOCK_DIV_BY_4 },    // 100/24= 4 us , 1 us with os

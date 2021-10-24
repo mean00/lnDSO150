@@ -2,7 +2,6 @@
 #include "dso_control.h"
 #include "dso_display.h"
 
-#include "dso_voltTime.h"
 #include "dso_adc_capture.h"
 
 struct UI_eventCallbacks;
