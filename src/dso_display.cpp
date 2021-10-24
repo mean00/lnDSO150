@@ -32,6 +32,15 @@
 #define C_Y 10
 #define CENTER_CROSS 1
 
+#define LINE_OFFSET 4
+
+#define DSO_CHAR_HEIGHT 20
+#define DSO_HEIGHT_OFFSET 1
+#define DSO_INFO_START_COLUMN (248)
+#define DSO_INFO_MAX_WIDTH  (320-DSO_INFO_START_COLUMN-8)
+
+static void prettyPrint(float x,int mx);
+
 static ili9341 *tft;
 extern DSO_portArbitrer *arbitrer;
 static DSO_ArmingMode oldMode=DSO_CAPTURE_MODE_INVALIDE;
@@ -69,6 +78,19 @@ static const uint16_t *getBackGround(int line)
 
 
 /**
+ * 
+ * @param line
+ * @param info
+ */
+static void printMeasurement(int line, const float f)
+{
+    tft->square(0,
+            DSO_INFO_START_COLUMN,             DSO_HEIGHT_OFFSET+(line)*DSO_CHAR_HEIGHT+3-5,
+            320-DSO_INFO_START_COLUMN,         DSO_CHAR_HEIGHT);
+    tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(line+1)*DSO_CHAR_HEIGHT-5);
+    prettyPrint(f,1);
+}
+/**
  */
 static const char *fq2Text(int fq)
 {
@@ -96,7 +118,6 @@ void DSODisplay::init(ili9341 *d)
     }
    // triggerWatch.elapsed(0);
 }
-
 
 /**
  * 
@@ -151,7 +172,17 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
         last=next;
     }    
 } 
-
+/**
+ * 
+ * @param mn
+ * @param mx
+ */
+void  DSODisplay::drawMinMax(float mn, float mx)
+{
+    AutoGfx autogfx;
+    printMeasurement(3, mn);
+    printMeasurement(5, mx);    
+}
 /**
  * 
  */
@@ -232,19 +263,12 @@ void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
     }
 }
 
-
-#define DSO_CHAR_HEIGHT 20
-#define DSO_HEIGHT_OFFSET 1
-#define DSO_INFO_START_COLUMN (248)
-#define DSO_INFO_MAX_WIDTH  (320-DSO_INFO_START_COLUMN-8)
-
-
 /**
  * 
  * @param stats
  */
 
-static void prettyPrint(float x,int mx)
+void prettyPrint(float x,int mx)
 {
     float a=fabs(x);
   
@@ -293,13 +317,15 @@ void DSODisplay::drawStats(CaptureStats &stats)
  */
 static void drawInfoHeader(int line, const char *info,int color)
 {
-#define LINE_OFFSET 4
+
     tft->square(color,
             DSO_INFO_START_COLUMN,             DSO_HEIGHT_OFFSET+(line)*DSO_CHAR_HEIGHT+3-LINE_OFFSET,
             320-DSO_INFO_START_COLUMN,         DSO_CHAR_HEIGHT);
     tft->print(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(line+1)*DSO_CHAR_HEIGHT-LINE_OFFSET,info/*,DSO_INFO_MAX_WIDTH*/);
 }
-
+/**
+ * 
+ */
 void DSODisplay::drawStatsBackGround()
 {
     AutoGfx autogfx;
@@ -310,7 +336,7 @@ void DSODisplay::drawStatsBackGround()
         
 
     tft->setTextColor(BLACK,BG_COLOR);
-     drawInfoHeader(0,"Avrg",BG_COLOR);
+    drawInfoHeader(0,"Avrg",BG_COLOR);
     drawInfoHeader(2,"Min",BG_COLOR);
     drawInfoHeader(4,"Max",BG_COLOR);  
     drawInfoHeader(6,"Freq",BG_COLOR);
@@ -371,7 +397,6 @@ static void genericDraw(int column,const char *v,bool highlight)
     }    
     lowBarPrint(column,v);
 }
-
 /**
  * 
  * @param v

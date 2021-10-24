@@ -72,11 +72,21 @@ void mainLoop()
     
     while(1)
     {
-        int evt=evtGroup->waitEvents(0xff,10000);
+        xDelay(1);
+        int evt=evtGroup->waitEvents(0xff,2*1000);
+        if(!evt)
+        {
+            Logger("*\n");
+            continue;
+        }
+            
         if(evt & DSO_EVT_UI)
         {
+            Logger("UI\n");
             processUiEvent();
+            Logger("IU\n");
         }
+        float vMin=500,vMax=-500;
         if(evt & DSO_EVT_CAPTURE)
         {
             // display
@@ -87,6 +97,8 @@ void mainLoop()
             for(int i=0;i<nb;i++)
             {
                 float f=captureBuffer[i];
+                if(f>vMax) vMax=f;
+                if(f<vMin) vMin=f;
                 f*=displayGain;
                 int d=100-(int)(f+0.5);
                 if(d>199) d=199;
@@ -96,12 +108,14 @@ void mainLoop()
             // we can ask for the next one now
             DSOCapture::startCapture(240);
             DSODisplay::drawWaveForm(nb,displayData);
+            DSODisplay::drawMinMax(vMin,vMax);
             
         }
         if(evt & DSO_EVT_COUPLING)
         {
             DSODisplay::drawCoupling(control->geCouplingStateAsText(),false);
         }
+        
     }
 }
 // EOF
