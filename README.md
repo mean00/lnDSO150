@@ -12,7 +12,7 @@ __Features__ :
 
 * Screen support for both  ST7789 and ILI9341, autodetected
 * Supports STM32F103 GD32F303, GD32VF103 (the latter is ~ 2 times faster)
-* Only supports modified unit where rotary encoder is connected to PA14/PA15, see wiki
+* Only supports modified unit where rotary encoder is connected to PB14/PB15, see wiki
 
 
 ![screenshot](gfx/front.jpg?raw=true "front")
