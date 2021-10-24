@@ -21,12 +21,12 @@ public:
       MAX_VOLTAGE_200MV=4,    // 4
       MAX_VOLTAGE_250MV=5,    // 5 In theory it is 400MV but the TL084 saturates
       // do not use MAX_VOLTAGE_400MV=5,    // x
-      // do not use MAX_VOLTAGE_800MV=6,    // x
+      MAX_VOLTAGE_800MV=6,    // x
       
-      MAX_VOLTAGE_2V=6,      // 6
-      MAX_VOLTAGE_4V=7,      // 7
-      MAX_VOLTAGE_8V=8,      // 8
-      MAX_VOLTAGE_20V=9,     // 9
+      MAX_VOLTAGE_2V=7,      // 6
+      MAX_VOLTAGE_4V=8,      // 7
+      MAX_VOLTAGE_8V=9,      // 8
+      MAX_VOLTAGE_20V=10,     // 9
     // do not use   MAX_VOLTAGE_40V=11,     // 11
     // do not use   MAX_VOLTAGE_80V=12   // 12
     };
