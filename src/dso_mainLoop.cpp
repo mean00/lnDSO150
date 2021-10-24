@@ -109,6 +109,7 @@ void mainLoop()
             DSOCapture::startCapture(240);
             DSODisplay::drawWaveForm(nb,displayData);
             DSODisplay::drawMinMax(vMin,vMax);
+            DSODisplay::drawFq(0.0);
             
         }
         if(evt & DSO_EVT_COUPLING)

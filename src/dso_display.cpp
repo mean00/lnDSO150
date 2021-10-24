@@ -52,6 +52,13 @@ uint8_t prevSize[256];
 static char textBuffer[24];
 //
 
+
+#define MIN_ROW   0
+#define MAX_ROW   2
+#define FREQ_ROW  4
+#define AVRG_ROW  6
+
+
 class AutoGfx
 {
 public:
@@ -180,9 +187,24 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
 void  DSODisplay::drawMinMax(float mn, float mx)
 {
     AutoGfx autogfx;
-    printMeasurement(3, mn);
-    printMeasurement(5, mx);    
+    printMeasurement(MIN_ROW+1, mn);
+    printMeasurement(MAX_ROW+1, mx);    
 }
+void  DSODisplay::drawFq(float f)
+{
+    AutoGfx autogfx;
+    if(f==0.0)
+    {
+        tft->square(0,
+            DSO_INFO_START_COLUMN,             DSO_HEIGHT_OFFSET+(FREQ_ROW+1)*DSO_CHAR_HEIGHT+3-5,
+            320-DSO_INFO_START_COLUMN,         DSO_CHAR_HEIGHT);
+        tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(FREQ_ROW+1+1)*DSO_CHAR_HEIGHT-5);
+        tft->print("---");
+        return;            
+    }
+    printMeasurement(FREQ_ROW+1, f);
+}
+
 /**
  * 
  */
@@ -336,12 +358,12 @@ void DSODisplay::drawStatsBackGround()
         
 
     tft->setTextColor(BLACK,BG_COLOR);
-    drawInfoHeader(0,"Avrg",BG_COLOR);
-    drawInfoHeader(2,"Min",BG_COLOR);
-    drawInfoHeader(4,"Max",BG_COLOR);  
-    drawInfoHeader(6,"Freq",BG_COLOR);
-    drawInfoHeader(8,"Trigg",BG_COLOR);
-    drawInfoHeader(10,"Offst",BG_COLOR);
+    drawInfoHeader(AVRG_ROW ,   "Avrg",BG_COLOR);
+    drawInfoHeader(MIN_ROW,     "Min",BG_COLOR);
+    drawInfoHeader(MAX_ROW,     "Max",BG_COLOR);  
+    drawInfoHeader(FREQ_ROW,    "Freq",BG_COLOR);
+    drawInfoHeader(8,           "Trigg",BG_COLOR);
+    drawInfoHeader(10,          "Offst",BG_COLOR);
     tft->setTextColor(BG_COLOR,BLACK);
     oldMode=DSO_CAPTURE_MODE_INVALIDE;
     

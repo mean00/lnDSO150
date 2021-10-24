@@ -41,6 +41,7 @@ public:
             static void  cleanup();
             static void  drawWaveForm(int count,const uint8_t *data);
             static void  drawMinMax(float mn, float mx);
+            static void  drawFq(float fq);
             static void  drawGrid(void);
             // individual item on the screen 
             static void  drawVolt(const char *v, bool highlight);
