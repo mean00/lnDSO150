@@ -6,12 +6,10 @@
 #include "dso_menuEngine.h"
 #include "dso_display.h"
 #include "dso_control.h"
-#include "dso_capture_stub.h"
 #include "dso_adc_capture.h"
 
 xFastEventGroup            *evtGroup;
 extern DSOControl          *control;
-extern demoCapture         *capture;
 extern void processUiEvent();
 extern void initUiEvent();
 

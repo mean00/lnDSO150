@@ -55,9 +55,9 @@ DSOCapture::DSO_VOLTAGE_RANGE DSOCapture::getVoltageRange()
 void            DSOCapture::setTimeBase(DSO_TIME_BASE timeBase)
 {    
     currentTimeBase=timeBase;
-    _adc->setSource(3,3,timerBases[currentTimeBase].fq,_pin,timerBases[currentTimeBase].scale,timerBases[currentTimeBase].rate);
+    _adc->setSource(3,3,timerBases[currentTimeBase].fq,_pin,timerADC[currentTimeBase].scale,timerADC[currentTimeBase].rate);
     Logger("New timebase=%d : %s, fq=%d\n",(int)timeBase,timerBases[timeBase].name,timerBases[timeBase].fq);
-    _adc->setSmpt(timerBases[currentTimeBase].rate);
+    _adc->setSmpt(timerADC[currentTimeBase].rate);
 }
 /**
  * 
@@ -84,7 +84,8 @@ void DSOCapture::initialize(lnPin pin)
     _state=CAPTURE_STOPPED;
     _pin=pin;
     _adc=new lnDSOAdc(0);    
-    _adc->setSource(3,3,timerBases[currentTimeBase].fq,_pin,timerBases[currentTimeBase].scale,timerBases[currentTimeBase].rate);
+    xAssert(timerBases[currentTimeBase].timeBase==timerADC[currentTimeBase].timeBase);
+    _adc->setSource(3,3,timerBases[currentTimeBase].fq,_pin,timerADC[currentTimeBase].scale,timerADC[currentTimeBase].rate);
     setTimeBase(DSO_TIME_BASE_20US);
 }
 /**

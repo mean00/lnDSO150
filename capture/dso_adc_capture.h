@@ -120,9 +120,16 @@ struct TimerTimeBase
   DSOCapture::DSO_TIME_BASE timeBase;
   const char    *name;
   int           fq;  
+};
+
+struct TimerTimeADC
+{
+  DSOCapture::DSO_TIME_BASE timeBase;
   int           overSampling; // Oversampling ratio, only on GD32!
   lnADC_CYCLES  rate ;
   lnADC_DIVIDER scale;  
 };
+
 extern const TimerTimeBase timerBases[];
+extern  TimerTimeADC  timerADC[];
 // EOF
