@@ -56,6 +56,8 @@ void mainLoop()
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);    
     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_1MS);    
     
+    DSOInputGain::readCalibrationValue();
+    
     evtGroup=new xFastEventGroup;
     evtGroup->takeOwnership();
     control->changeCb(ControlCb);
