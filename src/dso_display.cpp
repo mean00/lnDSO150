@@ -91,6 +91,7 @@ static const uint16_t *getBackGround(int line)
  */
 static void printMeasurement(int line, const float f)
 {
+    tft->setTextColor(WHITE,BLACK);
     tft->square(0,
             DSO_INFO_START_COLUMN,             DSO_HEIGHT_OFFSET+(line)*DSO_CHAR_HEIGHT+3-5,
             320-DSO_INFO_START_COLUMN,         DSO_CHAR_HEIGHT);
@@ -187,6 +188,7 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
 void  DSODisplay::drawMinMax(float mn, float mx)
 {
     AutoGfx autogfx;
+    
     printMeasurement(MIN_ROW+1, mn);
     printMeasurement(MAX_ROW+1, mx);    
 }
