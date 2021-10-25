@@ -90,7 +90,7 @@ void loop()
     if(!DSOCalibrate::loadCalibrationData())
         DSOCalibrate::zeroCalibrate();
     
-    DSOInputGain::readCalibrationValue();
+   
     
     mainLoop();       
 
