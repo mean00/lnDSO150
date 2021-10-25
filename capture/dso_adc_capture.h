@@ -129,7 +129,7 @@ struct TimerTimeADC
   lnADC_CYCLES  rate ;
   lnADC_DIVIDER scale;  
 };
-
+#define DSO_NB_TIMESCALE 12
 extern const TimerTimeBase timerBases[];
 extern  TimerTimeADC  timerADC[];
 // EOF

@@ -45,7 +45,8 @@ const TimerTimeBase timerBases[]=
  };
 /**
  */
-TimerTimeADC timerADC[]=
+
+TimerTimeADC timerADC[DSO_NB_TIMESCALE]=
 {   //                                 OVER    CYCLES                 PREDIV 
     { DSOCapture::DSO_TIME_BASE_10US,   1, LN_ADC_SMPT_1_5,    lnADC_CLOCK_DIV_BY_2 }, // 1 us / sample round up, error =0.3%%
     { DSOCapture::DSO_TIME_BASE_20US,   1, LN_ADC_SMPT_1_5,    lnADC_CLOCK_DIV_BY_2 }, // 1 us / sample round up, error =0.3%%

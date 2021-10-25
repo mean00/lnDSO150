@@ -76,16 +76,17 @@ bool     lnDSOAdc::setSource( int timer, int channel, int fq,lnPin pin,lnADC_DIV
     _adcTimer->setPwmFrequency(fq); // wtf
     
     // add our channel(s)
-    adc->RSQS[0]=0;
-    uint32_t rsq2 =adcChannel(pin);
-    adc->RSQS[2]=rsq2;    
-    //
-    adc->CTL0|=LN_ADC_CTL0_SM; // scan mode
+    // We go for single channel
+    adc->RSQS[0]=adcChannel(pin);
+    adc->RSQS[1]=0;
+    adc->RSQS[2]=0;
+    adc->CTL1&=~LN_ADC_CTL1_CTN;    // not yet
+    adc->CTL1&=~LN_ADC_CTL1_DMA;    // not yet
+    adc->CTL0&=~LN_ADC_CTL0_SM; // not scan mode
+    adc->CTL0&=~LN_ADC_CTL0_DISRC; // not dicontinuous
     
     lnPeripherals::setAdcDivider(divider);       
     setSmpt(cycles);    
-    // go !
-    adc->CTL1|=LN_ADC_CTL1_ADCON;
     return true;
 }
 /**
@@ -107,7 +108,7 @@ void lnDSOAdc::dmaDone()
     // cleanup
     adc->CTL1&=~LN_ADC_CTL1_DMA;
     adc->CTL1&=~LN_ADC_CTL1_CTN;
-  
+    adc->CTL1&=~LN_ADC_CTL1_ADCON;
     // invoke CB
     if(_cb)
         _cb(_nbSamples);
@@ -131,9 +132,13 @@ bool     lnDSOAdc::startDmaTransfer(int n,  uint16_t *output)
     _dma.attachCallback(lnDSOAdc::dmaDone_,this);
     _dma.doPeripheralToMemoryTransferNoLock(n, (uint16_t *)output,(uint16_t *)&( adc->RDATA),  false);
     // go !
-    adc->CTL1|=LN_ADC_CTL1_CTN;
     adc->CTL1|=LN_ADC_CTL1_DMA;
+    adc->CTL1&=~LN_ADC_CTL1_CTN;
+    
     _adcTimer->enable();    
+    // go !
+    adc->CTL1|=LN_ADC_CTL1_ADCON;
+    
     return true;
 }
 /**

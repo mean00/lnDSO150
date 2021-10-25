@@ -55,9 +55,9 @@ DSOCapture::DSO_VOLTAGE_RANGE DSOCapture::getVoltageRange()
 void            DSOCapture::setTimeBase(DSO_TIME_BASE timeBase)
 {    
     currentTimeBase=timeBase;
+    xAssert(timerBases[currentTimeBase].timeBase==timerADC[currentTimeBase].timeBase);
     _adc->setSource(3,3,timerBases[currentTimeBase].fq,_pin,timerADC[currentTimeBase].scale,timerADC[currentTimeBase].rate);
-    Logger("New timebase=%d : %s, fq=%d\n",(int)timeBase,timerBases[timeBase].name,timerBases[timeBase].fq);
-    _adc->setSmpt(timerADC[currentTimeBase].rate);
+    Logger("New timebase=%d : %s, fq=%d\n",(int)timeBase,timerBases[timeBase].name,timerBases[timeBase].fq);    
 }
 /**
  * 
@@ -83,10 +83,12 @@ void DSOCapture::initialize(lnPin pin)
 {
     _state=CAPTURE_STOPPED;
     _pin=pin;
+    for(int i=0;i<DSO_NB_TIMESCALE;i++)
+    {
+        timerADC[i].scale=lnADC_CLOCK_DIV_BY_2;
+        timerADC[i].rate=LN_ADC_SMPT_1_5;
+    }    
     _adc=new lnDSOAdc(0);    
-    xAssert(timerBases[currentTimeBase].timeBase==timerADC[currentTimeBase].timeBase);
-    _adc->setSource(3,3,timerBases[currentTimeBase].fq,_pin,timerADC[currentTimeBase].scale,timerADC[currentTimeBase].rate);
-    setTimeBase(DSO_TIME_BASE_20US);
 }
 /**
  * 
