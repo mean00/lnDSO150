@@ -92,11 +92,8 @@ static const uint16_t *getBackGround(int line)
 static void printMeasurement(int line, const float f)
 {
     tft->setTextColor(WHITE,BLACK);
-    tft->square(0,
-            DSO_INFO_START_COLUMN,             DSO_HEIGHT_OFFSET+(line)*DSO_CHAR_HEIGHT+3-5,
-            320-DSO_INFO_START_COLUMN,         DSO_CHAR_HEIGHT);
     tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(line+1)*DSO_CHAR_HEIGHT-5);
-    prettyPrint(f,1);
+    prettyPrint(f,320-DSO_INFO_START_COLUMN);
 }
 /**
  */
@@ -292,7 +289,7 @@ void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
  * @param stats
  */
 
-void prettyPrint(float x,int mx)
+void prettyPrint(float x,int maxW=0)
 {
     float a=fabs(x);
   
@@ -305,7 +302,10 @@ void prettyPrint(float x,int mx)
     }
     else
         sprintf(textBuffer,"%02.2f",x);
-  tft->print(textBuffer/*,mx*/);   
+    if(maxW)
+        tft->printUpTo(textBuffer,maxW);
+    else
+        tft->print(textBuffer);
 }
 char tmpBuf[10];
     
