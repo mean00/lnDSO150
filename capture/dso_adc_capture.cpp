@@ -4,7 +4,7 @@
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
 #include "lnArduino.h"
-
+#include "lnCpuID.h"
 #include "dso_adc_capture.h"
 #include "dso_adc.h"
 
@@ -79,14 +79,47 @@ const char *    DSOCapture::getTimeBaseAsText()
  * 
  * @param pin
  */
+
+const int cycles[8]={ 14,20,26,41,54,68,84,252};
+
+static int lin2log2(int in)
+{
+    int out=0;
+    while(in>(1<<(out+1)) && out<8) out++;
+    return out;
+}
+
 void DSOCapture::initialize(lnPin pin)
 {
     _state=CAPTURE_STOPPED;
     _pin=pin;
+    
+    // Use max # of cycles possible
+    int adcInputClock=lnPeripherals::getClock(pADC0)/2;
+    bool hasOverSampling=(lnCpuID::vendor()==lnCpuID::LN_MCU_GD32);
     for(int i=0;i<DSO_NB_TIMESCALE;i++)
     {
-        timerADC[i].scale=lnADC_CLOCK_DIV_BY_2;
-        timerADC[i].rate=LN_ADC_SMPT_1_5;
+        timerADC[i].scale=lnADC_CLOCK_DIV_BY_2;        
+        int samplingFq=timerBases[i].fq;        
+        int r=adcInputClock/samplingFq;
+        int overSampling=0;
+        
+        if(hasOverSampling && r>=2*252)
+        {
+            overSampling=lin2log2(r/252);
+            r>>=overSampling;
+        }
+        timerADC[i].overSampling=overSampling;
+        Logger("%d: R=%d overSampling=%d \n",i,r,overSampling);
+        for(int c=7;c>=0;c--)
+        {
+            if(r>cycles[c]) 
+            {
+                timerADC[i].rate=(lnADC_CYCLES)c;
+                break;
+            }                
+        }
+        
     }    
     _adc=new lnDSOAdc(0);    
 }
