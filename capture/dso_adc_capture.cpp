@@ -55,8 +55,8 @@ DSOCapture::DSO_VOLTAGE_RANGE DSOCapture::getVoltageRange()
 void            DSOCapture::setTimeBase(DSO_TIME_BASE timeBase)
 {    
     currentTimeBase=timeBase;
-    xAssert(timerBases[currentTimeBase].timeBase==timerADC[currentTimeBase].timeBase);
-    _adc->setSource(3,3,timerBases[currentTimeBase].fq,_pin,timerADC[currentTimeBase].scale,timerADC[currentTimeBase].rate);
+    xAssert(timerBases[currentTimeBase].timeBase==timerADC[currentTimeBase].timeBase);    
+    _adc->setSource(3,3,timerBases[currentTimeBase].fq,_pin,timerADC[currentTimeBase].scale,timerADC[currentTimeBase].rate,timerADC[currentTimeBase].overSampling);
     Logger("New timebase=%d : %s, fq=%d\n",(int)timeBase,timerBases[timeBase].name,timerBases[timeBase].fq);    
 }
 /**
@@ -96,7 +96,8 @@ void DSOCapture::initialize(lnPin pin)
     
     // Use max # of cycles possible
     int adcInputClock=lnPeripherals::getClock(pADC0)/2;
-    bool hasOverSampling=(lnCpuID::vendor()==lnCpuID::LN_MCU_GD32);
+    int maxTimerFq=lnPeripherals::getClock(pTIMER3)/4;
+    bool hasOverSampling=0+1*(lnCpuID::vendor()==lnCpuID::LN_MCU_GD32);
     for(int i=0;i<DSO_NB_TIMESCALE;i++)
     {
         timerADC[i].scale=lnADC_CLOCK_DIV_BY_2;        
@@ -104,13 +105,17 @@ void DSOCapture::initialize(lnPin pin)
         int r=adcInputClock/samplingFq;
         int overSampling=0;
         
-        if(hasOverSampling && r>=2*252)
+        if(hasOverSampling && r>=2*84)
         {
-            overSampling=lin2log2(r/252);
+            overSampling=lin2log2(r/84);
+            // make sure we done exceed max Timer FQ
+            while(((samplingFq<<overSampling)>maxTimerFq) && overSampling) overSampling--;
             r>>=overSampling;
         }
         timerADC[i].overSampling=overSampling;
         Logger("%d: R=%d overSampling=%d \n",i,r,overSampling);
+        // Lookup up the biggest cycle that fits the frequency we need
+        // the higher it is, the more accurate the ADC is (?)
         for(int c=7;c>=0;c--)
         {
             if(r>cycles[c]) 

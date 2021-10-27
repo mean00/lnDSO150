@@ -42,7 +42,7 @@ void setup()
 
     
     testSignal=new DSO_testSignal(PIN_TEST_SIGNAL,PIN_TEST_SIGNAL_AMP);
-    testSignal->setFrequency(50*1000);
+    testSignal->setFrequency(1*1000);
     DSOCapture::initialize(PA0);
     
     nvm=new lnNvmGd32();

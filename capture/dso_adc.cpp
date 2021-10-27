@@ -9,6 +9,7 @@
 #include "lnTimer.h"
 #include "lnDma.h"
 #include "dso_adc.h"
+#include "lnCpuID.h"
 
 
 //------------------------------------------------------------------
@@ -40,18 +41,24 @@ lnDSOAdc::~lnDSOAdc()
  * @param timer
  * @param channel
  * @param fq
+ * @param overSamplingLog2 , i.e. 0=>1; 1=>2;....;4=>16 etc.. The frequency will  be adjusted already for OVR
  * @return 
  */
-bool     lnDSOAdc::setSource( int timer, int channel, int fq,lnPin pin,lnADC_DIVIDER divider,lnADC_CYCLES cycles)
+bool     lnDSOAdc::setSource( int timer, int channel, int fq,lnPin pin,lnADC_DIVIDER divider,lnADC_CYCLES cycles, int overSamplingLog2)
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
     _fq=fq;    
+    if(lnCpuID::vendor()==lnCpuID::LN_MCU_GD32)
+    {        
+     _fq<<= overSamplingLog2;  
+    }
     _channel=channel;
     _timer=timer;
     int source=-1;
     int timerId=-1,timerChannel=-1;
     
     lnBaseAdc::setup();
+    adc->CTL1&=~LN_ADC_CTL1_ADCON; // disable ADC so we can keep configuring it
     
 #define SETTIM(c,a,b) case a*10+b: source=LN_ADC_CTL1_ETSRC_SOURCE_##c;timerId=a;timerChannel=b;break;
     switch(_timer*10+_channel)
@@ -73,13 +80,28 @@ bool     lnDSOAdc::setSource( int timer, int channel, int fq,lnPin pin,lnADC_DIV
     //
     if(_adcTimer) delete _adcTimer;
     _adcTimer=new lnAdcTimer(timerId, timerChannel);
-    _adcTimer->setPwmFrequency(fq); // wtf
+    _adcTimer->setPwmFrequency(_fq); // wtf
     
     // add our channel(s)
     // We go for single channel
     adc->RSQS[0]=adcChannel(pin);
     adc->RSQS[1]=0;
     adc->RSQS[2]=0;
+    if(lnCpuID::vendor()==lnCpuID::LN_MCU_GD32)
+    {
+        if(!overSamplingLog2)
+        {
+             adc->OVRS=0; // no oversampling
+        }else
+        {
+            uint32_t ovr=0;        
+            ovr|=LN_ADC_OVRS_OVSS_SET(overSamplingLog2);
+            ovr|=LN_ADC_OVRS_OVSR_SET((overSamplingLog2-1));
+            ovr|=LN_ADC_OVRS_OVSR_TOVS;
+            ovr|=LN_ADC_OVRS_OVSEN;
+            adc->OVRS=ovr;
+        }
+    }
     adc->CTL1&=~LN_ADC_CTL1_CTN;    // not yet
     adc->CTL1&=~LN_ADC_CTL1_DMA;    // not yet
     adc->CTL0&=~LN_ADC_CTL0_SM; // not scan mode
