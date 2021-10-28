@@ -88,7 +88,7 @@ static int lin2log2(int in)
     while(in>(1<<(out+1)) && out<8) out++;
     return out;
 }
-
+#define THRESHOLD_TO_PREFER_OVERSAMPLING 84
 void DSOCapture::initialize(lnPin pin)
 {
     _state=CAPTURE_STOPPED;
@@ -105,9 +105,9 @@ void DSOCapture::initialize(lnPin pin)
         int r=adcInputClock/samplingFq;
         int overSampling=0;
         
-        if(hasOverSampling && r>=2*84)
+        if(hasOverSampling && r>=2*THRESHOLD_TO_PREFER_OVERSAMPLING)
         {
-            overSampling=lin2log2(r/84);
+            overSampling=lin2log2(r/THRESHOLD_TO_PREFER_OVERSAMPLING);
             // make sure we done exceed max Timer FQ
             while(((samplingFq<<overSampling)>maxTimerFq) && overSampling) overSampling--;
             r>>=overSampling;

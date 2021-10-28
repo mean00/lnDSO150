@@ -4,6 +4,7 @@ ADD_LIBRARY(  captureLib
                 dso_adc_gain.cpp
                 dso_adc_capture.cpp
                 dso_adc.cpp
+                dso_frequency.cpp
         
                 )
 

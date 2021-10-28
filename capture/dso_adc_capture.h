@@ -92,7 +92,9 @@ public:
 
     static void                             captureDone(int nb);
     static float                            getVoltToPix();
+    static int                              computeFrequency();
 protected:
+    static int                             computeFrequency_(int xsamples,uint16_t *data);
     static int                             currentVoltageRange;
     static DSO_TIME_BASE                   currentTimeBase; 
     

@@ -41,6 +41,7 @@
 
 static void prettyPrint(float x,int mx);
 
+
 static ili9341 *tft;
 extern DSO_portArbitrer *arbitrer;
 static DSO_ArmingMode oldMode=DSO_CAPTURE_MODE_INVALIDE;
@@ -106,8 +107,10 @@ static const char *fq2Text(int fq)
 
     STEP(1000000,"M")
     STEP(1000,"K")
-    {}
-    sprintf(buff,"%2.1f%s",f,suff);
+    if(*suff)
+        sprintf(buff,"%2.1f%s",f,suff);
+    else
+        sprintf(buff,"%d%s",(int)f,suff);
     return buff;
 }
 /**
@@ -189,10 +192,10 @@ void  DSODisplay::drawMinMax(float mn, float mx)
     printMeasurement(MIN_ROW+1, mn);
     printMeasurement(MAX_ROW+1, mx);    
 }
-void  DSODisplay::drawFq(float f)
+void  DSODisplay::drawFq(int f)
 {
     AutoGfx autogfx;
-    if(f==0.0)
+    if(f==0)
     {
         tft->square(0,
             DSO_INFO_START_COLUMN,             DSO_HEIGHT_OFFSET+(FREQ_ROW+1)*DSO_CHAR_HEIGHT+3-5,
@@ -201,7 +204,11 @@ void  DSODisplay::drawFq(float f)
         tft->print("---");
         return;            
     }
-    printMeasurement(FREQ_ROW+1, f);
+    const char *t= fq2Text(f)  ;
+    tft->setTextColor(WHITE,BLACK);
+    int line=FREQ_ROW+1;
+    tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(line+1)*DSO_CHAR_HEIGHT-5);
+    tft->printUpTo(t,320-DSO_INFO_START_COLUMN);
 }
 
 /**
@@ -307,6 +314,8 @@ void prettyPrint(float x,int maxW=0)
     else
         tft->print(textBuffer);
 }
+
+
 char tmpBuf[10];
     
 #define AND_ONE_A(x,y) { tft->print(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(y+1)*DSO_CHAR_HEIGHT,x/*,DSO_INFO_MAX_WIDTH*/);}        

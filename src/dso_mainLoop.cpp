@@ -91,6 +91,7 @@ void mainLoop()
         {
             // display
             // next
+            int fq=DSOCapture::computeFrequency();
             DSOCapture::getData(nb,captureBuffer);
             // convert data to display
             float displayGain=DSOCapture::getVoltToPix();
@@ -105,11 +106,13 @@ void mainLoop()
                 if(d<0) d=0;
                 displayData[i]=d;
             }
+            
+            
             // we can ask for the next one now
             DSOCapture::startCapture(240);
             DSODisplay::drawWaveForm(nb,displayData);
             DSODisplay::drawMinMax(vMin,vMax);
-            DSODisplay::drawFq(0.0);
+            DSODisplay::drawFq(fq);
             
         }
         if(evt & DSO_EVT_COUPLING)
