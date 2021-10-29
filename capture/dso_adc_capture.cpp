@@ -14,7 +14,7 @@ int             DSOCapture::_nb;
 int             DSOCapture::currentVoltageRange=0;
 DSOCapture::DSO_TIME_BASE  DSOCapture::currentTimeBase=DSOCapture::DSO_TIME_BASE_1MS;
 lnDSOAdc *_adc;
-uint16_t internalAdcBuffer[1024];
+uint16_t *internalAdcBuffer;
 DSOCapture::captureState DSOCapture::_state=DSOCapture::CAPTURE_STOPPED;
 /**
  * 
@@ -91,6 +91,7 @@ static int lin2log2(int in)
 #define THRESHOLD_TO_PREFER_OVERSAMPLING 84
 void DSOCapture::initialize(lnPin pin)
 {
+    internalAdcBuffer=new uint16_t[1024];
     _state=CAPTURE_STOPPED;
     _pin=pin;
     

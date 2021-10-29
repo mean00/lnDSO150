@@ -7,12 +7,17 @@
 #include "dso_display.h"
 #include "dso_control.h"
 #include "dso_adc_capture.h"
-
+//--
 xFastEventGroup            *evtGroup;
 extern DSOControl          *control;
 extern void processUiEvent();
 extern void initUiEvent();
+//--
+float      *captureBuffer;
+uint8_t    *displayData;
+extern uint16_t calibrationDC[];
 
+//--
 #define DSO_EVT_UI       (1<<0)
 #define DSO_EVT_CAPTURE  (1<<1)
 #define DSO_EVT_COUPLING (1<<2)
@@ -42,9 +47,6 @@ extern void initUiEvent();
 /**
  * 
  */
- float      captureBuffer[240];
- uint8_t    displayData[240];
- extern uint16_t calibrationDC[];
  
  void redrawEverything()
  {
@@ -57,6 +59,10 @@ extern void initUiEvent();
  
 void mainLoop()
 {
+    
+    captureBuffer=new float[240];
+    displayData=new uint8_t[240];
+    
     redrawEverything();
     
     Logger("Setting 2v max gain\n");
