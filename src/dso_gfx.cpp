@@ -95,7 +95,13 @@ void DSO_GFX::setBigFont(bool big)
     else
         tft->setFontSize(ili9341::MediumFont);
 }
-
+/**
+ * 
+ */
+void DSO_GFX::setSmallFont()
+{
+    tft->setFontSize(ili9341::SmallFont);
+}
 /**
  * 
  * @param array

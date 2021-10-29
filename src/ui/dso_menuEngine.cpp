@@ -72,9 +72,9 @@ void MenuManager::printBackHint()
  */
 void MenuManager::run(void)
 {
-     DSO_GFX::clear(BLACK);
-     DSO_GFX::setBigFont(true);     
-     runOne(_menu);     
+    DSO_GFX::clear(BLACK);
+    DSO_GFX::setBigFont(true);   
+    runOne(_menu);     
 };
 /**
  */
@@ -136,6 +136,8 @@ void MenuManager::runOne( const MenuItem *xtop)
      Logger("Entering menu\n");
      _control->changeCb( MenuManager_controlEvent);
      //xDelay(100); // wait for bouncing to go off
+     _control->purgeEvent();
+     xDelay(400);    
      runOne_(xtop);
      _control->changeCb(oldCb);
      Logger("Exiting menu\n");

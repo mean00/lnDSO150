@@ -78,30 +78,14 @@ void loop()
     ili->setFontSize(ili9341::SmallFont);
     ili->setTextColor(GREEN,BLACK);
     
-
-    
     DSO_GFX::init(ili);
     DSODisplay::init(ili);
-    
-    
     
     testFunc2();
     Logger("Loading calibration data\n");
     if(!DSOCalibrate::loadCalibrationData())
         DSOCalibrate::zeroCalibrate();
     
-   
-    
     mainLoop();       
-
 }
-
-
-uint16_t directADC2Read(int pin)
-{
-    return 0;
-}
- void useAdc2(bool use)
- {
-     
- }
+//

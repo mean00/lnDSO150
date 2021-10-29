@@ -6,105 +6,87 @@
 #include "lnArduino.h"
 #include "dso_menuEngine.h"
 #include "dso_gfx.h"
-//#include "dso_calibrate.h"
-#if 0
-class testSignal
-{
-public:
-    void setFrequency(int x) {};
-    void setAmplitude(bool t) {};
-};
-class DSOCalibrate
-{
-public:
-    static void zeroCalibrate(void) {};
-    static void voltageCalibrate(void) {};
-    static void decalibrate(void) {};
-    
-protected:
-    static bool voltageCalibrate_()    ;
-    
-};
-extern testSignal *myTestSignal;
+#include "dso_test_signal.h"
+#include "dso_calibrate.h"
 
-extern void buttonTest(void);
+extern DSO_testSignal      *testSignal;
+static int currentFQ;
+static int largeAmplitude;
 
-void updateFrequency(int fq)
-{
-    myTestSignal->setFrequency(fq);
-}
-#define MKFQ(x,y) void fq##x() {updateFrequency(y); }
 
-MKFQ(100,100)
-MKFQ(1000,1000)
-MKFQ(10000,10000)
-MKFQ(100000,100000)
-        
-void range0()
-{
-    myTestSignal->setAmplitude(false);
-}        
-void range1()
-{
-    myTestSignal->setAmplitude(true);
-}        
-        
-#define FQ_MENU(x,y)     {MenuItem::MENU_CALL, x,(void *)fq##y},     
+#define MAKEFQITEM(name,val) static const MenuListItem name={&currentFQ,val};
+
+MAKEFQITEM(fq100,100)
+MAKEFQITEM(fq1k,1000)
+MAKEFQITEM(fq10k,10*1000)
+MAKEFQITEM(fq100k,100*1000)
+
+#define FQ_MENU(x,y)     {MenuItem::MENU_INDEX,x,(void *)&(fq##y)},
 const MenuItem  fqMenu[]=
 {
     {MenuItem::MENU_TITLE, "Frequency",NULL},
     FQ_MENU("100 Hz" ,100)
-    FQ_MENU("1 kHz",  1000)
-    FQ_MENU("10 kHz", 10000)
-    FQ_MENU("100 kHz",100000)
-    {MenuItem::MENU_BACK, "Back",NULL},
+    FQ_MENU("1 kHz",  1k)
+    FQ_MENU("10 kHz", 10k)
+    FQ_MENU("100 kHz",100k)
     {MenuItem::MENU_END, NULL,NULL}
 };
-#define RANGE_MENU(x,y)     {MenuItem::MENU_CALL, x,(void *)range##y},     
+
+#define MAKEAMPLITEM(name,val) static const MenuListItem name={&largeAmplitude,val};
+MAKEAMPLITEM(ampl3v,1)
+MAKEAMPLITEM(ampl0v,0)
+
+#define RANGE_MENU(x,y)     {MenuItem::MENU_INDEX, x,(void *)(&ampl##y)},     
+        //--
 const MenuItem  amplitudeMenu[]=
 {
-    {MenuItem::MENU_TITLE, "Range",NULL},
-    RANGE_MENU("3.3v" ,1)
-    RANGE_MENU("100mv" ,0)
-    {MenuItem::MENU_BACK, "Back",NULL},
+    {MenuItem::MENU_TITLE, "Amplitude",NULL},
+    RANGE_MENU("3.3v" ,3v)
+    RANGE_MENU("100mv" ,0v)
     {MenuItem::MENU_END, NULL,NULL}
 };
+//--
 const MenuItem  signalMenu[]=
 {
     {MenuItem::MENU_TITLE, "Test Signal",NULL},
-    {MenuItem::MENU_SUBMENU, "Range",(const void *)&amplitudeMenu},
+    {MenuItem::MENU_SUBMENU, "Amplitude",(const void *)&amplitudeMenu},
     {MenuItem::MENU_SUBMENU, "Frequency",(const void *)&fqMenu},
-    {MenuItem::MENU_BACK, "Back",NULL},
     {MenuItem::MENU_END, NULL,NULL}
 };
+//--
 const MenuItem  calibrationMenu[]=
 {
     {MenuItem::MENU_TITLE, "Calibration",NULL},
     {MenuItem::MENU_CALL, "Basic Calibrate",(const void *)DSOCalibrate::zeroCalibrate},    
-    {MenuItem::MENU_CALL, "Fine Calibrate",(const void *)DSOCalibrate::voltageCalibrate},
+    //{MenuItem::MENU_CALL, "Fine Calibrate",(const void *)DSOCalibrate::voltageCalibrate},
     {MenuItem::MENU_CALL, "Wipe Calibration",(const void *)DSOCalibrate::decalibrate},
-    {MenuItem::MENU_BACK, "Back",NULL},
     {MenuItem::MENU_END, NULL,NULL}
 };
+//--
 const MenuItem  topMenu[]={
     {MenuItem::MENU_TITLE, "Main Menu",NULL},
     {MenuItem::MENU_SUBMENU, "Test signal",(const void *)&signalMenu},
-    {MenuItem::MENU_CALL, "Button Test",(const void *)buttonTest},
+    //{MenuItem::MENU_CALL, "Button Test",(const void *)buttonTest},
     {MenuItem::MENU_SUBMENU, "Calibration",(const void *)&calibrationMenu},
-    {MenuItem::MENU_BACK, "Back",NULL},
     {MenuItem::MENU_END, NULL,NULL}
 };
-#endif
 
 /**
+ * 
+ * @param control
  */
 void  menuManagement(DSOControl *control)
 {
-#if 0
-    DSO_GFX::clear(BLACK);
+     DSO_GFX::clear(BLACK);
      const MenuItem *tem=topMenu;
+     
+     currentFQ=testSignal->getFrequency();
+     largeAmplitude=testSignal->getAmplitude();
+     
      MenuManager man(control, tem);
      man.run();
-#endif
+     
+     testSignal->setFrequency(currentFQ);
+     testSignal->setAmplitude(largeAmplitude);
 }
 // EOF

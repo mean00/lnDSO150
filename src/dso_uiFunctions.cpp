@@ -8,6 +8,7 @@ struct UI_eventCallbacks;
  typedef void redrawProto(bool onoff);
  typedef void incdecProto(int count);
  extern DSOControl          *control;
+ extern void redrawEverything();
  /**
   */
 
@@ -22,7 +23,7 @@ struct UI_eventCallbacks;
  
  
  int currentTrigger=0;
- 
+ extern void menuManagement(DSOControl *control) ;
 // Volt / Offset
  void voltMenu_redraw(bool on)
  {
@@ -148,28 +149,55 @@ const UI_eventCallbacks timeMenu= {DSOControl::DSO_BUTTON_TIME,NULL, &time_redra
             int kind=ev>>16;
             int key=ev&0xffff;
             debug("Event:%d , key:%d\n",kind,key);
-           // if(kind==DSOControl::StatePressed)
-            { // different key ?
-                if(currentMenu)
-                {
-                    if(currentMenu->myKey==key)
-                    {
-                        debug("Toggle\n");
-                        currentMenu->redraw(false); // toggle inside the same menu line
-                        currentMenu=currentMenu->next;
-                        if(currentMenu) currentMenu->redraw(true);
-                        continue;
+            switch(kind)
+            {
+                case EVENT_SHORT_PRESS:
+                    { // different key ?
+                        if(currentMenu)
+                        {
+                            if(currentMenu->myKey==key)
+                            {
+                                debug("Toggle\n");
+                                currentMenu->redraw(false); // toggle inside the same menu line
+                                currentMenu=currentMenu->next;
+                                if(currentMenu) currentMenu->redraw(true);
+                                continue;
+                            }
+                        }
+
+                        if(currentMenu)
+                              currentMenu->redraw(false);
+                        // it's a different menu line
+                        currentMenu=topMenus[key];
+                     //   xAssert(currentMenu);
+                        if(currentMenu)
+                            currentMenu->redraw(true);                        
                     }
-                }
-                 
-                if(currentMenu)
-                      currentMenu->redraw(false);
-                // it's a different menu line
-                currentMenu=topMenus[key];
-             //   xAssert(currentMenu);
-                if(currentMenu)
-                    currentMenu->redraw(true);                        
-            }            
+                break;
+                case EVENT_LONG_PRESS:
+                    { 
+                        switch(key)
+                        {
+                            case DSOControl::DSO_BUTTON_ROTARY:
+                            {
+                                DSOCapture::stopCapture();
+                                menuManagement(control);
+                                redrawEverything();
+                                currentMenu=NULL;
+                                initUiEvent();
+                                DSOCapture::startCapture(240);
+                                break;
+                            }
+                            default:
+                               Logger("Unhandled ui key long press\n");
+                               break;
+                        }
+                    }
+                break;
+                default:
+                    Logger("Unhandled ui key\n");
+                    break;
+            }
      }
      int incdec=control->getRotaryValue();
      debug("Rotary: %d\n",incdec);

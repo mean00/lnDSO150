@@ -18,19 +18,31 @@ DSO_testSignal::DSO_testSignal(lnPin pin,lnPin pinAmp)
     lnPinMode(pinSignal,lnPWM);    
     _timer=new lnTimer(pinSignal);
     _timer->setPwmMode(512);
-    _timer->enable();
-    setFrequency(1000);
+    _timer->enable();    
+    _fq=1000;
+    _large=true;
+    setFrequency(_fq);
     
 }
 /**
  */
  bool DSO_testSignal::setFrequency(int fq)
  {     
+     _fq=fq;
      _timer->disable();
      _timer->setPwmFrequency(fq);
      _timer->enable();
     return true;
 }
+ /**
+  * 
+  * @param fq
+  * @return 
+  */
+ int DSO_testSignal::getFrequency(void)
+ {
+     return _fq;
+ }
  /**
   * The actual output is connected like that
   *    PA7  --- R16
@@ -43,6 +55,7 @@ DSO_testSignal::DSO_testSignal(lnPin pin,lnPin pinAmp)
   */
  bool DSO_testSignal::setAmplitude(bool  large)
  {
+     _large=large;
      if(large)
      {
            lnPinMode(pinAmp,lnINPUT_FLOATING);
@@ -53,5 +66,12 @@ DSO_testSignal::DSO_testSignal(lnPin pin,lnPin pinAmp)
      }
      return true;
  }
- 
+ /**
+  * 
+  * @return 
+  */
+ bool DSO_testSignal::getAmplitude()
+ {
+     return _large;
+ }
  // EOF

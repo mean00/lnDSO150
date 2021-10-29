@@ -46,11 +46,18 @@ extern void initUiEvent();
  uint8_t    displayData[240];
  extern uint16_t calibrationDC[];
  
-void mainLoop()
-{
+ void redrawEverything()
+ {
     DSODisplay::cleanup();
+    DSO_GFX::setSmallFont();
     DSODisplay::drawGrid();
     DSODisplay::drawStatsBackGround();
+    DSODisplay::drawCoupling(control->geCouplingStateAsText(),false);
+ }
+ 
+void mainLoop()
+{
+    redrawEverything();
     
     Logger("Setting 2v max gain\n");
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);    

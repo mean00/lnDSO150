@@ -469,6 +469,16 @@ bool DSOControl::getButtonState(DSOControl::DSOButton button)
 }
 /**
  * 
+ */
+void DSOControl::purgeEvent()
+{
+    for(int i=DSO_BUTTON_UP;i<=DSO_BUTTON_OK;i++)
+    {
+        _buttons[i]._events=0;
+    }
+}
+/**
+ * 
  * @return 
  */
 int DSOControl::getQButtonEvent()
