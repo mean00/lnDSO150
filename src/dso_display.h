@@ -59,7 +59,7 @@ public:
             static void  drawMode(MODE_TYPE mode);
             static MODE_TYPE getMode();
             static void  setMode(MODE_TYPE t);
-            static void  printTriggerValue(float volt); 
+            static void  printTriggerValue(float volt,bool hilight=false); 
             static void  printOffset(float volt); 
             
             static void  drawAutoSetup();

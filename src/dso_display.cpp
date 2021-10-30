@@ -17,6 +17,7 @@
 #include "dso_colors.h"
 #include "DSO_portBArbitrer.h"
 #include "assets/gfx/generated/splash_decl.h"
+#include "dso_version.h"
 
 #define XMAX(x, y) (((x) > (y)) ? (x) : (y))
 #define XMIN(x, y) (((x) < (y)) ? (x) : (y))
@@ -322,33 +323,8 @@ void prettyPrint(float x,int maxW=0)
 
 char tmpBuf[10];
     
-#define AND_ONE_A(x,y) { tft->print(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(y+1)*DSO_CHAR_HEIGHT,x/*,DSO_INFO_MAX_WIDTH*/);}        
-#define AND_ONE_T(x,y) { tft->print(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+(y+1)*DSO_CHAR_HEIGHT,x/*,DSO_INFO_MAX_WIDTH*/);}    
 #define AND_ONE_F(x,y) { snprintf(tmpBuf,9,"%2.2f",x);tft->print(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+(y+1)*DSO_CHAR_HEIGHT,tmpBuf/*,DSO_INFO_MAX_WIDTH*/);}    
-#if 0
-void DSODisplay::drawStats(CaptureStats &stats)
-{
 
-    if(stats.saturation)
-    {
-           tft->setTextColor(RED,BLACK);
-    }else
-    {
-           tft->setTextColor(GREEN,BLACK);
-    }
-    AND_ONE_F(stats.xmin,3);
-    AND_ONE_F(stats.xmax,5);
-    AND_ONE_F(stats.avg,1);      
-    tft->setTextColor(GREEN,BLACK);
-    if(stats.frequency>0)
-    {
-        AND_ONE_T(fq2Text(stats.frequency),7);
-    }else
-    {
-        AND_ONE_T("--",7);
-    }
-}
-#endif
 /**
  * 
  */
@@ -398,9 +374,12 @@ void  DSODisplay::printOffset(float volt)
  * @param mode
  * @param volt
  */
-void DSODisplay::printTriggerValue( float volt)
+void DSODisplay::printTriggerValue( float volt,bool hilight)
 {    
-    
+    if(hilight)
+        tft->setTextColor(BLACK,WHITE);
+    else
+        tft->setTextColor(WHITE,BLACK);
     AND_ONE_F(volt,9);      
 }
 
@@ -443,52 +422,7 @@ void DSODisplay::drawVolt(const char *v, bool highlight)    { genericDraw(VOLTAG
 void DSODisplay::drawTrigger(const char *v, bool highlight) { genericDraw(TRIGGER_MODE,v,highlight);}
 void DSODisplay::drawTime(const char *v, bool highlight)    { genericDraw(TIME_MODE,   v,highlight);}
 void DSODisplay::drawCoupling(const char *v, bool highlight){ genericDraw(ARMING_MODE, v,highlight);}
-/**
- * 
- */
-#if 0
-void DSODisplay::printVoltTimeTriggerMode(const char *volt, const char *time,DSOCapture::TriggerMode tmode,DSO_ArmingMode arming)
-{
-    const char *st="????";
-    switch(tmode)
-    {
-        case DSOCapture::Trigger_Rising:    st="UP  ";break;
-        case DSOCapture::Trigger_Falling:   st="DOWN";break;
-        case DSOCapture::Trigger_Both:      st="BOTH";break;
-        case DSOCapture::Trigger_Run:       st="NONE ";break;
-        default:            xAssert(0);            break;
-    }
-    const char *coupling="??";
-     switch(controlButtons->getCouplingState())
-    {
-        case DSOControl::DSO_COUPLING_GND:  coupling="GND";break;
-        case DSOControl::DSO_COUPLING_DC:   coupling=" DC"; break;
-        case DSOControl::DSO_COUPLING_AC:   coupling=" AC"; break;
-        default:            xAssert(0);            break;
-    }    
-    LOWER_BAR(VOLTAGE_MODE,volt,0);
-    LOWER_BAR(TIME_MODE,time,1);
-    LOWER_BAR_NCHAR(TRIGGER_MODE,st,2);
-    
-    SELECT(ARMING_MODE);
-    drawArmingMode(arming);
-   
-    tft->setTextColor(BG_COLOR,BLACK);
-    LOWER_BAR_PRINT_NCHARS(coupling,3,3);
-    
-    if(mode&0x80)
-    {
-        tft->setTextColor(BLACK,BLUE);
-        switch(mode & 0x7f)
-        {
-            case TRIGGER_MODE:    AND_ONE_A("Trigg",8);break;
-            case VOLTAGE_MODE:    AND_ONE_A("Offst",10);break;
-        }
-        tft->setTextColor(BG_COLOR,BLACK);
-    }
-        
-}
-#endif
+
 /**
  * 
  * @return 
@@ -587,9 +521,6 @@ void  DSODisplay::drawTriggeredState(DSO_ArmingMode mode, bool triggered)
 /**
  * 
  */
-
-#define DSO_VERSION_MAJOR 2
-#define DSO_VERSION_MINOR 0
 
 void DSODisplay::drawSplash()
 {

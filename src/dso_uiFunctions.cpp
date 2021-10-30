@@ -71,10 +71,9 @@ struct UI_eventCallbacks;
      {
         DSODisplay::drawVoltageTrigger(false, currentTrigger);
         currentTrigger+=inc;
+        DSODisplay::printTriggerValue(currentTrigger,true);
         DSODisplay::drawVoltageTrigger(true, currentTrigger);
      }
-     
-     
  }
  /**
   * 
