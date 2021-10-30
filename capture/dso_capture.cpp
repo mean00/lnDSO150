@@ -5,7 +5,7 @@
  ****************************************************/
 #include "lnArduino.h"
 #include "lnCpuID.h"
-#include "dso_adc_capture.h"
+#include "dso_capture.h"
 #include "dso_adc.h"
 
 lnPin           DSOCapture::_pin;

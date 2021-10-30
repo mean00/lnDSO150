@@ -1,6 +1,6 @@
 
 #include "lnArduino.h"
-#include "dso_adc_capture.h"
+#include "dso_capture.h"
 
 
 /*

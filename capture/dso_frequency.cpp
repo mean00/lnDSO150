@@ -4,7 +4,7 @@
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
 #include "lnArduino.h"
-#include "dso_adc_capture.h"
+#include "dso_capture.h"
 
 
 #define DEFAULT_VALUE  0x400*0x10000

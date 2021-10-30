@@ -11,7 +11,7 @@
 #include "dso_calibrate.h"
 #include "gd32/nvm_gd32.h"
 #include "dso_adc_gain.h"
-#include "dso_adc_capture.h"
+#include "dso_capture.h"
 #include "lnCpuID.h"
 
 extern void  menuManagement(void);

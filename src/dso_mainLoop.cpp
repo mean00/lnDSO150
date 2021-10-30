@@ -5,7 +5,7 @@
 #include "dso_menuEngine.h"
 #include "dso_display.h"
 #include "dso_control.h"
-#include "dso_adc_capture.h"
+#include "dso_capture.h"
 #include "dso_calibrate.h"
 //--
 xFastEventGroup            *evtGroup;
