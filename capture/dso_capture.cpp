@@ -7,6 +7,7 @@
 #include "lnCpuID.h"
 #include "dso_capture.h"
 #include "dso_adc.h"
+#include "pinConfiguration.h"
 
 lnPin           DSOCapture::_pin;
 captureCb      *DSOCapture::_cb;
@@ -127,7 +128,7 @@ void DSOCapture::initialize(lnPin pin)
         }
         
     }    
-    _adc=new lnDSOAdc(0,3,3);     // timer 3 channel 3
+    _adc=new lnDSOAdc(0,TIMER_ADC_ID,TIMER_ADC_CHANNEL);     // timer 3 channel 3
 }
 /**
  * 

@@ -45,3 +45,6 @@
 
 #define PIN_TEST_SIGNAL     PA7
 #define PIN_TEST_SIGNAL_AMP PB12
+
+#define TIMER_ADC_ID      3
+#define TIMER_ADC_CHANNEL 3
