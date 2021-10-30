@@ -13,3 +13,4 @@ python3 convert.py $1_preview.png $1_compressed.h $1
 }
 conv dso_small
 convGif dso150nb
+convGif splash
