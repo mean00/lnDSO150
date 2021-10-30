@@ -21,7 +21,7 @@ struct VoltageSettings
 //---------------
 
 extern VoltageSettings vSettings[NB_CAPTURE_VOLTAGE];
-
+class lnDSOAdc;
 /**
  */
 class DSOCapture
@@ -111,6 +111,7 @@ public:
         CAPTURE_DONE=2, // It is done but not cleaned up yet
     };
     static captureState                     _state;
+    static lnDSOAdc                         *_adc;
 };
 
 

@@ -19,9 +19,9 @@ class lnAdcTimer;
 class lnDSOAdc : public lnBaseAdc
 {
 public:
-                lnDSOAdc(int instance);
+                lnDSOAdc(int instance,int timer, int channel);
    virtual      ~lnDSOAdc();
-   bool         setSource(int timer, int channel,int fq, lnPin pins,lnADC_DIVIDER divider, lnADC_CYCLES cycles, int overSamplingLog2);
+   bool         setSource(int fq, lnPin pins,lnADC_DIVIDER divider, lnADC_CYCLES cycles, int overSamplingLog2);
    bool         startDmaTransfer(int n,  uint16_t *output) ;
    void         stopCapture();
    void         setCb(adcCb *c) { _cb=c;}

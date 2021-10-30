@@ -19,12 +19,12 @@
  * 
  * @param instance
  */
-lnDSOAdc::lnDSOAdc(int instance)  : lnBaseAdc(instance), 
+lnDSOAdc::lnDSOAdc(int instance,int timer, int channel)  : lnBaseAdc(instance), 
         _dma( lnDMA::DMA_PERIPH_TO_MEMORY,   lnAdcDesc[_instance].dmaEngine, lnAdcDesc[_instance].dmaChannel,  32,16)
 {
     xAssert(instance==0); // we need DMA so only ADC0
-    _timer=-1;
-    _channel=-1;
+    _channel=channel;
+    _timer=timer;
     _fq=-1;
     _adcTimer=NULL;
 }
@@ -44,7 +44,7 @@ lnDSOAdc::~lnDSOAdc()
  * @param overSamplingLog2 , i.e. 0=>1; 1=>2;....;4=>16 etc.. The frequency will  be adjusted already for OVR
  * @return 
  */
-bool     lnDSOAdc::setSource( int timer, int channel, int fq,lnPin pin,lnADC_DIVIDER divider,lnADC_CYCLES cycles, int overSamplingLog2)
+bool     lnDSOAdc::setSource(  int fq,lnPin pin,lnADC_DIVIDER divider,lnADC_CYCLES cycles, int overSamplingLog2)
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
     _fq=fq;    
@@ -52,8 +52,7 @@ bool     lnDSOAdc::setSource( int timer, int channel, int fq,lnPin pin,lnADC_DIV
     {        
      _fq<<= overSamplingLog2;  
     }
-    _channel=channel;
-    _timer=timer;
+   
     int source=-1;
     int timerId=-1,timerChannel=-1;
     

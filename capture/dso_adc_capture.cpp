@@ -9,11 +9,11 @@
 #include "dso_adc.h"
 
 lnPin           DSOCapture::_pin;
-captureCb       *DSOCapture::_cb;
+captureCb      *DSOCapture::_cb;
 int             DSOCapture::_nb;
 int             DSOCapture::currentVoltageRange=0;
 DSOCapture::DSO_TIME_BASE  DSOCapture::currentTimeBase=DSOCapture::DSO_TIME_BASE_1MS;
-lnDSOAdc *_adc;
+lnDSOAdc *DSOCapture::_adc;
 uint16_t *internalAdcBuffer;
 DSOCapture::captureState DSOCapture::_state=DSOCapture::CAPTURE_STOPPED;
 /**
@@ -56,7 +56,7 @@ void            DSOCapture::setTimeBase(DSO_TIME_BASE timeBase)
 {    
     currentTimeBase=timeBase;
     xAssert(timerBases[currentTimeBase].timeBase==timerADC[currentTimeBase].timeBase);    
-    _adc->setSource(3,3,timerBases[currentTimeBase].fq,_pin,timerADC[currentTimeBase].scale,timerADC[currentTimeBase].rate,timerADC[currentTimeBase].overSampling);
+    _adc->setSource(timerBases[currentTimeBase].fq,_pin,timerADC[currentTimeBase].scale,timerADC[currentTimeBase].rate,timerADC[currentTimeBase].overSampling);
     Logger("New timebase=%d : %s, fq=%d\n",(int)timeBase,timerBases[timeBase].name,timerBases[timeBase].fq);    
 }
 /**
@@ -127,7 +127,7 @@ void DSOCapture::initialize(lnPin pin)
         }
         
     }    
-    _adc=new lnDSOAdc(0);    
+    _adc=new lnDSOAdc(0,3,3);     // timer 3 channel 3
 }
 /**
  * 

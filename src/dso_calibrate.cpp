@@ -9,18 +9,18 @@
 #include "dso_control.h"
 #include "dso_adc_gain.h"
 #include "dso_calibrate.h"
-#include "dso_adc_gain.h"
 #include "dso_gfx.h"
 #include "lnADC.h"
 #include "dso_capture_input.h"
 #include "gd32/nvm_gd32.h"
+#include "lnADC.h"
 
 
 static void printCalibrationTemplate( const char *st1, const char *st2);
 static void doCalibrate(uint16_t *array,int color, const char *txt,DSOControl::DSOCoupling target);
 
 //
-extern lnTimingAdc              *_adc;
+lnTimingAdc                     *calAdc=NULL;
 extern DSOControl               *control;
 extern lnNvm                    *nvm;
 
@@ -126,6 +126,12 @@ bool DSOCalibrate::zeroCalibrate_()
               
     printCalibrationTemplate("Connect the probe to","ground");
     waitOk();    
+    
+    
+    calAdc=new lnTimingAdc(0);
+    lnPin pin=PA0;
+    calAdc->setSource(3,3,1000,1,&pin);    
+    
     doCalibrate(calibrationDC,YELLOW,"",DSOControl::DSO_COUPLING_DC);       
     doCalibrate(calibrationAC,GREEN, "",DSOControl::DSO_COUPLING_AC);    
     const char *msg="Restart the unit.";
@@ -136,6 +142,8 @@ bool DSOCalibrate::zeroCalibrate_()
     }
     DSO_GFX::clear(0);    
     DSO_GFX::printxy(5,4,msg);
+    delete calAdc;
+    calAdc=NULL;
     while(1) {};
     return true;        
 }
@@ -212,8 +220,8 @@ void header(int color,const char *txt,DSOControl::DSOCoupling target)
 static int averageADCRead()
 {
 #define NB_POINTS 16
-    uint16_t samples[NB_POINTS];
-   _adc->multiRead(16,samples);
+   uint16_t samples[NB_POINTS];
+   calAdc->multiRead(NB_POINTS,samples);
    int sum=0;
    for(int i=0;i<NB_POINTS;i++)
    {
