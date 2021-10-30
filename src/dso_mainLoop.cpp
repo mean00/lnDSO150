@@ -61,12 +61,7 @@ void mainLoop()
 {
     
     captureBuffer=new float[240];
-    displayData=new uint8_t[240];
-    
-    Logger("Loading calibration data\n");
-    if(!DSOCalibrate::loadCalibrationData())
-        DSOCalibrate::zeroCalibrate();
-    
+    displayData=new uint8_t[240];    
     
     redrawEverything();
     
@@ -80,6 +75,10 @@ void mainLoop()
     evtGroup->takeOwnership();
     control->changeCb(ControlCb);
     
+    
+    Logger("Loading calibration data\n");
+    if(!DSOCalibrate::loadCalibrationData())
+        DSOCalibrate::zeroCalibrate();
     
     initUiEvent();
     
