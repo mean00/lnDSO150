@@ -1,7 +1,7 @@
 #include "lnArduino.h"
 #include "gd32_8bits.h"
 #include "lnStopWatch.h"
-#include "assets/gfx/dso150nb_compressed.h"
+#include "assets/gfx/generated/splash_decl.h"
 #include "dso_gfx.h"
 #include "dso_menuEngine.h"
 #include "dso_display.h"
@@ -13,6 +13,7 @@
 #include "gd32/nvm_gd32.h"
 #include "dso_adc_gain.h"
 #include "dso_adc_capture.h"
+#include "lnCpuID.h"
 
 extern void  menuManagement(void);
 extern const GFXfont *smallFont();
@@ -20,7 +21,9 @@ extern const GFXfont *mediumFont();
 extern const GFXfont *bigFont();
 extern void testFunc();
 extern void testFunc2();
+extern const uint8_t *getSplash();
 
+static void drawSplash();
 
 DSOControl          *control;
 DSO_portArbitrer    *arbitrer;
@@ -73,10 +76,13 @@ void loop()
     ili->init();    
     ili->setRotation(1);
     
-    ili->fillScreen(GREEN);
     ili->setFontFamily(smallFont(),mediumFont(),bigFont());
     ili->setFontSize(ili9341::SmallFont);
     ili->setTextColor(GREEN,BLACK);
+    
+    drawSplash();
+    
+    
     
     DSO_GFX::init(ili);
     DSODisplay::init(ili);
@@ -88,4 +94,37 @@ void loop()
     
     mainLoop();       
 }
+/**
+ * 
+ */
+
+#define DSO_VERSION_MAJOR 2
+#define DSO_VERSION_MINOR 0
+
+void drawSplash()
+{
+    ili->fillScreen(BLACK);   
+    ili->drawRLEBitmap(splash_width,splash_height,2,2, WHITE,BLACK,getSplash());
+    ili->setFontSize(ili9341::SmallFont);
+    ili->setTextColor(WHITE,BLACK);
+    ili->setCursor(140, 64);
+    ili->print("lnDSO150");              
+    ili->setCursor(140, 84);
+#ifdef USE_RXTX_PIN_FOR_ROTARY        
+        ili->print("USB  Version");              
+#else
+        tft->print("RXTX Version");              
+#endif
+    char bf[20];
+    sprintf(bf,"%d.%02d",DSO_VERSION_MAJOR,DSO_VERSION_MINOR);
+    ili->setCursor(140, 64+20*2);        
+    ili->print(bf);       
+    ili->setCursor(140, 64+20*4);
+    ili->print(lnCpuID::idAsString());         
+    ili->setCursor(140, 64+20*5);
+    sprintf(bf,"%d Mhz",lnCpuID::clockSpeed()/1000000);
+    ili->print(bf);         
+    xDelay(500);
+}
+
 //

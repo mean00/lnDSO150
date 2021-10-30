@@ -6,8 +6,8 @@ from PIL import Image
 from struct import *
 import sys
 
-mpretty=0
 compressed=0
+mpretty=0
 stuct_name=""
 def print_external_header(f):
     global struct_name
@@ -40,47 +40,53 @@ struct_name=sys.argv[4]
 pixels = image.load
 print("loaded image "+str(sys.argv[1])+" "+str(width)+"x"+str(height))
 print_header(f)
-arr = bytearray(width)
-out = bytearray(512)
+arr = bytearray(width*height)
+out = bytearray(width*height)
 for y in range(0,height):
     x=0
     # First pack them as a byte array
     while x<width:
-        arr[x]=image.getpixel((x,y))
+        arr[x+y*width]=image.getpixel((x,y))
         x+=1
-    # 8 bits -> 1 bit
-    mask=0x80
-    xx=0
-    value=0
-    for x in range(0,width):
-        if arr[x] >0x0:
-            value+=mask
-        mask>>=1
-        if mask==0:
-            out[xx]=value
-            mask=0x80
-            xx+=1
-            value=0
-    x=0 
-    while x<xx:
-        current=out[x]
-        count=1
-        while (x+count<xx) and (current == out[x+count]) and count<255 :
-           count+=1
-        if(count >3 or current==0x76):
-            x+=count
-            printout(0x76)
-            printout(current)
-            printout(count)
-        else:
-            printout(current)
-            x+=1
+
+#  convert to 1 bit per pixel
+n=width*height
+mask=0x80
+xx=0
+value=0
+for i in range(0,n):
+   if arr[i] >0x0:
+       value+=mask
+
+   mask>>=1
+   if mask==0:
+       out[xx]=value
+       mask=0x80
+       xx+=1
+       value=0
+xx+=1
+print("%d bytes to pack" % xx)
+# Then RLE pack them
+x=0 
+while x<xx:
+    current=out[x]
+    count=1
+    while (x+count<xx) and (current == out[x+count]) and count<254 :
+       count+=1
+    #print("Val=%x count=%d" % (current,count))
+    if(count >3 or current==0x76):
+        x+=count
+        printout(0x76)
+        printout(current)
+        printout(count)
+    else:
+        printout(current)
+        x+=1
+print("Incoming size = %d => %d" % (width*height, compressed))
 #        print(str(x)+":  "+str(current)+"x"+str(count))
 print_footer(f)
 f.close()
 f= open(sys.argv[3], 'wt')
 print_external_header(f);
 f.close()
-print("Incoming size = %d => %d" % (width*height, compressed))
 print("Done generating "+str(sys.argv[2])+"\n")
-
