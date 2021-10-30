@@ -195,6 +195,7 @@ void DSO_GFX::printMenuTitle(const char *text)
  */
 void DSO_GFX::center(const char *text, int line)
 {
+    AutoLcd autolcd;
     DSO_GFX_center(text,line);
 }
 /**

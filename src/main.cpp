@@ -1,7 +1,6 @@
 #include "lnArduino.h"
 #include "gd32_8bits.h"
 #include "lnStopWatch.h"
-#include "assets/gfx/generated/splash_decl.h"
 #include "dso_gfx.h"
 #include "dso_menuEngine.h"
 #include "dso_display.h"
@@ -21,9 +20,8 @@ extern const GFXfont *mediumFont();
 extern const GFXfont *bigFont();
 extern void testFunc();
 extern void testFunc2();
-extern const uint8_t *getSplash();
 
-static void drawSplash();
+
 
 DSOControl          *control;
 DSO_portArbitrer    *arbitrer;
@@ -80,51 +78,19 @@ void loop()
     ili->setFontSize(ili9341::SmallFont);
     ili->setTextColor(GREEN,BLACK);
     
-    drawSplash();
+    
     
     
     
     DSO_GFX::init(ili);
     DSODisplay::init(ili);
+    DSODisplay::drawSplash();
     
     testFunc2();
-    Logger("Loading calibration data\n");
-    if(!DSOCalibrate::loadCalibrationData())
-        DSOCalibrate::zeroCalibrate();
+   
+   
+    
     
     mainLoop();       
 }
-/**
- * 
- */
-
-#define DSO_VERSION_MAJOR 2
-#define DSO_VERSION_MINOR 0
-
-void drawSplash()
-{
-    ili->fillScreen(BLACK);   
-    ili->drawRLEBitmap(splash_width,splash_height,2,2, WHITE,BLACK,getSplash());
-    ili->setFontSize(ili9341::SmallFont);
-    ili->setTextColor(WHITE,BLACK);
-    ili->setCursor(140, 64);
-    ili->print("lnDSO150");              
-    ili->setCursor(140, 84);
-#ifdef USE_RXTX_PIN_FOR_ROTARY        
-        ili->print("USB  Version");              
-#else
-        tft->print("RXTX Version");              
-#endif
-    char bf[20];
-    sprintf(bf,"%d.%02d",DSO_VERSION_MAJOR,DSO_VERSION_MINOR);
-    ili->setCursor(140, 64+20*2);        
-    ili->print(bf);       
-    ili->setCursor(140, 64+20*4);
-    ili->print(lnCpuID::idAsString());         
-    ili->setCursor(140, 64+20*5);
-    sprintf(bf,"%d Mhz",lnCpuID::clockSpeed()/1000000);
-    ili->print(bf);         
-    xDelay(500);
-}
-
 //

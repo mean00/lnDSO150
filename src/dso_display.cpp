@@ -9,12 +9,14 @@
  * 
  ****************************************************/
 #include "lnArduino.h"
+#include "lnCpuID.h"
 #include "dso_display.h"
 #include "pattern.h"
 #include "simpler9341.h"
 #include "math.h"
 #include "dso_colors.h"
 #include "DSO_portBArbitrer.h"
+#include "assets/gfx/generated/splash_decl.h"
 
 #define XMAX(x, y) (((x) > (y)) ? (x) : (y))
 #define XMIN(x, y) (((x) < (y)) ? (x) : (y))
@@ -51,6 +53,8 @@ static DSODisplay::MODE_TYPE mode=DSODisplay::VOLTAGE_MODE;
 uint8_t prevPos[256];
 uint8_t prevSize[256];
 static char textBuffer[24];
+
+extern const uint8_t *getSplash();
 //
 
 
@@ -579,5 +583,40 @@ void  DSODisplay::drawTriggeredState(DSO_ArmingMode mode, bool triggered)
     tft->setTextColor(fg,bg);
 }
 
+
+/**
+ * 
+ */
+
+#define DSO_VERSION_MAJOR 2
+#define DSO_VERSION_MINOR 0
+
+void DSODisplay::drawSplash()
+{
+    AutoGfx autogfx;
+    
+    tft->fillScreen(BLACK);   
+    tft->drawRLEBitmap(splash_width,splash_height,2,2, WHITE,BLACK,getSplash());
+    tft->setFontSize(ili9341::SmallFont);
+    tft->setTextColor(WHITE,BLACK);
+    tft->setCursor(140, 64);
+    tft->print("lnDSO150");              
+    tft->setCursor(140, 84);
+#ifdef USE_RXTX_PIN_FOR_ROTARY        
+        tft->print("USB  Version");              
+#else
+        tft->print("RXTX Version");              
+#endif
+    char bf[20];
+    sprintf(bf,"%d.%02d",DSO_VERSION_MAJOR,DSO_VERSION_MINOR);
+    tft->setCursor(140, 64+20*2);        
+    tft->print(bf);       
+    tft->setCursor(140, 64+20*4);
+    tft->print(lnCpuID::idAsString());         
+    tft->setCursor(140, 64+20*5);
+    sprintf(bf,"%d Mhz",lnCpuID::clockSpeed()/1000000);
+    tft->print(bf);         
+    xDelay(500);
+}
 
 // EOF

@@ -6,6 +6,7 @@
 #include "dso_display.h"
 #include "dso_control.h"
 #include "dso_adc_capture.h"
+#include "dso_calibrate.h"
 //--
 xFastEventGroup            *evtGroup;
 extern DSOControl          *control;
@@ -62,6 +63,11 @@ void mainLoop()
     captureBuffer=new float[240];
     displayData=new uint8_t[240];
     
+    Logger("Loading calibration data\n");
+    if(!DSOCalibrate::loadCalibrationData())
+        DSOCalibrate::zeroCalibrate();
+    
+    
     redrawEverything();
     
     Logger("Setting 2v max gain\n");
@@ -73,6 +79,8 @@ void mainLoop()
     evtGroup=new xFastEventGroup;
     evtGroup->takeOwnership();
     control->changeCb(ControlCb);
+    
+    
     initUiEvent();
     
     DSODisplay::drawCoupling(control->geCouplingStateAsText(),false);
