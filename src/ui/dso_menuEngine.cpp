@@ -134,10 +134,15 @@ void MenuManager::runOne( const MenuItem *xtop)
      printBackHint();
      DSOControl::ControlEventCb *oldCb=_control->getCb();
      Logger("Entering menu\n");
-     _control->changeCb( MenuManager_controlEvent);
-     //xDelay(100); // wait for bouncing to go off
+     
+     // Wait for the key to be released
+     while(1)
+     {
+         if(!_control->getButtonState(DSOControl::DSO_BUTTON_ROTARY)) break;
+         xDelay(50);
+     }
+     _control->changeCb( MenuManager_controlEvent);     
      _control->purgeEvent();
-     xDelay(400);    
      runOne_(xtop);
      _control->changeCb(oldCb);
      Logger("Exiting menu\n");
