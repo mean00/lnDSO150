@@ -64,8 +64,8 @@ extern const uint8_t *getSplash();
 #define MIN_ROW   0
 #define MAX_ROW   2
 #define FREQ_ROW  4
-#define AVRG_ROW  6
-#define TRIGGER_ROW  8
+//#define AVRG_ROW  8
+#define TRIGGER_ROW  6
 
 
 class AutoGfx
@@ -114,9 +114,9 @@ static const uint16_t *getHzBackGround(int line)
  */
 static void printMeasurement(int line, const float f)
 {
-    tft->setTextColor(WHITE,BLACK);
+    
     tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(line+1)*DSO_CHAR_HEIGHT-5);
-    prettyPrint(f,320-DSO_INFO_START_COLUMN);
+    prettyPrint(f,320-4-DSO_INFO_START_COLUMN);
 }
 /**
  */
@@ -210,7 +210,7 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
 void  DSODisplay::drawMinMax(float mn, float mx)
 {
     AutoGfx autogfx;
-    
+    tft->setTextColor(WHITE,BLACK);
     printMeasurement(MIN_ROW+1, mn);
     printMeasurement(MAX_ROW+1, mx);    
 }
@@ -380,12 +380,7 @@ void DSODisplay::printTriggerValue( float volt,bool hilight)
         tft->setTextColor(BLACK,WHITE);
     else
         tft->setTextColor(WHITE,BLACK);
-    
-    tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(TRIGGER_ROW+1+1)*DSO_CHAR_HEIGHT-5);
-    prettyPrint(volt,320-DSO_INFO_START_COLUMN);
-    
-    
-       
+    printMeasurement(TRIGGER_ROW+1, volt);
 }
 /**
  * 
@@ -400,12 +395,12 @@ void DSODisplay::drawStatsBackGround()
         
 
     tft->setTextColor(BLACK,BG_COLOR);
-    drawInfoHeader(AVRG_ROW ,   "Avrg",BG_COLOR);
+    //drawInfoHeader(AVRG_ROW ,   "Avrg",BG_COLOR);
     drawInfoHeader(MIN_ROW,     "Min",BG_COLOR);
     drawInfoHeader(MAX_ROW,     "Max",BG_COLOR);  
     drawInfoHeader(FREQ_ROW,    "Freq",BG_COLOR);
-    drawInfoHeader(8,           "Trigg",BG_COLOR);
-    drawInfoHeader(10,          "Offst",BG_COLOR);
+    drawInfoHeader(TRIGGER_ROW, "Trigg",BG_COLOR);
+    //drawInfoHeader(10,          "Offst",BG_COLOR);
     tft->setTextColor(BG_COLOR,BLACK);
     oldMode=DSO_CAPTURE_MODE_INVALIDE;
     

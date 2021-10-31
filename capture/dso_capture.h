@@ -74,7 +74,13 @@ public:
       DSO_VOLTAGE_MAX=DSO_VOLTAGE_5V
     };
   
-    
+  
+    enum captureState
+    {
+        CAPTURE_STOPPED=0,        
+        CAPTURE_RUNNING=1,
+        CAPTURE_DONE=2, // It is done but not cleaned up yet
+    }; 
 public:
     static void                            initialize(lnPin pin);
     static void                            setCouplingMode(int isAc) {_couplingModeIsAC=isAc;}
@@ -99,6 +105,7 @@ public:
     static void                             captureDone(int nb);
     static float                            getVoltToPix();
     static int                              computeFrequency();
+    static DSOCapture::captureState                     state() {return _state;};
 protected:
     static int                             computeFrequency_(int xsamples,uint16_t *data);
     static int                             currentVoltageRange;
@@ -108,14 +115,7 @@ protected:
     static  lnPin                           _pin;
     static  captureCb                       *_cb;
     static  int                             _nb;
-    
-public:    
-    enum captureState
-    {
-        CAPTURE_STOPPED=0,        
-        CAPTURE_RUNNING=1,
-        CAPTURE_DONE=2, // It is done but not cleaned up yet
-    };
+protected:    
     static captureState                     _state;
     static lnDSOAdc                         *_adc;
     static float                            _triggerVolt;

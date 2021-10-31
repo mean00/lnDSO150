@@ -171,6 +171,23 @@ const UI_eventCallbacks timeMenu= {DSOControl::DSO_BUTTON_TIME,NULL, &time_redra
             {
                 case EVENT_SHORT_PRESS:
                     { // different key ?
+                        
+                        if(key==DSOControl::DSO_BUTTON_ROTARY)
+                        {
+                            // toggle start /stop
+                            switch(DSOCapture::state())
+                            {
+                                case DSOCapture:: CAPTURE_STOPPED:        
+                                    DSOCapture::startCapture(240);
+                                    break;
+                                case DSOCapture:: CAPTURE_RUNNING:                                    
+                                case DSOCapture:: CAPTURE_DONE:
+                                    DSOCapture::stopCapture();
+                                    break;
+
+                            }
+                        }
+                        
                         if(currentMenu)
                         {
                             if(currentMenu->myKey==key)
@@ -189,7 +206,8 @@ const UI_eventCallbacks timeMenu= {DSOControl::DSO_BUTTON_TIME,NULL, &time_redra
                         currentMenu=topMenus[key];
                      //   xAssert(currentMenu);
                         if(currentMenu)
-                            currentMenu->redraw(true);                        
+                            currentMenu->redraw(true);   
+                        
                     }
                 break;
                 case EVENT_LONG_PRESS:
