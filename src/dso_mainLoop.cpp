@@ -48,7 +48,6 @@ extern uint16_t calibrationDC[];
 /**
  * 
  */
- 
  void redrawEverything()
  {
     DSODisplay::cleanup();
@@ -57,16 +56,16 @@ extern uint16_t calibrationDC[];
     DSODisplay::drawStatsBackGround();
     DSODisplay::drawCoupling(control->geCouplingStateAsText(),false);
  }
- 
+/**
+ * 
+ */
 void mainLoop()
-{
-    
+{    
     captureBuffer=new float[240];
     displayData=new uint8_t[240];    
     
     redrawEverything();
-    
-    Logger("Setting 2v max gain\n");
+       
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);    
     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_1MS);    
     
@@ -82,17 +81,15 @@ void mainLoop()
         DSOCalibrate::zeroCalibrate();
     
     initUiEvent();
-    
+    DSOCapture::setCouplingMode(control->getCouplingState()==DSOControl::DSO_COUPLING_AC);
     DSODisplay::drawCoupling(control->geCouplingStateAsText(),false);
-    
-    
+        
     DSOCapture::setCb(CaptureCb);
-    int nb=240;
     DSOCapture::startCapture(240);
     
     while(1)
     {
-        xDelay(1);
+        xDelay(1); // if we go too fast , it will be stuck (?)
         int evt=evtGroup->waitEvents(0xff,2*1000);
         if(!evt)
         {
@@ -102,11 +99,9 @@ void mainLoop()
             
         if(evt & DSO_EVT_UI)
         {
-            Logger("UI\n");
-            processUiEvent();
-            Logger("IU\n");
+            processUiEvent();         
         }
-        float vMin=500,vMax=-500;
+        
         if(evt & DSO_EVT_CAPTURE)
         {
             showCapture();            

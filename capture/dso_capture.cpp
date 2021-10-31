@@ -21,7 +21,7 @@ DSOCapture::captureState DSOCapture::_state=DSOCapture::CAPTURE_STOPPED;
 float      DSOCapture::_triggerVolt=1.0;
 int        DSOCapture::_triggerAdc=2048;
 DSOCapture::TriggerMode  DSOCapture::_triggerMode;
-bool       DSOCapture::_couplingModeIsAC;
+bool       DSOCapture::_couplingModeIsAC=0;
 
 /**
  * 
@@ -258,7 +258,7 @@ bool DSOCapture::getData(int &nb, float *f)
 {
     _adc->endCapture();
     nb=_nb;
-    int offset=DSOInputGain::getOffset(0);
+    int offset=DSOInputGain::getOffset(_couplingModeIsAC);
     float multiplier=DSOInputGain::getMultiplier();
     for(int i=0;i<_nb;i++)
     {

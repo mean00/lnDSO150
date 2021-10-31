@@ -88,6 +88,20 @@ static const uint16_t *getBackGround(int line)
             bg=(uint16_t *)lightGreenPattern;
     return bg;
 }
+/**
+ * 
+ * @param line
+ * @return 
+ */
+static const uint16_t *getHzBackGround(int line)
+{
+    const uint16_t *bg=(uint16_t *)horizontal;
+    if(!(line%SCALE_STEP)) 
+            bg=(uint16_t *)darkGreenPattern;
+    if(line==DSO_WAVEFORM_WIDTH/2)
+            bg=(uint16_t *)lightGreenPattern;
+    return bg;
+}
 
 
 /**
@@ -268,7 +282,7 @@ void  DSODisplay::drawVerticalTrigger(bool drawOrErase,int column)
      tft->VLine(column,DSO_WAVEFORM_OFFSET+1,DSO_WAVEFORM_HEIGHT-1,RED);
     else
     {
-        const uint16_t *bg=getBackGround(column);
+        const uint16_t *bg=getHzBackGround(column);
         tft->setAddress(column,1+DSO_WAVEFORM_OFFSET,
                         1,DSO_WAVEFORM_HEIGHT-1);
         tft->pushColors(DSO_WAVEFORM_HEIGHT,((uint16_t *)bg));
@@ -283,15 +297,18 @@ void  DSODisplay::drawVerticalTrigger(bool drawOrErase,int column)
 void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
 {
     AutoGfx autogfx;
+    
     line=DSO_WAVEFORM_HEIGHT/2+DSO_WAVEFORM_OFFSET-line;
     if(line<1) line=1;
     if(line>DSO_WAVEFORM_HEIGHT-1) line=DSO_WAVEFORM_HEIGHT-1;
     
     if(drawOrErase)
-        tft->HLine(1,1+line,DSO_WAVEFORM_WIDTH-2,BLUE);
-    else
     {
-        const uint16_t *bg=getBackGround(line);
+        tft->HLine(1,1+line,DSO_WAVEFORM_WIDTH-2,BLUE);
+    }
+    else // erase
+    {
+        const uint16_t *bg=getHzBackGround(line);
         tft->setAddress( 0,                  1+line,
                             DSO_WAVEFORM_WIDTH, 1);
         tft->pushColors(DSO_WAVEFORM_WIDTH,((uint16_t *)bg));
@@ -378,6 +395,7 @@ void  DSODisplay::printOffset(float volt)
  */
 void DSODisplay::printTriggerValue( float volt,bool hilight)
 {    
+    AutoGfx autogfx;
     if(hilight)
         tft->setTextColor(BLACK,WHITE);
     else
