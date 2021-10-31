@@ -5,6 +5,7 @@ ADD_LIBRARY(  sourceLib
                 DSO_portBArbitrer.cpp 
                 dso_display.cpp dso_mainLoop.cpp dso_uiFunctions.cpp
                 dso_calibrate.cpp
+                dso_autoSetup.cpp
                 )
 
         

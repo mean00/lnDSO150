@@ -282,6 +282,8 @@ void  DSODisplay::drawVerticalTrigger(bool drawOrErase,int column)
 
 void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
 {
+    AutoGfx autogfx;
+    line=DSO_WAVEFORM_HEIGHT/2+DSO_WAVEFORM_OFFSET-line;
     if(line<1) line=1;
     if(line>DSO_WAVEFORM_HEIGHT-1) line=DSO_WAVEFORM_HEIGHT-1;
     

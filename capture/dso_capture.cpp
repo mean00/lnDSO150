@@ -17,6 +17,29 @@ DSOCapture::DSO_TIME_BASE  DSOCapture::currentTimeBase=DSOCapture::DSO_TIME_BASE
 lnDSOAdc *DSOCapture::_adc;
 uint16_t *internalAdcBuffer;
 DSOCapture::captureState DSOCapture::_state=DSOCapture::CAPTURE_STOPPED;
+
+float      DSOCapture::_triggerVolt=1.0;
+int        DSOCapture::_triggerAdc=2048;
+
+
+/**
+ * 
+ * @return 
+ */
+float                           DSOCapture::getTriggerVoltage()
+{
+    return _triggerVolt;
+}
+/**
+ * 
+ * @param s
+ */
+void                            DSOCapture::setTriggerVoltage(const float &s)
+{
+    _triggerVolt=s;
+}
+
+
 /**
  * 
  * @param voltRange

@@ -9,6 +9,7 @@ struct UI_eventCallbacks;
  typedef void incdecProto(int count);
  extern DSOControl          *control;
  extern void redrawEverything();
+ extern void autoSetup();
  /**
   */
 
@@ -22,7 +23,6 @@ struct UI_eventCallbacks;
  };
  
  
- int currentTrigger=0;
  extern void menuManagement(DSOControl *control) ;
 // Volt / Offset
  void voltMenu_redraw(bool on)
@@ -57,22 +57,29 @@ struct UI_eventCallbacks;
  {
      Logger("voltTrigger_incdec : %d\n",inc);
  }
+ 
+
+ 
  //-------
  // Volt / Offset
  void voltTriggerValue_redraw(bool on)
  {
-     DSODisplay::drawVoltageTrigger(on, currentTrigger);
-     Logger("voltTriggerValue_redraw : redraw %d\n",on);     
+    float conv=DSOCapture::getVoltToPix();
+    float  v=DSOCapture::getTriggerVoltage();
+    DSODisplay::drawVoltageTrigger(on, v*conv);
+    DSODisplay::printTriggerValue( v,on);
+    Logger("voltTriggerValue_redraw : redraw %d\n",on);     
  }
  void voltTriggerValue_incdec(int inc)
  {
      Logger("voltTriggerValue_incdec : %d\n",inc);
      if(inc)
      {
-        DSODisplay::drawVoltageTrigger(false, currentTrigger);
-        currentTrigger+=inc;
-        DSODisplay::printTriggerValue(currentTrigger,true);
-        DSODisplay::drawVoltageTrigger(true, currentTrigger);
+        float conv=DSOCapture::getVoltToPix();
+        float  v=DSOCapture::getTriggerVoltage();
+        DSODisplay::drawVoltageTrigger(false, v*conv);
+        v+=(float)inc/conv;
+        DSOCapture::setTriggerVoltage(v);
      }
  }
  /**
@@ -83,6 +90,7 @@ struct UI_eventCallbacks;
  {     
      Logger("voltTriggerValue_redraw : redraw %d\n",on);
      DSODisplay::drawTime(DSOCapture::getTimeBaseAsText(),on);
+     
  }
  /**
   * 
@@ -137,6 +145,8 @@ const UI_eventCallbacks timeMenu= {DSOControl::DSO_BUTTON_TIME,NULL, &time_redra
          if(m) 
              m->redraw(false);
      }
+     // Secondary menu
+     triggerValueMenu.redraw(false);
  }
  
  void processUiEvent()
@@ -187,6 +197,12 @@ const UI_eventCallbacks timeMenu= {DSOControl::DSO_BUTTON_TIME,NULL, &time_redra
                                 DSOCapture::startCapture(240);
                                 break;
                             }
+                            case DSOControl::DSO_BUTTON_VOLTAGE:
+                                DSOCapture::stopCapture();
+                                autoSetup();
+                                redrawEverything();
+                                DSOCapture::startCapture(240);
+                                break;
                             default:
                                Logger("Unhandled ui key long press\n");
                                break;
