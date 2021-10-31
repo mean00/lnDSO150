@@ -37,6 +37,8 @@
 
 #define LINE_OFFSET 4
 
+#define DSO_LOW_BAR_BUTTON  64
+
 #define DSO_CHAR_HEIGHT 20
 #define DSO_HEIGHT_OFFSET 1
 #define DSO_INFO_START_COLUMN (248)
@@ -63,6 +65,7 @@ extern const uint8_t *getSplash();
 #define MAX_ROW   2
 #define FREQ_ROW  4
 #define AVRG_ROW  6
+#define TRIGGER_ROW  8
 
 
 class AutoGfx
@@ -340,10 +343,18 @@ void prettyPrint(float x,int maxW=0)
 }
 
 
-char tmpBuf[10];
     
-#define AND_ONE_F(x,y) { snprintf(tmpBuf,9,"%2.2f",x);tft->print(DSO_INFO_START_COLUMN+4, DSO_HEIGHT_OFFSET+(y+1)*DSO_CHAR_HEIGHT,tmpBuf/*,DSO_INFO_MAX_WIDTH*/);}    
 
+
+
+/**
+ * 
+ */
+static void drawInfo(int line, const char *info,int color)
+{
+
+    tft->print(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(line+1)*DSO_CHAR_HEIGHT-LINE_OFFSET,info);
+}
 /**
  * 
  */
@@ -353,7 +364,28 @@ static void drawInfoHeader(int line, const char *info,int color)
     tft->square(color,
             DSO_INFO_START_COLUMN,             DSO_HEIGHT_OFFSET+(line)*DSO_CHAR_HEIGHT+3-LINE_OFFSET,
             320-DSO_INFO_START_COLUMN,         DSO_CHAR_HEIGHT);
-    tft->print(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(line+1)*DSO_CHAR_HEIGHT-LINE_OFFSET,info/*,DSO_INFO_MAX_WIDTH*/);
+    tft->print(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(line+1)*DSO_CHAR_HEIGHT-LINE_OFFSET,info);
+}
+
+
+/**
+ * 
+ * @param mode
+ * @param volt
+ */
+void DSODisplay::printTriggerValue( float volt,bool hilight)
+{    
+    AutoGfx autogfx;    
+    if(hilight)
+        tft->setTextColor(BLACK,WHITE);
+    else
+        tft->setTextColor(WHITE,BLACK);
+    
+    tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(TRIGGER_ROW+1+1)*DSO_CHAR_HEIGHT-5);
+    prettyPrint(volt,320-DSO_INFO_START_COLUMN);
+    
+    
+       
 }
 /**
  * 
@@ -385,42 +417,19 @@ void DSODisplay::drawStatsBackGround()
  */
 void  DSODisplay::printOffset(float volt)
 {
-    AND_ONE_F(volt,11);      
+//    AND_ONE_F(volt,11);      
 }
 
-/**
- * 
- * @param mode
- * @param volt
- */
-void DSODisplay::printTriggerValue( float volt,bool hilight)
-{    
-    AutoGfx autogfx;
-    if(hilight)
-        tft->setTextColor(BLACK,WHITE);
-    else
-        tft->setTextColor(WHITE,BLACK);
-    AND_ONE_F(volt,9);      
-}
 
 void lowBarPrint(int column, const char *st)
 {
     AutoGfx autogfx;
     
-    tft->setCursor((column-1)*64+1, 240-2); 
-    tft->square(0,(column-1)*64+1, 240-20,64,20);
+    tft->setCursor((column-1)*DSO_LOW_BAR_BUTTON+1, 240-2); 
+    tft->square(0,(column-1)*DSO_LOW_BAR_BUTTON+1, 240-20,DSO_LOW_BAR_BUTTON,20);
     tft->print(st);
 }
-#define LOWER_BAR_PRINT(x,y) { tft->setCursor(x*64, 240-18); tft->print(y); /*myDrawString(x,64);*/}            
-#define LOWER_BAR_PRINT_NCHARS(x,y,n) { tft->setCursor(y*64, 240-18); tft->myDrawString(x,n*18);}            
     
-#define HIGHER_BAR_PRINT(x,y) { tft->print(y*64, 1,x/*,64*/);}            
-
-#define SELECT(md)   { if(md==mode) tft->setTextColor(BLACK,BG_COLOR); else  tft->setTextColor(BG_COLOR,BLACK);}
-#define LOWER_BAR(mode,st,column) {SELECT(mode);    LOWER_BAR_PRINT(st,column);}
-#define LOWER_BAR_NCHAR(mode,st,column) {SELECT(mode);    LOWER_BAR_PRINT_NCHARS(st,column,4);}    
-   
-#define HIGHER_BAR(mode,st,column) {SELECT(mode);HIGHER_BAR_PRINT(st,column);}
 
 static void genericDraw(int column,const char *v,bool highlight)
 {
@@ -443,6 +452,22 @@ void DSODisplay::drawTrigger(const char *v, bool highlight) { genericDraw(TRIGGE
 void DSODisplay::drawTime(const char *v, bool highlight)    { genericDraw(TIME_MODE,   v,highlight);}
 void DSODisplay::drawCoupling(const char *v, bool highlight){ genericDraw(ARMING_MODE, v,highlight);}
 
+/**
+ * 
+ * @param mode
+ */
+void  DSODisplay::drawArmingMode(DSO_ArmingMode arming)
+{       
+    const char *armingString="?";
+    switch(arming)
+    {
+        case DSO_CAPTURE_SINGLE: armingString="SING";break;
+        case DSO_CAPTURE_MULTI: armingString="REPT";break;
+        case DSO_CAPTURE_CONTINUOUS: armingString="CONT";break;
+            default:            xAssert(0);            break;
+    }   
+    tft->print(0*DSO_LOW_BAR_BUTTON, 1,armingString);
+}
 /**
  * 
  * @return 
@@ -483,22 +508,6 @@ void DSODisplay::drawAutoSetupStep(int i )
      
  }
 
-/**
- * 
- * @param mode
- */
-void  DSODisplay::drawArmingMode(DSO_ArmingMode arming)
-{       
-    const char *armingString="?";
-    switch(arming)
-    {
-        case DSO_CAPTURE_SINGLE: armingString="SING";break;
-        case DSO_CAPTURE_MULTI: armingString="REPT";break;
-        case DSO_CAPTURE_CONTINUOUS: armingString="CONT";break;
-            default:            xAssert(0);            break;
-    }    
-    HIGHER_BAR_PRINT(armingString,0);
-}
 /**
  * 
  * @param triggered
