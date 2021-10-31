@@ -15,7 +15,7 @@ It is a follow up of the other firmware (DSO_STM32Duino) with the following chan
 __Features__ :
 
 * Screen support for both  ST7789 and ILI9341, autodetected
-* Supports STM32F103 GD32F303, GD32VF103 (the later is ~ 2 times faster)
+* Supports STM32F103 GD32F303, GD32VF103 (the GD32F303 is ~ 2 times faster)
 * Only supports modified unit where rotary encoder is connected to PB14/PB15, see wiki. It will NOT work with unmodified DSO
 
 ![screenshot](gfx/front.jpg?raw=true "front")

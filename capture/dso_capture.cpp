@@ -20,6 +20,7 @@ DSOCapture::captureState DSOCapture::_state=DSOCapture::CAPTURE_STOPPED;
 
 float      DSOCapture::_triggerVolt=1.0;
 int        DSOCapture::_triggerAdc=2048;
+DSOCapture::TriggerMode  DSOCapture::_triggerMode;
 
 
 /**
@@ -38,7 +39,39 @@ void                            DSOCapture::setTriggerVoltage(const float &s)
 {
     _triggerVolt=s;
 }
-
+/**
+ * 
+ * @param mode
+ */
+void          DSOCapture::setTriggerMode(TriggerMode mode)
+{
+    _triggerMode=mode;
+}
+/**
+ * 
+ * @return 
+ */
+DSOCapture::TriggerMode     DSOCapture::getTriggerMode()
+{
+    return _triggerMode;
+}
+/**
+ * 
+ * @return 
+ */
+const char *      DSOCapture::getTriggerModeAsText()
+{
+#define TTT(x,y) case x:  return y;break;
+    switch(_triggerMode)
+    {
+        TTT(Trigger_Rising,"Down")
+        TTT(Trigger_Falling,"Up")
+        TTT(Trigger_Both,"Both")
+        TTT(Trigger_Run,"None")
+        default: xAssert(0);break;
+    }
+    return NULL;
+}
 
 /**
  * 
@@ -237,3 +270,4 @@ bool DSOCapture::getData(int &nb, float *f)
  }
 
 // EOF
+

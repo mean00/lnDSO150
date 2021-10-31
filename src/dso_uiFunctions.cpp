@@ -51,11 +51,20 @@ struct UI_eventCallbacks;
  void voltTrigger_redraw(bool on)
  {
      Logger("voltTrigger_redraw : redraw %d\n",on);
-     DSODisplay::drawTrigger("Down",on);
+     DSODisplay::drawTrigger( DSOCapture::getTriggerModeAsText(),on);
  }
  void voltTrigger_incdec(int inc)
- {
-     Logger("voltTrigger_incdec : %d\n",inc);
+ {     
+    int v=(int)DSOCapture::getTriggerMode();
+    v+=inc;
+    int mod=1+(int)(DSOCapture::Trigger_Run);
+    while(v<0)
+    {
+       v+=mod;
+    }
+    v%=mod;
+    DSOCapture::setTriggerMode((DSOCapture::TriggerMode)v);
+    Logger("voltTrigger_incdec : %d\n",inc);
  }
  
 

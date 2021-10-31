@@ -77,6 +77,9 @@ public:
     
 public:
     static void                            initialize(lnPin pin);
+    static void                            setTriggerMode(TriggerMode mode);
+    static TriggerMode                     getTriggerMode();
+    static const char *                    getTriggerModeAsText();
     static float                           getTriggerVoltage();
     static void                            setTriggerVoltage(const float &s);
     static bool                            setVoltageRange(DSOCapture::DSO_VOLTAGE_RANGE voltRange);
@@ -116,6 +119,7 @@ public:
     static lnDSOAdc                         *_adc;
     static float                            _triggerVolt;
     static int                              _triggerAdc;
+    static TriggerMode                      _triggerMode;
 };
 
 
