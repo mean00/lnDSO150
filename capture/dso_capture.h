@@ -77,6 +77,7 @@ public:
     
 public:
     static void                            initialize(lnPin pin);
+    static void                            setCouplingMode(int isAc) {_couplingModeIsAC=isAc;}
     static void                            setTriggerMode(TriggerMode mode);
     static TriggerMode                     getTriggerMode();
     static const char *                    getTriggerModeAsText();
@@ -120,6 +121,7 @@ public:
     static float                            _triggerVolt;
     static int                              _triggerAdc;
     static TriggerMode                      _triggerMode;
+    static bool                             _couplingModeIsAC;
 };
 
 

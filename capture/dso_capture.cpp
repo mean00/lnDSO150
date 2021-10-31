@@ -21,7 +21,7 @@ DSOCapture::captureState DSOCapture::_state=DSOCapture::CAPTURE_STOPPED;
 float      DSOCapture::_triggerVolt=1.0;
 int        DSOCapture::_triggerAdc=2048;
 DSOCapture::TriggerMode  DSOCapture::_triggerMode;
-
+bool       DSOCapture::_couplingModeIsAC;
 
 /**
  * 

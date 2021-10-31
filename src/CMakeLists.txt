@@ -6,6 +6,7 @@ ADD_LIBRARY(  sourceLib
                 dso_display.cpp dso_mainLoop.cpp dso_uiFunctions.cpp
                 dso_calibrate.cpp
                 dso_autoSetup.cpp
+                dso_show_capture.cpp
                 )
 
         
