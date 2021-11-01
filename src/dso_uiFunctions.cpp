@@ -42,6 +42,8 @@ struct UI_eventCallbacks;
  {
      Logger("voltOffset_redraw : redraw %d\n",on);
  }
+ /*
+  */
  void voltOffset_incdec(int inc)
  {
      Logger("VolOffset : %d\n",inc);
@@ -53,6 +55,10 @@ struct UI_eventCallbacks;
      Logger("voltTrigger_redraw : redraw %d\n",on);
      DSODisplay::drawTrigger( DSOCapture::getTriggerModeAsText(),on);
  }
+ /**
+  * 
+  * @param inc
+  */
  void voltTrigger_incdec(int inc)
  {     
     int v=(int)DSOCapture::getTriggerMode();
@@ -66,9 +72,6 @@ struct UI_eventCallbacks;
     DSOCapture::setTriggerMode((DSOCapture::TriggerMode)v);
     Logger("voltTrigger_incdec : %d\n",inc);
  }
- 
-
- 
  //-------
  // Volt / Offset
  void voltTriggerValue_redraw(bool on)
@@ -79,6 +82,10 @@ struct UI_eventCallbacks;
     DSODisplay::printTriggerValue( v,on);
     Logger("voltTriggerValue_redraw : redraw %d\n",on);     
  }
+ /**
+  * 
+  * @param inc
+  */
  void voltTriggerValue_incdec(int inc)
  {
      Logger("voltTriggerValue_incdec : %d\n",inc);
@@ -98,8 +105,7 @@ struct UI_eventCallbacks;
  void time_redraw(bool on)
  {     
      Logger("voltTriggerValue_redraw : redraw %d\n",on);
-     DSODisplay::drawTime(DSOCapture::getTimeBaseAsText(),on);
-     
+     DSODisplay::drawTime(DSOCapture::getTimeBaseAsText(),on);     
  }
  /**
   * 
@@ -126,8 +132,8 @@ const UI_eventCallbacks timeMenu= {DSOControl::DSO_BUTTON_TIME,NULL, &time_redra
 
 #define NB_TOP_MENU 8
    
- static const UI_eventCallbacks  *topMenus[NB_TOP_MENU]=
- {
+static const UI_eventCallbacks  *topMenus[NB_TOP_MENU]=
+{
      NULL,NULL,NULL, // up / down
      NULL,          //DSO_BUTTON_ROTARY= 3
      &voltMenu,     //DSO_BUTTON_VOLTAGE=4,
@@ -145,7 +151,9 @@ const UI_eventCallbacks timeMenu= {DSOControl::DSO_BUTTON_TIME,NULL, &time_redra
  /**
   * 
   */
- 
+ /**
+  * 
+  */
  void initUiEvent()
  {
      for( int i=0;i<NB_TOP_MENU;i++)
@@ -158,6 +166,27 @@ const UI_eventCallbacks timeMenu= {DSOControl::DSO_BUTTON_TIME,NULL, &time_redra
      triggerValueMenu.redraw(false);
  }
  
+ /**
+  * 
+  */
+ void processStartStop()
+ {
+     // toggle start /stop
+    switch(DSOCapture::state())
+    {
+        case DSOCapture:: CAPTURE_STOPPED:        
+            DSOCapture::startCapture(240);
+            break;
+        case DSOCapture:: CAPTURE_RUNNING:                                    
+        case DSOCapture:: CAPTURE_DONE:
+            DSOCapture::stopCapture();
+            break;
+
+    } 
+ }
+ /**
+  * 
+  */
  void processUiEvent()
  {
      while(1)
@@ -174,18 +203,8 @@ const UI_eventCallbacks timeMenu= {DSOControl::DSO_BUTTON_TIME,NULL, &time_redra
                         
                         if(key==DSOControl::DSO_BUTTON_ROTARY)
                         {
-                            // toggle start /stop
-                            switch(DSOCapture::state())
-                            {
-                                case DSOCapture:: CAPTURE_STOPPED:        
-                                    DSOCapture::startCapture(240);
-                                    break;
-                                case DSOCapture:: CAPTURE_RUNNING:                                    
-                                case DSOCapture:: CAPTURE_DONE:
-                                    DSOCapture::stopCapture();
-                                    break;
-
-                            }
+                            processStartStop();
+                            return;
                         }
                         
                         if(currentMenu)

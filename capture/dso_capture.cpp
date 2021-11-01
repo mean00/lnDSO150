@@ -27,7 +27,7 @@ bool       DSOCapture::_couplingModeIsAC=0;
  * 
  * @return 
  */
-float                           DSOCapture::getTriggerVoltage()
+float      DSOCapture::getTriggerVoltage()
 {
     return _triggerVolt;
 }
@@ -35,7 +35,7 @@ float                           DSOCapture::getTriggerVoltage()
  * 
  * @param s
  */
-void                            DSOCapture::setTriggerVoltage(const float &s)
+void      DSOCapture::setTriggerVoltage(const float &s)
 {
     _triggerVolt=s;
 }

@@ -125,10 +125,14 @@ static const char *fq2Text(int fq)
     static char buff[16];
     float  f=fq;
     const char *suff="";
-#define STEP(x,t)  if(f>x)     {suff=t;f/=(float)x;}else
+#define STEP(x,t)  if((int)f>x)     {suff=t;f/=(float)x;}else
 
     STEP(1000000,"M")
     STEP(1000,"K")
+    {        
+    }            
+            
+            
     if(*suff)
         sprintf(buff,"%2.1f%s",f,suff);
     else

@@ -12,7 +12,7 @@ static int fdelta[16];
 static int dex=0;
 
 
-extern uint16_t internalAdcBuffer[];
+extern uint16_t *internalAdcBuffer;
 
 static void getMinMax(int xsamples, uint16_t *data, int *xmi, int *xma)
 {
@@ -37,7 +37,9 @@ int DSOCapture::computeFrequency()
     if(fint)
     {
             float f=fint;
-            f=((float)timerBases[currentTimeBase].fq)*1000./f;
+            // Period is f*1/base
+            // so fq=base/f
+            f=(((float)timerBases[currentTimeBase].fq)*1000.)/f;
             return (int)f;
 
     }else  

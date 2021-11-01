@@ -5,7 +5,7 @@
 
 extern float      *captureBuffer;
 extern uint8_t    *displayData;
-
+uint32_t lastRefresh=0;
 
 /**
  */
@@ -15,7 +15,19 @@ void showCapture()
     int nb;
     // display
     // next
-    int fq=DSOCapture::computeFrequency();
+    uint32_t now=lnGetMs();
+    if(now<lastRefresh)
+    {
+        now=0;
+    }
+    if(now>lastRefresh+10)
+    {
+        lastRefresh=now;
+        int fq=DSOCapture::computeFrequency();
+        Logger("F:%d\n",fq);
+        DSODisplay::drawFq(fq); 
+    }
+    
     DSOCapture::getData(nb,captureBuffer);
     // convert data to display
     float displayGain=DSOCapture::getVoltToPix();
@@ -36,6 +48,6 @@ void showCapture()
     DSOCapture::startCapture(240);
     DSODisplay::drawWaveForm(nb,displayData);
     DSODisplay::drawMinMax(vMin,vMax);
-    DSODisplay::drawFq(fq);        
+           
 }
 // EOF

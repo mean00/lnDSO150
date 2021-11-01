@@ -47,6 +47,9 @@ lnDSOAdc::~lnDSOAdc()
 bool     lnDSOAdc::setSource(  int fq,lnPin pin,lnADC_DIVIDER divider,lnADC_CYCLES cycles, int overSamplingLog2)
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
+    
+    //overSamplingLog2=0;
+    
     _fq=fq;    
     if(lnCpuID::vendor()==lnCpuID::LN_MCU_GD32)
     {        
