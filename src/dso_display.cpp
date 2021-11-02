@@ -127,8 +127,8 @@ static const char *fq2Text(int fq)
     const char *suff="";
 #define STEP(x,t)  if((int)f>x)     {suff=t;f/=(float)x;}else
 
-    STEP(1000000,"M")
-    STEP(1000,"K")
+    STEP(1100000,"M")
+    STEP(1100,"K")
     {        
     }            
             
@@ -497,6 +497,7 @@ void  DSODisplay::setMode(MODE_TYPE t)
  }
 void DSODisplay::drawAutoSetupStep(int i )
  {
+    AutoGfx autogfx;
     int pg=((AUTOCAL_BOX_WIDTH-AUTOCAL_BORDER*2)*i)/3;
      tft-> fillRoundRect(320/2-AUTOCAL_BOX_WIDTH/2+AUTOCAL_BORDER,
                          240/2-AUTOCAL_BOX_HEIGHT/2+AUTOCAL_BORDER, 

@@ -268,6 +268,64 @@ bool DSOCapture::getData(int &nb, float *f)
     }
     return true;       
  }
+/**
+ * \fn getMaxVoltageValue
+ * \brief return the max absolute voltage for the current selected voltage range
+ * It the actual value is higher than max it means either ADC saturates or we can't display it
+ * @return 
+ */
+float        DSOCapture::getMaxVoltageValue()
+{
+     // we want to have less than 80% pixels= 100 (i.e. half screen), else it means saturation
+   
+    float gain=vSettings[currentVoltageRange].displayGain;
+    float v=116./gain;
+    return v;
+}
+/**
+ * 
+ * @return 
+ */
+float        DSOCapture::getMinVoltageValue()
+{
+    // Same but for 2 blocks i.e. 2*24=48 pixel
+   
+    float gain=vSettings[currentVoltageRange].displayGain;
+    float v=44./gain;
+    return v;
+}
+/**
+ * 
+ * @param timeBase
+ * @return 
+ */
+int         DSOCapture::timeBaseToFrequency(DSOCapture::DSO_TIME_BASE timeBase)
+{
+#define CASE(x,y) case DSO_TIME_BASE_##x: return y;break;
+    
+    switch(timeBase)
+    {
+        //CASE(5US,   500*1000) 
+        CASE(10US,  100*1000) 
+        CASE(20US,  40*1000) 
+        CASE(50US,  20*1000) 
+        CASE(100US, 10*1000) 
+        CASE(200US, 5*1000) 
+        CASE(500US, 2*1000) 
+        CASE(1MS,   1000) 
+        CASE(2MS,   500) 
+        CASE(5MS,   200) 
+        CASE(10MS,  100) 
+        CASE(20MS,  50) 
+        CASE(50MS,  20) 
+        CASE(100MS, 10) 
+        CASE(200MS, 5) 
+        CASE(500MS, 2) 
+        CASE(1S,    1)     
+    }
+    xAssert(0);
+    return 0;
+}
 
 // EOF
 

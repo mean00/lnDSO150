@@ -98,6 +98,7 @@ public:
     static const char *                    getTimeBaseAsText();
 
     static                                  void setCb(captureCb *cb);
+    static                                  captureCb *getCb() {return _cb;}
     static                                  bool getData(int &nb, float *f);
     static                                  bool startCapture(int nb);
     static                                  void stopCapture();
@@ -106,6 +107,13 @@ public:
     static float                            getVoltToPix();
     static int                              computeFrequency();
     static DSOCapture::captureState                     state() {return _state;};
+    
+    static float        getMaxVoltageValue();
+    static float        getMinVoltageValue();
+    static int          timeBaseToFrequency(DSOCapture::DSO_TIME_BASE timeBase);
+
+    
+    
 protected:
     static int                             computeFrequency_(int xsamples,uint16_t *data);
     static int                             currentVoltageRange;

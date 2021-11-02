@@ -24,7 +24,7 @@ void showCapture()
     {
         lastRefresh=now;
         int fq=DSOCapture::computeFrequency();
-        Logger("F:%d\n",fq);
+      //  Logger("F:%d\n",fq);
         DSODisplay::drawFq(fq); 
     }
     

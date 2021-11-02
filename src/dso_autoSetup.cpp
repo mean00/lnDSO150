@@ -12,14 +12,27 @@
 
 static bool autoSetupVoltage(bool setTrigger);
 static bool autoSetupFrequency();
+static captureCb *oldCb;
+static xBinarySemaphore *sem=NULL;
+static float *capture=NULL;
+void setupCb()
+{
+    sem->give();
+}
 
 /**
  * 
  */
 void        autoSetup()
 {
-    DSOCapture::stopCapture();
+   capture=new float[240];
+   DSOCapture::stopCapture();
+   if(!sem) sem=new xBinarySemaphore;
+    
     DSODisplay::drawAutoSetup();
+    oldCb=DSOCapture::getCb();
+    DSOCapture::setCb(setupCb);
+    
     // switch to free running mode
     
  //   DSOCapture::setTriggerMode(DSOCapture::Trigger_Run);
@@ -40,6 +53,8 @@ void        autoSetup()
     DSODisplay::drawAutoSetupStep(3);    
 end:    
     DSOCapture::stopCapture();
+    DSOCapture::setCb(oldCb);
+    delete [] capture;
     return;
    
 }
@@ -53,49 +68,43 @@ bool autoSetupVoltage(bool setTrigger)
     int voltage=DSOCapture::DSO_VOLTAGE_5V;
     DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)voltage);
     
-#if 0
     int tries=NB_CAPTURE_VOLTAGE+2;
-    while(!clock.elapsed(2000))
+    int nb;
+    while(1) //!clock.elapsed(2000))
     {
-        int n=DSOCapture::capture(240,test_samples,stats);
-        if(!n)
-            continue;
+        sem->tryTake();
+        DSOCapture::startCapture(240);
+        sem->take();
+        DSOCapture::getData(nb,capture);
         
-        float  xmin= stats.xmin;
-        float  xmax= stats.xmax;
-        
-        xmin=fabs(xmin);
-        xmax=fabs(xmax);
-        if(xmin>xmax) 
-            xmax=xmin;
-        clock.ok();
+        float xMax=-5000;
+        float xMin=5000;
+        for(int i=0;i<nb;i++)
+        {
+            float f=capture[i];
+            if(f>xMax) xMax=f;
+            if(f<xMin) xMin=f;
+        }
+        xMax=fabs(xMax);
+        xMin=fabs(xMin);
         
         if(tries--<0) return true; // did not converge ?
         // Are we over the max ?
-        if(xmax>DSOCapture::getMaxVoltageValue() && voltage<DSOCapture::DSO_VOLTAGE_MAX) // saturation            
+        if(xMax>DSOCapture::getMaxVoltageValue() && voltage<DSOCapture::DSO_VOLTAGE_MAX) // saturation            
         {
             voltage=voltage+1; // yes, use higher scale
             DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)voltage);
             continue;
         }
         // is it too small ?, if so take a lower (more zoom) range
-        if(xmax<DSOCapture::getMinVoltageValue() && voltage>1) // too small, voltage =0 means ground, we dont want it
+        if(xMax<DSOCapture::getMinVoltageValue() && voltage>1) // too small, voltage =0 means ground, we dont want it
         {
             voltage=voltage-1;
             DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE)voltage);
             continue;
-        }    
-        // Set the trigger
-        float med=(stats.xmin+stats.xmax)/2;
-        if(setTrigger)
-        {
-            DSOCapture::setTriggerValue(med);
-          //  DSOCapture::setTriggerMode(DSOCapture::Trigger_Rising);
-        }
-        
+        }          
         return true;
     } 
-#endif    
     return false;
 }
 
@@ -108,33 +117,29 @@ bool autoSetupFrequency()
 {
     int timeBase=(int)DSOCapture::DSO_TIME_MIN;
     DSOCapture::setTimeBase((DSOCapture::DSO_TIME_BASE)timeBase);
-#if 0    
-    CaptureStats stats;
-    StopWatch clock;
-    clock.ok();
     int tries=20;
     while(1)
     {
-        if(clock.elapsed(2000) || timeBase>DSOCapture::DSO_TIME_BASE_MAX)
+        if( timeBase>DSOCapture::DSO_TIME_BASE_MAX)
         {
             break;
         }
     
-        int n=DSOCapture::capture(240,test_samples,stats);
-        if(!n)
-            continue;
-        if(tries--<0) return true; // did not converge ?
-        if(stats.frequency>30)
+        DSOCapture::startCapture(240);
+        sem->take();        
+        // get fq 
+        int fq=DSOCapture::computeFrequency();
+        Logger("timeBase: %d Fq=%d\n",timeBase,fq);
+        if(fq)
         {
-            // Try to get fq = 4 square
-            int fq=DSOCapture::timeBaseToFrequency((DSOCapture::DSO_TIME_BASE)timeBase);
-            if(0 || stats.frequency<= fq*4)
+            if(fq>30)
             {
-                //
-                // Readjust trigger
-                float trigger=(stats.xmax+stats.xmin)/2.;
-                DSOCapture::setTriggerValue(trigger);
-                return true;
+                // Try to get fq = 4 square
+                int qfq=DSOCapture::timeBaseToFrequency((DSOCapture::DSO_TIME_BASE)timeBase);
+                if(fq<= qfq*4)
+                {                    
+                    return true;
+                }
             }
         }
         timeBase++;
@@ -142,6 +147,5 @@ bool autoSetupFrequency()
         DSOCapture::setTimeBase((DSOCapture::DSO_TIME_BASE)timeBase);
     } 
     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_1MS);
-#endif    
     return false;
 }

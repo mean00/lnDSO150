@@ -244,10 +244,14 @@ static const UI_eventCallbacks  *topMenus[NB_TOP_MENU]=
                                 break;
                             }
                             case DSOControl::DSO_BUTTON_VOLTAGE:
+                            {
                                 DSOCapture::stopCapture();
                                 autoSetup();
-                                redrawEverything();
+                                redrawEverything();                                
+                                currentMenu=NULL;
+                                initUiEvent();                                
                                 DSOCapture::startCapture(240);
+                            }
                                 break;
                             default:
                                Logger("Unhandled ui key long press\n");

@@ -79,17 +79,11 @@ void loop()
     ili->setTextColor(GREEN,BLACK);
     
     
-    
-    
-    
     DSO_GFX::init(ili);
     DSODisplay::init(ili);
     DSODisplay::drawSplash();
     
     testFunc2();
-   
-   
-    
     
     mainLoop();       
 }

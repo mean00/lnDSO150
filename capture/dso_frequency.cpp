@@ -94,13 +94,13 @@ int DSOCapture::computeFrequency_(int xsamples,uint16_t *data)
     if(nbSample<3) return 0; // not enough points
     int sum=0;
     int *v=fdelta;
-    int usableSamples=nbSample-1;
-    for(int i=0;i<usableSamples;i++)
+    int usableSamples=nbSample;
+    for(int i=1;i<usableSamples;i++)
     {
         sum+=v[1]-v[0];
         v++;
     }
-    sum=(1000*sum)/usableSamples; 
+    sum=(1000*sum)/(usableSamples-1); 
     return sum;
 }
 // EOF
