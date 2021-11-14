@@ -11,10 +11,15 @@
 #include "dso_adc.h"
 #include "lnCpuID.h"
 
-
+static lnDSOAdc *_currentInstance=NULL;
+extern lnDSOAdc::lnDSOADC_State DSOCapture_getWatchdog(lnDSOAdc::lnDSOADC_State state, int &mn, int &mxv);
 //------------------------------------------------------------------
-
-
+void dsoAdcIRq()
+{
+    xAssert(_currentInstance);
+    _currentInstance->irqHandler();
+}
+ 
 /**
  * 
  * @param instance
@@ -27,6 +32,9 @@ lnDSOAdc::lnDSOAdc(int instance,int timer, int channel)  : lnBaseAdc(instance),
     _timer=timer;
     _fq=-1;
     _adcTimer=NULL;
+    _currentInstance=this;
+    lnDisableInterrupt(LN_IRQ_ADC0_1);
+    lnSetInterruptHandler(LN_IRQ_ADC0_1, dsoAdcIRq);
 }
 /**
  * 
@@ -36,6 +44,38 @@ lnDSOAdc::~lnDSOAdc()
     if(_adcTimer) delete _adcTimer;
     _adcTimer=NULL;
 }
+/**
+ *  // Normally we can get here only when watchdog interrupt happens
+ */
+void lnDSOAdc::irqHandler(void)
+{
+    LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
+    switch(_state)
+    {
+        case ARMING: // Prepare for trigger, we reached an area that can trigger, reprogram watchdog for actual trigger
+        {
+                  int mn=2048,mx=2048;      
+                  _state=DSOCapture_getWatchdog(_state,mn,mx); // this is ugly
+                  adc->WDHT=mx;
+                  adc->WDLT=mn;
+                  return;
+        }
+                  break;
+        case ARMED: // the watchdog is an actual trigger here
+        {
+              _triggerLocation=_dma.getCurrentPointer()-(uint32_t)_output;
+              adc->CTL0 &=~LN_ADC_CTL0_WDEIE; 
+              adc->STAT &=~LN_ADC_STAT_WDE; 
+              _state=TRIGGERED;
+              return;
+        }
+             break;
+        default:
+              xAssert(0);
+              break;                  
+    }   
+}
+
 /**
  * 
  * @param timer
@@ -47,7 +87,7 @@ lnDSOAdc::~lnDSOAdc()
 bool     lnDSOAdc::setSource(  int fq,lnPin pin,lnADC_DIVIDER divider,lnADC_CYCLES cycles, int overSamplingLog2)
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
-    
+    _pin=pin;
     //overSamplingLog2=0;
     
     _fq=fq;    
@@ -135,8 +175,106 @@ void lnDSOAdc::dmaDone()
     adc->CTL1&=~LN_ADC_CTL1_ADCON;
     // invoke CB
     if(_cb)
-        _cb(_nbSamples);
+        _cb(_nbSamples,false);
 }
+/**
+ * 
+ * @param t
+ * @param typ
+ */
+void lnDSOAdc::dmaTriggerDone_(void *t, lnDMA::DmaInterruptType typ)
+{
+    lnDSOAdc *me=(lnDSOAdc *)t;
+    me->dmaTriggerDone(typ);
+}
+/**
+ * 
+ * @param typ
+ */
+
+void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
+{ 
+  LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
+
+  if(_state!=TRIGGERED || _dmaLoop<2)
+  {  
+    _dmaLoop++;
+    return;        
+  }
+  bool stop=false;
+  uint32_t offset=(_triggerLocation*4)/_nb;
+
+    switch(typ)
+    {
+        case lnDMA::DMA_INTERRUPT_HALF:  if(offset!=1) stop=true;break;
+        case lnDMA::DMA_INTERRUPT_FULL: if(offset!=3) stop=true;break;
+        default: xAssert(0);break;
+    }
+    if(stop)
+    {
+      _adcTimer->disable();
+      // cleanup
+      adc->CTL1&=~LN_ADC_CTL1_DMA;
+      adc->CTL1&=~LN_ADC_CTL1_CTN;
+      adc->CTL1&=~LN_ADC_CTL1_ADCON;
+      // invoke CB
+      if(_cb)
+          _cb(_nbSamples,typ==lnDMA::DMA_INTERRUPT_HALF);
+    }   
+   _dmaLoop++;
+}
+
+/**
+ * 
+ * @param n
+ * @param output
+ * @return 
+ */
+bool     lnDSOAdc::startTriggeredDma(int n,  uint16_t *output) 
+{
+    _output=output;
+    _nb=n;
+    LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;       
+    xAssert(_fq>0);
+    // Program DMA
+    _nbSamples=n;
+    _state=IDLE;
+    
+    // --Setup watchdog --
+    
+    uint32_t ctl0=adc->CTL0;
+    
+    ctl0 |=LN_ADC_CTL0_WDSC;  // watchdog on a single channel
+    ctl0 &=~LN_ADC_CTL0_WDEIE; // enable watchdog interrupt
+    ctl0 |=LN_ADC_CTL0_RWDEN; // enable watchdog on regular
+    ctl0 &=~0x1f;
+    ctl0 |=adcChannel(_pin);
+    adc->CTL0=ctl0;
+    
+    _dmaLoop=0;
+    lnEnableInterrupt(LN_IRQ_ADC0_1);    
+    
+    _dma.beginTransfer();
+    _dma.attachCallback(lnDSOAdc::dmaTriggerDone_,this);
+    
+    // Go for the "safe" area
+    int mn,mx;
+    _state=DSOCapture_getWatchdog(lnDSOAdc::IDLE,mn,mx);
+     adc->WDHT=mx;
+     adc->WDLT=mn;
+     // Enable watchdog
+     adc->CTL0 |=LN_ADC_CTL0_WDEIE; 
+    // Circular mode + both interrupt
+    _dma.doPeripheralToMemoryTransferNoLock(n, (uint16_t *)output,(uint16_t *)&( adc->RDATA),  true,true);
+    // go !
+    adc->CTL1&=~LN_ADC_CTL1_CTN;
+    adc->CTL1|=LN_ADC_CTL1_DMA;
+    _adcTimer->enable();    
+    // go !
+    adc->CTL1|=LN_ADC_CTL1_ADCON;
+    return true;
+}
+
 /**
  * 
  * @param fq
@@ -150,6 +288,11 @@ bool     lnDSOAdc::startDmaTransfer(int n,  uint16_t *output)
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;       
     xAssert(_fq>0);
+    lnDisableInterrupt(LN_IRQ_ADC0_1);
+    uint32_t ctl0=adc->CTL0;
+    ctl0 &=~LN_ADC_CTL0_WDSC; // watchdog on a single channel
+    ctl0 &=~LN_ADC_CTL0_WDEIE; // disable watchdog interrupt
+    adc->CTL0=ctl0;
     // Program DMA
     _nbSamples=n;
     _dma.beginTransfer();
@@ -172,6 +315,8 @@ void      lnDSOAdc::endCapture()
 {
       _dma.endTransfer();    // This is incorrect, should be in its own task
 }
+
+
 void lnDSOAdc:: stopCapture()
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;      

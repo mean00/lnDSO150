@@ -95,7 +95,10 @@ struct UI_eventCallbacks;
         float  v=DSOCapture::getTriggerVoltage();
         DSODisplay::drawVoltageTrigger(false, v*conv);
         v+=(float)inc/conv;
+        
+        DSOCapture::stopCapture();
         DSOCapture::setTriggerVoltage(v);
+        DSOCapture::startCapture(240);
      }
  }
  /**

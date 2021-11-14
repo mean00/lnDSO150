@@ -1,6 +1,7 @@
 
 #pragma once
 #include "lnADC.h"
+#include "dso_adc.h"
 #include "dso_adc_gain.h"
 #include "lnGPIO.h"
 #define NB_CAPTURE_VOLTAGE (11)     
@@ -103,19 +104,21 @@ public:
     static                                  bool startCapture(int nb);
     static                                  void stopCapture();
 
-    static void                             captureDone(int nb);
+    static void                             captureDone(int nb,bool mid);
     static float                            getVoltToPix();
     static int                              computeFrequency();
-    static DSOCapture::captureState                     state() {return _state;};
+    static DSOCapture::captureState         state() {return _state;};
     
-    static float        getMaxVoltageValue();
-    static float        getMinVoltageValue();
-    static int          timeBaseToFrequency(DSOCapture::DSO_TIME_BASE timeBase);
+    static lnDSOAdc::lnDSOADC_State         getWatchdog(lnDSOAdc::lnDSOADC_State s, int &mn, int &max);
+    static float                            getMaxVoltageValue();
+    static float                            getMinVoltageValue();
+    static int                              timeBaseToFrequency(DSOCapture::DSO_TIME_BASE timeBase);
 
     
     
 protected:
     static int                             computeFrequency_(int xsamples,uint16_t *data);
+    static int                             voltToADCValue(float v);
     static int                             currentVoltageRange;
     static DSO_TIME_BASE                   currentTimeBase; 
     
@@ -130,6 +133,7 @@ protected:
     static int                              _triggerAdc;
     static TriggerMode                      _triggerMode;
     static bool                             _couplingModeIsAC;
+    static bool                             _med; // if true the transfer was halted mid way
 };
 
 

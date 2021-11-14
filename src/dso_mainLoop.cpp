@@ -84,6 +84,8 @@ void mainLoop()
     DSOCapture::setCouplingMode(control->getCouplingState()==DSOControl::DSO_COUPLING_AC);
     DSODisplay::drawCoupling(control->geCouplingStateAsText(),false);
         
+    DSOCapture::setTriggerVoltage(0);
+    DSOCapture::setTriggerMode(DSOCapture::Trigger_Rising);
     DSOCapture::setCb(CaptureCb);
     DSOCapture::startCapture(240);
     

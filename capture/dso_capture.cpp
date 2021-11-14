@@ -12,6 +12,7 @@
 lnPin           DSOCapture::_pin;
 captureCb      *DSOCapture::_cb;
 int             DSOCapture::_nb;
+bool            DSOCapture::_med;
 int             DSOCapture::currentVoltageRange=0;
 DSOCapture::DSO_TIME_BASE  DSOCapture::currentTimeBase=DSOCapture::DSO_TIME_BASE_1MS;
 lnDSOAdc *DSOCapture::_adc;
@@ -33,12 +34,83 @@ float      DSOCapture::getTriggerVoltage()
 }
 /**
  * 
+ * @param current
+ * @param mn
+ * @param mxv
+ * @return 
+ */
+lnDSOAdc::lnDSOADC_State DSOCapture_getWatchdog(lnDSOAdc::lnDSOADC_State state, int &mn, int &mxv)
+{
+    return DSOCapture::getWatchdog(state, mn,mxv);
+}
+/**
+ * 
+ * @param current
+ * @param mn
+ * @param mxv
+ * @return 
+ */
+lnDSOAdc::lnDSOADC_State DSOCapture::getWatchdog(lnDSOAdc::lnDSOADC_State state, int &mn, int &mx)
+{
+    switch(state)            
+    {
+        case lnDSOAdc::IDLE: // first let's go to start state
+                switch(_triggerMode)
+                {
+                    case  Trigger_Rising:   mn=_triggerAdc;      mx=4095;           return lnDSOAdc::ARMING;break;
+                    case  Trigger_Falling:  mn=0;                mx=_triggerAdc;    return lnDSOAdc::ARMING;break;
+                    case  Trigger_Both:     mn=_triggerAdc;      mx=_triggerAdc;    return lnDSOAdc::ARMING;break;
+
+
+                    default:
+                        xAssert(0);
+                        break;
+                }                        
+        case lnDSOAdc::ARMING: // ok we are in safe zone, put the trigger
+                switch(_triggerMode)
+                {
+                    case  Trigger_Rising:   mn=0;               mx=_triggerAdc;   return lnDSOAdc::ARMED;break;
+                    case  Trigger_Falling:  mn=_triggerAdc;     mx=4095;          return lnDSOAdc::ARMED;break;
+                    case  Trigger_Both:     mn=_triggerAdc;     mx=_triggerAdc;   return lnDSOAdc::ARMED;break;
+                    default:
+                        xAssert(0);
+                        break;
+                }
+                break;
+            case    lnDSOAdc::ARMED:   return lnDSOAdc::ARMED;break;
+        default:
+            xAssert(0);
+            break;
+    }
+    return  lnDSOAdc::ARMED;
+}
+/**
+ * 
  * @param s
  */
 void      DSOCapture::setTriggerVoltage(const float &s)
 {
     _triggerVolt=s;
+    // convert volt to ADC value
+    _triggerAdc=voltToADCValue(s);
+    
 }
+
+/**
+ * 
+ * @param v
+ * @return 
+ */
+int DSOCapture::voltToADCValue(float v)
+{    
+    float out=v/DSOInputGain::getMultiplier();;
+#warning SET AC/DC mode here    
+    out+=DSOInputGain::getOffset(0 ); //INDEX_AC1_DC0()
+    return (int)out;    
+}
+
+
+
 /**
  * 
  * @param mode
@@ -190,10 +262,10 @@ void DSOCapture::initialize(lnPin pin)
  * 
  * @param n
  */
-static void captureDone(int n)
+static void captureDone(int n, bool med)
 {
     
-    DSOCapture::captureDone(n);
+    DSOCapture::captureDone(n,med);
 }
 void DSOCapture::setCb(captureCb *cb)
 {
@@ -202,10 +274,11 @@ void DSOCapture::setCb(captureCb *cb)
 /**
  * 
  */
-void DSOCapture::captureDone(int nb)
+void DSOCapture::captureDone(int nb,bool med)
 {
     xAssert(_cb);
     _state=CAPTURE_DONE;
+    _med=med;
     _cb( );
 }
 /**
@@ -229,7 +302,20 @@ bool DSOCapture::startCapture(int nb)
     }
     _adc->setCb(captureDone);
     _state=CAPTURE_RUNNING;
-    return _adc->startDmaTransfer(nb,internalAdcBuffer);
+    
+    switch(_triggerMode)
+    {
+        case   Trigger_Rising:
+        case   Trigger_Falling:
+        case   Trigger_Both:
+                            return _adc->startTriggeredDma(nb,internalAdcBuffer);
+                            break;
+        case   Trigger_Run:
+                            return _adc->startDmaTransfer(nb,internalAdcBuffer);
+                            break;
+    }
+    xAssert(0);    
+    return false;
 }
 /**
  * 
