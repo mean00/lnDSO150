@@ -265,6 +265,7 @@ bool     lnDSOAdc::startTriggeredDma(int n,  uint16_t *output)
     
     // Go for the "safe" area
     int mn,mx;
+     adc->STAT &=~LN_ADC_STAT_WDE;  // clear watchdog flag
     _state=DSOCapture_getWatchdog(lnDSOAdc::IDLE,mn,mx);
      adc->WDHT=mx;
      adc->WDLT=mn;
