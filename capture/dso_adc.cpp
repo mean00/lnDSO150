@@ -57,8 +57,10 @@ void lnDSOAdc::irqHandler(void)
                   int mn=2048,mx=2048;      
                   _state=DSOCapture_getWatchdog(_state,mn,mx); // this is ugly
                   adc->STAT &=~LN_ADC_STAT_WDE; 
+                  adc->CTL1&=~LN_ADC_CTL1_ADCON;
                   adc->WDHT=mx; // can we change the watchdog on the fly ????
                   adc->WDLT=mn;
+                  adc->CTL1|=LN_ADC_CTL1_ADCON; // re-enable ADC 
                   return;
         }
                   break;

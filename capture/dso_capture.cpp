@@ -220,7 +220,7 @@ static int lin2log2(int in)
 #define THRESHOLD_TO_PREFER_OVERSAMPLING 84
 void DSOCapture::initialize(lnPin pin)
 {
-    internalAdcBuffer=new uint16_t[1024];
+    internalAdcBuffer=new uint16_t[DSO_CAPTURE_INTERNAL_BUFFER_SIZE];
     _state=CAPTURE_STOPPED;
     _pin=pin;
     
@@ -302,16 +302,16 @@ bool DSOCapture::startCapture(int nb)
     }
     _adc->setCb(captureDone);
     _state=CAPTURE_RUNNING;
-    
+    xAssert(nb<=DSO_CAPTURE_INTERNAL_BUFFER_SIZE/2);
     switch(_triggerMode)
     {
         case   Trigger_Rising:
         case   Trigger_Falling:
         case   Trigger_Both:
-                            return _adc->startTriggeredDma(nb,internalAdcBuffer);
+                            return _adc->startTriggeredDma(DSO_CAPTURE_INTERNAL_BUFFER_SIZE,internalAdcBuffer);
                             break;
         case   Trigger_Run:
-                            return _adc->startDmaTransfer(nb,internalAdcBuffer);
+                            return _adc->startDmaTransfer(DSO_CAPTURE_INTERNAL_BUFFER_SIZE,internalAdcBuffer);
                             break;
     }
     xAssert(0);    
