@@ -55,6 +55,8 @@ extern uint16_t calibrationDC[];
     DSODisplay::drawGrid();
     DSODisplay::drawStatsBackGround();
     DSODisplay::drawCoupling(control->geCouplingStateAsText(),false);
+    DSODisplay::drawTrigger(DSOCapture::getTriggerModeAsText(),false);
+    
  }
 /**
  * 
@@ -64,7 +66,7 @@ void mainLoop()
     captureBuffer=new float[240];
     displayData=new uint8_t[240];    
     
-    redrawEverything();
+    
        
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);    
     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_1MS);    
@@ -80,12 +82,13 @@ void mainLoop()
     if(!DSOCalibrate::loadCalibrationData())
         DSOCalibrate::zeroCalibrate();
     
-    initUiEvent();
+    
     DSOCapture::setCouplingMode(control->getCouplingState()==DSOControl::DSO_COUPLING_AC);
-    DSODisplay::drawCoupling(control->geCouplingStateAsText(),false);
-        
+    DSOCapture::setTriggerMode(DSOCapture::Trigger_Run);    
     DSOCapture::setTriggerVoltage(0);
-    DSOCapture::setTriggerMode(DSOCapture::Trigger_Rising);
+    
+    redrawEverything();        
+    initUiEvent();
     DSOCapture::setCb(CaptureCb);
     DSOCapture::startCapture(240);
     
