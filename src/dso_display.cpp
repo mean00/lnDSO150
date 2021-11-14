@@ -576,7 +576,7 @@ void DSODisplay::drawSplash()
     tft->setCursor(140, 64+20*5);
     sprintf(bf,"%d Mhz",lnCpuID::clockSpeed()/1000000);
     tft->print(bf);         
-    xDelay(500);
+    xDelay(100);
 }
 
 // EOF

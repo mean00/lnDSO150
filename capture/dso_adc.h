@@ -36,7 +36,7 @@ public:
    bool         startTriggeredDma(int n,  uint16_t *output) ;
    bool         setWatchdog(int low, int high);
    void         stopCapture();
-   void         setCb(adcCb *c) { _cb=c;}
+   void         setCb(adcCb *c) { _captureCb=c;}
    void         endCapture();
 public:
     static void dmaDone_(void *foo, lnDMA::DmaInterruptType typ);
@@ -50,7 +50,7 @@ protected:
     lnDMA       _dma;
     xBinarySemaphore _dmaSem;
     lnAdcTimer *_adcTimer;
-    adcCb      *_cb;
+    adcCb      *_captureCb;
     int         _nbSamples;
     int         _pin;
     

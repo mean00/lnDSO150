@@ -56,10 +56,13 @@ void lnDSOAdc::irqHandler(void)
         {
                   int mn=2048,mx=2048;      
                   _state=DSOCapture_getWatchdog(_state,mn,mx); // this is ugly
+                  // We need to stop DMA and restart the whole thing 
+                  _dma.pause();
                   adc->STAT &=~LN_ADC_STAT_WDE; 
                   adc->CTL1&=~LN_ADC_CTL1_ADCON;
                   adc->WDHT=mx; // can we change the watchdog on the fly ????
                   adc->WDLT=mn;
+                  _dma.resume();
                   adc->CTL1|=LN_ADC_CTL1_ADCON; // re-enable ADC 
                   return;
         }
@@ -177,8 +180,8 @@ void lnDSOAdc::dmaDone()
     adc->CTL1&=~LN_ADC_CTL1_CTN;
     adc->CTL1&=~LN_ADC_CTL1_ADCON;
     // invoke CB
-    if(_cb)
-        _cb(_nbSamples,false);
+    if(_captureCb)
+        _captureCb(_nbSamples,false);
 }
 /**
  * 
@@ -221,8 +224,8 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
       adc->CTL1&=~LN_ADC_CTL1_CTN;
       adc->CTL1&=~LN_ADC_CTL1_ADCON;
       // invoke CB
-      if(_cb)
-          _cb(_nbSamples,typ==lnDMA::DMA_INTERRUPT_HALF);
+      if(_captureCb)
+          _captureCb(_nbSamples,typ==lnDMA::DMA_INTERRUPT_HALF);
     }   
    _dmaLoop++;
 }
