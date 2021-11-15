@@ -136,8 +136,8 @@ const char *      DSOCapture::getTriggerModeAsText()
 #define TTT(x,y) case x:  return y;break;
     switch(_triggerMode)
     {
-        TTT(Trigger_Rising,"Down")
-        TTT(Trigger_Falling,"Up")
+        TTT(Trigger_Rising,"Up")        // it is inverted !
+        TTT(Trigger_Falling,"Down")     // it is inverted !
         TTT(Trigger_Both,"Both")
         TTT(Trigger_Run,"None")
         default: xAssert(0);break;
@@ -279,7 +279,7 @@ void DSOCapture::captureDone(int nb,bool med)
     xAssert(_cb);
     _state=CAPTURE_DONE;
     _med=med;
-    _cb( );
+    _cb( ); // Data are in the internal buffer, warn client
 }
 /**
  * 
@@ -335,6 +335,36 @@ void DSOCapture::stopCapture()
 }
 
 /**
+ */
+int  DSOCapture::lookupTrigger(int medOffset)
+{
+    int half=_nb/2;
+     for(int i=half;i<DSO_CAPTURE_INTERNAL_BUFFER_SIZE-half-1;i++)
+     {
+            int cur=internalAdcBuffer[(i+medOffset)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE];
+            int next=internalAdcBuffer[(i+medOffset+1)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE];
+            switch(_triggerMode)
+            {
+                case   Trigger_Rising:
+                    if(cur<_triggerAdc && next >=_triggerAdc) return i-half;
+                    break;
+                case   Trigger_Falling:
+                    if(cur>_triggerAdc && next <=_triggerAdc) return i-half;
+                    break;                    
+                case   Trigger_Both:
+                    return 0;
+                    break;
+                default:
+                    xAssert(0);
+            }
+    }
+    Logger("Cannot find trigger\n");
+    return 0;
+}
+            
+
+
+/**
  * 
  * @param nb
  * @param f
@@ -344,11 +374,16 @@ bool DSOCapture::getData(int &nb, float *f)
 {
     _adc->endCapture();
     nb=_nb;
+    int medOffset=_med*(DSO_CAPTURE_INTERNAL_BUFFER_SIZE/2);
+    int startOffset=0;
+    if(_triggerMode!=Trigger_Run)
+        startOffset=lookupTrigger(medOffset);
+    
     int offset=DSOInputGain::getOffset(_couplingModeIsAC);
     float multiplier=DSOInputGain::getMultiplier();
     for(int i=0;i<_nb;i++)
     {
-        int fint=(int)internalAdcBuffer[i]-offset;
+        int fint=(int)internalAdcBuffer[(i+medOffset+startOffset)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE]-offset;
         float z=(float)fint*multiplier;
         f[i]=z; // now in volt
     }

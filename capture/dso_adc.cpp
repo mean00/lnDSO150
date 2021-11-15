@@ -69,7 +69,7 @@ void lnDSOAdc::irqHandler(void)
                   break;
         case ARMED: // the watchdog is an actual trigger here
         {
-              _triggerLocation=_dma.getCurrentPointer()-(uint32_t)_output;
+              _triggerLocation=_nb-_dma.getCurrentCount();
               adc->CTL0 &=~LN_ADC_CTL0_WDEIE; 
               adc->STAT &=~LN_ADC_STAT_WDE; 
               _state=TRIGGERED;

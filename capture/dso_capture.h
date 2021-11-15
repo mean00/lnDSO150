@@ -119,6 +119,7 @@ public:
 protected:
     static int                             computeFrequency_(int xsamples,uint16_t *data);
     static int                             voltToADCValue(float v);
+    static int                             lookupTrigger(int medOffset);
     static int                             currentVoltageRange;
     static DSO_TIME_BASE                   currentTimeBase; 
     
