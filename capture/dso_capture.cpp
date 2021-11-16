@@ -13,6 +13,7 @@ lnPin           DSOCapture::_pin;
 captureCb      *DSOCapture::_cb;
 int             DSOCapture::_nb;
 bool            DSOCapture::_med;
+int             DSOCapture::_segment;
 int             DSOCapture::currentVoltageRange=0;
 DSOCapture::DSO_TIME_BASE  DSOCapture::currentTimeBase=DSOCapture::DSO_TIME_BASE_1MS;
 lnDSOAdc *DSOCapture::_adc;
@@ -262,10 +263,10 @@ void DSOCapture::initialize(lnPin pin)
  * 
  * @param n
  */
-static void captureDone(int n, bool med)
+static void captureDone(int n, bool med,int seg)
 {
     
-    DSOCapture::captureDone(n,med);
+    DSOCapture::captureDone(n,med,seg);
 }
 void DSOCapture::setCb(captureCb *cb)
 {
@@ -274,11 +275,12 @@ void DSOCapture::setCb(captureCb *cb)
 /**
  * 
  */
-void DSOCapture::captureDone(int nb,bool med)
+void DSOCapture::captureDone(int nb,bool med,int seg)
 {
     xAssert(_cb);
     _state=CAPTURE_DONE;
     _med=med;
+    _segment=seg;
     _cb( ); // Data are in the internal buffer, warn client
 }
 /**
@@ -339,29 +341,40 @@ void DSOCapture::stopCapture()
 int  DSOCapture::lookupTrigger(int medOffset)
 {
     int half=_nb/2;
-     for(int i=half;i<DSO_CAPTURE_INTERNAL_BUFFER_SIZE-half-1;i++)
-     {
-            int cur=internalAdcBuffer[(i+medOffset)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE];
-            int next=internalAdcBuffer[(i+medOffset+1)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE];
-            switch(_triggerMode)
+    
+    switch(_triggerMode)
+    {
+        case   Trigger_Rising:
+            for(int i=half;i<DSO_CAPTURE_INTERNAL_BUFFER_SIZE-half-1;i++)
             {
-                case   Trigger_Rising:
-                    if(cur<_triggerAdc && next >=_triggerAdc) return i-half;
-                    break;
-                case   Trigger_Falling:
-                    if(cur>_triggerAdc && next <=_triggerAdc) return i-half;
-                    break;                    
-                case   Trigger_Both:
-                    return 0;
-                    break;
-                default:
-                    xAssert(0);
+                int cur=internalAdcBuffer[(i+medOffset)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE];
+                int next=internalAdcBuffer[(i+medOffset+1)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE];
+                if(cur<_triggerAdc && next >=_triggerAdc) 
+                    return i-half;
             }
+             Logger("Med=%d, seg=%d\n",_med,_segment);
+            Logger("Cannot find up trigger\n");
+            break;
+        case   Trigger_Falling:
+            for(int i=half;i<DSO_CAPTURE_INTERNAL_BUFFER_SIZE-half-1;i++)
+            {
+                int cur=internalAdcBuffer[(i+medOffset)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE];
+                int next=internalAdcBuffer[(i+medOffset+1)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE];
+                if(cur>_triggerAdc && next <=_triggerAdc) return i-half;
+                    return i-half;
+            }
+             Logger("Med=%d, seg=%d\n",_med,_segment);
+            Logger("Cannot find Down trigger\n");
+            break;
+        case   Trigger_Both:
+            return 0;
+            break;
+        default:
+            xAssert(0);
     }
-    Logger("Cannot find trigger\n");
     return 0;
 }
-            
+
 
 
 /**
@@ -374,6 +387,7 @@ bool DSOCapture::getData(int &nb, float *f)
 {
     _adc->endCapture();
     nb=_nb;
+   
     int medOffset=_med*(DSO_CAPTURE_INTERNAL_BUFFER_SIZE/2);
     int startOffset=0;
     if(_triggerMode!=Trigger_Run)

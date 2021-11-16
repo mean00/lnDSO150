@@ -15,11 +15,12 @@ void showCapture()
     int nb;
     // display
     // next
+#if 0    
     uint32_t now=lnGetMs();
     if(now<lastRefresh)
     {
         now=0;
-    }
+    }    
     if(now>lastRefresh+10)
     {
         lastRefresh=now;
@@ -27,7 +28,7 @@ void showCapture()
       //  Logger("F:%d\n",fq);
         DSODisplay::drawFq(fq); 
     }
-    
+#endif    
     DSOCapture::getData(nb,captureBuffer);
     // convert data to display
     float displayGain=DSOCapture::getVoltToPix();

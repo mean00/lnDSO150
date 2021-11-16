@@ -9,7 +9,7 @@
 #include "lnDma.h"
 #include "lnADC.h"
 
-typedef void (adcCb)(int nb,bool mid);
+typedef void (adcCb)(int nb,bool mid,int segment);
 
 /**
  * 

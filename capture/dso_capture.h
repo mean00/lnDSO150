@@ -104,7 +104,7 @@ public:
     static                                  bool startCapture(int nb);
     static                                  void stopCapture();
 
-    static void                             captureDone(int nb,bool mid);
+    static void                             captureDone(int nb,bool mid, int seg);
     static float                            getVoltToPix();
     static int                              computeFrequency();
     static DSOCapture::captureState         state() {return _state;};
@@ -135,6 +135,7 @@ protected:
     static TriggerMode                      _triggerMode;
     static bool                             _couplingModeIsAC;
     static bool                             _med; // if true the transfer was halted mid way
+    static int                              _segment; // the segment where the capture happened
 };
 
 
