@@ -48,6 +48,10 @@ lnDSOAdc::lnDSOAdc(int instance,int timer, int channel)  : lnBaseAdc(instance),
     _currentInstance=this;
     lnDisableInterrupt(LN_IRQ_ADC0_1);
     lnSetInterruptHandler(LN_IRQ_ADC0_1, dsoAdcIRq);
+    _dma.setPriority(lnDMA::DMA_PRIORITY_ULTRA_HIGH);
+#warning HARDCODED
+    lnIrqSetPriority((LnIRQ)LN_IRQ_DMA0_Channel0,6);
+    lnIrqSetPriority((LnIRQ)LN_IRQ_ADC0_1,4);
 }
 /**
  * 
@@ -91,13 +95,14 @@ void lnDSOAdc::irqHandler(void)
               // enable dma interrupt
               switch(height)
               {
-                  case 1: case 2: case 3: case 4: case 5: case 6:
+                  case 2: case 3: case 4: case 5: 
                                         _dma.setInterruptMask(true, false);  // next full
                                         break;
+                  case 1:
                   case 0:
                                         _dma.setInterruptMask(false,true);// next half
                                         break;
-                  case 7:
+                  case 6: case 7:
                                         _dma.setInterruptMask(true, false);  // next next half, so next full then next half
                                         break;
                   default:
@@ -239,7 +244,7 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
   {
       case lnDMA::DMA_INTERRUPT_FULL:
         {
-          if(height==7)
+          if(height==7 || height==6)
           {
                   _dma.setInterruptMask(false, true); // wait for the next half interrupt
                   return;
