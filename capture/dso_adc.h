@@ -8,6 +8,7 @@
 #pragma once
 #include "lnDma.h"
 #include "lnADC.h"
+#include "lnBasicTimer.h"
 
 typedef void (adcCb)(int nb,bool mid,int segment);
 
@@ -43,6 +44,7 @@ public:
     static void dmaDone_(void *foo, lnDMA::DmaInterruptType typ);
     static void dmaTriggerDone_(void *foo, lnDMA::DmaInterruptType typ);
     void        irqHandler(void);
+    void        delayIrq();
 protected:   
     void        dmaDone();
     void        dmaTriggerDone(lnDMA::DmaInterruptType typ);
@@ -59,6 +61,7 @@ protected:
     uint16_t   *_output;
     uint32_t    _triggerLocation;
     bool        _triggerHalf;
+    lnBasicDelayTimer _delayTimer;
     
 };
 // EOF

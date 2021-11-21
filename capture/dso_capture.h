@@ -101,6 +101,7 @@ public:
     static                                  void setCb(captureCb *cb);
     static                                  captureCb *getCb() {return _cb;}
     static                                  bool getData(int &nb, float *f);
+    static                                  bool getDataTriggered(int &nb, float *f);
     static                                  bool startCapture(int nb);
     static                                  void stopCapture();
 
@@ -135,7 +136,7 @@ protected:
     static TriggerMode                      _triggerMode;
     static bool                             _couplingModeIsAC;
     static bool                             _med; // if true the transfer was halted mid way
-    static int                              _segment; // the segment where the capture happened
+    static int                              _triggerLocation; // the segment where the capture happened, not accurate
 };
 
 

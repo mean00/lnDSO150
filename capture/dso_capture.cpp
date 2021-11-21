@@ -13,7 +13,7 @@ lnPin           DSOCapture::_pin;
 captureCb      *DSOCapture::_cb;
 int             DSOCapture::_nb;
 bool            DSOCapture::_med;
-int             DSOCapture::_segment;
+int             DSOCapture::_triggerLocation;
 int             DSOCapture::currentVoltageRange=0;
 DSOCapture::DSO_TIME_BASE  DSOCapture::currentTimeBase=DSOCapture::DSO_TIME_BASE_1MS;
 lnDSOAdc *DSOCapture::_adc;
@@ -280,7 +280,7 @@ void DSOCapture::captureDone(int nb,bool med,int seg)
     xAssert(_cb);
     _state=CAPTURE_DONE;
     _med=med;
-    _segment=seg;
+    _triggerLocation=seg;
     _cb( ); // Data are in the internal buffer, warn client
 }
 /**
@@ -358,7 +358,7 @@ int  DSOCapture::lookupTrigger(int medOffset)
                     return i+start;
                 cur++;
             }
-            Logger("Med=%d, seg=%d\n",_med,_segment);
+            Logger("Med=%d, seg=%d\n",_med,_triggerLocation);
             Logger("Cannot find up trigger\n");
         }
             break;
@@ -372,7 +372,7 @@ int  DSOCapture::lookupTrigger(int medOffset)
                     return i+start;
                 cur++;
             }
-            Logger("Med=%d, seg=%d\n",_med,_segment);
+            Logger("Med=%d, seg=%d\n",_med,_triggerLocation);
             Logger("Cannot find Down trigger\n");
         }
             break;
@@ -386,7 +386,21 @@ int  DSOCapture::lookupTrigger(int medOffset)
 }
 
 
-
+bool DSOCapture::getDataTriggered(int &nb, float *f)
+{
+    
+    
+    
+    int offset=DSOInputGain::getOffset(_couplingModeIsAC);
+    float multiplier=DSOInputGain::getMultiplier();
+    for(int i=0;i<_nb;i++)
+    {
+        int fint=(int)internalAdcBuffer[(i)]-offset;
+        float z=(float)fint*multiplier;
+        f[i]=z; // now in volt
+    } 
+    return true;
+}
 /**
  * 
  * @param nb
@@ -398,31 +412,16 @@ bool DSOCapture::getData(int &nb, float *f)
     _adc->endCapture();
     nb=_nb;
    
-    int startOffset=0;
     if(_triggerMode!=Trigger_Run)
     {
-        if(_med) // make the buffer linear
-        {
-            uint16_t *left=internalAdcBuffer,*right=internalAdcBuffer+DSO_CAPTURE_INTERNAL_BUFFER_SIZE/2;
-            
-            for(int i=0;i<DSO_CAPTURE_INTERNAL_BUFFER_SIZE/2;i++)
-            {
-                uint16_t o=*left;
-                *left=*right;
-                *right=o;
-                left++;
-                right++;
-            }
-        }
-        startOffset=lookupTrigger(0);
-        if(startOffset) startOffset-=_nb/2;
+        return getDataTriggered(nb,f);      
     }
     
     int offset=DSOInputGain::getOffset(_couplingModeIsAC);
     float multiplier=DSOInputGain::getMultiplier();
     for(int i=0;i<_nb;i++)
     {
-        int fint=(int)internalAdcBuffer[(i+startOffset)]-offset;
+        int fint=(int)internalAdcBuffer[(i)]-offset;
         float z=(float)fint*multiplier;
         f[i]=z; // now in volt
     }

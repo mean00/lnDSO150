@@ -33,12 +33,17 @@ void dsoAdcIRq()
     _currentInstance->irqHandler();
 }
  
+void delayIrq_(void *a)
+{
+    lnDSOAdc *adc=(lnDSOAdc *)a;
+    adc->delayIrq();
+}
 /**
  * 
  * @param instance
  */
 lnDSOAdc::lnDSOAdc(int instance,int timer, int channel)  : lnBaseAdc(instance), 
-        _dma( lnDMA::DMA_PERIPH_TO_MEMORY,   lnAdcDesc[_instance].dmaEngine, lnAdcDesc[_instance].dmaChannel,  32,16)
+        _dma( lnDMA::DMA_PERIPH_TO_MEMORY,   lnAdcDesc[_instance].dmaEngine, lnAdcDesc[_instance].dmaChannel,  32,16), _delayTimer(0)
 {
     xAssert(instance==0); // we need DMA so only ADC0
     _channel=channel;
@@ -52,7 +57,25 @@ lnDSOAdc::lnDSOAdc(int instance,int timer, int channel)  : lnBaseAdc(instance),
 #warning HARDCODED
     lnIrqSetPriority((LnIRQ)LN_IRQ_DMA0_Channel0,4);
     lnIrqSetPriority((LnIRQ)LN_IRQ_ADC0_1,4);
+    _delayTimer.setInterrupt(delayIrq_,this);
 }
+/**
+ * 
+ * @return 
+ */
+void lnDSOAdc::delayIrq()
+{
+    // stop ADC
+    LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;         
+    adc->CTL1&=~(LN_ADC_CTL1_ADCON+LN_ADC_CTL1_DMA+LN_ADC_CTL1_CTN);
+    _adcTimer->disable();
+    // cleanup
+    //_dma.setInterruptMask(false, false);     
+    // invoke CB
+    if(_captureCb)
+          _captureCb(_nbSamples,lnDMA::DMA_INTERRUPT_HALF,_triggerLocation);    
+}
+
 /**
  * 
  */
@@ -73,24 +96,7 @@ void lnDSOAdc::irqHandler(void)
     adc->STAT &=~LN_ADC_STAT_WDE; 
     _state=TRIGGERED;
     // enable dma interrupt
-    switch(height)
-    {
-        //case 1:case 6:
-        case 2: case 3: case 4: case 5: 
-                            _triggerHalf=false;
-                            _dma.setInterruptMask(true, false);  // next full
-                            break;
-        case 1:
-        case 6:
-        case 7:                              
-        case 0:
-                            _triggerHalf=true;
-                            _dma.setInterruptMask(false,true);// next half
-                            break;       
-        default:
-                            xAssert(0);
-                            break;
-    }                          
+    _delayTimer.arm(120/2+20);  // ask for 120 samples
     return;
        
 }
@@ -219,7 +225,7 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
       _state=ARMED;
       adc->STAT &=~LN_ADC_STAT_WDE; 
       adc->CTL0 |=LN_ADC_CTL0_WDEIE; 
-      _dma.setInterruptMask(false, false);
+     // _dma.setInterruptMask(false, false);
       return;
   }     
   if(_triggerHalf)
@@ -237,7 +243,7 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
     // cleanup
     adc->CTL1&=~LN_ADC_CTL1_DMA;
     adc->CTL1&=~LN_ADC_CTL1_CTN;
-    _dma.setInterruptMask(false, false);     
+    //_dma.setInterruptMask(false, false);     
     // invoke CB
     if(_captureCb)
           _captureCb(_nbSamples,typ==lnDMA::DMA_INTERRUPT_HALF,_triggerLocation);    
@@ -293,7 +299,7 @@ bool     lnDSOAdc::startTriggeredDma(int n,  uint16_t *output)
     // Set the trigger
     
     // We  want DMA interrupt to start the engine
-    _dma.setInterruptMask(true, false);
+    //_dma.setInterruptMask(true, false);
      adc->STAT &=~LN_ADC_STAT_WDE;  // clear watchdog flag
     _adcTimer->enable();    
     _state=WARMUP;
@@ -322,6 +328,7 @@ bool     lnDSOAdc::startDmaTransfer(int n,  uint16_t *output)
     adc->CTL0=ctl0;
     // Program DMA
     _nbSamples=n;
+    _dma.setInterruptMask(true, false);
     _dma.beginTransfer();
     _dma.attachCallback(lnDSOAdc::dmaDone_,this);
     _dma.doPeripheralToMemoryTransferNoLock(n, (uint16_t *)output,(uint16_t *)&( adc->RDATA),  false);
