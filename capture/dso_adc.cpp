@@ -54,8 +54,8 @@ lnDSOAdc::lnDSOAdc(int instance,int timer, int channel)  : lnBaseAdc(instance),
     lnDisableInterrupt(LN_IRQ_ADC0_1);    
     _dma.setPriority(lnDMA::DMA_PRIORITY_ULTRA_HIGH);
 #warning HARDCODED
-    lnIrqSetPriority((LnIRQ)LN_IRQ_DMA0_Channel0,4);
-    lnIrqSetPriority(LN_IRQ_TIMER5,4);
+    lnIrqSetPriority((LnIRQ)LN_IRQ_DMA0_Channel0,5);
+    lnIrqSetPriority(LN_IRQ_TIMER5,5);
     _delayTimer.setInterrupt(delayIrq_,this);
 }
 /**
