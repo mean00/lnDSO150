@@ -7,7 +7,7 @@
 #define NB_CAPTURE_VOLTAGE (11)     
 #define DSO_NB_TIMEBASE (11)
 #define SLOWER_FAST_MODE     DSO_TIME_BASE_10US
-#define DSO_CAPTURE_INTERNAL_BUFFER_SIZE 2048
+#define DSO_CAPTURE_INTERNAL_BUFFER_SIZE 1024
 typedef void (captureCb)();
 
 /**
@@ -132,11 +132,12 @@ protected:
     static captureState                     _state;
     static lnDSOAdc                         *_adc;
     static float                            _triggerVolt;
-    static int                              _triggerAdc;
     static TriggerMode                      _triggerMode;
     static bool                             _couplingModeIsAC;
     static bool                             _med; // if true the transfer was halted mid way
     static int                              _triggerLocation; // the segment where the capture happened, not accurate
+public:
+    static int                              _triggerAdc;    
 };
 
 

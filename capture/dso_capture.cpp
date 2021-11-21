@@ -385,22 +385,6 @@ int  DSOCapture::lookupTrigger(int medOffset)
     return 0;
 }
 
-
-bool DSOCapture::getDataTriggered(int &nb, float *f)
-{
-    
-    
-    
-    int offset=DSOInputGain::getOffset(_couplingModeIsAC);
-    float multiplier=DSOInputGain::getMultiplier();
-    for(int i=0;i<_nb;i++)
-    {
-        int fint=(int)internalAdcBuffer[(i)]-offset;
-        float z=(float)fint*multiplier;
-        f[i]=z; // now in volt
-    } 
-    return true;
-}
 /**
  * 
  * @param nb
@@ -410,13 +394,13 @@ bool DSOCapture::getDataTriggered(int &nb, float *f)
 bool DSOCapture::getData(int &nb, float *f)
 {
     _adc->endCapture();
-    nb=_nb;
+
    
     if(_triggerMode!=Trigger_Run)
     {
         return getDataTriggered(nb,f);      
     }
-    
+    nb=_nb;    
     int offset=DSOInputGain::getOffset(_couplingModeIsAC);
     float multiplier=DSOInputGain::getMultiplier();
     for(int i=0;i<_nb;i++)
@@ -486,5 +470,28 @@ int         DSOCapture::timeBaseToFrequency(DSOCapture::DSO_TIME_BASE timeBase)
     return 0;
 }
 
+/**
+ * 
+ * @param nb
+ * @param f
+ * @return 
+ */
+bool DSOCapture::getDataTriggered(int &nb, float *f)
+{
+    nb=_nb;
+    int offset=DSOInputGain::getOffset(_couplingModeIsAC);
+    float multiplier=DSOInputGain::getMultiplier();
+    
+    int back=(_triggerLocation-_nb/2+DSO_CAPTURE_INTERNAL_BUFFER_SIZE)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE;
+    
+    //Logger("F=0x%x\n",f);
+    for(int i=0;i<_nb;i++)
+    {
+        int fint=(int)internalAdcBuffer[(back+i)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE]-offset;
+        float z=(float)fint*multiplier;
+        f[i]=z; // now in volt
+    }
+    return true;
+}
 // EOF
 

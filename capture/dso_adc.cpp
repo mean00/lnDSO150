@@ -24,6 +24,9 @@
 #include "dso_adc.h"
 #include "lnCpuID.h"
 
+#include "dso_capture.h"
+
+static int dmaFull=0, dmaHalf=0,dmaCount=0;
 static lnDSOAdc *_currentInstance=NULL;
 extern lnDSOAdc::lnDSOADC_State DSOCapture_getWatchdog(lnDSOAdc::lnDSOADC_State state, int &mn, int &mxv);
 //------------------------------------------------------------------
@@ -89,6 +92,7 @@ lnDSOAdc::~lnDSOAdc()
  */
 void lnDSOAdc::irqHandler(void)
 {
+    xAssert(0);
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;  
     _triggerLocation=_nbSamples-_dma.getCurrentCount(); // about the location of the trigger
     int height=(_triggerLocation*8)/_nbSamples;
@@ -220,34 +224,76 @@ void lnDSOAdc::dmaTriggerDone_(void *t, lnDMA::DmaInterruptType typ)
 void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
 { 
   LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
-  if(_state==WARMUP)
+  //---
+  dmaCount++;  
+  int scan=_nbSamples/2;
+  uint16_t *start;
+  switch(typ)
   {
-      _state=ARMED;
-      adc->STAT &=~LN_ADC_STAT_WDE; 
-      adc->CTL0 |=LN_ADC_CTL0_WDEIE; 
-     // _dma.setInterruptMask(false, false);
-      return;
-  }     
-  if(_triggerHalf)
-  {
-      xAssert(typ==lnDMA::DMA_INTERRUPT_HALF);
+      case lnDMA::DMA_INTERRUPT_HALF:
+            start=_output;
+
+            xAssert(dmaCount &1);
+            dmaHalf++;
+            break;
+      case lnDMA::DMA_INTERRUPT_FULL:
+            start=_output+scan;
+            dmaFull++;
+            xAssert(!(dmaCount &1));            
+            break;
+      default:
+          xAssert(0);
+          break;
   }
-  else
+  
+  switch(_state)
   {
-      xAssert(typ==lnDMA::DMA_INTERRUPT_FULL);
+      case WARMUP:
+            {
+                xAssert(typ==lnDMA::DMA_INTERRUPT_HALF);
+                _state=ARMING;
+                return;
+            }     
+            break;
+      case ARMING:
+      {
+          bool f=false;
+          for(int i=0;i<scan && !f;i++)
+          {
+              if(start[i]<DSOCapture::_triggerAdc) 
+              {
+                  f=true;
+                  start+=i;
+                  scan-=i;
+                  _state=ARMED;
+              }
+          }  
+          if(!f) return; // not found 
+      }     // no break !
+      case ARMED:
+      {
+            bool f=false;
+            for(int i=0;i<scan && !f;i++)
+            {
+                if(start[i]>=DSOCapture::_triggerAdc) 
+                {
+                    f=true;
+                    _state=TRIGGERED;
+                    _triggerLocation=start+i-_output;
+                }
+            }  
+            if(!f) return;
+
+          //--- ARM delay----------
+            _dma.setInterruptMask(false, false);
+            _delayTimer.arm(10); //
+      }
+      break;
+      default:
+          xAssert(0);
+          break;
   }
-  //-------------
-    adc->CTL1&=~LN_ADC_CTL1_ADCON;
-    adc->CTL1&=~LN_ADC_CTL1_DMA;          
-    _adcTimer->disable();
-    // cleanup
-    adc->CTL1&=~LN_ADC_CTL1_DMA;
-    adc->CTL1&=~LN_ADC_CTL1_CTN;
-    //_dma.setInterruptMask(false, false);     
-    // invoke CB
-    if(_captureCb)
-          _captureCb(_nbSamples,typ==lnDMA::DMA_INTERRUPT_HALF,_triggerLocation);    
-   _dmaLoop++;
+
 }
 
 /**
@@ -260,6 +306,7 @@ bool     lnDSOAdc::startTriggeredDma(int n,  uint16_t *output)
 {
     _output=output;
     _nbSamples=n;
+    dmaCount=0;
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;       
     xAssert(_fq>0);
     // Program DMA
@@ -299,7 +346,7 @@ bool     lnDSOAdc::startTriggeredDma(int n,  uint16_t *output)
     // Set the trigger
     
     // We  want DMA interrupt to start the engine
-    //_dma.setInterruptMask(true, false);
+    _dma.setInterruptMask(true, true);
      adc->STAT &=~LN_ADC_STAT_WDE;  // clear watchdog flag
     _adcTimer->enable();    
     _state=WARMUP;
