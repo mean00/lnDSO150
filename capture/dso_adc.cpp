@@ -30,11 +30,6 @@ static int dmaFull=0, dmaHalf=0,dmaCount=0;
 static lnDSOAdc *_currentInstance=NULL;
 extern lnDSOAdc::lnDSOADC_State DSOCapture_getWatchdog(lnDSOAdc::lnDSOADC_State state, int &mn, int &mxv);
 //------------------------------------------------------------------
-void dsoAdcIRq()
-{
-    xAssert(_currentInstance);
-    _currentInstance->irqHandler();
-}
  
 void delayIrq_(void *a)
 {
@@ -54,12 +49,11 @@ lnDSOAdc::lnDSOAdc(int instance,int timer, int channel)  : lnBaseAdc(instance),
     _fq=-1;
     _adcTimer=NULL;
     _currentInstance=this;
-    lnDisableInterrupt(LN_IRQ_ADC0_1);
-    lnSetInterruptHandler(LN_IRQ_ADC0_1, dsoAdcIRq);
+    lnDisableInterrupt(LN_IRQ_ADC0_1);    
     _dma.setPriority(lnDMA::DMA_PRIORITY_ULTRA_HIGH);
 #warning HARDCODED
     lnIrqSetPriority((LnIRQ)LN_IRQ_DMA0_Channel0,4);
-    lnIrqSetPriority((LnIRQ)LN_IRQ_ADC0_1,4);
+    lnIrqSetPriority(LN_IRQ_TIMER5,4);
     _delayTimer.setInterrupt(delayIrq_,this);
 }
 /**
@@ -71,10 +65,6 @@ void lnDSOAdc::delayIrq()
     // stop ADC
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;         
     adc->CTL1&=~(LN_ADC_CTL1_ADCON+LN_ADC_CTL1_DMA+LN_ADC_CTL1_CTN);
-    _adcTimer->disable();
-    // cleanup
-    //_dma.setInterruptMask(false, false);     
-    // invoke CB
     if(_captureCb)
           _captureCb(_nbSamples,lnDMA::DMA_INTERRUPT_HALF,_triggerLocation);    
 }
@@ -87,23 +77,7 @@ lnDSOAdc::~lnDSOAdc()
     if(_adcTimer) delete _adcTimer;
     _adcTimer=NULL;
 }
-/**
- *  // Normally we can get here only when watchdog interrupt happens
- */
-void lnDSOAdc::irqHandler(void)
-{
-    xAssert(0);
-    LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;  
-    _triggerLocation=_nbSamples-_dma.getCurrentCount(); // about the location of the trigger
-    int height=(_triggerLocation*8)/_nbSamples;
-    adc->CTL0 &=~LN_ADC_CTL0_WDEIE; 
-    adc->STAT &=~LN_ADC_STAT_WDE; 
-    _state=TRIGGERED;
-    // enable dma interrupt
-    _delayTimer.arm(120/2+20);  // ask for 120 samples
-    return;
-       
-}
+
 
 /**
  * 
@@ -323,8 +297,8 @@ bool     lnDSOAdc::startTriggeredDma(int n,  uint16_t *output)
     ctl0 |=adcChannel(_pin);
     adc->CTL0=ctl0;
     
-    _dmaLoop=0;
-    lnEnableInterrupt(LN_IRQ_ADC0_1);    
+    
+    lnDisableInterrupt(LN_IRQ_ADC0_1);    
     
     _dma.beginTransfer();
     _dma.attachCallback(lnDSOAdc::dmaTriggerDone_,this);
@@ -403,6 +377,7 @@ void lnDSOAdc:: stopCapture()
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;      
     adc->CTL1&=~(LN_ADC_CTL1_DMA+LN_ADC_CTL1_CTN+LN_ADC_CTL1_ADCON);
     adc->CTL1&=~LN_ADC_CTL1_CTN;
+    _adcTimer->disable();
     _dma.cancelTransfer();     
 }
 // EOF

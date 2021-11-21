@@ -43,7 +43,6 @@ public:
 public:
     static void dmaDone_(void *foo, lnDMA::DmaInterruptType typ);
     static void dmaTriggerDone_(void *foo, lnDMA::DmaInterruptType typ);
-    void        irqHandler(void);
     void        delayIrq();
 protected:   
     void        dmaDone();
@@ -51,16 +50,13 @@ protected:
     lnDSOADC_State _state;
     int         _timer,_channel,_fq;
     lnDMA       _dma;
-    xBinarySemaphore _dmaSem;
     lnAdcTimer *_adcTimer;
     adcCb      *_captureCb;
     int         _nbSamples;
     int         _pin;
-    
-    int         _dmaLoop;    
+        
     uint16_t   *_output;
     uint32_t    _triggerLocation;
-    bool        _triggerHalf;
     lnBasicDelayTimer _delayTimer;
     
 };
