@@ -24,11 +24,13 @@
 #include "dso_adc.h"
 #include "lnCpuID.h"
 
-#include "dso_capture.h"
 
 static int dmaFull=0, dmaHalf=0,dmaCount=0;
 static lnDSOAdc *_currentInstance=NULL;
 extern lnDSOAdc::lnDSOADC_State DSOCapture_getWatchdog(lnDSOAdc::lnDSOADC_State state, int &mn, int &mxv);
+bool DSOCapture_lookup_arming(uint16_t *data,int size,int &index);
+bool DSOCapture_lookup_armed(uint16_t *data,int size,int &index);
+int  DSOCapture_delay();
 //------------------------------------------------------------------
  
 void delayIrq_(void *a)
@@ -226,41 +228,45 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
             {
                 xAssert(typ==lnDMA::DMA_INTERRUPT_HALF);
                 _state=ARMING;
+                adc->STAT &=~LN_ADC_STAT_WDE;
                 return;
             }     
             break;
       case ARMING:
       {
-          bool f=false;
-          for(int i=0;i<scan && !f;i++)
-          {
-              if(start[i]<DSOCapture::_triggerAdc) 
-              {
-                  f=true;
-                  start+=i;
-                  scan-=i;
-                  _state=ARMED;
-              }
-          }  
-          if(!f) return; // not found 
-      }     // no break !
-      case ARMED:
-      {
-            bool f=false;
-            for(int i=0;i<scan && !f;i++)
-            {
-                if(start[i]>=DSOCapture::_triggerAdc) 
-                {
-                    f=true;
-                    _state=TRIGGERED;
-                    _triggerLocation=start+i-_output;
-                }
-            }  
-            if(!f) return;
-
-          //--- ARM delay----------
+          adc->STAT &=~LN_ADC_STAT_WDE;
+          int index;
+          if(!DSOCapture_lookup_arming(start,scan,index))
+              return;
+          start+=index;
+          scan-=index;
+          _state=ARMED;
+         if(DSOCapture_lookup_armed(start,scan,index))
+         {
+            _state=TRIGGERED;
+            _triggerLocation=start+index-_output;
+            //--- ARM delay----------
             _dma.setInterruptMask(false, false);
             _delayTimer.arm(10); //
+            return;
+         }
+          // not in that block, arm Watchdog
+          
+          return;
+            
+      }     // no break ! = NOT A MISTALE
+      case ARMED:
+      {
+            if(!(adc->STAT &LN_ADC_STAT_WDE)) return; //no watchdog, no need to check
+            
+            int index;
+            if(!DSOCapture_lookup_armed(start,scan,index))
+              return;
+            _state=TRIGGERED;
+            _triggerLocation=start+index-_output;
+            //--- ARM delay----------
+            _dma.setInterruptMask(false, false);
+            _delayTimer.arm(DSOCapture_delay()); //
       }
       break;
       default:

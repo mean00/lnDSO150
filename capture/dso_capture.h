@@ -83,6 +83,7 @@ public:
         CAPTURE_DONE=2, // It is done but not cleaned up yet
     }; 
 public:
+    static int                             delay();
     static void                            initialize(lnPin pin);
     static void                            setCouplingMode(int isAc) {_couplingModeIsAC=isAc;}
     static void                            setTriggerMode(TriggerMode mode);
@@ -149,6 +150,7 @@ struct TimerTimeBase
   DSOCapture::DSO_TIME_BASE timeBase;
   const char    *name;
   int           fq;  
+  int           usToGet120Samples;
 };
 
 struct TimerTimeADC

@@ -27,21 +27,22 @@ VoltageSettings vSettings[NB_CAPTURE_VOLTAGE]= {
 };
 
 #define DSO_FQ_US(x) (20*1000*1000/x)
+#define DSO_FQ_SAMPLES(x) ((x*120)/20) // 120 samples / 20 pixel / div => time in us
 const TimerTimeBase timerBases[]=
 {   //                                  20 pix/dev => fq*20
-    { DSOCapture::DSO_TIME_BASE_10US,   "10us",  DSO_FQ_US(10)   }, // 1 us / sample round up, error =0.3%%
-    { DSOCapture::DSO_TIME_BASE_20US,   "20us",  DSO_FQ_US(20)   }, // 1 us / sample round up, error =0.3%%
+    { DSOCapture::DSO_TIME_BASE_10US,   "10us",  DSO_FQ_US(10)   ,DSO_FQ_SAMPLES(10)}, // 1 us / sample round up, error =0.3%%
+    { DSOCapture::DSO_TIME_BASE_20US,   "20us",  DSO_FQ_US(20)   ,DSO_FQ_SAMPLES(20)}, // 1 us / sample round up, error =0.3%%
     //---
-    { DSOCapture::DSO_TIME_BASE_50US,   "50us",  DSO_FQ_US(50)   }, // 2 us / sample => 0.5 with OS, no oversampling
-    { DSOCapture::DSO_TIME_BASE_100US,  "100us", DSO_FQ_US(100)  },    // 100/24= 4 us , 1 us with os
-    { DSOCapture::DSO_TIME_BASE_200US,  "200us", DSO_FQ_US(200)  },    // 100/24= 4 us , 1 us with os    
-    { DSOCapture::DSO_TIME_BASE_500US,  "500us", DSO_FQ_US(500)  },    // 500/24=> 20 us /sample => 5 us with over
-    { DSOCapture::DSO_TIME_BASE_1MS,    "1ms",   DSO_FQ_US(1000) }, // 40 us / sample => 10 us with oversampling
-    { DSOCapture::DSO_TIME_BASE_2MS,    "2ms",   DSO_FQ_US(2000) }, // 40 us / sample => 10 us with oversampling    
-    { DSOCapture::DSO_TIME_BASE_5MS,    "5ms",   DSO_FQ_US(5000) }, // 200 us / sample => 50 us with os
-    { DSOCapture::DSO_TIME_BASE_10MS,   "10ms",  DSO_FQ_US(10000)}, // 400 us / 100 us with os    **20
-    { DSOCapture::DSO_TIME_BASE_20MS,   "20ms",  DSO_FQ_US(20000)}, // 400 us / 100 us with os    **20    
-    { DSOCapture::DSO_TIME_BASE_50MS,   "50ms",  DSO_FQ_US(50000)},  // 2 ms      **71
+    { DSOCapture::DSO_TIME_BASE_50US,   "50us",  DSO_FQ_US(50)   ,DSO_FQ_SAMPLES(50)}, // 2 us / sample => 0.5 with OS, no oversampling
+    { DSOCapture::DSO_TIME_BASE_100US,  "100us", DSO_FQ_US(100)  ,DSO_FQ_SAMPLES(100)},    // 100/24= 4 us , 1 us with os
+    { DSOCapture::DSO_TIME_BASE_200US,  "200us", DSO_FQ_US(200)  ,DSO_FQ_SAMPLES(200)},    // 100/24= 4 us , 1 us with os    
+    { DSOCapture::DSO_TIME_BASE_500US,  "500us", DSO_FQ_US(500)  ,DSO_FQ_SAMPLES(500)},    // 500/24=> 20 us /sample => 5 us with over
+    { DSOCapture::DSO_TIME_BASE_1MS,    "1ms",   DSO_FQ_US(1000) ,DSO_FQ_SAMPLES(1000)}, // 40 us / sample => 10 us with oversampling
+    { DSOCapture::DSO_TIME_BASE_2MS,    "2ms",   DSO_FQ_US(2000) ,DSO_FQ_SAMPLES(2000)}, // 40 us / sample => 10 us with oversampling    
+    { DSOCapture::DSO_TIME_BASE_5MS,    "5ms",   DSO_FQ_US(5000) ,DSO_FQ_SAMPLES(5000)}, // 200 us / sample => 50 us with os
+    { DSOCapture::DSO_TIME_BASE_10MS,   "10ms",  DSO_FQ_US(10000),DSO_FQ_SAMPLES(10000)}, // 400 us / 100 us with os    **20
+    { DSOCapture::DSO_TIME_BASE_20MS,   "20ms",  DSO_FQ_US(20000),DSO_FQ_SAMPLES(20000)}, // 400 us / 100 us with os    **20    
+    { DSOCapture::DSO_TIME_BASE_50MS,   "50ms",  DSO_FQ_US(50000),DSO_FQ_SAMPLES(50000)},  // 2 ms      **71
  };
 /**
  */

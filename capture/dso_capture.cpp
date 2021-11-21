@@ -34,6 +34,83 @@ float      DSOCapture::getTriggerVoltage()
     return _triggerVolt;
 }
 /**
+ * Time to let the DMA run to get 120 more samples
+ * @return 
+ */
+int DSOCapture::delay()
+{
+    return timerBases[currentTimeBase].usToGet120Samples;
+    // time to get 120 sammples (in us)
+}
+
+int DSOCapture_delay()
+{
+    return DSOCapture::delay();
+}
+
+#define MACRO_SEARCH(cond)  \
+        { \
+                for(int i=0;i<size && !f;i++) \
+                { \
+                    if(data[i] cond)  \
+                    {\
+                        f=true;\
+                        index=i;\
+                        return true;\
+                    }\
+                }  \
+                return false;\
+        }
+
+/**
+ * 
+ * @param data
+ * @param size
+ * @param index
+ * @return 
+ */
+bool DSOCapture_lookup_arming(uint16_t *data,int size,int &index)
+{
+    bool f=false;
+    switch(DSOCapture::getTriggerMode())
+    {
+         
+        case DSOCapture::Trigger_Run: xAssert(0);break;
+        case DSOCapture::Trigger_Both:
+        case DSOCapture::Trigger_Rising:        
+                MACRO_SEARCH(<DSOCapture::_triggerAdc)        
+                break;
+        case DSOCapture::Trigger_Falling:        
+                MACRO_SEARCH(>DSOCapture::_triggerAdc)        
+                break;
+    }
+    return false;
+}
+/**
+ * 
+ * @param data
+ * @param size
+ * @param index
+ * @return 
+ */
+bool DSOCapture_lookup_armed(uint16_t *data,int size,int &index)
+{
+    bool f=false;
+    switch(DSOCapture::getTriggerMode())
+    {
+        case DSOCapture::Trigger_Run: xAssert(0);break;
+        case DSOCapture::Trigger_Both:
+        case DSOCapture::Trigger_Rising:        
+                MACRO_SEARCH(>=DSOCapture::_triggerAdc)        
+                break;
+        case DSOCapture::Trigger_Falling:        
+                MACRO_SEARCH(<=DSOCapture::_triggerAdc)        
+                break;
+    }
+    return false;
+}
+ 
+/**
  * 
  * @param current
  * @param mn
