@@ -7,7 +7,7 @@
 #define NB_CAPTURE_VOLTAGE (11)     
 #define DSO_NB_TIMEBASE (11)
 #define SLOWER_FAST_MODE     DSO_TIME_BASE_10US
-#define DSO_CAPTURE_INTERNAL_BUFFER_SIZE 1024
+#define DSO_CAPTURE_INTERNAL_BUFFER_SIZE 2048
 typedef void (captureCb)();
 
 /**

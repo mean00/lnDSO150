@@ -50,7 +50,7 @@ lnDSOAdc::lnDSOAdc(int instance,int timer, int channel)  : lnBaseAdc(instance),
     lnSetInterruptHandler(LN_IRQ_ADC0_1, dsoAdcIRq);
     _dma.setPriority(lnDMA::DMA_PRIORITY_ULTRA_HIGH);
 #warning HARDCODED
-    lnIrqSetPriority((LnIRQ)LN_IRQ_DMA0_Channel0,6);
+    lnIrqSetPriority((LnIRQ)LN_IRQ_DMA0_Channel0,4);
     lnIrqSetPriority((LnIRQ)LN_IRQ_ADC0_1,4);
 }
 /**
@@ -66,57 +66,33 @@ lnDSOAdc::~lnDSOAdc()
  */
 void lnDSOAdc::irqHandler(void)
 {
-    LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
-    switch(_state)
+    LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;  
+    _triggerLocation=_nb-_dma.getCurrentCount(); // about the location of the trigger
+    int height=(_triggerLocation*8)/_nb;
+    adc->CTL0 &=~LN_ADC_CTL0_WDEIE; 
+    adc->STAT &=~LN_ADC_STAT_WDE; 
+    _state=TRIGGERED;
+    // enable dma interrupt
+    switch(height)
     {
-        case ARMING: // Prepare for trigger, we reached an area that can trigger, reprogram watchdog for actual trigger
-        {
-                  int mn=2048,mx=2048;      
-                  _state=DSOCapture_getWatchdog(_state,mn,mx); // this is ugly
-                  // We need to stop DMA and restart the whole thing 
-                  _dma.pause();
-                  
-                  adc->CTL1&=~LN_ADC_CTL1_ADCON;
-                  adc->STAT &=~LN_ADC_STAT_WDE; 
-                  adc->WDHT=mx; // can we change the watchdog on the fly ????
-                  adc->WDLT=mn;
-                  _dma.resume();
-                  adc->CTL1|=LN_ADC_CTL1_ADCON; // re-enable ADC 
-                  return;
-        }
-                  break;
-        case ARMED: // the watchdog is an actual trigger here
-        {
-              _triggerLocation=_nb-_dma.getCurrentCount(); // about the location of the trigger
-              int height=(_triggerLocation*8)/_nb;
-              adc->CTL0 &=~LN_ADC_CTL0_WDEIE; 
-              adc->STAT &=~LN_ADC_STAT_WDE; 
-              _state=TRIGGERED;
-              // enable dma interrupt
-              switch(height)
-              {
-                  case 2: case 3: case 4: case 5: 
-                                        _dma.setInterruptMask(true, false);  // next full
-                                        break;
-                  case 1:
-                  case 0:
-                                        _dma.setInterruptMask(false,true);// next half
-                                        break;
-                  case 6: case 7:
-                                        _dma.setInterruptMask(true, false);  // next next half, so next full then next half
-                                        break;
-                  default:
-                                        xAssert(0);
-                                        break;
-                                            
-              }                          
-              return;
-        }
-             break;
+        //case 1:case 6:
+        case 2: case 3: case 4: case 5: 
+                            _triggerHalf=false;
+                            _dma.setInterruptMask(true, false);  // next full
+                            break;
+        case 1:
+        case 6:
+        case 7:                              
+        case 0:
+                            _triggerHalf=true;
+                            _dma.setInterruptMask(false,true);// next half
+                            break;       
         default:
-              xAssert(0);
-              break;                  
-    }   
+                            xAssert(0);
+                            break;
+    }                          
+    return;
+       
 }
 
 /**
@@ -238,38 +214,33 @@ void lnDSOAdc::dmaTriggerDone_(void *t, lnDMA::DmaInterruptType typ)
 void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
 { 
   LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
-  xAssert(_state==TRIGGERED);
-  int height=(_triggerLocation*8)/_nb;
-  switch(typ)
+  if(_state==WARMUP)
   {
-      case lnDMA::DMA_INTERRUPT_FULL:
-        {
-          if(height==7 || height==6)
-          {
-                  _dma.setInterruptMask(false, true); // wait for the next half interrupt
-                  return;
-          }
-        }
-      break;
-      
-      case lnDMA::DMA_INTERRUPT_HALF:
-          break;
-      default:
-          xAssert(0);
-          break;
+      _state=ARMED;
+      adc->STAT &=~LN_ADC_STAT_WDE; 
+      adc->CTL0 |=LN_ADC_CTL0_WDEIE; 
+      _dma.setInterruptMask(false, false);
+      return;
+  }     
+  if(_triggerHalf)
+  {
+      xAssert(typ==lnDMA::DMA_INTERRUPT_HALF);
   }
-   // stop all dma interrupts
-    _dma.setInterruptMask(false, false);    
-    {
-      _adcTimer->disable();
-      // cleanup
-      adc->CTL1&=~LN_ADC_CTL1_DMA;
-      adc->CTL1&=~LN_ADC_CTL1_CTN;
-      adc->CTL1&=~LN_ADC_CTL1_ADCON;
-      // invoke CB
-      if(_captureCb)
-          _captureCb(_nbSamples,typ==lnDMA::DMA_INTERRUPT_HALF,_triggerLocation);
-    }   
+  else
+  {
+      xAssert(typ==lnDMA::DMA_INTERRUPT_FULL);
+  }
+  //-------------
+    adc->CTL1&=~LN_ADC_CTL1_ADCON;
+    adc->CTL1&=~LN_ADC_CTL1_DMA;          
+    _adcTimer->disable();
+    // cleanup
+    adc->CTL1&=~LN_ADC_CTL1_DMA;
+    adc->CTL1&=~LN_ADC_CTL1_CTN;
+    _dma.setInterruptMask(false, false);     
+    // invoke CB
+    if(_captureCb)
+          _captureCb(_nbSamples,typ==lnDMA::DMA_INTERRUPT_HALF,_triggerLocation);    
    _dmaLoop++;
 }
 
@@ -308,22 +279,25 @@ bool     lnDSOAdc::startTriggeredDma(int n,  uint16_t *output)
     
     // Go for the "safe" area
     int mn,mx;
-     adc->STAT &=~LN_ADC_STAT_WDE;  // clear watchdog flag
-    _state=DSOCapture_getWatchdog(lnDSOAdc::IDLE,mn,mx);
+     
+     DSOCapture_getWatchdog(lnDSOAdc::ARMING,mn,mx);
      adc->WDHT=mx;
      adc->WDLT=mn;
      // Enable watchdog
-     adc->CTL0 |=LN_ADC_CTL0_WDEIE; 
+     //adc->CTL0 |=LN_ADC_CTL0_WDEIE; 
     // Circular mode + both interrupt
     _dma.doPeripheralToMemoryTransferNoLock(n, (uint16_t *)output,(uint16_t *)&( adc->RDATA),  true,true);
     // go !
     adc->CTL1&=~LN_ADC_CTL1_CTN;
     adc->CTL1|=LN_ADC_CTL1_DMA;
     
-    // We dont want DMA interrupt for now
-    _dma.setInterruptMask(false, false);
+    // Set the trigger
     
+    // We  want DMA interrupt to start the engine
+    _dma.setInterruptMask(true, false);
+     adc->STAT &=~LN_ADC_STAT_WDE;  // clear watchdog flag
     _adcTimer->enable();    
+    _state=WARMUP;
     // go !
     adc->CTL1|=LN_ADC_CTL1_ADCON;
     return true;

@@ -23,6 +23,7 @@ public:
     enum lnDSOADC_State
     {
         IDLE=0,
+        WARMUP=8,
         ARMING=1,
         ARMING2=2,
         ARMED=3,
@@ -58,6 +59,7 @@ protected:
     uint16_t   *_output;
     int         _nb;
     uint32_t    _triggerLocation;
+    bool        _triggerHalf;
     
 };
 // EOF

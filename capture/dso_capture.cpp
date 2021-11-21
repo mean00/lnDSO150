@@ -340,18 +340,22 @@ void DSOCapture::stopCapture()
  */
 int  DSOCapture::lookupTrigger(int medOffset)
 {
-    int half=DSO_CAPTURE_INTERNAL_BUFFER_SIZE/8;
-    xAssert(half>=_nb/2);
+    
+#define DEADZONE 200    
+//#define DEADZONE DSO_CAPTURE_INTERNAL_BUFFER_SIZE/8;
+    int start=DEADZONE ;
+    int len=DSO_CAPTURE_INTERNAL_BUFFER_SIZE-DEADZONE*2;;
+
     switch(_triggerMode)
     {
         case   Trigger_Rising:
         {
-            uint16_t *cur=internalAdcBuffer+half;
-            for(int i=0;i<DSO_CAPTURE_INTERNAL_BUFFER_SIZE-2*half-1;i++)
+            uint16_t *cur=internalAdcBuffer+start;
+            for(int i=0;i<len-1;i++)
             {
                 
                 if(cur[0]<_triggerAdc && cur[1] >=_triggerAdc) 
-                    return i+half;
+                    return i+start;
                 cur++;
             }
             Logger("Med=%d, seg=%d\n",_med,_segment);
@@ -360,12 +364,12 @@ int  DSOCapture::lookupTrigger(int medOffset)
             break;
         case   Trigger_Falling:
         {
-            uint16_t *cur=internalAdcBuffer+half;
-            for(int i=0;i<DSO_CAPTURE_INTERNAL_BUFFER_SIZE-2*half-1;i++)
+            uint16_t *cur=internalAdcBuffer+start;
+            for(int i=0;i<len-1;i++)
             {
                 
                 if(cur[0]>_triggerAdc && cur[1] <=_triggerAdc) 
-                    return i+half;
+                    return i+start;
                 cur++;
             }
             Logger("Med=%d, seg=%d\n",_med,_segment);
