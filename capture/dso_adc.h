@@ -57,7 +57,6 @@ protected:
     
     int         _dmaLoop;    
     uint16_t   *_output;
-    int         _nb;
     uint32_t    _triggerLocation;
     bool        _triggerHalf;
     

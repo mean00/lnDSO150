@@ -67,8 +67,8 @@ lnDSOAdc::~lnDSOAdc()
 void lnDSOAdc::irqHandler(void)
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;  
-    _triggerLocation=_nb-_dma.getCurrentCount(); // about the location of the trigger
-    int height=(_triggerLocation*8)/_nb;
+    _triggerLocation=_nbSamples-_dma.getCurrentCount(); // about the location of the trigger
+    int height=(_triggerLocation*8)/_nbSamples;
     adc->CTL0 &=~LN_ADC_CTL0_WDEIE; 
     adc->STAT &=~LN_ADC_STAT_WDE; 
     _state=TRIGGERED;
@@ -253,13 +253,12 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
 bool     lnDSOAdc::startTriggeredDma(int n,  uint16_t *output) 
 {
     _output=output;
-    _nb=n;
+    _nbSamples=n;
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;       
     xAssert(_fq>0);
     // Program DMA
-    _nbSamples=n;
     _state=IDLE;
-    
+    adc->CTL1&=~LN_ADC_CTL1_ADCON;
     // --Setup watchdog --
     
     uint32_t ctl0=adc->CTL0;
@@ -348,8 +347,8 @@ void      lnDSOAdc::endCapture()
 void lnDSOAdc:: stopCapture()
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;      
-    adc->CTL1&=~LN_ADC_CTL1_DMA;
+    adc->CTL1&=~(LN_ADC_CTL1_DMA+LN_ADC_CTL1_CTN+LN_ADC_CTL1_ADCON);
     adc->CTL1&=~LN_ADC_CTL1_CTN;
-    _dma.cancelTransfer(); 
+    _dma.cancelTransfer();     
 }
 // EOF
