@@ -56,6 +56,12 @@ void setup()
 uint32_t chipId;
 extern void mainLoop();
 
+
+void mainLoop_bounce(void *a)
+{
+    mainLoop();
+}
+
 /**
  * 
  */
@@ -84,7 +90,11 @@ void loop()
     DSODisplay::drawSplash();
     
     testFunc2();
-    
-    mainLoop();       
+   
+    xTaskCreate(mainLoop_bounce, "mainLoop",1000,NULL,4,NULL);
+    while(1)
+    {
+        xDelay(1000);
+    }
 }
 //
