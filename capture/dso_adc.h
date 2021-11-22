@@ -52,9 +52,8 @@ protected:
     lnDMA       _dma;
     lnAdcTimer *_adcTimer;
     adcCb      *_captureCb;
-    int         _nbSamples;
     int         _pin;
-        
+    int         _nbSamples;
     uint16_t   *_output;
     uint32_t    _triggerLocation;
     lnBasicDelayTimer _delayTimer;

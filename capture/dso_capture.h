@@ -152,7 +152,8 @@ struct TimerTimeBase
   int           fq;  
   int           usToGet120Samples;
 };
-
+/**
+ */
 struct TimerTimeADC
 {
   DSOCapture::DSO_TIME_BASE timeBase;

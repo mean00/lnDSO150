@@ -39,8 +39,7 @@ float      DSOCapture::getTriggerVoltage()
  */
 int DSOCapture::delay()
 {
-    return timerBases[currentTimeBase].usToGet120Samples;
-    // time to get 120 sammples (in us)
+    return timerBases[currentTimeBase].usToGet120Samples;    
 }
 
 int DSOCapture_delay()
@@ -63,50 +62,49 @@ int DSOCapture_delay()
         }
 
 /**
- * 
+ * \brief search in the capture buffer to see if we have a trigger
+ * /!\ it will miss stuff when it happens just at the boundary!
  * @param data
  * @param size
  * @param index
  * @return 
  */
-bool DSOCapture_lookup_arming(uint16_t *data,int size,int &index)
+bool DSOCapture_lookup(lnDSOAdc::lnDSOADC_State state, uint16_t *data,int size,int &index)
 {
-    bool f=false;
-    switch(DSOCapture::getTriggerMode())
+    if(state==lnDSOAdc::ARMING)
     {
-         
-        case DSOCapture::Trigger_Run: xAssert(0);break;
-        case DSOCapture::Trigger_Both:
-        case DSOCapture::Trigger_Rising:        
-                MACRO_SEARCH(<DSOCapture::_triggerAdc)        
-                break;
-        case DSOCapture::Trigger_Falling:        
-                MACRO_SEARCH(>DSOCapture::_triggerAdc)        
-                break;
+        bool f=false;
+        switch(DSOCapture::getTriggerMode())
+        {
+
+            case DSOCapture::Trigger_Run: xAssert(0);break;
+            case DSOCapture::Trigger_Both:
+            case DSOCapture::Trigger_Rising:        
+                    MACRO_SEARCH(<DSOCapture::_triggerAdc)        
+                    break;
+            case DSOCapture::Trigger_Falling:        
+                    MACRO_SEARCH(>DSOCapture::_triggerAdc)        
+                    break;
+        }
+        return false;
     }
-    return false;
-}
-/**
- * 
- * @param data
- * @param size
- * @param index
- * @return 
- */
-bool DSOCapture_lookup_armed(uint16_t *data,int size,int &index)
-{
-    bool f=false;
-    switch(DSOCapture::getTriggerMode())
+    if(state==lnDSOAdc::ARMED)
     {
-        case DSOCapture::Trigger_Run: xAssert(0);break;
-        case DSOCapture::Trigger_Both:
-        case DSOCapture::Trigger_Rising:        
-                MACRO_SEARCH(>=DSOCapture::_triggerAdc)        
-                break;
-        case DSOCapture::Trigger_Falling:        
-                MACRO_SEARCH(<=DSOCapture::_triggerAdc)        
-                break;
+        bool f=false;
+        switch(DSOCapture::getTriggerMode())
+        {
+            case DSOCapture::Trigger_Run: xAssert(0);break;
+            case DSOCapture::Trigger_Both:
+            case DSOCapture::Trigger_Rising:        
+                    MACRO_SEARCH(>=DSOCapture::_triggerAdc)        
+                    break;
+            case DSOCapture::Trigger_Falling:        
+                    MACRO_SEARCH(<=DSOCapture::_triggerAdc)        
+                    break;
+        }
+        return false;
     }
+    xAssert(0);
     return false;
 }
  
@@ -559,9 +557,24 @@ bool DSOCapture::getDataTriggered(int &nb, float *f)
     int offset=DSOInputGain::getOffset(_couplingModeIsAC);
     float multiplier=DSOInputGain::getMultiplier();
     
-    int back=(_triggerLocation-_nb/2+DSO_CAPTURE_INTERNAL_BUFFER_SIZE)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE;
     
-    //Logger("F=0x%x\n",f);
+    // We know the trigger location, rewind a bit so we have the trigger located at the center
+    int back=(_triggerLocation-_nb/2+DSO_CAPTURE_INTERNAL_BUFFER_SIZE)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE;
+    int endPos=(back+_nb)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE;
+    
+    // does not wrap
+    if(endPos>back)
+    {
+        uint16_t *data16=internalAdcBuffer+back;
+        for(int i=0;i<_nb;i++)
+        {
+            int fint=(int)*data16++-offset;
+            float z=(float)fint*multiplier;
+            f[i]=z; // now in volt
+        }
+        return true;
+    }
+    // it wraps, use the slow method
     for(int i=0;i<_nb;i++)
     {
         int fint=(int)internalAdcBuffer[(back+i)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE]-offset;

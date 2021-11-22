@@ -28,11 +28,13 @@
 static int dmaFull=0, dmaHalf=0,dmaCount=0;
 static lnDSOAdc *_currentInstance=NULL;
 extern lnDSOAdc::lnDSOADC_State DSOCapture_getWatchdog(lnDSOAdc::lnDSOADC_State state, int &mn, int &mxv);
-bool DSOCapture_lookup_arming(uint16_t *data,int size,int &index);
-bool DSOCapture_lookup_armed(uint16_t *data,int size,int &index);
+bool DSOCapture_lookup(lnDSOAdc::lnDSOADC_State state,uint16_t *data,int size,int &index);
 int  DSOCapture_delay();
 //------------------------------------------------------------------
- 
+/**
+ * 
+ * @param a
+ */
 void delayIrq_(void *a)
 {
     lnDSOAdc *adc=(lnDSOAdc *)a;
@@ -54,8 +56,8 @@ lnDSOAdc::lnDSOAdc(int instance,int timer, int channel)  : lnBaseAdc(instance),
     lnDisableInterrupt(LN_IRQ_ADC0_1);    
     _dma.setPriority(lnDMA::DMA_PRIORITY_ULTRA_HIGH);
 #warning HARDCODED
-    lnIrqSetPriority((LnIRQ)LN_IRQ_DMA0_Channel0,5);
-    lnIrqSetPriority(LN_IRQ_TIMER5,5);
+    lnIrqSetPriority((LnIRQ)LN_IRQ_DMA0_Channel0,2); // more urgent than default
+    lnIrqSetPriority(LN_IRQ_TIMER5,2);
     _delayTimer.setInterrupt(delayIrq_,this);
 }
 /**
@@ -236,12 +238,12 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
       {
           adc->STAT &=~LN_ADC_STAT_WDE;
           int index;
-          if(!DSOCapture_lookup_arming(start,scan,index))
+          if(!DSOCapture_lookup(ARMING,start,scan,index))
               return;
           start+=index;
           scan-=index;
           _state=ARMED;
-         if(DSOCapture_lookup_armed(start,scan,index))
+         if(DSOCapture_lookup(ARMED,start,scan,index))
          {
             _state=TRIGGERED;
             _triggerLocation=start+index-_output;
@@ -260,7 +262,7 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
             if(!(adc->STAT &LN_ADC_STAT_WDE)) return; //no watchdog, no need to check
             
             int index;
-            if(!DSOCapture_lookup_armed(start,scan,index))
+            if(!DSOCapture_lookup(ARMED, start,scan,index))
               return;
             _state=TRIGGERED;
             _triggerLocation=start+index-_output;
