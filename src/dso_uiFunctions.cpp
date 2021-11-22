@@ -69,7 +69,9 @@ struct UI_eventCallbacks;
        v+=mod;
     }
     v%=mod;
+    DSOCapture::stopCapture();
     DSOCapture::setTriggerMode((DSOCapture::TriggerMode)v);
+    DSOCapture::startCapture(240);
     Logger("voltTrigger_incdec : %d\n",inc);
  }
  //-------

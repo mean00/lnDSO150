@@ -15,7 +15,8 @@ void showCapture()
     int nb;
     // display
     // next
-#if 0    
+#warning this is not completely correct    
+#if 1   
     uint32_t now=lnGetMs();
     if(now<lastRefresh)
     {
