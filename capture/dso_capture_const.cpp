@@ -27,7 +27,7 @@ VoltageSettings vSettings[NB_CAPTURE_VOLTAGE]= {
 };
 
 #define DSO_FQ_US(x) (20*1000*1000/x)
-#define DSO_FQ_SAMPLES(x) ((x*120)/20) // 120 samples / 20 pixel / div => time in us
+#define DSO_FQ_SAMPLES(x) ((x*DSO_CAPTURE_INTERNAL_BUFFER_SIZE)/(20*4)) // X/20 pixel/div => core clock, multiplied by BUFFER SIZE/4 => time to fill 1/4 of the buffer
 const TimerTimeBase timerBases[]=
 {   //                                  20 pix/dev => fq*20
     { DSOCapture::DSO_TIME_BASE_10US,   "10us",  DSO_FQ_US(10)   ,DSO_FQ_SAMPLES(10)}, // 1 us / sample round up, error =0.3%%

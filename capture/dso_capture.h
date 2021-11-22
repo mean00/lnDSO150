@@ -150,7 +150,7 @@ struct TimerTimeBase
   DSOCapture::DSO_TIME_BASE timeBase;
   const char    *name;
   int           fq;  
-  int           usToGet120Samples;
+  int           usToFillBuffer;
 };
 /**
  */

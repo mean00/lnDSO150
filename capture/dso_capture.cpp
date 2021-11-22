@@ -34,12 +34,13 @@ float      DSOCapture::getTriggerVoltage()
     return _triggerVolt;
 }
 /**
- * Time to let the DMA run to get 120 more samples
+ * This returns the time (in us) to let the delay timer run
+ * so that we have 1/4 of the buffer full
  * @return 
  */
 int DSOCapture::delay()
 {
-    return timerBases[currentTimeBase].usToGet120Samples;    
+    return timerBases[currentTimeBase].usToFillBuffer;
 }
 
 int DSOCapture_delay()
