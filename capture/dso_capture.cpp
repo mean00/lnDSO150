@@ -413,55 +413,6 @@ void DSOCapture::stopCapture()
 }
 
 /**
- */
-int  DSOCapture::lookupTrigger(int medOffset)
-{
-    
-#define DEADZONE 200    
-//#define DEADZONE DSO_CAPTURE_INTERNAL_BUFFER_SIZE/8;
-    int start=DEADZONE ;
-    int len=DSO_CAPTURE_INTERNAL_BUFFER_SIZE-DEADZONE*2;;
-
-    switch(_triggerMode)
-    {
-        case   Trigger_Rising:
-        {
-            uint16_t *cur=internalAdcBuffer+start;
-            for(int i=0;i<len-1;i++)
-            {
-                
-                if(cur[0]<_triggerAdc && cur[1] >=_triggerAdc) 
-                    return i+start;
-                cur++;
-            }
-            Logger("Med=%d, seg=%d\n",_med,_triggerLocation);
-            Logger("Cannot find up trigger\n");
-        }
-            break;
-        case   Trigger_Falling:
-        {
-            uint16_t *cur=internalAdcBuffer+start;
-            for(int i=0;i<len-1;i++)
-            {
-                
-                if(cur[0]>_triggerAdc && cur[1] <=_triggerAdc) 
-                    return i+start;
-                cur++;
-            }
-            Logger("Med=%d, seg=%d\n",_med,_triggerLocation);
-            Logger("Cannot find Down trigger\n");
-        }
-            break;
-        case   Trigger_Both:
-            return 0;
-            break;
-        default:
-            xAssert(0);
-    }
-    return 0;
-}
-
-/**
  * 
  * @param nb
  * @param f
