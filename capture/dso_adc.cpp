@@ -2,17 +2,11 @@
  *  (C) 2021 MEAN00 fixounet@free.fr
  *  See license file
  * 
- * The one is a bit complicated
- * Let's take as example a trigger on rising signal with a threshold at 1v
- * In trigger mode, we do the following :
- *    * Program a watchdog ADC interrupt on the "safe" zone i.e; BELOW 1v in the example
- *    * When that watchdog triggers we reprogram the watchdog to the real trigger zone , i.e ABOVE 1v
- *    * When that watchdog triggers we compute where it happened and enable the next dma full/half transfer complete
- *        so that the trigger point is roughly in the middle of the buffer
- * 
- * So the right DMA complete interrupt can be  the next half one, the next full one, or the half one following the next full one
- * 
- * 
+ *  For now it works like this :
+ *      Actively scan to see we are "OUT" of the trigger area
+ *      When you are in, look for WD triggering in polling mode
+ *      When the WD trigger arm a delay timer to have some samples after the trigger
+ *      When the delay timer triggers, stop the DMA and warn the client
  * 
  */
 #include "lnArduino.h"
@@ -24,22 +18,16 @@
 #include "dso_adc.h"
 #include "lnCpuID.h"
 
-
+// statistics
 static int dmaFull=0, dmaHalf=0,dmaCount=0;
+
+
 static lnDSOAdc *_currentInstance=NULL;
-extern lnDSOAdc::lnDSOADC_State DSOCapture_getWatchdog(lnDSOAdc::lnDSOADC_State state, int &mn, int &mxv);
-bool DSOCapture_lookup(lnDSOAdc::lnDSOADC_State state,uint16_t *data,int size,int &index);
+static void delayIrq_(void *a);
+
 int  DSOCapture_delay();
 //------------------------------------------------------------------
-/**
- * 
- * @param a
- */
-void delayIrq_(void *a)
-{
-    lnDSOAdc *adc=(lnDSOAdc *)a;
-    adc->delayIrq();
-}
+
 /**
  * 
  * @param instance
@@ -59,7 +47,19 @@ lnDSOAdc::lnDSOAdc(int instance,int timer, int channel)  : lnBaseAdc(instance),
     lnIrqSetPriority((LnIRQ)LN_IRQ_DMA0_Channel0,2); // more urgent than default
     lnIrqSetPriority(LN_IRQ_TIMER5,2);
     _delayTimer.setInterrupt(delayIrq_,this);
+    _cb=NULL;
 }
+
+/**
+ * 
+ * @param a
+ */
+void delayIrq_(void *a)
+{
+    lnDSOAdc *adc=(lnDSOAdc *)a;
+    adc->delayIrq();
+}
+
 /**
  * 
  * @return 
@@ -238,12 +238,12 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
       {
           adc->STAT &=~LN_ADC_STAT_WDE;
           int index;
-          if(!DSOCapture_lookup(ARMING,start,scan,index))
+          if(!_cb->lookup(ARMING,start,scan,index))
               return;
           start+=index;
           scan-=index;
           _state=ARMED;
-         if(DSOCapture_lookup(ARMED,start,scan,index))
+         if(_cb->lookup(ARMED,start,scan,index))
          {
             _state=TRIGGERED;
             _triggerLocation=start+index-_output;
@@ -262,13 +262,13 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
             if(!(adc->STAT &LN_ADC_STAT_WDE)) return; //no watchdog, no need to check
             
             int index;
-            if(!DSOCapture_lookup(ARMED, start,scan,index))
+            if(!_cb->lookup(ARMED, start,scan,index))
               return;
             _state=TRIGGERED;
             _triggerLocation=start+index-_output;
             //--- ARM delay----------
             _dma.setInterruptMask(false, false);
-            _delayTimer.arm(DSOCapture_delay()); //
+            _delayTimer.arm(_cb->getDelayUs()); //
       }
       break;
       default:
@@ -314,7 +314,8 @@ bool     lnDSOAdc::startTriggeredDma(int n,  uint16_t *output)
     // Go for the "safe" area
     int mn,mx;
      
-     DSOCapture_getWatchdog(lnDSOAdc::ARMING,mn,mx);
+    xAssert(_cb);
+    _cb->getWatchdog(lnDSOAdc::ARMING,mn,mx);
      adc->WDHT=mx;
      adc->WDLT=mn;
      // Enable watchdog

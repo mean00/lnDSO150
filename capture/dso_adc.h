@@ -11,7 +11,7 @@
 #include "lnBasicTimer.h"
 
 typedef void (adcCb)(int nb,bool mid,int segment);
-
+struct lnDSOADCCallbacks;
 /**
  * 
  * @param instance
@@ -32,13 +32,14 @@ public:
     };
     
                 lnDSOAdc(int instance,int timer, int channel);
+   bool         setCallbacks(const lnDSOADCCallbacks *cb) {_cb=cb;return true;}
    virtual      ~lnDSOAdc();
    bool         setSource(int fq, lnPin pins,lnADC_DIVIDER divider, lnADC_CYCLES cycles, int overSamplingLog2);
    bool         startDmaTransfer(int n,  uint16_t *output) ;
    bool         startTriggeredDma(int n,  uint16_t *output) ;
    bool         setWatchdog(int low, int high);
    void         stopCapture();
-   void         setCb(adcCb *c) { _captureCb=c;}
+   void         setCb(  adcCb *c) { _captureCb=c;}
    void         endCapture();
 public:
     static void dmaDone_(void *foo, lnDMA::DmaInterruptType typ);
@@ -50,14 +51,29 @@ protected:
     lnDSOADC_State _state;
     int         _timer,_channel,_fq;
     lnDMA       _dma;
-    lnAdcTimer *_adcTimer;
-    adcCb      *_captureCb;
+    lnAdcTimer  *_adcTimer;
+    adcCb       *_captureCb;
     int         _pin;
     int         _nbSamples;
     uint16_t   *_output;
     uint32_t    _triggerLocation;
     lnBasicDelayTimer _delayTimer;
+    const lnDSOADCCallbacks *_cb;
     
 };
+
+typedef   lnDSOAdc::lnDSOADC_State (LN_GetWatchdogCb)(lnDSOAdc::lnDSOADC_State state, int &mn, int &mxv);
+typedef   bool (LN_Lookup)(lnDSOAdc::lnDSOADC_State state,uint16_t *data,int size,int &index);
+typedef   int  (LN_GetDelayUs)(void);
+/**
+ */
+struct lnDSOADCCallbacks
+{
+    const LN_GetWatchdogCb *getWatchdog;
+    const LN_Lookup        *lookup;
+    const LN_GetDelayUs    *getDelayUs;
+};
+
+
 // EOF
 

@@ -115,7 +115,7 @@ public:
     static float                            getMaxVoltageValue();
     static float                            getMinVoltageValue();
     static int                              timeBaseToFrequency(DSOCapture::DSO_TIME_BASE timeBase);
-
+    static bool                             lookup(lnDSOAdc::lnDSOADC_State state, uint16_t *data,int size,int &index);
     
     
 protected:

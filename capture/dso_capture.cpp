@@ -24,6 +24,14 @@ float      DSOCapture::_triggerVolt=1.0;
 int        DSOCapture::_triggerAdc=2048;
 DSOCapture::TriggerMode  DSOCapture::_triggerMode;
 bool       DSOCapture::_couplingModeIsAC=0;
+/**
+ */
+static const lnDSOADCCallbacks adcCaptureCb=
+{
+    DSOCapture::getWatchdog,
+    DSOCapture::lookup,
+    DSOCapture::delay
+};
 
 /**
  * 
@@ -70,7 +78,7 @@ int DSOCapture_delay()
  * @param index
  * @return 
  */
-bool DSOCapture_lookup(lnDSOAdc::lnDSOADC_State state, uint16_t *data,int size,int &index)
+bool DSOCapture::lookup(lnDSOAdc::lnDSOADC_State state, uint16_t *data,int size,int &index)
 {
     if(state==lnDSOAdc::ARMING)
     {
@@ -334,6 +342,7 @@ void DSOCapture::initialize(lnPin pin)
         
     }    
     _adc=new lnDSOAdc(0,TIMER_ADC_ID,TIMER_ADC_CHANNEL);     // timer 3 channel 3
+    _adc->setCallbacks(&adcCaptureCb);
 }
 /**
  * 
