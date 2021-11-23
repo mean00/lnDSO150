@@ -64,7 +64,7 @@ protected:
 
 typedef   lnDSOAdc::lnDSOADC_State (LN_GetWatchdogCb)(lnDSOAdc::lnDSOADC_State state, int &mn, int &mxv);
 typedef   bool (LN_Lookup)(lnDSOAdc::lnDSOADC_State state,uint16_t *data,int size,int &index);
-typedef   int  (LN_GetDelayUs)(void);
+typedef   int  (LN_GetDelayUs)(int currentLocation, int triggerLocation, int loopSize);
 /**
  */
 struct lnDSOADCCallbacks

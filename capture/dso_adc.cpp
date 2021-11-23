@@ -25,7 +25,6 @@ static int dmaFull=0, dmaHalf=0,dmaCount=0;
 static lnDSOAdc *_currentInstance=NULL;
 static void delayIrq_(void *a);
 
-int  DSOCapture_delay();
 //------------------------------------------------------------------
 
 /**
@@ -249,7 +248,7 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
             _triggerLocation=start+index-_output;
             //--- ARM delay----------
             _dma.setInterruptMask(false, false);
-            _delayTimer.arm(10); //
+            _delayTimer.arm(_cb->getDelayUs(_nbSamples-_dma.getCurrentCount(), _triggerLocation, _nbSamples)); //
             return;
          }
           // not in that block, arm Watchdog
@@ -268,7 +267,7 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
             _triggerLocation=start+index-_output;
             //--- ARM delay----------
             _dma.setInterruptMask(false, false);
-            _delayTimer.arm(_cb->getDelayUs()); //
+            _delayTimer.arm(_cb->getDelayUs(_nbSamples-_dma.getCurrentCount(), _triggerLocation, _nbSamples)); //
       }
       break;
       default:

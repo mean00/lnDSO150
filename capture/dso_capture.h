@@ -83,7 +83,7 @@ public:
         CAPTURE_DONE=2, // It is done but not cleaned up yet
     }; 
 public:
-    static int                             delay();
+    static int                             delay(int currentLocation, int triggerLocation, int loopSize);
     static void                            initialize(lnPin pin);
     static void                            setCouplingMode(int isAc) {_couplingModeIsAC=isAc;}
     static void                            setTriggerMode(TriggerMode mode);

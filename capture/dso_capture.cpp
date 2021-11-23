@@ -46,15 +46,17 @@ float      DSOCapture::getTriggerVoltage()
  * so that we have 1/4 of the buffer full
  * @return 
  */
-int DSOCapture::delay()
+int DSOCapture::delay(int currentLocation, int triggerLocation, int loopSize)
 {
-    return timerBases[currentTimeBase].usToFillBuffer;
+     //   timerBases[currentTimeBase].usToFillBuffer; is the time to fill 1/4 of the buffer
+    //   ((x*DSO_CAPTURE_INTERNAL_BUFFER_SIZE)/(20*4)) // X/20 pixel/div => core clock, multiplied by BUFFER SIZE/4 => time to fill 1/4 of the buffer
+    int ratio=(currentLocation+loopSize-triggerLocation)&(loopSize-1);
+    // bufffer consumed in 1/8th of the buffer
+    ratio=(8*ratio+4)/loopSize;
+    if(ratio>=2) return 1; // Consumed already 2*1/8=1/4 of the buffer    
+    return timerBases[currentTimeBase].usToFillBuffer; // ask for 1/4 more
 }
 
-int DSOCapture_delay()
-{
-    return DSOCapture::delay();
-}
 
 #define MACRO_SEARCH(cond)  \
         { \
