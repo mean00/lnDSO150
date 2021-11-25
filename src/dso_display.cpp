@@ -490,6 +490,7 @@ void  DSODisplay::setMode(MODE_TYPE t)
 
  void DSODisplay::drawAutoSetup(void )
  {
+     AutoGfx autogfx;
      tft->fillRoundRect(320/2-AUTOCAL_BOX_WIDTH/2,
                          240/2-AUTOCAL_BOX_HEIGHT/2, 
                          AUTOCAL_BOX_WIDTH,AUTOCAL_BOX_HEIGHT,
