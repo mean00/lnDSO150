@@ -48,6 +48,7 @@ public:
 protected:   
     void        dmaDone();
     void        dmaTriggerDone(lnDMA::DmaInterruptType typ);
+    void        armTimer();
     lnDSOADC_State _state;
     int         _timer,_channel,_fq;
     lnDMA       _dma;

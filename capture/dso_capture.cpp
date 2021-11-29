@@ -53,8 +53,8 @@ int DSOCapture::delay(int currentLocation, int triggerLocation, int loopSize)
     int ratio=(currentLocation+loopSize-triggerLocation)&(loopSize-1);
     // bufffer consumed in 1/8th of the buffer
     ratio=(8*ratio+4)/loopSize;
-    if(ratio>=2) return 1; // Consumed already 2*1/8=1/4 of the buffer    
-    return timerBases[currentTimeBase].usToFillBuffer; // ask for 1/4 more
+    if(ratio>=2) return 20; // Consumed already 2*1/8=1/4 of the buffer    
+    return 20+timerBases[currentTimeBase].usToFillBuffer; // ask for 1/4 more
 }
 
 

@@ -19,7 +19,7 @@
 #include "lnCpuID.h"
 
 // statistics
-static int dmaFull=0, dmaHalf=0,dmaCount=0;
+static int dmaFull=0, dmaHalf=0,dmaCount=0,timerArmed=0;;
 
 
 static lnDSOAdc *_currentInstance=NULL;
@@ -44,7 +44,7 @@ lnDSOAdc::lnDSOAdc(int instance,int timer, int channel)  : lnBaseAdc(instance),
     _dma.setPriority(lnDMA::DMA_PRIORITY_ULTRA_HIGH);
 #warning HARDCODED
     lnIrqSetPriority((LnIRQ)LN_IRQ_DMA0_Channel0,2); // more urgent than default
-    lnIrqSetPriority(LN_IRQ_TIMER5,2);
+    lnIrqSetPriority(LN_IRQ_TIMER5,3);
     _delayTimer.setInterrupt(delayIrq_,this);
     _cb=NULL;
 }
@@ -197,7 +197,23 @@ void lnDSOAdc::dmaTriggerDone_(void *t, lnDMA::DmaInterruptType typ)
  * 
  * @param typ
  */
-
+void lnDSOAdc::armTimer()
+{
+    _state=TRIGGERED;
+    //--- ARM delay----------
+    _dma.setInterruptMask(false, false);
+    int currentSample=_nbSamples-_dma.getCurrentCount();
+    timerArmed++;
+#if 0
+    delayIrq();
+#else            
+    _delayTimer.arm(_cb->getDelayUs(currentSample, _triggerLocation, _nbSamples)); //
+#endif            
+}
+/**
+ * 
+ * @param typ
+ */
 void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
 { 
   LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
@@ -244,11 +260,9 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
           _state=ARMED;
          if(_cb->lookup(ARMED,start,scan,index))
          {
-            _state=TRIGGERED;
+            
             _triggerLocation=start+index-_output;
-            //--- ARM delay----------
-            _dma.setInterruptMask(false, false);
-            _delayTimer.arm(_cb->getDelayUs(_nbSamples-_dma.getCurrentCount(), _triggerLocation, _nbSamples)); //
+            armTimer();
             return;
          }
           // not in that block, arm Watchdog
@@ -263,11 +277,9 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
             int index;
             if(!_cb->lookup(ARMED, start,scan,index))
               return;
-            _state=TRIGGERED;
+            
             _triggerLocation=start+index-_output;
-            //--- ARM delay----------
-            _dma.setInterruptMask(false, false);
-            _delayTimer.arm(_cb->getDelayUs(_nbSamples-_dma.getCurrentCount(), _triggerLocation, _nbSamples)); //
+            armTimer();                              
       }
       break;
       default:

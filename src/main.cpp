@@ -22,7 +22,7 @@ extern void testFunc();
 extern void testFunc2();
 
 
-
+extern void foo(void *a);
 DSOControl          *control;
 DSO_portArbitrer    *arbitrer;
 DSO_testSignal      *testSignal;
@@ -32,15 +32,32 @@ lnNvm               *nvm;
 /**
  * 
  */
+float f;
+void foo(void *)
+{
+    f+=0.1;
+}
 void setup()
 {
     Logger("Setuping up DSO...\n");
+#if 0   
+    lnBasicDelayTimer bTimer(0);
+    bTimer.setInterrupt(foo,NULL);
+    bTimer.arm(5);
+    while(1)
+    {
+        xDelay(100);
+    }
+#endif    
     xMutex *PortBMutex=new xMutex;
     arbitrer=new DSO_portArbitrer(1,PortBMutex);
     
     control=new DSOControl(NULL); // control must be initialised after ili !
     control->setup();
 
+  
+
+    
     
     testSignal=new DSO_testSignal(PIN_TEST_SIGNAL,PIN_TEST_SIGNAL_AMP);
     testSignal->setFrequency(1*1000);
@@ -65,6 +82,7 @@ void mainLoop_bounce(void *a)
 /**
  * 
  */
+
 void loop()
 {
     
@@ -91,6 +109,8 @@ void loop()
     
     testFunc2();
    
+   
+    
     xTaskCreate(mainLoop_bounce, "mainLoop",1000,NULL,4,NULL);
     while(1)
     {
