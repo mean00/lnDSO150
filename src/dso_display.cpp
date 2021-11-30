@@ -168,7 +168,7 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
     int start,sz;
     
     if(count<3) return;
-    for(int j=2;j<count-1;j++)
+    for(int j=1;j<count-1;j++)
     {
         
         int color=YELLOW;
