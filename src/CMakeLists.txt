@@ -1,3 +1,4 @@
+    
 include_directories(ui)
 ADD_LIBRARY(  sourceLib
                 main.cpp dso_gfx.cpp dso_test_signal.cpp dso_control.cpp
@@ -17,3 +18,10 @@ ENDIF( )
 IF(NOT USE_ROTARY_FULL_STEP)    
     TARGET_COMPILE_DEFINITIONS(sourceLib PRIVATE "-DDSO_ROTARY_FULL_STEP")
 ENDIF( )
+
+            
+IF("${LN_ARCH}" STREQUAL "RISCV")
+    MESSAGE(STATUS "ILI9341 : Using PB8 instead of PB3 for LCD")
+    TARGET_COMPILE_OPTIONS(sourceLib PRIVATE "-DUSE_PB8_INSTEAD_OF_PB3")
+ENDIF()
+        
