@@ -36,7 +36,33 @@ void setup()
 {
     Logger("Setuping up DSO...\n");
     xMutex *PortBMutex=new xMutex;
-    arbitrer=new DSO_portArbitrer(1,PortBMutex);
+    
+     // arbitrer must be created with screen already set up
+    // ili must be first
+     ili=new ln8bit9341( 240, 320,
+                                    1,          // port B
+                                    PC14,       // DC/RS
+                                    PC13,       // CS
+                                    PC15,       // Write
+                                    PA6,        // Read
+                                    PB9);       // LCD RESET
+    ili->init();    
+    ili->setRotation(1);
+    
+    ili->setFontFamily(smallFont(),mediumFont(),bigFont());
+    ili->setFontSize(ili9341::SmallFont);
+    ili->setTextColor(GREEN,BLACK);
+    
+    
+    DSO_GFX::init(ili);
+    DSODisplay::init(ili);
+    
+    arbitrer=new DSO_portArbitrer(1,PortBMutex); // arbitrer must be created with screen already set up
+    
+    DSODisplay::drawSplash();
+    
+    
+    
     
     control=new DSOControl(NULL); // control must be initialised after ili !
     control->setup();
@@ -69,24 +95,7 @@ void loop()
     
     Logger("Starting DSO...\n");
     testFunc();
-    ili=new ln8bit9341( 240, 320,
-                                    1,          // port B
-                                    PC14,       // DC/RS
-                                    PC13,       // CS
-                                    PC15,       // Write
-                                    PA6,        // Read
-                                    PB9);       // LCD RESET
-    ili->init();    
-    ili->setRotation(1);
-    
-    ili->setFontFamily(smallFont(),mediumFont(),bigFont());
-    ili->setFontSize(ili9341::SmallFont);
-    ili->setTextColor(GREEN,BLACK);
-    
-    
-    DSO_GFX::init(ili);
-    DSODisplay::init(ili);
-    DSODisplay::drawSplash();
+   
     
     testFunc2();
    
