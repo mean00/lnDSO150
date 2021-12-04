@@ -54,6 +54,7 @@ int ampMapping[16]=
 
 
 #define ButtonToPin(x)    (PB0+x)
+//#define pinAsInput(x)     lnPinMode(ButtonToPin(x),lnINPUT_FLOATING);
 #define pinAsInput(x)     lnPinMode(ButtonToPin(x),lnINPUT_PULLUP);
 #define attachRE(x)       lnExtiAttachInterrupt(ButtonToPin(x),LN_EDGE_FALLING,_myInterruptRE,(void *)x );
 
@@ -125,6 +126,8 @@ public:
         switch(s)
         {
             default:
+                xAssert(0);
+                break;
             case 0: // flat
                 break;
             case 2:
@@ -182,6 +185,25 @@ static void _myInterruptRE(lnPin pin,void *a)
     ints++;
     instance->interruptRE(!!a);
 }
+/**
+ * 
+ * @return 
+ */
+uint32_t DSOControl::snapshot()
+{
+    uint32_t val;
+#if 1        
+        arbitrer->beginInput();   
+        val= lnReadPort(1); // read all bits from portB        
+        val=0xffff^val;
+        arbitrer->endInput();
+        
+#else
+        val=0;
+#endif
+        return val;
+}
+
 /**
  * 
  * @param button
@@ -249,27 +271,39 @@ DSOControl::DSOControl(ControlEventCb *c)
     #define PREPARE_PIN(x)  lnPinMode(x,lnOUTPUT);  digitalWrite(x,1);lnPinMode(x,lnINPUT_PULLUP);     
     PREPARE_PIN(ALT_ROTARY_LEFT)
     PREPARE_PIN(ALT_ROTARY_RIGHT)
-#else    
-    pinAsInput(DSO_BUTTON_UP);
-    pinAsInput(DSO_BUTTON_DOWN);
+#endif            
+
+            
+    for(int i=0;i<4;i++)    
+        lnPinMode(SENSEL_PIN+i,lnOUTPUT); // SENSEL            
+            
+    uint32_t oldDir=arbitrer->currentDirection(0), oldDir2=arbitrer->currentDirection(1);
+    uint32_t oldVal=arbitrer->currentValue();        
+    
+#ifndef USE_RXTX_PIN_FOR_ROTARY                
+    pinAsInput(ButtonMapping[DSO_BUTTON_UP]);
+    pinAsInput(ButtonMapping[DSO_BUTTON_DOWN]);
 #endif
     
-    pinAsInput(DSO_BUTTON_ROTARY);
-    pinAsInput(DSO_BUTTON_VOLTAGE);
-    pinAsInput(DSO_BUTTON_TIME);
-    pinAsInput(DSO_BUTTON_TRIGGER);
-    pinAsInput(DSO_BUTTON_OK);
+    pinAsInput(ButtonMapping[DSO_BUTTON_ROTARY]);
+    pinAsInput(ButtonMapping[DSO_BUTTON_VOLTAGE]);
+    pinAsInput(ButtonMapping[DSO_BUTTON_TIME]);
+    pinAsInput(ButtonMapping[DSO_BUTTON_TRIGGER]);
+    pinAsInput(ButtonMapping[DSO_BUTTON_OK]);
     
-    for(int i=0;i<4;i++)    
-        lnPinMode(SENSEL_PIN+i,lnOUTPUT); // SENSEL
+   
     
     // Ok now the direction is correct, memorize it
-    arbitrer->setInputDirectionValue(arbitrer->currentDirection());
+    arbitrer->setInputDirectionValue(arbitrer->currentDirection(0),arbitrer->currentDirection(1));    
+    arbitrer->setInputValue(arbitrer->currentValue());
+    // now restore everything
+    arbitrer->setDirection(0,oldDir); // restore...
+    arbitrer->setDirection(1,oldDir2); // restore...
+    arbitrer->setValue(oldVal); // restore...
     // 
     lnPinMode(COUPLING_PIN,lnADC_MODE);
     couplingAdc=new  lnSimpleADC(1, COUPLING_PIN);
     couplingState=couplingFromAdc2();    
-        
 }
 /**
  * 
@@ -282,7 +316,9 @@ bool DSOControl::changeCb(ControlEventCb *newCb)
     _cb=newCb;
     // clear events when switching callback
     for(int button=DSO_BUTTON_UP;button<= DSO_BUTTON_OK;button++)
+    {
         _buttons[button].reset();
+    }
     counter=0;
     interrupts();
     return true;
@@ -361,14 +397,8 @@ void DSOControl::runLoop()
             if(_cb)
                 _cb(DSOControl::DSOEventCoupling);
         }
-#if 1        
-        arbitrer->beginInput();        
-        uint32_t val= lnReadPort(1); // read all bits from portB        
-        val=0xffff^val;
-        arbitrer->endInput();
-#else
-        uint32_t val=0;
-#endif
+
+        uint32_t val=snapshot();
         
         
         int changed=0;
@@ -378,10 +408,10 @@ void DSOControl::runLoop()
             if(button.holdOff()) 
                 continue;
             
-            int k=(val&(1<<i));
-#if 0
-            if(k) Logger("Button %i down \n",i);
-#endif            
+            int mask=1<<ButtonMapping[i];
+            
+            int k=(val&mask);
+            
             int oldCount=button._pinCounter;
             button.integrate(k);
             changed+=button.runMachine(oldCount);          

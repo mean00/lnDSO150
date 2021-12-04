@@ -30,12 +30,19 @@ public:
   {
     DSO_BUTTON_UP=0,
     DSO_BUTTON_DOWN=1,
-    DSO_BUTTON_ROTARY=3,
-    DSO_BUTTON_VOLTAGE=4,
-    DSO_BUTTON_TIME=5,
-    DSO_BUTTON_TRIGGER=6,
-    DSO_BUTTON_OK=7
+    DSO_BUTTON_ROTARY=2,
+    DSO_BUTTON_VOLTAGE=3,
+    DSO_BUTTON_TIME=4,
+    DSO_BUTTON_TRIGGER=5,    
+    DSO_BUTTON_OK=6
   };
+#ifndef USE_PB8_INSTEAD_OF_PB3
+  const int ButtonMapping[7]={0,1,2,3,4,5,6};
+#else
+  const int ButtonMapping[7]={0,1,2,8,4,5,6};
+#endif
+  
+  
   enum DSOButtonState
   {
     StateIdle=0,
@@ -69,6 +76,7 @@ public:
     int           getRawCoupling();
     static const char *getName(const DSOButton &button);
 protected:
+    uint32_t    snapshot();
     int         couplingValue;
     DSOCoupling couplingState;
     ControlEventCb *_cb;

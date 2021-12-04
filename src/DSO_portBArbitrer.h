@@ -15,6 +15,7 @@ public:
                 void endLCD();
                 uint32_t currentDirection(int offset) { return _directionPort[offset];}
                 uint32_t currentValue() { return _valuePort[0];}
+                void     setValue(uint32_t v) {  _valuePort[0]=v;}
                 void     setDirection(int offset,uint32_t val) {  _directionPort[offset]=val;}
 protected:
     xMutex      *_tex;
