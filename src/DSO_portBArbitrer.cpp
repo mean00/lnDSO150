@@ -21,9 +21,10 @@ DSO_portArbitrer::DSO_portArbitrer(int port,  xMutex *tex)
 }
 /**
  */
-void DSO_portArbitrer::setInputDirectionValue(uint32_t v)
+void DSO_portArbitrer::setInputDirectionValue(uint32_t v, uint32_t v2)
 {
     _inputDirection=v;
+    _inputDirection2=v2;
 }
 /**
  * 
@@ -41,9 +42,11 @@ void DSO_portArbitrer::beginInput()
 {
     _tex->lock();
     WAIT_A_BIT
-    _oldDirection=*_directionPort;
+    _oldDirection=_directionPort[0];
+    _oldDirection2=_directionPort[1];
     _oldInput=*_valuePort;
-    *_directionPort=_inputDirection;
+    _directionPort[0]=_inputDirection;
+    _directionPort[1]=_inputDirection2;
     *_valuePort=_intputValue;
     WAIT_A_BIT
 }
@@ -51,7 +54,8 @@ void DSO_portArbitrer::beginInput()
  */
 void DSO_portArbitrer::endInput()
 {
-    *_directionPort=_oldDirection;
+    _directionPort[0]=_oldDirection;
+    _directionPort[1]=_oldDirection2;
     *_valuePort=_oldInput;
     WAIT_A_BIT
     _tex->unlock();
