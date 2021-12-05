@@ -95,9 +95,9 @@ bool     lnDSOAdc::setSource(  int fq,lnPin pin,lnADC_DIVIDER divider,lnADC_CYCL
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
     _pin=pin;
     //overSamplingLog2=0;
-    
+    bool gd32=lnCpuID::vendor()==lnCpuID::LN_MCU_GD32;
     _fq=fq;    
-    if(lnCpuID::vendor()==lnCpuID::LN_MCU_GD32)
+    if(gd32)
     {        
      _fq<<= overSamplingLog2;  
     }
@@ -135,7 +135,7 @@ bool     lnDSOAdc::setSource(  int fq,lnPin pin,lnADC_DIVIDER divider,lnADC_CYCL
     adc->RSQS[0]=adcChannel(pin);
     adc->RSQS[1]=0;
     adc->RSQS[2]=0;
-    if(lnCpuID::vendor()==lnCpuID::LN_MCU_GD32)
+    if(gd32)
     {
         if(!overSamplingLog2)
         {
