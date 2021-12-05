@@ -145,7 +145,8 @@ static const UI_eventCallbacks  *topMenus[NB_TOP_MENU]=
      &voltMenu,     // 3: DSO_BUTTON_VOLTAGE,
      &timeMenu,     // 4: DSO_BUTTON_TIME,
      &triggerMenu,  // 5: DSO_BUTTON_TRIGGER,
-     NULL,          // 7: DSO_BUTTON_OK
+     NULL,          // 6: DSO_BUTTON_OK
+     NULL,          // 7: xx
  };
  static const UI_eventCallbacks *currentMenu=NULL;
  
