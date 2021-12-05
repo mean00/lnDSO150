@@ -20,6 +20,7 @@ MAKEFQITEM(fq100,100)
 MAKEFQITEM(fq1k,1000)
 MAKEFQITEM(fq10k,10*1000)
 MAKEFQITEM(fq100k,100*1000)
+MAKEFQITEM(fq50k,50*1000)
 
 #define FQ_MENU(x,y)     {MenuItem::MENU_INDEX,x,(void *)&(fq##y)},
 const MenuItem  fqMenu[]=
@@ -28,7 +29,7 @@ const MenuItem  fqMenu[]=
     FQ_MENU("100 Hz" ,100)
     FQ_MENU("1 kHz",  1k)
     FQ_MENU("10 kHz", 10k)
-    FQ_MENU("100 kHz",100k)
+    FQ_MENU("50 kHz",50k)
     {MenuItem::MENU_END, NULL,NULL}
 };
 

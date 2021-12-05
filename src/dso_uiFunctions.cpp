@@ -139,12 +139,13 @@ const UI_eventCallbacks timeMenu= {DSOControl::DSO_BUTTON_TIME,NULL, &time_redra
    
 static const UI_eventCallbacks  *topMenus[NB_TOP_MENU]=
 {
-     NULL,NULL,NULL, // up / down
-     NULL,          //DSO_BUTTON_ROTARY= 3
-     &voltMenu,     //DSO_BUTTON_VOLTAGE=4,
-     &timeMenu,     //DSO_BUTTON_TIME=5,
-     &triggerMenu,  //DSO_BUTTON_TRIGGER=6,
-     NULL,          //DSO_BUTTON_OK=7
+     NULL,          // 0: up
+     NULL,          // 1: down
+     NULL,          // 2: rotary     
+     &voltMenu,     // 3: DSO_BUTTON_VOLTAGE,
+     &timeMenu,     // 4: DSO_BUTTON_TIME,
+     &triggerMenu,  // 5: DSO_BUTTON_TRIGGER,
+     NULL,          // 7: DSO_BUTTON_OK
  };
  static const UI_eventCallbacks *currentMenu=NULL;
  

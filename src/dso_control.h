@@ -36,10 +36,18 @@ public:
     DSO_BUTTON_TRIGGER=5,    
     DSO_BUTTON_OK=6
   };
+  
+// V/DIV    => B4
+// SEC/DIV  => B5
+// TRIGGER  => B6
+// OK       => B7
+// Rotary   => B3 or B8
+  
+  
 #ifndef USE_PB8_INSTEAD_OF_PB3
-  const int ButtonMapping[7]={0,1,2,3,4,5,6};
+  const int ButtonMapping[7]={0,1,  3, 4,5,6,7};
 #else
-  const int ButtonMapping[7]={0,1,2,8,4,5,6};
+  const int ButtonMapping[7]={0,1,  8, 4,5,6,7};
 #endif
   
   

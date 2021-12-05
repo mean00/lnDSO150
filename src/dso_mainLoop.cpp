@@ -69,7 +69,7 @@ void mainLoop()
     
        
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);    
-    DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_10US);    
+    DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_1MS);    
     
     DSOInputGain::readCalibrationValue();
     
@@ -85,6 +85,7 @@ void mainLoop()
     
     DSOCapture::setCouplingMode(control->getCouplingState()==DSOControl::DSO_COUPLING_AC);
     DSOCapture::setTriggerMode(DSOCapture::Trigger_Rising);    
+    DSOCapture::setTriggerMode(DSOCapture::Trigger_Run);        
     DSOCapture::setTriggerVoltage(1.0);
     
     redrawEverything();        
