@@ -93,6 +93,7 @@ lnDSOAdc::~lnDSOAdc()
 bool     lnDSOAdc::setSource(  int fq,lnPin pin,lnADC_DIVIDER divider,lnADC_CYCLES cycles, int overSamplingLog2)
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
+    lnPinMode(pin,lnADC_MODE);
     _pin=pin;
     //overSamplingLog2=0;
     bool gd32=lnCpuID::vendor()==lnCpuID::LN_MCU_GD32;
