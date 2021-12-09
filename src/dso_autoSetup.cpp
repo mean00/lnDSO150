@@ -70,21 +70,14 @@ bool autoSetupVoltage(bool setTrigger)
     
     int tries=NB_CAPTURE_VOLTAGE+2;
     int nb;
+    float xMin,xMax;
     while(1) //!clock.elapsed(2000))
     {
         sem->tryTake();
         DSOCapture::startCapture(240);
         sem->take();
-        DSOCapture::getData(nb,capture);
+        DSOCapture::getData(nb,capture,xMin,xMax);
         
-        float xMax=-5000;
-        float xMin=5000;
-        for(int i=0;i<nb;i++)
-        {
-            float f=capture[i];
-            if(f>xMax) xMax=f;
-            if(f<xMin) xMin=f;
-        }
         xMax=fabs(xMax);
         xMin=fabs(xMin);
         
