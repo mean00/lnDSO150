@@ -437,6 +437,17 @@ void DSOCapture::stopCapture()
  * @return 
  */
 
+#define BODY()   if(adc<mmin) mmin=adc; \
+        if(adc>mmax) mmax=adc; \
+        int fint=adc-offset; \
+        float ff=LN_FROM_INT(fint); \
+        ff=LN_FP_MUL(ff,multiplier); \
+        f[i]=ff; // now in volt
+
+#define LN_MINMAX()   vMin=(float)(mmin-offset)*multiplier; \
+        vMax=(float)(mmax-offset)*multiplier;
+
+
 extern uint32_t lnGetCycle32();
 bool DSOCapture::getData(int &nb, float *f, float &vMin, float &vMax)
 {
@@ -448,7 +459,7 @@ bool DSOCapture::getData(int &nb, float *f, float &vMin, float &vMax)
    
     if(_triggerMode!=Trigger_Run)
     {
-        return getDataTriggered(nb,f);      
+        return getDataTriggered(nb,f,vMin,vMax);      
     }
     nb=_nb;    
     int offset=DSOInputGain::getOffset(_couplingModeIsAC);
@@ -458,17 +469,11 @@ bool DSOCapture::getData(int &nb, float *f, float &vMin, float &vMax)
     for(int i=0;i<_nb;i++)
     {
         int adc=(int)internalAdcBuffer[(i)];
-        if(adc<mmin) mmin=adc;
-        if(adc>mmax) mmax=adc;
-        int fint=adc-offset;
-        float ff=LN_FROM_INT(fint);
-        ff=LN_FP_MUL(ff,multiplier);
-        f[i]=ff; // now in volt
+        BODY()
     }
     //int after=lnGetCycle32();    Logger("Conv 2 volt =%d\n",after-before);
     
-    vMin=(float)(mmin-offset)*multiplier;
-    vMax=(float)(mmax-offset)*multiplier;
+    LN_MINMAX();
     return true;       
  }
 /**
@@ -536,12 +541,13 @@ int         DSOCapture::timeBaseToFrequency(DSOCapture::DSO_TIME_BASE timeBase)
  * @param f
  * @return 
  */
-bool DSOCapture::getDataTriggered(int &nb, float *f)
+bool DSOCapture::getDataTriggered(int &nb, float *f,float &vMin,float &vMax)
 {
     nb=_nb;
     int offset=DSOInputGain::getOffset(_couplingModeIsAC);
     float multiplier=DSOInputGain::getMultiplier();
-    
+    int mmin=4095;
+    int mmax=0;
     
     // We know the trigger location, rewind a bit so we have the trigger located at the center
     int back=(_triggerLocation-_nb/2+DSO_CAPTURE_INTERNAL_BUFFER_SIZE)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE;
@@ -553,19 +559,29 @@ bool DSOCapture::getDataTriggered(int &nb, float *f)
         uint16_t *data16=internalAdcBuffer+back;
         for(int i=0;i<_nb;i++)
         {
-            int fint=(int)*data16++-offset;
-            float z=(float)fint*multiplier;
-            f[i]=z; // now in volt
+            int adc=(int)*data16++;            
+            BODY()
         }
-        return true;
-    }
-    // it wraps, use the slow method
-    for(int i=0;i<_nb;i++)
+    }else
     {
-        int fint=(int)internalAdcBuffer[(back+i)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE]-offset;
-        float z=(float)fint*multiplier;
-        f[i]=z; // now in volt
+        // till the end of buffer...
+        int left=DSO_CAPTURE_INTERNAL_BUFFER_SIZE-back;
+        uint16_t *data16=internalAdcBuffer+back;
+        for(int i=0;i<left;i++)
+        {
+            int adc=(int)*data16++;
+            BODY()
+        }
+        // wrap
+        data16=internalAdcBuffer;
+        for(int i=left;i<_nb;i++)
+        {
+            int adc=(int)*data16++;
+            BODY()
+        }
     }
+    // update vMin/vMax
+    LN_MINMAX();
     return true;
 }
 // EOF
