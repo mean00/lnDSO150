@@ -1,0 +1,8 @@
+Qfplib is open source, licensed under version 2 of the GNU GPL. A copy
+of that licence is included in this archive. The archive also contains:
+
+- qfplib-m3.s, the source code to Qfplib-M3. The GNU assembler syntax is used.
+
+- qfplib-m3.h, a C header file giving prototypes for the Qfplib-M3 functions.
+
+Visit http://www.quinapalus.com/qfplib-m3.html for more information.

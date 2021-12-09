@@ -101,7 +101,7 @@ public:
 
     static                                  void setCb(captureCb *cb);
     static                                  captureCb *getCb() {return _cb;}
-    static                                  bool getData(int &nb, float *f);
+    static                                  bool getData(int &nb, float *f, float &vmin,float &vmax);
     static                                  bool getDataTriggered(int &nb, float *f);
     static                                  bool startCapture(int nb);
     static                                  void stopCapture();

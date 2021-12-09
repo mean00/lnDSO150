@@ -8,6 +8,7 @@
 #include "dso_capture.h"
 #include "dso_adc.h"
 #include "pinConfiguration.h"
+#include "lnDso_fp.h"
 
 lnPin           DSOCapture::_pin;
 captureCb      *DSOCapture::_cb;
@@ -429,8 +430,19 @@ void DSOCapture::stopCapture()
  * @param f
  * @return 
  */
-bool DSOCapture::getData(int &nb, float *f)
+/**
+ * 
+ * RISCV First : 11k cycles Optim-> same
+ * 
+ * @return 
+ */
+
+extern uint32_t lnGetCycle32();
+bool DSOCapture::getData(int &nb, float *f, float &vMin, float &vMax)
 {
+    int mmin=4095;
+    int mmax=0;
+    
     _adc->endCapture();
 
    
@@ -441,12 +453,22 @@ bool DSOCapture::getData(int &nb, float *f)
     nb=_nb;    
     int offset=DSOInputGain::getOffset(_couplingModeIsAC);
     float multiplier=DSOInputGain::getMultiplier();
+    
+    //int before=lnGetCycle32();
     for(int i=0;i<_nb;i++)
     {
-        int fint=(int)internalAdcBuffer[(i)]-offset;
-        float z=(float)fint*multiplier;
-        f[i]=z; // now in volt
+        int adc=(int)internalAdcBuffer[(i)];
+        if(adc<mmin) mmin=adc;
+        if(adc>mmax) mmax=adc;
+        int fint=adc-offset;
+        float ff=LN_FROM_INT(fint);
+        ff=LN_FP_MUL(ff,multiplier);
+        f[i]=ff; // now in volt
     }
+    //int after=lnGetCycle32();    Logger("Conv 2 volt =%d\n",after-before);
+    
+    vMin=(float)(mmin-offset)*multiplier;
+    vMax=(float)(mmax-offset)*multiplier;
     return true;       
  }
 /**

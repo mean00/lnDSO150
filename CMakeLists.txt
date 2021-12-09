@@ -59,8 +59,23 @@ SET(EXTENSION "${EXTENSION}_${MCU_SPEED_M}M")
 
  
 include_directories(src)
-include_directories(qfp)
 
+#_______________________
+# FPU
+#_______________________
+IF("${LN_ARCH}" STREQUAL "RISCV")
+    SET(FP fp/rvfp)
+    include_directories(${FP}/include)
+    SET(FP_LIB rvfp)
+ELSEIF("${LN_ARCH}" STREQUAL "ARM")
+    IF("${LN_MCU}" STREQUAL "M3")
+        SET(FP fp/qfp)
+        include_directories(${FP})
+        SET(FP_LIB qfpm3)
+    ENDIF("${LN_MCU}" STREQUAL "M3")
+ENDIF("${LN_ARCH}" STREQUAL "RISCV")
+ADD_SUBDIRECTORY(fp)
+include_directories(fp)
 # FreeRTOS
 SET(USE_TRIGGER True)
 #_______________________
@@ -85,7 +100,7 @@ ADD_SUBDIRECTORY(testFunc)
 GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION})
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  captureLib )
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  sourceLib testLib)
-TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341 assets)
+TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341 assets ${FP_LIB})
 
 # Summary
 MESSAGE(STATUS "Configuration:")

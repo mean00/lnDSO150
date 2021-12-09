@@ -2,16 +2,18 @@
 #include "dso_display.h"
 #include "dso_control.h"
 #include "dso_capture.h"
-
+#include "lnDso_fp.h"
 extern float      *captureBuffer;
 extern uint8_t    *displayData;
 uint32_t lastRefresh=0;
+
+extern uint32_t lnGetCycle32();
 
 /**
  */
 void showCapture()
 {
-    float vMin=500,vMax=-500;
+    float vMin=500,vMax=-500;    
     int nb;
     // display
     // next
@@ -30,21 +32,39 @@ void showCapture()
         DSODisplay::drawFq(fq); 
     }
 #endif    
-    DSOCapture::getData(nb,captureBuffer);
+    DSOCapture::getData(nb,captureBuffer,vMin,vMax);
     // convert data to display
     float displayGain=DSOCapture::getVoltToPix();
+    // Nano RISCV@108 Mhz
+    // ---------------------  Original       Optim
+    //  capture -> volt         11   kCycke  11 kCycle
+    //  Volt -> Display         24.5 kCycle  10 kCycle
+    //    
+    // Cortex M4 @ 72 Mhz
+    // -------------------     
+    // capture->volt              6k cycle
+    // Volt -> display            7k cycle
+    //
+    //  Cortex M3 @72 Mhz (GD)
+    // ---------------------------
+    // capture->volt              20k cycle
+    // Volt -> display            18k cycle
+
+    
+    
+    //int before=lnGetCycle32();
+    float displayGain2=displayGain*2.;
     for(int i=0;i<nb;i++)
     {
         float f=captureBuffer[i];
-        if(f>vMax) vMax=f;
-        if(f<vMin) vMin=f;
-        f*=displayGain;
-        int d=100-(int)(f+0.5);
-        if(d>199) d=199;
+        f=LN_FP_MUL(f,displayGain2);
+        int d=LN_TO_INT(f);
+        d=200-d;
+        if(d>398) d=398;
         if(d<0) d=0;
-        displayData[i]=d;
+        displayData[i]=d>>1;
     }
-
+//    int after=lnGetCycle32();Logger("Conv 2 display =%d\n",after-before);
 
     // we can ask for the next one now
     DSOCapture::startCapture(240);
