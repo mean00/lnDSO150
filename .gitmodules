@@ -7,3 +7,6 @@
 [submodule "externals/simplerILI9341"]
 	path = externals/simplerILI9341
 	url = https://github.com/mean00/simplerILI9341.git
+[submodule "fp/rvfp"]
+	path = fp/rvfp
+	url = https://github.com/pulp-platform/RVfplib.git
