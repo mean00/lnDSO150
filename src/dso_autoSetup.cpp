@@ -12,6 +12,8 @@
 
 static bool autoSetupVoltage(bool setTrigger);
 static bool autoSetupFrequency();
+static void autoTrigger();
+
 static captureCb *oldCb;
 static xBinarySemaphore *sem=NULL;
 static float *capture=NULL;
@@ -39,6 +41,9 @@ void        autoSetup()
        
     DSOCapture::DSO_TIME_BASE timeBase=DSOCapture::DSO_TIME_BASE_1MS;
     DSOCapture::setTimeBase(timeBase);
+    
+    DSOCapture::setTriggerMode(DSOCapture::Trigger_Run);
+    
     // voltage range
     
     if(!autoSetupVoltage(false))         
@@ -51,6 +56,8 @@ void        autoSetup()
     if(!autoSetupVoltage(true)) 
         goto end; // failed
     DSODisplay::drawAutoSetupStep(3);    
+    
+    autoTrigger();
 end:    
     DSOCapture::stopCapture();
     DSOCapture::setCb(oldCb);
@@ -141,4 +148,25 @@ bool autoSetupFrequency()
     } 
     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_1MS);
     return false;
+}
+/**
+ * 
+ */
+void autoTrigger()
+{
+    float xMin,xMax;
+    
+    sem->tryTake();
+    DSOCapture::startCapture(240);
+    sem->take();
+    int nb;
+    DSOCapture::getData(nb,capture,xMin,xMax);
+    
+    float trigger=(xMax+xMin)/2;
+    DSOCapture::setTriggerVoltage(trigger);
+    
+    if(((xMax-xMin))>0.1)
+        DSOCapture::setTriggerMode(DSOCapture::Trigger_Rising);
+    else
+        DSOCapture::setTriggerMode(DSOCapture::Trigger_Run);
 }
