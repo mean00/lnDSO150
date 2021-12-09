@@ -1,7 +1,7 @@
 #pragma once
 extern "C"
 {
-#include "rvfplib.h"
+#include "rvfp/include/rvfplib.h"
 }
 
 #define LN_FP_MUL(a,b) __mulsf3(a,b)

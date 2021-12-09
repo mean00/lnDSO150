@@ -7,7 +7,7 @@ IF("${LN_ARCH}" STREQUAL "RISCV")
             rvfp/src/asm/ieee754_nd/__divdf3.S       rvfp/src/asm/ieee754_nd/__fixunssfsi.S   rvfp/src/asm/ieee754_nd/__gtsf2.S
             rvfp/src/asm/ieee754_nd/__divsf3.S       rvfp/src/asm/ieee754_nd/__floatdidf.S    rvfp/src/asm/ieee754_nd/__ledf2.S
             rvfp/src/asm/ieee754_nd/__eqdf2.S        rvfp/src/asm/ieee754_nd/__floatdisf.S    rvfp/src/asm/ieee754_nd/__lesf2.S
-            rvfp/src/asm/ieee754_nd/__eqsf2.S        rvfp/src/asm/ieee754_nd/__floatsidf.S    rvfp/src/asm/ieee754_nd/__ltdf2.S
+            rvfp/src/asm/ieee754_nd/__eqsf2.S        rvfp/src/asm/ieee754_nd/__floatsidf.S   # rvfp/src/asm/ieee754_nd/__ltdf2.S
             rvfp/src/asm/ieee754_nd/__extendsfdf2.S  rvfp/src/asm/ieee754_nd/__floatsisf.S    rvfp/src/asm/ieee754_nd/__ltsf2.S
             rvfp/src/asm/ieee754_nd/__fixdfdi.S      rvfp/src/asm/ieee754_nd/__floatundidf.S  rvfp/src/asm/ieee754_nd/__muldf3.S
             rvfp/src/asm/ieee754_nd/__fixdfsi.S      rvfp/src/asm/ieee754_nd/__floatundisf.S  rvfp/src/asm/ieee754_nd/__mulsf3.S
