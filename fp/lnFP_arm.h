@@ -1,7 +1,7 @@
 #pragma once
 extern "C"
 {
-#include "qfplib-m3.h"
+#include "qfp/qfplib-m3.h"
 }
 
 #define LN_FP_MUL(a,b) qfp_fmul(a,b)
