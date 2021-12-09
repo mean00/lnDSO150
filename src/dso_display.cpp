@@ -494,7 +494,7 @@ void  DSODisplay::setMode(MODE_TYPE t)
      tft->fillRoundRect(320/2-AUTOCAL_BOX_WIDTH/2,
                          240/2-AUTOCAL_BOX_HEIGHT/2, 
                          AUTOCAL_BOX_WIDTH,AUTOCAL_BOX_HEIGHT,
-                         4,AUTOCAL_COLOR);      
+                         4,AUTOCAL_COLOR,0);      
  }
 void DSODisplay::drawAutoSetupStep(int i )
  {
@@ -505,7 +505,7 @@ void DSODisplay::drawAutoSetupStep(int i )
                          pg,
                          AUTOCAL_BOX_HEIGHT-AUTOCAL_BORDER*2,
                          4,
-                         0);    
+                         AUTOCAL_COLOR,AUTOCAL_COLOR);    
      
  }
 
