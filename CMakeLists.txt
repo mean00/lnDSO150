@@ -64,13 +64,9 @@ include_directories(src)
 # FPU
 #_______________________
 IF("${LN_ARCH}" STREQUAL "RISCV")
-    SET(FP fp/rvfp)
-    include_directories(${FP}/include)
     SET(FP_LIB rvfp)
 ELSEIF("${LN_ARCH}" STREQUAL "ARM")
     IF("${LN_MCU}" STREQUAL "M3")
-        SET(FP fp/qfp)
-        include_directories(${FP})
         SET(FP_LIB qfpm3)
     ENDIF("${LN_MCU}" STREQUAL "M3")
 ENDIF("${LN_ARCH}" STREQUAL "RISCV")
