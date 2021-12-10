@@ -37,8 +37,8 @@ void showCapture()
     float displayGain=DSOCapture::getVoltToPix();
     // Nano RISCV@108 Mhz
     // ---------------------  Original       Optim
-    //  capture -> volt         11   kCycke  11 kCycle
-    //  Volt -> Display         24.5 kCycle  10 kCycle
+    //  capture -> volt           11   kCycke  11 kCycle
+    //  Volt -> Display           24.5 kCycle  10 kCycle
     //    
     // Cortex M4 @ 72 Mhz
     // -------------------     
@@ -49,6 +49,11 @@ void showCapture()
     // ---------------------------
     // capture->volt              20k cycle
     // Volt -> display            18k cycle
+    //
+    //  Cortex M3 @72 Mhz (STM)
+    // ---------------------------
+    // capture->volt              31k cycle
+    // Volt -> display            27k cycle
 
     
     
