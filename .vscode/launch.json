@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+      {
+        "armToolchainPath" : "/home/fx/Arduino_stm32/arm-gcc-2020q4/bin/",
+        "name": "BMP attach",
+        "cwd": "${workspaceRoot}",
+        "executable": "${workspaceRoot}/build/lnDSO_M3_mod_hstep_72M.elf",
+        "request": "launch",
+        "type": "cortex-debug",
+        "servertype": "bmp",
+        "interface": "swd",
+        "device": "STM32F103",
+        "BMPGDBSerialPort" : "/dev/ttyBmpGdb",
+        "runToMain": true,
+        "preLaunchCommands":[
+        
+        ],
+        "preRestartCommands": [
+        "enable breakpoint",
+        "break main"
+        ]
+        }
+}
