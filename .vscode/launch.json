@@ -3,6 +3,7 @@
   "configurations": [
       {
         "armToolchainPath" : "/home/fx/Arduino_stm32/arm-gcc-2020q4/bin/",
+        "svdFile" : "${workspaceRoot}/.vscode/STM32F103.svd",
         "name": "BMP attach",
         "cwd": "${workspaceRoot}",
         "executable": "${workspaceRoot}/build/lnDSO_M3_mod_hstep_72M.elf",
@@ -14,7 +15,9 @@
         "BMPGDBSerialPort" : "/dev/ttyBmpGdb",
         "runToMain": true,
         "preLaunchCommands":[
-        
+        "b deadEnd",
+        "set mem inaccessible-by-default off",
+        "set confirm off"
         ],
         "preRestartCommands": [
         "enable breakpoint",
