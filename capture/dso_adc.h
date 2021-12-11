@@ -8,7 +8,7 @@
 #pragma once
 #include "lnDma.h"
 #include "lnADC.h"
-#include "lnBasicTimer.h"
+#include "lnTimer.h"
 
 typedef void (adcCb)(int nb,bool mid,int segment);
 struct lnDSOADCCallbacks;
@@ -58,7 +58,7 @@ protected:
     int         _nbSamples;
     uint16_t   *_output;
     uint32_t    _triggerLocation;
-    lnBasicDelayTimer _delayTimer;
+    lnDelayTimer _delayTimer;
     const lnDSOADCCallbacks *_cb;
     
 };

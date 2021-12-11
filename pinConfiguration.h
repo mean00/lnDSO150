@@ -29,6 +29,9 @@
  * For VF103 we also have PB8 for LCD
  * and PB3/PA15 are used for jtag
  * 
+ * Timer3 is used as clock for ADC
+ * Timer2/PA7 is used for square test signal
+ * Timer 1 is delay timer
  */
 
 

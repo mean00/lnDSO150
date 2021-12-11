@@ -32,7 +32,7 @@ static void delayIrq_(void *a);
  * @param instance
  */
 lnDSOAdc::lnDSOAdc(int instance,int timer, int channel)  : lnBaseAdc(instance), 
-        _dma( lnDMA::DMA_PERIPH_TO_MEMORY,   lnAdcDesc[_instance].dmaEngine, lnAdcDesc[_instance].dmaChannel,  32,16), _delayTimer(0)
+        _dma( lnDMA::DMA_PERIPH_TO_MEMORY,   lnAdcDesc[_instance].dmaEngine, lnAdcDesc[_instance].dmaChannel,  32,16), _delayTimer(1,0)
 {
     xAssert(instance==0); // we need DMA so only ADC0
     _channel=channel;
