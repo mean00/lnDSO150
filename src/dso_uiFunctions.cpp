@@ -245,6 +245,7 @@ static const UI_eventCallbacks  *topMenus[NB_TOP_MENU]=
                                 DSOCapture::stopCapture();
                                 menuManagement(control);
                                 redrawEverything();
+                                control->saveSettings();
                                 currentMenu=NULL;
                                 initUiEvent();
                                 DSOCapture::startCapture(240);

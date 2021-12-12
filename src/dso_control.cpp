@@ -15,6 +15,10 @@
 #include "dso_config.h"
 #include "DSO_portBArbitrer.h"
 #include "lnADC.h"
+#include "gd32/nvm_gd32.h"
+#include "DSO_nvmId.h"
+
+extern lnNvm                    *nvm;
 
 #define TICK                  10 // 10 ms
 #define LONG_PRESS_THRESHOLD (1000/TICK) // 1s
@@ -162,6 +166,7 @@ DSOControl::DSOControl(ControlEventCb *c)
     instance=this;
     counter=0;
     _cb=c;
+    _inverted=false;
     
 #ifdef USE_RXTX_PIN_FOR_ROTARY    
     #define PREPARE_PIN(x)  lnPinMode(x,lnOUTPUT);  digitalWrite(x,1);lnPinMode(x,lnINPUT_PULLUP);     
@@ -355,15 +360,17 @@ void DSOControl::interruptRE(int a)
    // Determine new state from the pins and state table.
   state = ttable[state & 0xf][pinstate];
   // Return emit bits, ie the generated event.
+  int inc=1;
+  if(_inverted) inc=-1;
   switch(state&DIR_MASK)
   {
     case DIR_CW:
             debugUp++;
-            counter++;
+            counter+=inc;
             break;
     case DIR_CCW: 
             debugDown++;
-            counter--;
+            counter-=inc;
             break;
     default: 
             break;
@@ -474,4 +481,30 @@ void  DSOControl::setInputGain(int val)
     uint32_t v=set+(unset<<16);
     *portA=v<<1;
 }
+/**
+ * 
+ */
+void          DSOControl::loadSettings()
+{
+  uint8_t value;
+  if(!nvm->read(NVM_INVERT_ROTARY,1,(uint8_t *)&value))
+  {
+      Logger("Cannot read invert setting\n");
+      return;  
+  }
+  _inverted=value;
+}
+/**
+ * 
+ */
+void          DSOControl::saveSettings()
+{
+  uint8_t value=_inverted;
+  if(!nvm->write(NVM_INVERT_ROTARY,1,(uint8_t *)&value))
+  {
+      Logger("Cannot write invert setting\n");
+  }  
+}
+
+
 //

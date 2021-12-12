@@ -82,11 +82,17 @@ public:
     DSOCoupling   getCouplingState();
     const char    *geCouplingStateAsText();    
     int           getRawCoupling();
+    void          invert(bool inv) {_inverted=inv;}
+    bool          inverted() {return _inverted;}
     static const char *getName(const DSOButton &button);
+    //--
+    void          loadSettings();
+    void          saveSettings();
 protected:
     uint32_t    snapshot();
     int         couplingValue;
     DSOCoupling couplingState;
     ControlEventCb *_cb;
+    bool        _inverted;
 };
 // EOF

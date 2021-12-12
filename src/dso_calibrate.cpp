@@ -14,6 +14,7 @@
 #include "dso_capture_input.h"
 #include "gd32/nvm_gd32.h"
 #include "lnADC.h"
+#include "DSO_nvmId.h"
 
 
 static void printCalibrationTemplate( const char *st1, const char *st2);
@@ -24,9 +25,6 @@ lnTimingAdc                     *calAdc=NULL;
 extern DSOControl               *control;
 extern lnNvm                    *nvm;
 
-#define NVM_CALIBRATION_AC          5
-#define NVM_CALIBRATION_DC          6
-#define NVM_CALIBRATION_VERSION     11
 /**
  * 
  */

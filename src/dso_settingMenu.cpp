@@ -8,11 +8,12 @@
 #include "dso_gfx.h"
 #include "dso_test_signal.h"
 #include "dso_calibrate.h"
+#include "dso_control.h"
 
 extern DSO_testSignal      *testSignal;
 static int currentFQ;
 static int largeAmplitude;
-
+static int invertedRotary=0;
 
 #define MAKEFQITEM(name,val) static const MenuListItem name={&currentFQ,val};
 
@@ -47,6 +48,7 @@ const MenuItem  amplitudeMenu[]=
     {MenuItem::MENU_END, NULL,NULL}
 };
 //--
+
 const MenuItem  signalMenu[]=
 {
     {MenuItem::MENU_TITLE, "Test Signal",NULL},
@@ -54,6 +56,21 @@ const MenuItem  signalMenu[]=
     {MenuItem::MENU_SUBMENU, "Frequency",(const void *)&fqMenu},
     {MenuItem::MENU_END, NULL,NULL}
 };
+
+#define MAKEINVERTITEM(name,val) static const MenuListItem name={&invertedRotary,val};
+MAKEINVERTITEM(rotDirect,0)
+MAKEINVERTITEM(rotInverted,1)
+
+#define INVERT_MENU(x,y)     {MenuItem::MENU_INDEX, x,(void *)(&rot##y)},     
+
+const MenuItem  controlMenu[]=
+{
+    {MenuItem::MENU_TITLE, "Control",NULL},
+    INVERT_MENU("Clockwise" ,Direct)
+    INVERT_MENU("CounterClock" ,Inverted)
+    {MenuItem::MENU_END, NULL,NULL}
+};
+
 //--
 const MenuItem  calibrationMenu[]=
 {
@@ -69,6 +86,7 @@ const MenuItem  topMenu[]={
     {MenuItem::MENU_SUBMENU, "Test signal",(const void *)&signalMenu},
     //{MenuItem::MENU_CALL, "Button Test",(const void *)buttonTest},
     {MenuItem::MENU_SUBMENU, "Calibration",(const void *)&calibrationMenu},
+    {MenuItem::MENU_SUBMENU, "Control",(const void *)&controlMenu},
     {MenuItem::MENU_END, NULL,NULL}
 };
 
@@ -83,11 +101,12 @@ void  menuManagement(DSOControl *control)
      
      currentFQ=testSignal->getFrequency();
      largeAmplitude=testSignal->getAmplitude();
-     
+     invertedRotary=control->inverted();
      MenuManager man(control, tem);
      man.run();
      
      testSignal->setFrequency(currentFQ);
      testSignal->setAmplitude(largeAmplitude);
+     control->invert(invertedRotary);
 }
 // EOF

@@ -72,6 +72,7 @@ void mainLoop()
     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_1MS);    
     
     DSOInputGain::readCalibrationValue();
+    control->loadSettings();
     
     evtGroup=new xFastEventGroup;
     evtGroup->takeOwnership();
