@@ -10,6 +10,12 @@
 #include "pinConfiguration.h"
 #include "lnDso_fp.h"
 
+#if 0
+    #define debug Logger
+#else
+    #define debug(...) {}
+#endif
+
 lnPin           DSOCapture::_pin;
 captureCb      *DSOCapture::_cb;
 int             DSOCapture::_nb;
@@ -58,12 +64,23 @@ int DSOCapture::delay(int currentLocation, int triggerLocation, int loopSize)
     return 20+timerBases[currentTimeBase].usToFillBuffer; // ask for 1/4 more
 }
 
+/**
+ * 
+ *  Warning, we do something a bit fishy here
+ *   1- We ask for 2 consecutive value that matches the condition
+ *   2- There is a small hysteresis
+ *   If we dont do that, the noise will be enough to trigger even if the condition is inverted
+ *   i.e.
+ *    \
+ *     \/\   < a bit of noise here will trigger 
+ *        \
+ */
 
 #define MACRO_SEARCH(cond)  \
         { \
-                for(int i=0;i<size && !f;i++) \
+                for(int i=1;i<size && !f;i++) \
                 { \
-                    if(data[i] cond)  \
+                    if((data[i] cond) && (data[i-1] cond) )  \
                     {\
                         f=true;\
                         index=i;\
@@ -91,11 +108,19 @@ bool DSOCapture::lookup(lnDSOAdc::lnDSOADC_State state, uint16_t *data,int size,
 
             case DSOCapture::Trigger_Run: xAssert(0);break;
             case DSOCapture::Trigger_Both:
-            case DSOCapture::Trigger_Rising:        
-                    MACRO_SEARCH(<DSOCapture::_triggerAdc)        
+            case DSOCapture::Trigger_Rising:  
+            {
+                    int level=      DSOCapture::_triggerAdc-5;
+                    if(level<0) level=1;
+                    MACRO_SEARCH(<level)        
+            }
                     break;
-            case DSOCapture::Trigger_Falling:        
-                    MACRO_SEARCH(>DSOCapture::_triggerAdc)        
+            case DSOCapture::Trigger_Falling:   
+            {
+                    int level=      DSOCapture::_triggerAdc+5; 
+                    if(level>4094) level=4094;
+                    MACRO_SEARCH(>level)        
+            }
                     break;
         }
         return false;
@@ -107,11 +132,19 @@ bool DSOCapture::lookup(lnDSOAdc::lnDSOADC_State state, uint16_t *data,int size,
         {
             case DSOCapture::Trigger_Run: xAssert(0);break;
             case DSOCapture::Trigger_Both:
-            case DSOCapture::Trigger_Rising:        
-                    MACRO_SEARCH(>=DSOCapture::_triggerAdc)        
+            case DSOCapture::Trigger_Rising:   
+            {
+                    int level=      DSOCapture::_triggerAdc+5; 
+                    if(level>4094) level=4094;
+                    MACRO_SEARCH(>=level)        
+            }
                     break;
-            case DSOCapture::Trigger_Falling:        
-                    MACRO_SEARCH(<=DSOCapture::_triggerAdc)        
+            case DSOCapture::Trigger_Falling:     
+            {
+                    int level=      DSOCapture::_triggerAdc-5;
+                    if(level<0) level=1;   
+                    MACRO_SEARCH(<=level)        
+            }
                     break;
         }
         return false;
@@ -553,9 +586,12 @@ bool DSOCapture::getDataTriggered(int &nb, float *f,float &vMin,float &vMax)
     int back=(_triggerLocation-_nb/2+DSO_CAPTURE_INTERNAL_BUFFER_SIZE)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE;
     int endPos=(back+_nb)%DSO_CAPTURE_INTERNAL_BUFFER_SIZE;
     
+    debug("TriggerLocation : %d\n",_triggerLocation);
+
     // does not wrap
     if(endPos>back)
     {
+        debug("copy from %d to %d\n",back,back+_nb);
         uint16_t *data16=internalAdcBuffer+back;
         for(int i=0;i<_nb;i++)
         {
@@ -567,6 +603,7 @@ bool DSOCapture::getDataTriggered(int &nb, float *f,float &vMin,float &vMax)
         // till the end of buffer...
         int left=DSO_CAPTURE_INTERNAL_BUFFER_SIZE-back;
         uint16_t *data16=internalAdcBuffer+back;
+        debug("copy 1 : from %d to %d\n",back,back+left);
         for(int i=0;i<left;i++)
         {
             int adc=(int)*data16++;
@@ -574,6 +611,7 @@ bool DSOCapture::getDataTriggered(int &nb, float *f,float &vMin,float &vMax)
         }
         // wrap
         data16=internalAdcBuffer;
+        debug("copy 2 : from %d to %d\n",0,_nb-left);
         for(int i=left;i<_nb;i++)
         {
             int adc=(int)*data16++;
