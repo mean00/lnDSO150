@@ -8,6 +8,7 @@ struct UI_eventCallbacks;
  typedef void redrawProto(bool onoff);
  typedef void incdecProto(int count);
  extern DSOControl          *control;
+ extern float voltageOffset;
  extern void redrawEverything();
  extern void autoSetup();
  /**
@@ -30,6 +31,8 @@ struct UI_eventCallbacks;
      Logger("VolMenu : redraw %d\n",on);
      DSODisplay::drawVolt( DSOCapture::getVoltageRangeAsText(),on);
  }
+ /**
+  */
  void voltMenu_incdec(int inc)
  {
      int  range=DSOCapture::getVoltageRange();
@@ -40,13 +43,14 @@ struct UI_eventCallbacks;
 // Volt / Offset
  void voltOffset_redraw(bool on)
  {
-     Logger("voltOffset_redraw : redraw %d\n",on);
+      DSODisplay::printOffsetValue( voltageOffset,on);
  }
  /*
   */
  void voltOffset_incdec(int inc)
  {
-     Logger("VolOffset : %d\n",inc);
+     float finc=((float)inc)*0.1;
+     voltageOffset+=finc;     
  }
  //--
  // Volt / Offset
@@ -94,7 +98,7 @@ struct UI_eventCallbacks;
      if(inc)
      {
         float conv=DSOCapture::getVoltToPix();
-        float  v=DSOCapture::getTriggerVoltage();
+        float  v=(DSOCapture::getTriggerVoltage()+voltageOffset);
         DSODisplay::drawVoltageTrigger(false, v*conv);
         v+=(float)inc/conv;
         
@@ -109,7 +113,7 @@ struct UI_eventCallbacks;
   */
  void time_redraw(bool on)
  {     
-     Logger("voltTriggerValue_redraw : redraw %d\n",on);
+     Logger("time redraw : redraw %d\n",on);
      DSODisplay::drawTime(DSOCapture::getTimeBaseAsText(),on);     
  }
  /**
@@ -118,7 +122,7 @@ struct UI_eventCallbacks;
   */
  void time_incdec(int inc)
  {
-    Logger("voltTriggerValue_incdec : %d\n",inc);
+    Logger("time : %d\n",inc);
      
     int ctime=DSOCapture::getTimeBase();
     ctime=(ctime+inc+DSO_NB_TIMEBASE)%DSO_NB_TIMEBASE;
@@ -171,6 +175,7 @@ static const UI_eventCallbacks  *topMenus[NB_TOP_MENU]=
      }
      // Secondary menu
      triggerValueMenu.redraw(false);
+     voltOffset.redraw(false);
  }
  
  /**

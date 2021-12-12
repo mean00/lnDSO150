@@ -29,7 +29,7 @@ typedef enum
             TIME_MODE=2,
             TRIGGER_MODE=3,
             ARMING_MODE=4,
-            VOLTAGE_MODE_ALT=VOLTAGE_MODE+0x80,
+            VOLTAGE_OFFSET_MODE=VOLTAGE_MODE+0x80,
             TIME_MODE_ALT=TIME_MODE+0x80,
             TRIGGER_MODE_ALT=TRIGGER_MODE+0x80,
 }MODE_TYPE;
@@ -60,7 +60,7 @@ public:
             static MODE_TYPE getMode();
             static void  setMode(MODE_TYPE t);
             static void  printTriggerValue(float volt,bool hilight=false); 
-            static void  printOffset(float volt); 
+            static void  printOffsetValue( float volt,bool hilight=false);
             
             static void  drawAutoSetup();
             static void  drawAutoSetupStep(int x);

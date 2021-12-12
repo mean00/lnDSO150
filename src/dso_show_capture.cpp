@@ -6,7 +6,7 @@
 extern float      *captureBuffer;
 extern uint8_t    *displayData;
 uint32_t lastRefresh=0;
-
+float voltageOffset=0.0;
 extern uint32_t lnGetCycle32();
 
 /**
@@ -59,10 +59,12 @@ void showCapture()
     
     //int before=lnGetCycle32();
     float displayGain2=displayGain*2.;
+    float invOffset=voltageOffset;
     for(int i=0;i<nb;i++)
     {
         float f=captureBuffer[i];
-        f=LN_FP_MUL(f,displayGain2);
+        f=LN_FP_ADD(f,invOffset);
+        f=LN_FP_MUL(f,displayGain2);        
         int d=LN_TO_INT(f);
         d=200-d;
         if(d>398) d=398;

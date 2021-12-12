@@ -61,11 +61,11 @@ extern const uint8_t *getSplash();
 //
 
 
-#define MIN_ROW   0
-#define MAX_ROW   2
-#define FREQ_ROW  4
-//#define AVRG_ROW  8
-#define TRIGGER_ROW  6
+#define MIN_ROW                 0
+#define MAX_ROW                 2
+#define FREQ_ROW                4
+#define TRIGGER_ROW             6
+#define VOLTAGE_OFFSET_ROW      8
 
 
 class AutoGfx
@@ -333,6 +333,10 @@ void prettyPrint(float x,int maxW=0)
   
     if(a<0.8)
     {
+        if(a==0.0)
+        {
+            sprintf(textBuffer,"0");
+        }else
         if(a<0.001)
             sprintf(textBuffer,"%03du",(int)(1000000.*x));
         else
@@ -386,6 +390,23 @@ void DSODisplay::printTriggerValue( float volt,bool hilight)
         tft->setTextColor(WHITE,BLACK);
     printMeasurement(TRIGGER_ROW+1, volt);
 }
+
+
+/**
+ * 
+ * @param mode
+ * @param volt
+ */
+void DSODisplay::printOffsetValue( float volt,bool hilight)
+{    
+    AutoGfx autogfx;    
+    if(hilight)
+        tft->setTextColor(BLACK,WHITE);
+    else
+        tft->setTextColor(WHITE,BLACK);
+    printMeasurement(VOLTAGE_OFFSET_ROW+1, volt);
+}
+
 /**
  * 
  */
@@ -404,19 +425,11 @@ void DSODisplay::drawStatsBackGround()
     drawInfoHeader(MAX_ROW,     "Max",BG_COLOR);  
     drawInfoHeader(FREQ_ROW,    "Freq",BG_COLOR);
     drawInfoHeader(TRIGGER_ROW, "Trigg",BG_COLOR);
+    drawInfoHeader(VOLTAGE_OFFSET_ROW, "Offset",BG_COLOR);
     //drawInfoHeader(10,          "Offst",BG_COLOR);
     tft->setTextColor(BG_COLOR,BLACK);
     oldMode=DSO_CAPTURE_MODE_INVALIDE;
     
-}
-
-/**
- * 
- * @param volt
- */
-void  DSODisplay::printOffset(float volt)
-{
-//    AND_ONE_F(volt,11);      
 }
 
 
@@ -450,6 +463,7 @@ void DSODisplay::drawVolt(const char *v, bool highlight)    { genericDraw(VOLTAG
 void DSODisplay::drawTrigger(const char *v, bool highlight) { genericDraw(TRIGGER_MODE,v,highlight);}
 void DSODisplay::drawTime(const char *v, bool highlight)    { genericDraw(TIME_MODE,   v,highlight);}
 void DSODisplay::drawCoupling(const char *v, bool highlight){ genericDraw(ARMING_MODE, v,highlight);}
+
 
 /**
  * 
