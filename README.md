@@ -15,6 +15,7 @@ __Features__ :
 * Screen support for both  ST7789 and ILI9341, autodetected
 * Supports STM32F103 GD32F303, GD32VF103 (the GD32F303 is ~ 2 times faster). You need 128kB of flash minimum.
 * Trigger up/down
+* Auto setup (long press Volt)
 * Only supports modified unit where rotary encoder is connected to PB14/PB15, see wiki. The rotary encoder will NOT work with unmodified DSO
 
 
