@@ -125,10 +125,10 @@ static const char *fq2Text(int fq)
     static char buff[16];
     float  f=fq;
     const char *suff="";
-#define STEP(x,t)  if((int)f>x)     {suff=t;f/=(float)x;}else
+#define STEP(x,t)  if(fq>((x*11)/10))     {suff=t;f/=(float)x;}else
 
-    STEP(1100000,"M")
-    STEP(1100,"K")
+    STEP(1000000,"M")
+    STEP(1000,"K")
     {        
     }            
             

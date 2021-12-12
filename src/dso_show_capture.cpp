@@ -24,7 +24,7 @@ void showCapture()
     {
         now=0;
     }    
-    if(now>lastRefresh+10)
+    if(now>lastRefresh+100) // refresh 10 times a sec
     {
         lastRefresh=now;
         int fq=DSOCapture::computeFrequency();
