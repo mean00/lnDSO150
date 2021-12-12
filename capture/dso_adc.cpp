@@ -221,17 +221,19 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
   //---
   dmaCount++;  
   int scan=_nbSamples/2;
+  int beginIndex;
   uint16_t *start;
   switch(typ)
   {
       case lnDMA::DMA_INTERRUPT_HALF:
             start=_output;
-
+            beginIndex=0;
             xAssert(dmaCount &1);
             dmaHalf++;
             break;
       case lnDMA::DMA_INTERRUPT_FULL:
             start=_output+scan;
+            beginIndex=scan;
             dmaFull++;
             xAssert(!(dmaCount &1));            
             break;
@@ -254,15 +256,16 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
       {
           adc->STAT &=~LN_ADC_STAT_WDE;
           int index;
+          // Check we are NOT in the trigger area
           if(!_cb->lookup(ARMING,start,scan,index))
               return;
           start+=index;
+          beginIndex+=index;
           scan-=index;
           _state=ARMED;
          if(_cb->lookup(ARMED,start,scan,index))
          {
-            
-            _triggerLocation=start+index-_output;
+            _triggerLocation=beginIndex+index;
             armTimer();
             return;
          }
@@ -279,7 +282,7 @@ void lnDSOAdc::dmaTriggerDone(lnDMA::DmaInterruptType typ)
             if(!_cb->lookup(ARMED, start,scan,index))
               return;
             
-            _triggerLocation=start+index-_output;
+            _triggerLocation=beginIndex+index;
             armTimer();                              
       }
       break;
