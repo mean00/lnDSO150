@@ -6,9 +6,22 @@
 extern float      *captureBuffer;
 extern uint8_t    *displayData;
 uint32_t lastRefresh=0;
-float voltageOffset=0.0;
+static float voltageOffset=0.0;
 extern uint32_t lnGetCycle32();
 
+/**
+ * 
+ */
+float getVoltageOffset()
+{
+    return voltageOffset;
+}
+/**
+ */
+void setVoltageOffset(float v)
+{
+    voltageOffset=v;
+}
 /**
  */
 void showCapture()

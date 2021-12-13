@@ -17,6 +17,9 @@ static void autoTrigger();
 static captureCb *oldCb;
 static xBinarySemaphore *sem=NULL;
 static float *capture=NULL;
+
+extern void setVoltageOffset(float v);
+
 void setupCb()
 {
     sem->give();
@@ -41,6 +44,7 @@ void        autoSetup()
        
     DSOCapture::DSO_TIME_BASE timeBase=DSOCapture::DSO_TIME_BASE_1MS;
     DSOCapture::setTimeBase(timeBase);
+    setVoltageOffset(0);
     
     DSOCapture::setTriggerMode(DSOCapture::Trigger_Run);
     

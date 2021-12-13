@@ -5,12 +5,14 @@
 #include "dso_capture.h"
 
 struct UI_eventCallbacks;
- typedef void redrawProto(bool onoff);
- typedef void incdecProto(int count);
- extern DSOControl          *control;
- extern float voltageOffset;
- extern void redrawEverything();
- extern void autoSetup();
+typedef void redrawProto(bool onoff);
+typedef void incdecProto(int count);
+extern DSOControl          *control;
+extern void redrawEverything();
+extern void autoSetup();
+extern float getVoltageOffset();
+extern void setVoltageOffset(float v);
+
  /**
   */
 
@@ -43,14 +45,16 @@ struct UI_eventCallbacks;
 // Volt / Offset
  void voltOffset_redraw(bool on)
  {
-      DSODisplay::printOffsetValue( voltageOffset,on);
+      DSODisplay::printOffsetValue( getVoltageOffset(),on);
  }
  /*
   */
  void voltOffset_incdec(int inc)
  {
     float conv=DSOCapture::getVoltToPix();        
-    voltageOffset+=(float)inc/conv;
+    float vOffset=getVoltageOffset();
+    vOffset+=(float)inc/conv;
+    setVoltageOffset(vOffset);
  }
  //--
  // Volt / Offset
@@ -84,7 +88,7 @@ struct UI_eventCallbacks;
  {
     float conv=DSOCapture::getVoltToPix();
     float  v=DSOCapture::getTriggerVoltage();
-     float  vdisplay=v+voltageOffset;
+     float  vdisplay=v+getVoltageOffset();
     DSODisplay::drawVoltageTrigger(on, vdisplay*conv);
     DSODisplay::printTriggerValue( v,on);
     Logger("voltTriggerValue_redraw : redraw %d\n",on);     
@@ -100,7 +104,7 @@ struct UI_eventCallbacks;
      {
         float conv=DSOCapture::getVoltToPix();
         float  v=(DSOCapture::getTriggerVoltage());
-        float  vdisplay=v+voltageOffset;
+        float  vdisplay=v+getVoltageOffset();
         DSODisplay::drawVoltageTrigger(false, vdisplay*conv);
         v+=(float)inc/conv;
         
