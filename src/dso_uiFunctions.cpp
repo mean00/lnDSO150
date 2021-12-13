@@ -49,8 +49,8 @@ struct UI_eventCallbacks;
   */
  void voltOffset_incdec(int inc)
  {
-     float finc=((float)inc)*0.1;
-     voltageOffset+=finc;     
+    float conv=DSOCapture::getVoltToPix();        
+    voltageOffset+=(float)inc/conv;
  }
  //--
  // Volt / Offset
