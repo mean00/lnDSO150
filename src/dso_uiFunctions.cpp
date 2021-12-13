@@ -84,7 +84,8 @@ struct UI_eventCallbacks;
  {
     float conv=DSOCapture::getVoltToPix();
     float  v=DSOCapture::getTriggerVoltage();
-    DSODisplay::drawVoltageTrigger(on, v*conv);
+     float  vdisplay=v+voltageOffset;
+    DSODisplay::drawVoltageTrigger(on, vdisplay*conv);
     DSODisplay::printTriggerValue( v,on);
     Logger("voltTriggerValue_redraw : redraw %d\n",on);     
  }
@@ -98,8 +99,9 @@ struct UI_eventCallbacks;
      if(inc)
      {
         float conv=DSOCapture::getVoltToPix();
-        float  v=(DSOCapture::getTriggerVoltage()+voltageOffset);
-        DSODisplay::drawVoltageTrigger(false, v*conv);
+        float  v=(DSOCapture::getTriggerVoltage());
+        float  vdisplay=v+voltageOffset;
+        DSODisplay::drawVoltageTrigger(false, vdisplay*conv);
         v+=(float)inc/conv;
         
         DSOCapture::stopCapture();
