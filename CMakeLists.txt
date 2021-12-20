@@ -100,6 +100,7 @@ TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341 assets ${FP_LIB})
 
 # Summary
 MESSAGE(STATUS "Configuration:")
+MESSAGE(STATUS "\tBuild folder ${CMAKE_BINARY_DIR}")
 MESSAGE(STATUS "\tUsing ${LN_MCU} based MCU")
 if(USE_VANILLA_HW)
     MESSAGE(STATUS "\tUsing vanilla HW")
