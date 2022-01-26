@@ -22,6 +22,9 @@ extern void testFunc();
 extern void testFunc2();
 extern void mainLoop();
 
+extern const uint8_t dso_resetOff[] ;
+extern const uint8_t dso_wakeOn[] ;
+
 
 DSOControl          *control;
 DSO_portArbitrer    *arbitrer;
@@ -46,7 +49,7 @@ void setup()
                                     PC15,       // Write
                                     PA6,        // Read
                                     PB9);       // LCD RESET
-    ili->init();    
+    ili->init(dso_resetOff,dso_wakeOn);    
     ili->setRotation(1);
     
     ili->setFontFamily(smallFont(),mediumFont(),bigFont());

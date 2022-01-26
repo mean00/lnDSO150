@@ -1,5 +1,5 @@
 #include "lnArduino.h"
-#include "gfxfont.h"
+#include "pfxfont.h"
 #include "Fonts/waree9.h"
 //#include "Fonts/waree12.h"
 //#include "Fonts/OpenSans_Regular14pt7b.h"
