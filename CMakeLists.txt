@@ -77,8 +77,9 @@ SET(USE_TRIGGER True)
 #_______________________
 #  Display
 #_______________________
-include_directories(externals/simplerILI9341/platformExample/longanNano)
-SET(ILI9341_DRIVER  platformExample/longanNano/gd32_8bits.cpp)
+SET(SIMPLER_ILI9341_FONT_COMPRESSION ON CACHE INTERNAL "")
+include_directories(externals/simplerILI9341/platformExample/lnArduino)
+SET(ILI9341_DRIVER  platformExample/lnArduino/ili_ln8bits.cpp)
 ADD_SUBDIRECTORY(externals/simplerILI9341) 
 include_directories(externals/simplerILI9341)
 #
@@ -96,7 +97,7 @@ ADD_SUBDIRECTORY(testFunc)
 GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION})
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  captureLib )
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  sourceLib testLib)
-TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341 assets ${FP_LIB})
+TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341 simplerILI9341HS assets ${FP_LIB})
 
 # Summary
 MESSAGE(STATUS "Configuration:")

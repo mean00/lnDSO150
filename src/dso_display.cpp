@@ -571,7 +571,7 @@ void DSODisplay::drawSplash()
     AutoGfx autogfx;
     
     tft->fillScreen(BLACK);   
-    tft->drawRLEBitmap(splash_width,splash_height,2,2, WHITE,BLACK,getSplash());
+    tft->drawHSBitmap(splash_width,splash_height,2,2, WHITE,BLACK,getSplash());
     tft->setFontSize(ili9341::SmallFont);
     tft->setTextColor(WHITE,BLACK);
     tft->setCursor(140, 64);

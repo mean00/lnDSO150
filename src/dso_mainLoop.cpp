@@ -1,5 +1,5 @@
 #include "lnArduino.h"
-#include "gd32_8bits.h"
+#include "ili_ln8bits.h"
 #include "lnStopWatch.h"
 #include "dso_gfx.h"
 #include "dso_menuEngine.h"
