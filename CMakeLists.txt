@@ -39,16 +39,16 @@ include(${AF_FOLDER}/setup.cmake)
 
 SET(EXTENSION "_${LN_MCU}")
 
-IF(USE_VANILLA_HW)    
+IF(USE_VANILLA_HW)
     SET(EXTENSION "${EXTENSION}_vanilla")
-ELSE(USE_VANILLA_HW)    
+ELSE(USE_VANILLA_HW)
     ADD_DEFINITIONS("-DUSE_RXTX_PIN_FOR_ROTARY")
     SET(EXTENSION "${EXTENSION}_mod")
 ENDIF(USE_VANILLA_HW)
 
-IF(USE_ROTARY_FULL_STEP)    
+IF(USE_ROTARY_FULL_STEP)
     SET(EXTENSION "${EXTENSION}_fstep")
-ELSE(USE_ROTARY_FULL_STEP)    
+ELSE(USE_ROTARY_FULL_STEP)
     ADD_DEFINITIONS("-DDSO_ROTARY_FULL_STEP")
     SET(EXTENSION "${EXTENSION}_hstep")
 ENDIF(USE_ROTARY_FULL_STEP)
@@ -57,7 +57,7 @@ ENDIF(USE_ROTARY_FULL_STEP)
 math(EXPR MCU_SPEED_M "${LN_MCU_SPEED}/1000000")
 SET(EXTENSION "${EXTENSION}_${MCU_SPEED_M}M")
 
- 
+
 include_directories(src)
 
 #_______________________
@@ -78,15 +78,16 @@ SET(USE_TRIGGER True)
 #  Display
 #_______________________
 SET(SIMPLER_ILI9341_FONT_COMPRESSION ON CACHE INTERNAL "")
+SET(SIMPLER_ILI9341_2BPP_SUPPORT     ON CACHE INTERNAL "")
 include_directories(externals/simplerILI9341/platformExample/lnArduino)
 SET(ILI9341_DRIVER  platformExample/lnArduino/ili_ln8bits.cpp)
-ADD_SUBDIRECTORY(externals/simplerILI9341) 
+ADD_SUBDIRECTORY(externals/simplerILI9341)
 include_directories(externals/simplerILI9341)
 #
 include_directories(capture)
 USE_LIBRARY(NeVerMind)
 
-ADD_SUBDIRECTORY(assets) 
+ADD_SUBDIRECTORY(assets)
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(capture)
 ADD_SUBDIRECTORY(testFunc)
