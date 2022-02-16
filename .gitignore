@@ -1,4 +1,5 @@
 *.sw*
+.ccls*
 nbproject/*
 build/*
 build
