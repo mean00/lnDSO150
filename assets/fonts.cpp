@@ -1,10 +1,14 @@
 #include "lnArduino.h"
 #include "pfxfont.h"
-#include "Fonts/waree9.h"
-//#include "Fonts/waree12.h"
-//#include "Fonts/OpenSans_Regular14pt7b.h"
-//#include "Fonts/ostrich_regular14pt7b.h"
-#include "Fonts/Arimo_Regular14pt7b.h"
+
+#ifdef USE_SMALLFOOTPRINT
+  #include "Fonts/waree9_small.h"
+  #include "Fonts/Arimo_Regular14pt7b_small.h"
+#else
+  #include "Fonts/waree9.h"
+  #include "Fonts/Arimo_Regular14pt7b.h"
+#endif
+  
 const GFXfont *smallFont()
 {
     return &Waree9pt7b;

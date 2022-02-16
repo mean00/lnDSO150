@@ -11,6 +11,17 @@ cmake_minimum_required(VERSION 3.0)
 MESSAGE(STATUS "===============")
 MESSAGE(STATUS "Starting lnDSO")
 MESSAGE(STATUS "===============")
+#____________________
+# Options
+#____________________
+
+OPTION(USE_ROTARY_FULL_STEP     "Use full step for rotary encoder, else half step"  FALSE)
+OPTION(USE_USB                  "Enable USB support"                                FALSE)
+OPTION(USE_SMALLFOOTPRINT       "Build for 64k flash targets"                       FALSE)
+
+#SET(USE_SMALLFOOTPRINT TRUE CACHE INTERNAL "")
+
+
 
 SET(AF_FOLDER  ${CMAKE_SOURCE_DIR}/lnArduino/)
 include(./mcuSelect.cmake)
@@ -19,14 +30,6 @@ SET(CMAKE_TOOLCHAIN_FILE ${AF_FOLDER}/lnArduino.cmake)
 PROJECT(lnDSO NONE) # the NONE is very important !
 
 enable_language(C CXX ASM) # this is important too!
-
-#____________________
-# Options
-#____________________
-OPTION(USE_VANILLA_HW "user unmodified pins for rotary encoder"             FALSE)
-OPTION(USE_ROTARY_FULL_STEP "Use full step for rotary encoder, else half step"  FALSE)
-OPTION(USE_VANILLA_HW   "Use unmodified rotary encoder"                     FALSE)
-OPTION(USE_USB          "Enable USB support"                                FALSE)
 
 #
 
@@ -77,8 +80,13 @@ SET(USE_TRIGGER True)
 #_______________________
 #  Display
 #_______________________
-SET(SIMPLER_ILI9341_FONT_COMPRESSION ON CACHE INTERNAL "")
-SET(SIMPLER_ILI9341_2BPP_SUPPORT     ON CACHE INTERNAL "")
+IF(USE_SMALLFOOTPRINT)
+  
+ELSE()
+  SET(DSO_EXTRA_LIB simplerILI9341HS)
+  SET(SIMPLER_ILI9341_FONT_COMPRESSION ON CACHE INTERNAL "")
+  SET(SIMPLER_ILI9341_2BPP_SUPPORT     ON CACHE INTERNAL "")
+ENDIF()
 include_directories(externals/simplerILI9341/platformExample/lnArduino)
 SET(ILI9341_DRIVER  platformExample/lnArduino/ili_ln8bits.cpp)
 ADD_SUBDIRECTORY(externals/simplerILI9341)
@@ -98,12 +106,13 @@ ADD_SUBDIRECTORY(testFunc)
 GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION})
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  captureLib )
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  sourceLib testLib)
-TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341 simplerILI9341HS assets ${FP_LIB})
+TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341 ${DSO_EXTRA_LIB} assets ${FP_LIB})
 
 # Summary
 MESSAGE(STATUS "Configuration:")
 MESSAGE(STATUS "\tBuild folder ${CMAKE_BINARY_DIR}")
-MESSAGE(STATUS "\tUsing ${LN_MCU} based MCU")
+MESSAGE(STATUS "\tUsing ${LN_MCU} based MCU at ${LN_MCU_SPEED} Hz")
+MESSAGE(STATUS "\tUsing ${LN_MCU_FLASH_SIZE} kB of flash (small = ${USE_SMALLFOOTPRINT})")
 if(USE_VANILLA_HW)
     MESSAGE(STATUS "\tUsing vanilla HW")
 else(USE_VANILLA_HW)
@@ -116,5 +125,4 @@ ELSE()
 ENDIF()
 
 #
-MESSAGE(STATUS "\tUsing ${LN_MCU} MCU at ${LN_MCU_SPEED} Hz")
 MESSAGE(STATUS "\tFinal name is ${EXTENSION}")

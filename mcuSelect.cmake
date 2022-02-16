@@ -1,10 +1,16 @@
 IF(NOT DEFINED LN_ARCH)
-IF(0) # ARM
-    IF(0)
+IF(1) # ARM
+    IF(1)
         SET(LN_ARCH            "ARM" CACHE INTERNAL "")
         SET(LN_MCU             "M3"  CACHE INTERNAL "")
-        SET(LN_MCU_FLASH_SIZE  128   CACHE INTERNAL "")
         SET(LN_MCU_RAM_SIZE    20    CACHE INTERNAL "")
+        IF(USE_SMALLFOOTPRINT)
+          SET(LN_MCU_FLASH_SIZE  64   CACHE INTERNAL "")          
+          SET(LN_MCU_EEPROM_SIZE 2     CACHE INTERNAL "")          
+        ELSE()
+          SET(LN_MCU_FLASH_SIZE  128    CACHE INTERNAL "")
+          SET(LN_MCU_EEPROM_SIZE 4     CACHE INTERNAL "")                             
+        ENDIF()
         SET(LN_SPEC         "picolibc"   CACHE INTERNAL "") # if not set we use nano
     ELSE()
         SET(LN_ARCH            "ARM" CACHE INTERNAL "")

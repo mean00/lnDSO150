@@ -1,3 +1,8 @@
+
+
+IF(USE_SMALLFOOTPRINT)
+        ADD_DEFINITIONS("-DUSE_SMALLFOOTPRINT")
+ENDIF()
 ADD_LIBRARY(assets 
             fonts.cpp 
             gfx.cpp
