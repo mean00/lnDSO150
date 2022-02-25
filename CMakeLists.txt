@@ -15,6 +15,9 @@ MESSAGE(STATUS "===============")
 # Options
 #____________________
 
+SET(LN_ENABLE_I2C  OFF CACHE INTERNAL "")
+SET(LN_ENABLE_SPI  OFF CACHE INTERNAL "")
+
 OPTION(USE_ROTARY_FULL_STEP     "Use full step for rotary encoder, else half step"  FALSE)
 OPTION(USE_USB                  "Enable USB support"                                FALSE)
 OPTION(USE_SMALLFOOTPRINT       "Build for 64k flash targets"                       FALSE)
@@ -100,19 +103,26 @@ ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(capture)
 ADD_SUBDIRECTORY(testFunc)
 #
+IF(LN_ENABLE_USBD)
+    include(${AF_FOLDER}/setup.cmake)
+    USE_LIBRARY(tinyUsb)
+ENDIF(LN_ENABLE_USBD)
 #____________________
 # Build
 #____________________
 GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION})
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  captureLib )
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  sourceLib testLib)
+IF(LN_ENABLE_USBD)
+    TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  gd32_usb_usbd)
+ENDIF()
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341 ${DSO_EXTRA_LIB} assets ${FP_LIB})
-
 # Summary
 MESSAGE(STATUS "Configuration:")
 MESSAGE(STATUS "\tBuild folder ${CMAKE_BINARY_DIR}")
 MESSAGE(STATUS "\tUsing ${LN_MCU} based MCU at ${LN_MCU_SPEED} Hz")
 MESSAGE(STATUS "\tUsing ${LN_MCU_FLASH_SIZE} kB of flash (small = ${USE_SMALLFOOTPRINT})")
+MESSAGE(STATUS "\tUSB control enabled : ${LN_ENABLE_USBD}")
 if(USE_VANILLA_HW)
     MESSAGE(STATUS "\tUsing vanilla HW")
 else(USE_VANILLA_HW)
