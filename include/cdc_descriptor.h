@@ -8,17 +8,19 @@
 #define USB_BCD   0x0200
 
 /**
- * 
+ *
  */
- const char * descriptor [] =
+#define DIGIT(x) ('0'+x)
+ const char * device_descriptor []  =
  {
    (const char[]) { 0x09, 0x04 }, // 0: is supported language is English (0x0409)
-   "lnTUSB",                     // 1: Manufacturer
-   "lnTinyUSB Device",              // 2: Product
-   "45678",                      // 3: Serials, should use chip ID
+   "lnDSO150",                     // 1: Manufacturer
+   "lnDSO150",              // 2: Product
+   //"45678",                      // 3: Serials, should use chip ID
+   (const char []){ DIGIT(DSO_VERSION_MAJOR),'.',DIGIT(DSO_VERSION_MINOR/10),DIGIT(DSO_VERSION_MINOR&10),0},
    "USB CDC",                 // 4: CDC Interface
  };
- 
+
 
  const tusb_desc_device_t  desc_device =
  {

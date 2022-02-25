@@ -1,4 +1,5 @@
 #include "lnArduino.h"
+#include "dso_version.h"
 #include "include/lnUsbStack.h"
 #include "include/lnUsbCDC.h"
 #include "cdc_descriptor.h"
@@ -54,7 +55,7 @@ void cdcEventHandler(void *cookie, int interface,lnUsbCDC::lnUsbCDCEvents event)
 void dsoInitUsb()
 {
     usb = new lnUsbStack;
-    usb->init(5, descriptor);
+    usb->init(5, device_descriptor);
     usb->setConfiguration(desc_hs_configuration, desc_fs_configuration, &desc_device, &desc_device_qualifier);
     usb->setEventHandler(NULL, dsoUsbEvent);
 
