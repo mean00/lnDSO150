@@ -1,7 +1,7 @@
 # We ony enable usb for arm and non small footprint
 IF(NOT DEFINED LN_ARCH)
 IF(1) # ARM
-    IF(1)
+    IF(0)
         SET(LN_ARCH            "ARM" CACHE INTERNAL "")
         SET(LN_MCU             "M3"  CACHE INTERNAL "")
         SET(LN_MCU_RAM_SIZE    20    CACHE INTERNAL "")
@@ -16,7 +16,7 @@ IF(1) # ARM
 
         ENDIF()
         SET(LN_SPEC         "picolibc"   CACHE INTERNAL "") # if not set we use nano
-    ELSE(1)
+    ELSE()
         SET(LN_ARCH            "ARM" CACHE INTERNAL "")
         SET(LN_MCU             "M4"  CACHE INTERNAL "")
         SET(LN_MCU_FLASH_SIZE  256   CACHE INTERNAL "")

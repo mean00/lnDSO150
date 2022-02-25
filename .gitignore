@@ -12,3 +12,7 @@ build*
 pyUsb/__pycache__/
 pyUsb/*.csv
 bins
+*.gch
+updatedb.sh
+CMakeSettings.json
+

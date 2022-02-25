@@ -22,8 +22,11 @@ extern uint16_t calibrationDC[];
 #define DSO_EVT_UI       (1<<0)
 #define DSO_EVT_CAPTURE  (1<<1)
 #define DSO_EVT_COUPLING (1<<2)
+
+extern void dsoInitUsb();
+
 /**
- * 
+ *
  * @param evt
  */
  void ControlCb(DSOControl::DSOEvent evt)
@@ -31,14 +34,14 @@ extern uint16_t calibrationDC[];
      switch(evt)
      {
          case DSOControl::DSOEventCoupling:evtGroup->setEvents(DSO_EVT_COUPLING);break;
-             
+
          case DSOControl::DSOEventControl: evtGroup->setEvents(DSO_EVT_UI);break;
          default: xAssert(0);break;
      }
-     
+
  }
 /**
- * 
+ *
  * @param evt
  */
  void CaptureCb()
@@ -46,7 +49,7 @@ extern uint16_t calibrationDC[];
      evtGroup->setEvents(DSO_EVT_CAPTURE);
  }
 /**
- * 
+ *
  */
  void redrawEverything()
  {
@@ -56,44 +59,50 @@ extern uint16_t calibrationDC[];
     DSODisplay::drawStatsBackGround();
     DSODisplay::drawCoupling(control->geCouplingStateAsText(),false);
     DSODisplay::drawTrigger(DSOCapture::getTriggerModeAsText(),false);
-    
+
  }
 /**
- * 
+ *
  */
 void mainLoop()
-{    
+{
     captureBuffer=new float[240];
-    displayData=new uint8_t[240];    
-    
-    
-       
-    DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);    
-    DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_1MS);    
-    
+    displayData=new uint8_t[240];
+
+
+
+    DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
+    DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_1MS);
+
     DSOInputGain::readCalibrationValue();
     control->loadSettings();
-    
+
     evtGroup=new xFastEventGroup;
     evtGroup->takeOwnership();
     control->changeCb(ControlCb);
-    
-    
+
+
     Logger("Loading calibration data\n");
     if(!DSOCalibrate::loadCalibrationData())
         DSOCalibrate::zeroCalibrate();
-    
-    
+
+
     DSOCapture::setCouplingMode(control->getCouplingState()==DSOControl::DSO_COUPLING_AC);
-    DSOCapture::setTriggerMode(DSOCapture::Trigger_Rising);    
-    DSOCapture::setTriggerMode(DSOCapture::Trigger_Run);        
+    DSOCapture::setTriggerMode(DSOCapture::Trigger_Rising);
+    DSOCapture::setTriggerMode(DSOCapture::Trigger_Run);
     DSOCapture::setTriggerVoltage(1.0);
-    
-    redrawEverything();        
+
+    redrawEverything();
     initUiEvent();
     DSOCapture::setCb(CaptureCb);
     DSOCapture::startCapture(240);
-    
+
+    // Start USB
+#ifdef DSO_ENABLE_USB
+    dsoInitUsb();
+#endif
+
+    // and go!
     while(1)
     {
         xDelay(1); // if we go too fast , it will be stuck (?)
@@ -103,21 +112,21 @@ void mainLoop()
             Logger("*\n");
             continue;
         }
-            
+
         if(evt & DSO_EVT_UI)
         {
-            processUiEvent();         
+            processUiEvent();
         }
-        
+
         if(evt & DSO_EVT_CAPTURE)
         {
-            showCapture();            
+            showCapture();
         }
         if(evt & DSO_EVT_COUPLING)
         {
             DSODisplay::drawCoupling(control->geCouplingStateAsText(),false);
             DSOCapture::setCouplingMode(control->getCouplingState()==DSOControl::DSO_COUPLING_AC);
-        }        
+        }
     }
 }
 // EOF
