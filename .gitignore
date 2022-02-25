@@ -15,4 +15,4 @@ bins
 *.gch
 updatedb.sh
 CMakeSettings.json
-
+*.hs
