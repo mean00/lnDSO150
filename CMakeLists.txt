@@ -106,6 +106,7 @@ ADD_SUBDIRECTORY(testFunc)
 IF(LN_ENABLE_USBD)
     include(${AF_FOLDER}/setup.cmake)
     USE_LIBRARY(tinyUsb)
+    SET(EXTENSION "${EXTENSION}_USB")
 ENDIF(LN_ENABLE_USBD)
 #____________________
 # Build
