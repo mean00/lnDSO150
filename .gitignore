@@ -16,3 +16,6 @@ bins
 updatedb.sh
 CMakeSettings.json
 *.hs
+.cache
+compile_commands.json
+updat*.*
