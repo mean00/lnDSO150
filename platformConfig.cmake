@@ -11,15 +11,13 @@ IF("${LN_ARCH}" STREQUAL "RISCV") # RISCV
     SET(PLATFORM_TOOLCHAIN_PATH /opt/gd32/toolchain2/bin/)
   ENDIF(WIN32)
 ELSE()
-   SET(PLATFORM_CLANG True)
    SET(PLATFORM_PREFIX arm-none-eabi-)
    SET(PLATFORM_C_FLAGS " ")
    IF(WIN32)
       SET(PLATFORM_TOOLCHAIN_PATH  "/c/dev/arm83/bin")
    ELSE()
-        SET(PLATFORM_CLANG_PATH "/usr/bin") # Only used when using clang
-        SET(PLATFORM_CLANG_VERSION "-13") # Only used when using clang
-        SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/Arduino_stm32/arm-gcc-2020q4/bin") # we need this also when clang is used !
+      #SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/Arduino_stm32/arm-gcc-2020q2/bin")
+      SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/Arduino_stm32/arm-gcc-2021q4/bin")
    ENDIF()
 ENDIF()
 

@@ -1,7 +1,7 @@
 # We ony enable usb for arm and non small footprint
 IF(NOT DEFINED LN_ARCH)
 IF(1) # ARM
-    IF(0)
+    IF(1)
         SET(LN_ARCH            "ARM" CACHE INTERNAL "")
         SET(LN_MCU             "M3"  CACHE INTERNAL "")
         SET(LN_MCU_RAM_SIZE    20    CACHE INTERNAL "")
