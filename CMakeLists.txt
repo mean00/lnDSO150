@@ -119,6 +119,17 @@ IF(LN_ENABLE_USBD)
     TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  gd32_usb_usbd)
 ENDIF()
 TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341 ${DSO_EXTRA_LIB} assets ${FP_LIB})
+
+  add_custom_command(TARGET lnDSO${EXTENSION}
+                   POST_BUILD
+                   COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:lnDSO${EXTENSION}> $<TARGET_FILE:lnDSO${EXTENSION}>.tmp
+                   COMMAND python ${CMAKE_SOURCE_DIR}/lnDsoChecksum.py  $<TARGET_FILE:lnDSO${EXTENSION}>.tmp $<TARGET_FILE:lnDSO${EXTENSION}>.checksumed.bin
+                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                   COMMENT "Generating checksumed bin file"
+    )
+
+
+
 # Summary
 MESSAGE(STATUS "Configuration:")
 MESSAGE(STATUS "\tBuild folder ${CMAKE_BINARY_DIR}")
