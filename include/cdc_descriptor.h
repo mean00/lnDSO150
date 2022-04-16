@@ -1,9 +1,10 @@
 #pragma once
+#include "dfu/dfu.h"
+
 #define _PID_MAP(itf, n)  ( (CFG_TUD_##itf) << (n) )
 
-#define USB_VID   0xCafe
-#define USB_PID           (0x4000 | _PID_MAP(CDC, 0) | _PID_MAP(MSC, 1) | _PID_MAP(HID, 2) | \
-                           _PID_MAP(MIDI, 3) | _PID_MAP(VENDOR, 4) )
+#define USB_VID   0x1d50
+#define USB_PID   0x6021
 
 #define USB_BCD   0x0200
 
@@ -18,7 +19,8 @@
    "lnDSO150",              // 2: Product
    //"45678",                      // 3: Serials, should use chip ID
    (const char []){ DIGIT(DSO_VERSION_MAJOR),'.',DIGIT(DSO_VERSION_MINOR/10),DIGIT(DSO_VERSION_MINOR&10),0},
-   "USB CDC",                 // 4: CDC Interface
+   "lnDSO USB CDC",                 // 4: CDC Interface
+   "lnDSO DFU",                     // 5: CDC Interface
  };
 
 
@@ -55,12 +57,13 @@
  {
    ITF_NUM_CDC_0 = 0,
    ITF_NUM_CDC_0_DATA,
+   ITF_NUM_DFU_RT,
    // FXX ITF_NUM_CDC_1,
    // FXX ITF_NUM_CDC_1_DATA,
    ITF_NUM_TOTAL
  };
 
-   #define CONFIG_TOTAL_LEN    (TUD_CONFIG_DESC_LEN + CFG_TUD_CDC * TUD_CDC_DESC_LEN)
+   #define CONFIG_TOTAL_LEN    (TUD_CONFIG_DESC_LEN + CFG_TUD_CDC * TUD_CDC_DESC_LEN+TUD_DFU_RT_DESC_LEN)
    #define EPNUM_CDC_0_NOTIF   0x81
    #define EPNUM_CDC_0_OUT     0x02
    #define EPNUM_CDC_0_IN      0x82
@@ -79,6 +82,8 @@
 
    // 2nd CDC: Interface number, string index, EP notification address and size, EP data address (out, in) and size.
    //FXX TUD_CDC_DESCRIPTOR(ITF_NUM_CDC_1, 4, EPNUM_CDC_1_NOTIF, 8, EPNUM_CDC_1_OUT, EPNUM_CDC_1_IN, 64),
+   TUD_DFU_RT_DESCRIPTOR(ITF_NUM_DFU_RT, 5, 0x0d, 1000, 4096),
+
  };
 
 
@@ -94,6 +99,8 @@
 
    // 2nd CDC: Interface number, string index, EP notification address and size, EP data address (out, in) and size.
    // FXX TUD_CDC_DESCRIPTOR(ITF_NUM_CDC_1, 4, EPNUM_CDC_1_NOTIF, 8, EPNUM_CDC_1_OUT, EPNUM_CDC_1_IN, 512),
+   TUD_DFU_RT_DESCRIPTOR(ITF_NUM_DFU_RT, 5, 0x0d, 1000, 4096),
+
  };
 
  // device qualifier is mostly similar to device descriptor since we don't change configuration based on speed

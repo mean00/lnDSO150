@@ -3,6 +3,8 @@
 #include "include/lnUsbStack.h"
 #include "include/lnUsbCDC.h"
 #include "cdc_descriptor.h"
+#include "include/lnUsbDFUrt.h"
+
 
 lnUsbStack *usb =NULL;
 lnUsbCDC *cdc=NULL;
@@ -20,6 +22,23 @@ void dsoUsbEvent(void *cookie, lnUsbStack::lnUsbStackEvents event)
         default: xAssert(0); break;
     }
 }
+extern void lnSoftSystemReset(void);
+extern void lnHardSystemReset(void);
+
+void goDfu()
+{
+  Logger("Rebooting to DFU...\n");
+  // pull DP to low
+  lnDigitalWrite(PA12,0);
+  lnPinMode(PA12,lnOUTPUT);
+  lnDelayMs(100);
+  volatile uint32_t *ram=(volatile uint32_t *)0x2000000;
+  ram[2]=0x1234;
+  ram[3]=0x5678;
+  lnHardSystemReset(); 
+  //lnSoftSystemReset();
+}
+
 /**
 */
 void cdcEventHandler(void *cookie,int interface,lnUsbCDC::lnUsbCDCEvents event,uint32_t payload)
@@ -44,6 +63,8 @@ void cdcEventHandler(void *cookie,int interface,lnUsbCDC::lnUsbCDCEvents event,u
       case lnUsbCDC::CDC_SESSION_END:
           Logger("CDC SESSION END\n");
           break;
+      case lnUsbCDC::CDC_SET_SPEED:
+          break;
       default:
           xAssert(0);
           break;
@@ -61,6 +82,7 @@ void dsoInitUsb()
 
     cdc=new lnUsbCDC(0);
     cdc->setEventHandler(cdcEventHandler,NULL);
+    lnUsbDFURT::addDFURTCb(goDfu);
     usb->start();
 }
 
