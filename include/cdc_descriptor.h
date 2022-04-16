@@ -15,12 +15,11 @@
  const char * device_descriptor []  =
  {
    (const char[]) { 0x09, 0x04 }, // 0: is supported language is English (0x0409)
-   "lnDSO150",                     // 1: Manufacturer
+   "mean00",                     // 1: Manufacturer
    "lnDSO150",              // 2: Product
-   //"45678",                      // 3: Serials, should use chip ID
-   (const char []){ DIGIT(DSO_VERSION_MAJOR),'.',DIGIT(DSO_VERSION_MINOR/10),DIGIT(DSO_VERSION_MINOR&10),0},
+   (const char []){ DIGIT(DSO_VERSION_MAJOR),'.',DIGIT(DSO_VERSION_MINOR/10),DIGIT(DSO_VERSION_MINOR&10),0}, //3 serial
    "lnDSO USB CDC",                 // 4: CDC Interface
-   "lnDSO DFU",                     // 5: CDC Interface
+   "lnDSO DFU",                     // 5: DFU
  };
 
 

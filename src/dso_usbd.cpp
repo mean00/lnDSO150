@@ -32,9 +32,10 @@ void goDfu()
   lnDigitalWrite(PA12,0);
   lnPinMode(PA12,lnOUTPUT);
   lnDelayMs(100);
-  volatile uint32_t *ram=(volatile uint32_t *)0x2000000;
-  ram[2]=0x1234;
-  ram[3]=0x5678;
+  volatile uint32_t *ram=(volatile uint32_t *)  0x20000000;
+
+  ram[0]=0xCC00FFEEUL;
+  ram[1]=0xDEADBEEFUL;
   lnHardSystemReset(); 
   //lnSoftSystemReset();
 }
