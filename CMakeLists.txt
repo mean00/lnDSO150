@@ -24,7 +24,7 @@ SET(LN_USB_DFU_RUNTIME 1 CACHE INTERNAL "")
 OPTION(USE_ROTARY_FULL_STEP     "Use full step for rotary encoder, else half step"  FALSE)
 OPTION(USE_USB                  "Enable USB support"                                FALSE)
 OPTION(USE_SMALLFOOTPRINT       "Build for 64k flash targets"                       FALSE)
-
+OPTION(USE_GD32F3               "Build for GD32F303"                                FALSE)
 #SET(USE_SMALLFOOTPRINT TRUE CACHE INTERNAL "")
 
 
