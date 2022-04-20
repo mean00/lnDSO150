@@ -19,7 +19,7 @@ static xBinarySemaphore *sem=NULL;
 static float *capture=NULL;
 
 extern void setVoltageOffset(float v);
-
+extern float      *captureBuffer;
 void setupCb()
 {
     sem->give();
@@ -30,7 +30,7 @@ void setupCb()
  */
 void        autoSetup()
 {
-   capture=new float[240];
+   capture=captureBuffer;
    DSOCapture::stopCapture();
    if(!sem) sem=new xBinarySemaphore;
     
@@ -65,7 +65,7 @@ void        autoSetup()
 end:    
     DSOCapture::stopCapture();
     DSOCapture::setCb(oldCb);
-    delete [] capture;
+    capture=NULL;
     return;
    
 }
