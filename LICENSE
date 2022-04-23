@@ -1,2 +1,9 @@
 The code written by me is MIT licensed
 But careful, some subcomponents have different licenses, please check individual folders
+
+qfp : http://www.quinapalus.com/qfplib-m3.html GPL V2
+rvfp: https://github.com/pulp-platform/RVfplib GPL V3
+
+See also the licenses of lnArduino !
+
+
