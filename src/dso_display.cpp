@@ -561,7 +561,27 @@ void  DSODisplay::drawTriggeredState(DSO_ArmingMode mode, bool triggered)
     tft->setTextColor(fg,bg);
 }
 
-
+/**
+ * 
+ */
+void  DSODisplay::printString(int x, int y, const char *text)
+{
+    AutoGfx autogfx;
+    
+    tft->setFontSize(ili9341::MediumFont);
+    tft->setTextColor(WHITE,BLACK);
+    tft->setCursor(x, y);
+    tft->print(text);              
+}
+/**
+ * 
+ */
+void  DSODisplay::clearScreen()
+{
+ AutoGfx autogfx;
+    
+    tft->fillScreen(BLACK);   
+}
 /**
  * 
  */

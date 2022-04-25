@@ -32,6 +32,9 @@ DSO_testSignal      *testSignal;
 ln8bit9341          *ili;
 lnNvm               *nvm;
 uint32_t chipId;
+
+extern void testFunc();
+
 /**
  * 
  */
@@ -62,6 +65,9 @@ void setup()
     
     arbitrer=new DSO_portArbitrer(1,PortBMutex); // arbitrer must be created with screen already set up
     
+
+    //testFunc();
+
     DSODisplay::drawSplash();
     
     

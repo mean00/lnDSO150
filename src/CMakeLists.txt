@@ -15,6 +15,7 @@ ADD_LIBRARY(  sourceLib
                 dso_calibrate.cpp
                 dso_autoSetup.cpp
                 dso_show_capture.cpp
+                dso_test.cpp
                 ${USB_SRC}
                 )
 

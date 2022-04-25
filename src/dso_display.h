@@ -68,6 +68,8 @@ public:
             static void  drawTriggeredState(DSO_ArmingMode mode,bool triggered);
             
             static void  drawSplash();
+            static void  printString(int x, int y, const char *text);
+            static void  clearScreen();
             
 };
 
