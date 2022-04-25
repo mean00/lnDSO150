@@ -114,18 +114,18 @@ ENDIF(LN_ENABLE_USBD)
 #____________________
 # Build
 #____________________
-GENERATE_GD32_FIRMWARE(lnDSO${EXTENSION})
-TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  captureLib )
-TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  sourceLib )
+GENERATE_GD32_FIRMWARE(lnDSO)
+TARGET_LINK_LIBRARIES( lnDSO  captureLib )
+TARGET_LINK_LIBRARIES( lnDSO  sourceLib )
 IF(LN_ENABLE_USBD)
-    TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  gd32_usb_usbd)
+    TARGET_LINK_LIBRARIES( lnDSO  gd32_usb_usbd)
 ENDIF()
-TARGET_LINK_LIBRARIES( lnDSO${EXTENSION}  simplerILI9341 ${DSO_EXTRA_LIB} assets ${FP_LIB})
+TARGET_LINK_LIBRARIES( lnDSO  simplerILI9341 ${DSO_EXTRA_LIB} assets ${FP_LIB})
 
-  add_custom_command(TARGET lnDSO${EXTENSION}
+  add_custom_command(TARGET lnDSO
                    POST_BUILD
-                   COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:lnDSO${EXTENSION}> $<TARGET_FILE:lnDSO${EXTENSION}>.tmp
-                   COMMAND python ${CMAKE_SOURCE_DIR}/lnDsoChecksum.py  $<TARGET_FILE:lnDSO${EXTENSION}>.tmp $<TARGET_FILE:lnDSO${EXTENSION}>.checksumed.bin
+                   COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:lnDSO> $<TARGET_FILE:lnDSO>.tmp
+                   COMMAND python ${CMAKE_SOURCE_DIR}/lnDsoChecksum.py  $<TARGET_FILE:lnDSO>.tmp $<TARGET_FILE:lnDSO>.checksumed.bin
                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                    COMMENT "Generating checksumed bin file"
     )
@@ -150,4 +150,7 @@ ELSE()
 ENDIF()
 
 #
+
+set_target_properties(lnDSO PROPERTIES OUTPUT_NAME lnDSO${EXTENSION})
+
 MESSAGE(STATUS "\tFinal name is ${EXTENSION}")
