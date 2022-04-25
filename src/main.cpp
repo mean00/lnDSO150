@@ -97,10 +97,10 @@ void loop()
 {
     
     Logger("Starting DSO...\n");
-    testFunc();
+//    testFunc();
    
     
-    testFunc2();
+//    testFunc2();
    
    
     
