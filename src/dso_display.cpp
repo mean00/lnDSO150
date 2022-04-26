@@ -11,7 +11,7 @@
 #include "lnArduino.h"
 #include "lnCpuID.h"
 #include "dso_display.h"
-#include "pattern.h"
+#include "pattern_decl.h"
 #include "simpler9341.h"
 #include "math.h"
 #include "dso_colors.h"
@@ -82,13 +82,20 @@ public:
 };
 //-
 
-static const uint16_t *getBackGround(int line)
+static const uint16_t *getBackGround(int line,bool &repeat)
 {
     const uint16_t *bg=(uint16_t *)defaultPattern;
+    repeat=false;
     if(!(line%SCALE_STEP)) 
+    {
             bg=(uint16_t *)darkGreenPattern;
+            repeat=true;
+    }
     if(line==DSO_WAVEFORM_WIDTH/2)
+    {
             bg=(uint16_t *)lightGreenPattern;
+            repeat=true;
+    }
     return bg;
 }
 /**
@@ -96,13 +103,20 @@ static const uint16_t *getBackGround(int line)
  * @param line
  * @return 
  */
-static const uint16_t *getHzBackGround(int line)
+static const uint16_t *getHzBackGround(int line,bool &repeat)
 {
     const uint16_t *bg=(uint16_t *)horizontal;
+    repeat=false;
     if(!(line%SCALE_STEP)) 
+    {
             bg=(uint16_t *)darkGreenPattern;
+            repeat=true;
+    }
     if(line==DSO_WAVEFORM_WIDTH/2)
+    {
             bg=(uint16_t *)lightGreenPattern;
+            repeat=true;
+    }
     return bg;
 }
 
@@ -190,14 +204,17 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
         {            
             sz=1;
         }
-
-        const uint16_t *bg=getBackGround(j);
+        bool repeat=false;
+        const uint16_t *bg=getBackGround(j,repeat);
         // cleanup prev draw
         tft->setAddress(    j,
                             prevPos[j]+DSO_WAVEFORM_OFFSET,
                             1,
-                            prevSize[j]);        
-        tft->pushColors(prevSize[j],((uint16_t *)bg)+prevPos[j]);
+                            prevSize[j]); 
+        if(repeat)       
+            tft->floodWords(prevSize[j],bg[0]);
+        else
+            tft->pushColors(prevSize[j],((uint16_t *)bg)+prevPos[j]);        
         // Now draw the real one
         
         tft->VLine(j,start+DSO_WAVEFORM_OFFSET,sz,color);
@@ -289,10 +306,14 @@ void  DSODisplay::drawVerticalTrigger(bool drawOrErase,int column)
      tft->VLine(column,DSO_WAVEFORM_OFFSET+1,DSO_WAVEFORM_HEIGHT-1,RED);
     else
     {
-        const uint16_t *bg=getHzBackGround(column);
+        bool repeat;
+        const uint16_t *bg=getHzBackGround(column,repeat);
         tft->setAddress(column,1+DSO_WAVEFORM_OFFSET,
                         1,DSO_WAVEFORM_HEIGHT-1);
-        tft->pushColors(DSO_WAVEFORM_HEIGHT,((uint16_t *)bg));
+        if(repeat)
+            tft->floodWords(DSO_WAVEFORM_HEIGHT,bg[0]);
+        else
+            tft->pushColors(DSO_WAVEFORM_HEIGHT,((uint16_t *)bg));
     }
 }
 /**
@@ -315,10 +336,14 @@ void  DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
     }
     else // erase
     {
-        const uint16_t *bg=getHzBackGround(line);
+        bool repeat;
+        const uint16_t *bg=getHzBackGround(line,repeat);
         tft->setAddress( 0,                  1+line,
                             DSO_WAVEFORM_WIDTH, 1);
-        tft->pushColors(DSO_WAVEFORM_WIDTH,((uint16_t *)bg));
+        if(repeat)
+            tft->floodWords(DSO_WAVEFORM_WIDTH,bg[0]);
+        else
+            tft->pushColors(DSO_WAVEFORM_WIDTH,((uint16_t *)bg));
     }
 }
 
