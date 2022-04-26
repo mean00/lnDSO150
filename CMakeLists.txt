@@ -26,6 +26,7 @@ OPTION(USE_USB                  "Enable USB support"                            
 OPTION(USE_SMALLFOOTPRINT       "Build for 64k flash targets"                       FALSE)
 OPTION(USE_GD32F3               "Build for GD32F303"                                FALSE)
 #SET(USE_SMALLFOOTPRINT TRUE CACHE INTERNAL "")
+#SET(LN_LTO "-flto" CACHE INTERNAL "")
 
 
 
