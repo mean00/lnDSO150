@@ -7,6 +7,9 @@ IF(LN_ENABLE_USBD)
    LN_APPEND_FLAGS(dso_mainLoop.cpp -DDSO_ENABLE_USB)
 ENDIF(LN_ENABLE_USBD)
 
+IF(USE_FNIRSI_BUTTON)
+    ADD_DEFINITIONS("-DUSE_FNIRSI_BUTTON")
+ENDIF()
 ADD_LIBRARY(  sourceLib
                 main.cpp dso_gfx.cpp dso_test_signal.cpp dso_control.cpp
                 dso_settingMenu.cpp  ui/dso_menuEngine.cpp dso_display.cpp

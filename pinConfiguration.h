@@ -42,12 +42,14 @@
 #define ROTATY_SHIFT      14  
 
 #define COUPLING_PIN PA5
-  
+
 #define SENSEL_PIN PA1 //(1..4)
 
 
 #define PIN_TEST_SIGNAL     PA7
-#define PIN_TEST_SIGNAL_AMP PB12
+#define PIN_TEST_SIGNAL_AMP PB12  // no amp on FINRSI
+
+#define KEY_PIN             PB12 // used by FINRSI
 
 #define TIMER_ADC_ID      3
 #define TIMER_ADC_CHANNEL 3

@@ -29,7 +29,7 @@ extern lnNvm                    *nvm;
 extern uint16_t directADC2Read(int pin);
 
 extern DSO_portArbitrer *arbitrer;
-lnSimpleADC *couplingAdc;
+lnSimpleADC *couplingAdc=NULL;
 
 int debugUp=0;
 int debugDown=0;
@@ -59,11 +59,23 @@ int ampMapping[16]=
 
 #define ButtonToPin(x)    (PB0+(x))
 //#define pinAsInput(x)     lnPinMode(ButtonToPin(x),lnINPUT_FLOATING);
-#define pinAsInput(x)     lnPinMode(ButtonToPin(x),lnINPUT_PULLUP);
+
 #define attachRE(x)       lnExtiAttachInterrupt(ButtonToPin(x),LN_EDGE_FALLING,_myInterruptRE,(void *)x );
 
 #define NB_BUTTONS 8
-
+/**
+ * 
+ */
+static void pinAsInput(int x)
+{
+     if(x & DSO_CONTROL_BUTTON_PORT_A)
+     {
+        lnPinMode(PA0+(x&(DSO_CONTROL_BUTTON_PORT_A-1)),lnINPUT_PULLUP);
+     }else
+     {
+        lnPinMode(ButtonToPin(x),lnINPUT_PULLUP);
+     }
+}
   
 
 static int rawCoupling;  
@@ -143,11 +155,20 @@ extern void Logger(const char *fmt...);
  * 
  * @return 
  */
+
 DSOControl::DSOCoupling couplingFromAdc2()
 {
-#if 0
-    return DSOControl::DSO_COUPLING_DC;
-#endif
+#ifdef USE_FNIRSI_BUTTON
+    int val=lnDigitalRead(COUPLING_PIN)+lnDigitalRead(KEY_PIN)*2;
+    switch(val)
+    {
+        default:
+        case 0: return  DSOControl::DSO_COUPLING_GND;break;
+        case 2: return  DSOControl::DSO_COUPLING_DC;break;//dc
+        case 1: return  DSOControl::DSO_COUPLING_AC;break;//dc
+    }
+    return  DSOControl::DSO_COUPLING_GND;
+#else
     couplingAdc->setPin(COUPLING_PIN);   // Reset ADC1    
     int rawCoupling=couplingAdc->simpleRead();
     //Logger("C:%d\n",rawCoupling);
@@ -156,6 +177,7 @@ DSOControl::DSOCoupling couplingFromAdc2()
     if(rawCoupling<1000)       
         return DSOControl::DSO_COUPLING_GND;
     return DSOControl::DSO_COUPLING_DC;
+#endif
 }
 /**
  * 
@@ -204,9 +226,14 @@ DSOControl::DSOControl(ControlEventCb *c)
     // 
     // Use ADC1 to scan the coupling pin independantly
     //
+#ifdef USE_FNIRSI_BUTTON
+    lnPinMode(COUPLING_PIN,lnINPUT_PULLUP);
+    lnPinMode(KEY_PIN,lnINPUT_PULLUP);
+#else    
     lnPinMode(COUPLING_PIN,lnADC_MODE);
     couplingAdc=new  lnSimpleADC(1, COUPLING_PIN);
     couplingState=couplingFromAdc2();    
+#endif
 }
 /**
  * 
@@ -311,7 +338,12 @@ void DSOControl::runLoop()
             if(button.holdOff()) 
                 continue;
             
-            int mask=1<<ButtonMapping[i];
+            int shift=ButtonMapping[i];
+            int mask;
+            if(shift & DSO_CONTROL_BUTTON_PORT_A)
+                mask=!lnDigitalRead(PA0+(shift &(DSO_CONTROL_BUTTON_PORT_A-1)));
+            else
+                mask=1<<ButtonMapping[i];
             
             int k=(val&mask);
             

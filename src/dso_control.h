@@ -42,13 +42,16 @@ public:
 // TRIGGER  => B6
 // OK       => B7
 // Rotary   => B3 or B8
-  
-  
-#ifndef USE_PB8_INSTEAD_OF_PB3
-  const int ButtonMapping[7]={0,1,  3, 4,5,6,7};
+#define DSO_CONTROL_BUTTON_PORT_A  32
+#ifdef USE_FNIRSI_BUTTON  
+  const int ButtonMapping[7]={0,1,  3, 4,5,DSO_CONTROL_BUTTON_PORT_A+12,DSO_CONTROL_BUTTON_PORT_A+11};
 #else
-  const int ButtonMapping[7]={0,1,  8, 4,5,6,7};
-#endif
+  #ifndef USE_PB8_INSTEAD_OF_PB3
+    const int ButtonMapping[7]={0,1,  3, 4,5,6,7};
+  #else
+    const int ButtonMapping[7]={0,1,  8, 4,5,6,7};
+  #endif
+  #endif
   
   
   enum DSOButtonState

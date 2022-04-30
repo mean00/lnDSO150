@@ -55,7 +55,9 @@ DSO_testSignal::DSO_testSignal(lnPin pin,lnPin pinAmp)
   */
  bool DSO_testSignal::setAmplitude(bool  large)
  {
+
      _large=large;
+#ifndef     USE_FNIRSI_BUTTON     
      if(large)
      {
            lnPinMode(pinAmp,lnINPUT_FLOATING);
@@ -64,6 +66,7 @@ DSO_testSignal::DSO_testSignal(lnPin pin,lnPin pinAmp)
           lnPinMode(pinAmp,lnOUTPUT_OPEN_DRAIN);
           lnDigitalWrite(pinAmp,0);
      }
+#endif     
      return true;
  }
  /**

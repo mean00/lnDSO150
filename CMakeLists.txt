@@ -25,6 +25,7 @@ OPTION(USE_ROTARY_FULL_STEP     "Use full step for rotary encoder, else half ste
 OPTION(USE_USB                  "Enable USB support"                                FALSE)
 OPTION(USE_SMALLFOOTPRINT       "Build for 64k flash targets"                       FALSE)
 OPTION(USE_GD32F3               "Build for GD32F303"                                FALSE)
+OPTION(USE_FNIRSI_BUTTON        "Use FNIRSI button layout"                          FALSE)
 #SET(USE_SMALLFOOTPRINT TRUE CACHE INTERNAL "")
 #SET(LN_LTO "-flto" CACHE INTERNAL "")
 
