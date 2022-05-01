@@ -55,7 +55,6 @@ DSO_testSignal::DSO_testSignal(lnPin pin,lnPin pinAmp)
   */
  bool DSO_testSignal::setAmplitude(bool  large)
  {
-
      _large=large;
 #ifndef     USE_FNIRSI_BUTTON     
      if(large)

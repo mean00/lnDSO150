@@ -165,7 +165,7 @@ DSOControl::DSOCoupling couplingFromAdc2()
         default:
         case 0: return  DSOControl::DSO_COUPLING_GND;break;
         case 2: return  DSOControl::DSO_COUPLING_DC;break;//dc
-        case 1: return  DSOControl::DSO_COUPLING_AC;break;//dc
+        case 1: return  DSOControl::DSO_COUPLING_AC;break;//ac
     }
     return  DSOControl::DSO_COUPLING_GND;
 #else
