@@ -107,13 +107,15 @@ void loop()
    
     
 //    testFunc2();
-   
-   
-    
+          
     xTaskCreate(mainLoop_bounce, "mainLoop",1000,NULL,4,NULL);
+#if 1
+    vTaskDelete(NULL);
+#else
     while(1)
     {
         xDelay(1000);
     }
+#endif    
 }
 //
