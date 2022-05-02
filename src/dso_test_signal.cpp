@@ -17,7 +17,7 @@ DSO_testSignal::DSO_testSignal(lnPin pin,lnPin pinAmp)
     setAmplitude(true);
     lnPinMode(pinSignal,lnPWM);    
     _timer=new lnTimer(pinSignal);
-    _timer->setPwmMode(512);
+    _timer->setPwmMode(50);
     _timer->enable();    
     _fq=1000;
     _large=true;
