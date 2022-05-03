@@ -9,6 +9,7 @@
 #include "dso_test_signal.h"
 #include "dso_calibrate.h"
 #include "dso_control.h"
+#include "lnCpuID.h"
 
 extern DSO_testSignal      *testSignal;
 static int currentFQ;
@@ -80,6 +81,21 @@ const MenuItem  calibrationMenu[]=
     {MenuItem::MENU_CALL, "Wipe Calibration",(const void *)DSOCalibrate::decalibrate},
     {MenuItem::MENU_END, NULL,NULL}
 };
+
+static const char *getSwVersion()
+{
+    return "XXXXXXX";
+}
+
+//--
+const MenuItem  infoMenu[]=
+{
+    {MenuItem::MENU_TITLE, "Information",NULL},
+    {MenuItem::MENU_TEXT, "MC",(const void *)lnCpuID::idAsString},        
+    {MenuItem::MENU_TEXT, "SW",(const void *)getSwVersion},
+    {MenuItem::MENU_END, NULL,NULL}
+};
+
 //--
 const MenuItem  topMenu[]={
     {MenuItem::MENU_TITLE, "Main Menu",NULL},
@@ -87,6 +103,7 @@ const MenuItem  topMenu[]={
     //{MenuItem::MENU_CALL, "Button Test",(const void *)buttonTest},
     {MenuItem::MENU_SUBMENU, "Calibration",(const void *)&calibrationMenu},
     {MenuItem::MENU_SUBMENU, "Control",(const void *)&controlMenu},
+    {MenuItem::MENU_SUBMENU, "Info",(const void *)&infoMenu},
     {MenuItem::MENU_END, NULL,NULL}
 };
 

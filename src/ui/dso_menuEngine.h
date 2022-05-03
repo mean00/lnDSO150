@@ -13,6 +13,7 @@ public:
     MENU_END,
     MENU_TOGGLE,
     MENU_INDEX,
+    MENU_TEXT,
     MENU_BACK
   }MenuItemType;
   const MenuItemType type;

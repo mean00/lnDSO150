@@ -103,6 +103,17 @@ void MenuManager::redraw(const char *title, int n,const MenuItem *xtop, int curr
         if(mark)
             printPrefix(current==i,i,"v");
         printMenuEntry(current==i,i,xtop[i].menuText);
+typedef const char *(charcb)();
+        if(xtop[i].type==MenuItem::MENU_TEXT)
+        {
+            DSO_GFX::setSmallFont();
+            charcb *cb=( charcb *)xtop[i].cookie;
+            if(cb)
+            {
+                DSO_GFX::printxy(12,1+i,cb());
+            }
+            DSO_GFX::setBigFont(true);
+        }
     }         
 }
 
@@ -217,6 +228,9 @@ bool MenuManager::handlePress( const char *title,int n,const MenuItem *xtop,int 
 {
     switch(xtop[current].type)
     {
+        case MenuItem::MENU_TEXT:
+                return false;
+                break;
         case MenuItem::MENU_BACK: 
         case MenuItem::MENU_END:             
                 return true; 
