@@ -10,6 +10,7 @@
 #include "dso_calibrate.h"
 #include "dso_control.h"
 #include "lnCpuID.h"
+#include "dso_version.h"
 
 extern DSO_testSignal      *testSignal;
 static int currentFQ;
@@ -81,10 +82,16 @@ const MenuItem  calibrationMenu[]=
     {MenuItem::MENU_CALL, "Wipe Calibration",(const void *)DSOCalibrate::decalibrate},
     {MenuItem::MENU_END, NULL,NULL}
 };
-
+/**
+ * 
+ */
+#define MKSTRING(x) #x
 static const char *getSwVersion()
 {
-    return "XXXXXXX";
+    static char versionString[20];
+    
+    sprintf(versionString,"%d.%d %s",DSO_VERSION_MAJOR,DSO_VERSION_MINOR,LN_GIT_REV);
+    return versionString;
 }
 
 //--

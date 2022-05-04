@@ -1,6 +1,8 @@
 
 include_directories(ui)
 
+
+
 IF(LN_ENABLE_USBD)
    include(${AF_FOLDER}/libraries/tinyUsb/tiny.cmake)
    SET(USB_SRC dso_usbd.cpp)
@@ -21,8 +23,8 @@ ADD_LIBRARY(  sourceLib
                 dso_test.cpp
                 ${USB_SRC}
                 )
-
-
+TARGET_COMPILE_DEFINITIONS(sourceLib PRIVATE "-DLN_GIT_REV=\"${git_rev}\"")
+                
 IF(NOT USE_VANILLA_HW)
     TARGET_COMPILE_DEFINITIONS(sourceLib PRIVATE "-DUSE_RXTX_PIN_FOR_ROTARY")
 ENDIF( )

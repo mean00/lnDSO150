@@ -33,6 +33,7 @@ OPTION(USE_FNIRSI_BUTTON        "Use FNIRSI button layout"                      
 
 SET(AF_FOLDER  ${CMAKE_SOURCE_DIR}/lnArduino/)
 include(./mcuSelect.cmake)
+include(./FindGitSvn.cmake)
 SET(CMAKE_TOOLCHAIN_FILE ${AF_FOLDER}/lnArduino.cmake)
 
 PROJECT(lnDSO NONE) # the NONE is very important !
@@ -47,6 +48,7 @@ add_subdirectory(${AF_FOLDER})
 
 include(${AF_FOLDER}/setup.cmake)
 
+admGetGitRevision(${CMAKE_SOURCE_DIR} git_rev)
 
 SET(EXTENSION "_${LN_MCU}")
 
