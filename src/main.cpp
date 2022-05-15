@@ -118,4 +118,22 @@ void loop()
     }
 #endif    
 }
+/**
+ * 
+ */
+const char *getScreenID()
+{
+    uint32_t id=ili->getChipId();
+    const char *t="?????";
+    switch(id)
+    {
+        case 0x9341: t="ILI9341";break;
+        case 0x7789: t="ST7789";break;
+        default:break;
+    }
+    return t;
+}
+
+
+
 //

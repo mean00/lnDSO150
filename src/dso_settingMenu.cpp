@@ -93,6 +93,7 @@ static const char *getSwVersion()
     sprintf(versionString,"%d.%d %s",DSO_VERSION_MAJOR,DSO_VERSION_MINOR,LN_GIT_REV);
     return versionString;
 }
+extern const char *getScreenID();
 
 //--
 const MenuItem  infoMenu[]=
@@ -100,6 +101,7 @@ const MenuItem  infoMenu[]=
     {MenuItem::MENU_TITLE, "Information",NULL},
     {MenuItem::MENU_TEXT, "MC",(const void *)lnCpuID::idAsString},        
     {MenuItem::MENU_TEXT, "SW",(const void *)getSwVersion},
+    {MenuItem::MENU_TEXT, "SC",(const void *)getScreenID},
     {MenuItem::MENU_END, NULL,NULL}
 };
 
