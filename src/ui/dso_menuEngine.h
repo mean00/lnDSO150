@@ -48,12 +48,13 @@ protected:
           void printMenuEntry(bool onoff, int line,const char *text);
           void printMenuTitle(const char *text);
           void printPrefix(bool onoff, int line,const char *text);
-          void redraw(const char *title, int n,const MenuItem *xtop, int current);
+          void redraw(const char *title, int n,const MenuItem *xtop, int current,int oldCurrent);
           void blink(int current, const char *text);
           void printBackHint();
        
 protected:
-          bool              handlePress(const char *title,int n,const MenuItem *xtop,int current);
+          void              drawOneLine(const MenuItem *xtop, int current,bool onoff);
+          bool              handlePress(const char *title,int n,const MenuItem *xtop,int current,int oldCurrent);
           void              runOne_( const MenuItem *xtop);
           xBinarySemaphore  _sem;
           DSOControl        *_control;    

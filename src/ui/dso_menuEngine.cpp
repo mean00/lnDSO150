@@ -93,46 +93,55 @@ void MenuManager::run(void)
 /**
  */
 typedef const char *(charcb)();
-void MenuManager::redraw(const char *title, int n,const MenuItem *xtop, int current)
+
+
+void MenuManager::drawOneLine(const MenuItem *xtop, int current,bool onoff)
 {
-    DSO_GFX::clearBody(BLACK);
-    printMenuTitle(title); 
-    for(int i=0;i<n;i++)
+    bool mark=false;
+    switch(xtop[current].type)
     {
-        bool mark=false;
-        switch(xtop[i].type)
-        {
             case MenuItem::MENU_TOGGLE :
-                if(*(bool *) xtop[i].cookie) 
+                if(*(bool *) xtop[current].cookie) 
                     mark=true;
                 break; 
             case MenuItem::MENU_INDEX:
                 {
-                MenuListItem *tem=(MenuListItem *)xtop[i].cookie;
+                MenuListItem *tem=(MenuListItem *)xtop[current].cookie;
                 if(tem->thisItem==*(tem->item)) mark=true;
                 }
                 break;
             case MenuItem::MENU_TEXT:
                 {
                 DSO_GFX::setTextColor(WHITE,BLACK);
-                DSO_GFX::printxy(6,1+i,xtop[i].menuText);
-                charcb *cb=( charcb *)xtop[i].cookie;
+                DSO_GFX::printxy(6,1+current,xtop[current].menuText);
+                charcb *cb=( charcb *)xtop[current].cookie;
                 DSO_GFX::setSmallFont();
                 if(cb)
                 {
-                    DSO_GFX::printxy(12,1+i,cb());
+                    DSO_GFX::printxy(12,1+current,cb());
                 }
                 DSO_GFX::setBigFont(true);
                 }
-                continue;
+                return;
                 break;
             default:
                 break;
         }       
-        printMenuEntry(current==i,i,xtop[i].menuText);
+        printMenuEntry(onoff,current,xtop[current].menuText);
         if(mark)
-            printPrefix(current==i,i,"v");
-    }         
+            printPrefix(onoff,current,"v");
+}
+/**
+ * 
+ */
+void MenuManager::redraw(const char *title, int n,const MenuItem *xtop, int current,int oldCurrent)
+{
+    DSO_GFX::clearBody(BLACK);
+    printMenuTitle(title); 
+    for(int i=0;i<n;i++)
+    {
+        drawOneLine(xtop,  i,i==current);
+    }
 }
 
 void MenuManager::blink(int current, const char *text)
@@ -204,9 +213,11 @@ void MenuManager::runOne_( const MenuItem *xtop)
      }
      // draw them 
      // 0 to N-1
-     int current=0;    
-next:            
-        redraw(title,n,xtop,current);
+     int current=0; 
+     int oldCurrent=-1;   
+       
+        redraw(title,n,xtop,current,oldCurrent);
+next:             
         while(1)
         { 
                   _sem.take(200);
@@ -220,7 +231,7 @@ next:
                         return;
                     if(event==DSO_EVENT_Q(DSOControl::USE_MENU_BUTTON,EVENT_SHORT_PRESS))                    
                     {
-                        if(handlePress(title,n, xtop,current)) 
+                        if(handlePress(title,n, xtop,current,oldCurrent)) 
                         {
                             return;
                         }
@@ -229,9 +240,12 @@ next:
                   int inc=_control->getRotaryValue();
                   if(inc)
                   {
+                    drawOneLine(xtop,  current,false);
                     current+=inc;
                     while(current<0) current+=n;
                     while(current>=n) current-=n;
+                    drawOneLine(xtop,  current,true);
+                    
                     goto next;
                   }     
         }
@@ -242,7 +256,7 @@ next:
  * @param current
  * @return 
  */
-bool MenuManager::handlePress( const char *title,int n,const MenuItem *xtop,int current)
+bool MenuManager::handlePress( const char *title,int n,const MenuItem *xtop,int current,int oldCurrent)
 {
     switch(xtop[current].type)
     {
@@ -257,7 +271,7 @@ bool MenuManager::handlePress( const char *title,int n,const MenuItem *xtop,int 
               {
                   const MenuItem *sub=(const MenuItem *)xtop[current].cookie;
                   runOne_(sub);
-                  redraw(title,n,xtop,current);
+                  redraw(title,n,xtop,current,-1);
                   return false;
               }
               break;
@@ -275,16 +289,16 @@ bool MenuManager::handlePress( const char *title,int n,const MenuItem *xtop,int 
         {
             MenuListItem *item=(MenuListItem *)xtop[current].cookie;
             *(item->item)=item->thisItem;                          
-            redraw(title,n,xtop,current);
+            redraw(title,n,xtop,current,-1);
             return false;
         }
         break;
-
+#warning just redraw current
         case MenuItem::MENU_TOGGLE: 
         {
             bool *e=(bool *)xtop[current].cookie;
             *e=!*e;
-            redraw(title,n,xtop,current);
+            redraw(title,n,xtop,current,-1);
             return false;
         }
             break;
