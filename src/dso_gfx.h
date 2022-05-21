@@ -15,6 +15,7 @@ public:
   static void subtitle(const char *title);
   static void bottomLine(const char *title);  
   static void printxy(int x, int y, const char *t);
+  static void printButton(int x, int y, int length,const char *t, int fg, int button, int bg);
   static void clear(int color);
   static void setTextColor(int fg,int bg);  
   static void setBigFont(bool big);

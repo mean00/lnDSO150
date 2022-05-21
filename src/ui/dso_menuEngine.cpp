@@ -37,35 +37,49 @@ MenuManager::~MenuManager()
  * @param text
  * @return 
  */
+
+static void setColor(bool onoff, int &fg, int &bg)
+{
+    if(onoff)
+    {
+        fg=ILI_BLACK;
+        bg=ILI_GREEN;
+    }else
+    {
+        fg=ILI_GREEN;
+        bg=ILI_BLACK;
+    }
+}
+
 void MenuManager::printMenuEntry(bool onoff, int line,const char *text)
 {
-    #define BG_COLOR GREEN    
-    if(onoff)
-        DSO_GFX::setTextColor(BLACK,BG_COLOR); 
-    else  
-        DSO_GFX::setTextColor(BG_COLOR,BLACK);
-    DSO_GFX::printxy(8,1+line,text);
+    int fg,bg;
+    setColor(onoff, fg,bg);
+    DSO_GFX::printButton(3,1+line,240,text,fg,bg,ILI_BLACK);
 }
+/**
+ * 
+ */
 void MenuManager::printPrefix(bool onoff, int line,const char *text)
 {
-    #define BG_COLOR GREEN    
-    if(onoff)
-        DSO_GFX::setTextColor(BLACK,BG_COLOR); 
-    else  
-        DSO_GFX::setTextColor(BG_COLOR,BLACK);
-    DSO_GFX::printxy(6,1+line,text);
+    int fg,bg;
+    setColor(onoff, fg,bg);
+    DSO_GFX::setTextColor(fg,bg); 
+    DSO_GFX::printxy(4,1+line,text);
 }
 
 void MenuManager::printMenuTitle(const char *text)
 {
     DSO_GFX::printMenuTitle(text); 
 }
-
+/**
+ */
 void MenuManager::printBackHint()
 {
-    DSO_GFX::setTextColor(BLACK,BLUE); 
-    DSO_GFX::printxy(-5,-1,"Back");
-    DSO_GFX::setTextColor(GREEN,BLACK); 
+    DSO_GFX::printButton(-6,-1,80,"Back",ILI_BLACK,ILI_BLUE,ILI_BLACK);
+    //DSO_GFX::setTextColor(BLACK,BLUE); 
+    //DSO_GFX::printxy(-5,-1,"Back");
+    DSO_GFX::setTextColor(ILI_GREEN,ILI_BLACK); 
 }
 /**
  * 
@@ -78,6 +92,7 @@ void MenuManager::run(void)
 };
 /**
  */
+typedef const char *(charcb)();
 void MenuManager::redraw(const char *title, int n,const MenuItem *xtop, int current)
 {
     DSO_GFX::clearBody(BLACK);
@@ -92,28 +107,31 @@ void MenuManager::redraw(const char *title, int n,const MenuItem *xtop, int curr
                     mark=true;
                 break; 
             case MenuItem::MENU_INDEX:
-            {
+                {
                 MenuListItem *tem=(MenuListItem *)xtop[i].cookie;
                 if(tem->thisItem==*(tem->item)) mark=true;
-            }
+                }
+                break;
+            case MenuItem::MENU_TEXT:
+                {
+                DSO_GFX::setTextColor(WHITE,BLACK);
+                DSO_GFX::printxy(6,1+i,xtop[i].menuText);
+                charcb *cb=( charcb *)xtop[i].cookie;
+                DSO_GFX::setSmallFont();
+                if(cb)
+                {
+                    DSO_GFX::printxy(12,1+i,cb());
+                }
+                DSO_GFX::setBigFont(true);
+                }
+                continue;
                 break;
             default:
                 break;
-        }
+        }       
+        printMenuEntry(current==i,i,xtop[i].menuText);
         if(mark)
             printPrefix(current==i,i,"v");
-        printMenuEntry(current==i,i,xtop[i].menuText);
-typedef const char *(charcb)();
-        if(xtop[i].type==MenuItem::MENU_TEXT)
-        {
-            DSO_GFX::setSmallFont();
-            charcb *cb=( charcb *)xtop[i].cookie;
-            if(cb)
-            {
-                DSO_GFX::printxy(12,1+i,cb());
-            }
-            DSO_GFX::setBigFont(true);
-        }
     }         
 }
 

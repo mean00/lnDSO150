@@ -31,6 +31,18 @@ public:
 };
 /**
  * 
+ */
+static void charToPix(int x,int y, int &w, int &l)
+{       
+    if(y<0) l=240+FONT_SIZE_Y*y;
+    else l=FONT_SIZE_Y*y+2*FONT_SIZE_Y;
+    
+    if(x<0) w=320+FONT_SIZE_X*x;
+    else w=FONT_SIZE_X*x;
+}
+
+/**
+ * 
  * @param array
  */
 void DSO_GFX_markup(const char *t)
@@ -110,14 +122,25 @@ void DSO_GFX::printxy(int x, int y, const char *t)
 {
     AutoLcd autolcd;
     int l,w;
-    if(y<0) l=240+FONT_SIZE_Y*y;
-    else l=FONT_SIZE_Y*y+FONT_SIZE_Y;
-    
-    if(x<0) w=320+FONT_SIZE_X*x;
-    else w=FONT_SIZE_X*x;
-    
-    tft->setCursor(w, l+4);
+
+    charToPix(x,y,w,l);
+    tft->setCursor(w, l);
     DSO_GFX_markup(t);
+}
+
+/**
+ * 
+ * @param array
+ */
+void DSO_GFX::printButton(int x, int y, int length,const char *t,int fg, int button,int bg)
+{
+    AutoLcd autolcd;
+    int l,w;
+    charToPix(x,y,w,l);
+    l-=(FONT_SIZE_Y*3)/4;
+    if(l<0) l=0;
+    tft->centeredButton(w,l, length,FONT_SIZE_Y,t,  fg,button,bg);
+
 }
 /**
  * 
