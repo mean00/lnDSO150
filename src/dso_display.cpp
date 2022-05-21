@@ -37,7 +37,7 @@
 
 #define LINE_OFFSET 4
 
-#define DSO_LOW_BAR_BUTTON  64
+#define DSO_LOW_BAR_BUTTON  68
 
 #define DSO_CHAR_HEIGHT 20
 #define DSO_HEIGHT_OFFSET 1
@@ -478,6 +478,25 @@ static void genericDraw(int column,const char *v,bool highlight)
         tft->setTextColor(LIGHT_GREEN,BLACK);
     }    
     lowBarPrint(column,v);
+
+    int fg,bg,button;
+
+    if(highlight)
+    {
+        fg=ILI_BLACK;
+        button= ILI_BLUE ;
+        bg=ILI_BLACK;
+    }else
+    {
+        fg=LIGHT_GREEN;
+        button=ILI_BLACK;
+        bg=ILI_BLACK;
+    }
+    AutoGfx autogfx;
+    //(int x, int y, int w, int h, const char *text, int fontColor,int buttonColor,int bgColor)
+    tft->centeredButton( (column-1)*DSO_LOW_BAR_BUTTON+1, 240 - 20, 
+                        DSO_LOW_BAR_BUTTON,20, v,fg,button,bg);
+    tft->setTextColor(LIGHT_GREEN,BLACK);                        
 }
 /**
  * 
