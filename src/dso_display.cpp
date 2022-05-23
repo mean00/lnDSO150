@@ -74,23 +74,24 @@ extern const uint8_t *getSplash();
 #define VOLTAGE_OFFSET_ROW      4
 #define ARMING_ROW              5
 
+#define RIGHT_HAND_OFFSET 1
+
 static const int DisplayLine[10]=
 {
-2,//#define MIN_ROW                 0
-3,//#define MAX_ROW                 2
-5,//#define FREQ_ROW                4
-7,//#define TRIGGER_ROW             6
-9,//#define VOLTAGE_OFFSET_ROW      8
-11 // ARMING
+RIGHT_HAND_OFFSET+2,//#define MIN_ROW                 0
+RIGHT_HAND_OFFSET+3,//#define MAX_ROW                 2
+RIGHT_HAND_OFFSET+5,//#define FREQ_ROW                4
+RIGHT_HAND_OFFSET+7,//#define TRIGGER_ROW             6
+RIGHT_HAND_OFFSET+9,//#define VOLTAGE_OFFSET_ROW      8
 };
 static const int HeaderLine[10]=
 {
-1,//#define MIN_ROW                 0
-1, // MAX
-4,//#define FREQ_ROW                4
-6,//#define TRIGGER_ROW             6
-8,//#define VOLTAGE_OFFSET_ROW      8
-10, // ARMING
+RIGHT_HAND_OFFSET+1,//#define MIN_ROW                 0
+RIGHT_HAND_OFFSET+1, // MAX
+RIGHT_HAND_OFFSET+4,//#define FREQ_ROW                4
+RIGHT_HAND_OFFSET+6,//#define TRIGGER_ROW             6
+RIGHT_HAND_OFFSET+8,//#define VOLTAGE_OFFSET_ROW      8
+RIGHT_HAND_OFFSET+10, // ARMING
 };
 
 class AutoGfx
@@ -467,7 +468,6 @@ void DSODisplay::printOffsetValue( float volt,bool hilight)
         {FREQ_ROW,          "Freq"},
         {TRIGGER_ROW,       "Trigg"},
         {VOLTAGE_OFFSET_ROW,"Offset"},
-        {ARMING_ROW,        "Arming" },
         {-1,""},
     };
 
@@ -538,10 +538,10 @@ static void genericDraw(int column,const char *v,bool highlight)
 void DSODisplay::drawVolt(const char *v, bool highlight)    { genericDraw(VOLTAGE_MODE,v,highlight);}
 void DSODisplay::drawTrigger(const char *v, bool highlight) { genericDraw(TRIGGER_MODE,v,highlight);}
 void DSODisplay::drawTime(const char *v, bool highlight)    { genericDraw(TIME_MODE,   v,highlight);}
-void DSODisplay::drawCoupling(const char *v, bool highlight){ genericDraw(ARMING_MODE, v,highlight);}
-void DSODisplay::drawStat(const char *v, bool highlight)    { genericDraw(STAT_MODE,   v,highlight);}
+void DSODisplay::drawCoupling(const char *v, bool highlight){ genericDraw(STAT_MODE, v,highlight);}
+void DSODisplay::drawArming(const char *v, bool highlight)  { genericDraw(ARMING_MODE ,   v,highlight);}
 
-
+#if 0
 /**
  * 
  * @param mode
@@ -566,6 +566,7 @@ void  DSODisplay::drawArmingTriggeredMode(DSO_ArmingMode arming,bool triggered)
     VALUE_Y_POSITION(ARMING_ROW);    
     tft->printUpTo(armingString,320-DSO_INFO_START_COLUMN);
 }
+#endif
 /**
  * 
  * @return 

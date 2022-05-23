@@ -129,7 +129,7 @@ void  showCaptured()
     if(triggered!=lastTriggered)
     {
         #warning FIXME : Arming mode
-        DSODisplay::drawArmingTriggeredMode(DSO_CAPTURE_MULTI,triggered);
+        //
     }
     lastTriggered=triggered;
 }
