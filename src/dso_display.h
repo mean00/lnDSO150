@@ -67,8 +67,8 @@ public:
             
             static void  drawAutoSetup();
             static void  drawAutoSetupStep(int x);
-            static void  drawArmingMode(DSO_ArmingMode mode);
-            static void  drawTriggeredState(DSO_ArmingMode mode,bool triggered);
+            static void  drawArmingTriggeredMode(DSO_ArmingMode mode,bool triggered);
+
             
             static void  drawSplash();
             static void  printString(int x, int y, const char *text);
@@ -78,4 +78,4 @@ public:
 
 #define DSO_WAVEFORM_WIDTH  240  // 20 pixel / unit, 12 square => 240 pixel
 #define DSO_WAVEFORM_HEIGHT 200  // 10 square : 200 pixel
-#define DSO_WAVEFORM_OFFSET ((240-DSO_WAVEFORM_HEIGHT)/2)
+#define DSO_WAVEFORM_OFFSET ((240-DSO_WAVEFORM_HEIGHT)/4)

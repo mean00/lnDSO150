@@ -61,6 +61,7 @@ extern void showCaptured();
     DSODisplay::drawTrigger(DSOCapture::getTriggerModeAsText(),false);
 
  }
+ 
 /**
  *
  */
@@ -109,6 +110,7 @@ void mainLoop()
         int evt=evtGroup->waitEvents(0xff,2*1000);
         if(!evt)
         {
+            showCaptured();
             Logger("*\n");
             continue;
         }

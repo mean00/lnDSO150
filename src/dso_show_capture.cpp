@@ -107,6 +107,7 @@ void  captured()
 }
 /**
  */
+bool lastTriggered=false;
 void  showCaptured()
 {
     int now=lnGetMs() & 0xffff;
@@ -125,8 +126,12 @@ void  showCaptured()
     {
         triggered=false;
     }
-    #warning FIXME : Arming mode
-     //DSODisplay::drawTriggeredState(DSO_CAPTURE_MULTI,triggered);
+    if(triggered!=lastTriggered)
+    {
+        #warning FIXME : Arming mode
+        DSODisplay::drawArmingTriggeredMode(DSO_CAPTURE_MULTI,triggered);
+    }
+    lastTriggered=triggered;
 }
 
 

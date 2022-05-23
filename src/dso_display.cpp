@@ -72,6 +72,7 @@ extern const uint8_t *getSplash();
 #define FREQ_ROW                2
 #define TRIGGER_ROW             3
 #define VOLTAGE_OFFSET_ROW      4
+#define ARMING_ROW              5
 
 static const int DisplayLine[10]=
 {
@@ -79,7 +80,8 @@ static const int DisplayLine[10]=
 3,//#define MAX_ROW                 2
 5,//#define FREQ_ROW                4
 7,//#define TRIGGER_ROW             6
-9//#define VOLTAGE_OFFSET_ROW      8
+9,//#define VOLTAGE_OFFSET_ROW      8
+11 // ARMING
 };
 static const int HeaderLine[10]=
 {
@@ -87,7 +89,8 @@ static const int HeaderLine[10]=
 1, // MAX
 4,//#define FREQ_ROW                4
 6,//#define TRIGGER_ROW             6
-8//#define VOLTAGE_OFFSET_ROW      8
+8,//#define VOLTAGE_OFFSET_ROW      8
+10, // ARMING
 };
 
 class AutoGfx
@@ -266,16 +269,17 @@ void  DSODisplay::drawFq(int f)
     AutoGfx autogfx;
     if(f==0)
     {
-        TITLE_SQUARE(FREQ_ROW,0);
+        tft->square(0, 
+            DSO_INFO_START_COLUMN,             DSO_HEIGHT_OFFSET+(DisplayLine[FREQ_ROW]-1)*DSO_CHAR_HEIGHT, 
+            320-DSO_INFO_START_COLUMN,         DSO_CHAR_HEIGHT);
+
         VALUE_Y_POSITION(FREQ_ROW);        
-        tft->print("---");
+        tft->print("-");
         return;            
     }
     const char *t= fq2Text(f)  ;
-    tft->setTextColor(WHITE,BLACK);
-    //int line=FREQ_ROW+1;
-    VALUE_Y_POSITION(FREQ_ROW);
-    //tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(displayLine[line]+1)*DSO_CHAR_HEIGHT-5);
+    tft->setTextColor(WHITE,BLACK);    
+    VALUE_Y_POSITION(FREQ_ROW);    
     tft->printUpTo(t,320-DSO_INFO_START_COLUMN);
 }
 
@@ -473,6 +477,7 @@ void DSODisplay::drawStatsBackGround()
     drawInfoHeader(FREQ_ROW,    "Freq",BG_COLOR);
     drawInfoHeader(TRIGGER_ROW, "Trigg",BG_COLOR);
     drawInfoHeader(VOLTAGE_OFFSET_ROW, "Offset",BG_COLOR);
+    drawInfoHeader(ARMING_ROW, "Arming",BG_COLOR);
     //drawInfoHeader(10,          "Offst",BG_COLOR);
     tft->setTextColor(BG_COLOR,BLACK);
     oldMode=DSO_CAPTURE_MODE_INVALIDE;
@@ -536,17 +541,25 @@ void DSODisplay::drawStat(const char *v, bool highlight)    { genericDraw(STAT_M
  * 
  * @param mode
  */
-void  DSODisplay::drawArmingMode(DSO_ArmingMode arming)
+void  DSODisplay::drawArmingTriggeredMode(DSO_ArmingMode arming,bool triggered)
 {       
     const char *armingString="?";
     switch(arming)
     {
-        case DSO_CAPTURE_SINGLE: armingString="SING";break;
-        case DSO_CAPTURE_MULTI: armingString="REPT";break;
-        case DSO_CAPTURE_CONTINUOUS: armingString="CONT";break;
+        case DSO_CAPTURE_SINGLE: armingString="Single";break;
+        case DSO_CAPTURE_MULTI: armingString="Repeat";break;
+        case DSO_CAPTURE_CONTINUOUS: armingString="Run";break;
             default:            xAssert(0);            break;
     }   
-    tft->print(0*DSO_LOW_BAR_BUTTON, 1,armingString);
+    int color;
+    AutoGfx autogfx;    
+    if(triggered)
+        color=WHITE;
+    else
+        color=ILI_RED;
+    tft->setTextColor(color,BLACK);
+    VALUE_Y_POSITION(ARMING_ROW);    
+    tft->printUpTo(armingString,320-DSO_INFO_START_COLUMN);
 }
 /**
  * 
@@ -594,6 +607,7 @@ void DSODisplay::drawAutoSetupStep(int i )
  * 
  * @param triggered
  */
+#if 0
 DSO_ArmingMode lastMode=DSO_CAPTURE_MODE_INVALIDE;
 bool lastTriggered=false;
 
@@ -627,7 +641,7 @@ void  DSODisplay::drawTriggeredState(DSO_ArmingMode mode, bool triggered)
     tft->print(90, 0,s/*,90*/);
     tft->setTextColor(fg,bg);
 }
-
+#endif
 /**
  * 
  */
