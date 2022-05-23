@@ -47,7 +47,7 @@
 static void prettyPrint(float x,int mx);
 
 
-#define VALUE_Y_POSITION(x)  tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(DisplayLine[x])*DSO_CHAR_HEIGHT-5);
+
 #define TITLE_SQUARE(x,color)         tft->square(color, \
             DSO_INFO_START_COLUMN,             DSO_HEIGHT_OFFSET+(HeaderLine[x]-1)*DSO_CHAR_HEIGHT, \
             320-DSO_INFO_START_COLUMN,         DSO_CHAR_HEIGHT);
@@ -106,6 +106,11 @@ public:
     }
 };
 //-
+
+static void VALUE_Y_POSITION(int x)
+{
+      tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(DisplayLine[x])*DSO_CHAR_HEIGHT-5);
+}
 
 static const uint16_t *getBackGround(int line,bool &repeat)
 {
@@ -189,8 +194,7 @@ void DSODisplay::init(ili9341 *d)
     {
         prevPos[i]=120;
         prevSize[i]=1;
-    }
-   // triggerWatch.elapsed(0);
+    }   
 }
 
 /**
@@ -257,7 +261,7 @@ void  DSODisplay::drawWaveForm(int count,const uint8_t *data)
 void  DSODisplay::drawMinMax(float mn, float mx)
 {
     AutoGfx autogfx;
-    tft->setTextColor(WHITE,BLACK);
+    tft->setTextColor(ILI_WHITE,ILI_BLACK);
     printMeasurement(MIN_ROW, mn);
     printMeasurement(MAX_ROW, mx);    
 }
@@ -267,19 +271,17 @@ void  DSODisplay::drawMinMax(float mn, float mx)
 void  DSODisplay::drawFq(int f)
 {
     AutoGfx autogfx;
+    VALUE_Y_POSITION(FREQ_ROW);     
     if(f==0)
     {
         tft->square(0, 
             DSO_INFO_START_COLUMN,             DSO_HEIGHT_OFFSET+(DisplayLine[FREQ_ROW]-1)*DSO_CHAR_HEIGHT, 
-            320-DSO_INFO_START_COLUMN,         DSO_CHAR_HEIGHT);
-
-        VALUE_Y_POSITION(FREQ_ROW);        
+            320-DSO_INFO_START_COLUMN,         DSO_CHAR_HEIGHT);           
         tft->print("-");
         return;            
     }
     const char *t= fq2Text(f)  ;
-    tft->setTextColor(WHITE,BLACK);    
-    VALUE_Y_POSITION(FREQ_ROW);    
+    tft->setTextColor(WHITE,BLACK);        
     tft->printUpTo(t,320-DSO_INFO_START_COLUMN);
 }
 
@@ -310,7 +312,6 @@ void DSODisplay::drawGrid(void)
     }
     for(int i=0;i<=C_X;i++)
     {
-
         tft->VLine(SCALE_STEP*i,DSO_WAVEFORM_OFFSET,SCALE_STEP*C_Y,fgColor);
     }
     // Draw internal + cross in bright green
@@ -322,8 +323,6 @@ void DSODisplay::drawGrid(void)
     tft->VLine(0,DSO_WAVEFORM_OFFSET,SCALE_STEP*C_Y,hiLight);
     tft->VLine(C_X*SCALE_STEP,DSO_WAVEFORM_OFFSET,SCALE_STEP*C_Y,hiLight);   
     tft->VLine((C_X*SCALE_STEP)/2,DSO_WAVEFORM_OFFSET,SCALE_STEP*C_Y,hiLight);
-        
-    //tft->fillCircle(LED_X +LED_R, LED_Y+LED_R, LED_R, GREEN);
 }
 /**
  * 
@@ -405,22 +404,17 @@ void prettyPrint(float x,int maxW=0)
 }
 
 
-    
-
-
-
 /**
  * 
  */
-static void drawInfo(int line, const char *info,int color)
+static __attribute__ ((noinline)) void drawInfo(int line, const char *info,int color)
 {
-
     tft->print(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(line+1)*DSO_CHAR_HEIGHT-LINE_OFFSET,info);
 }
 /**
  * 
  */
-static void drawInfoHeader(int line, const char *info,int color)
+static __attribute__ ((noinline))  void drawInfoHeader(int line, const char *info,int color)
 {
     TITLE_SQUARE(line,color);
     tft->print(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+HeaderLine[line]*DSO_CHAR_HEIGHT-LINE_OFFSET,info);
@@ -461,6 +455,22 @@ void DSODisplay::printOffsetValue( float volt,bool hilight)
 /**
  * 
  */
+ struct HeaderDesc
+    {
+        int16_t     row;
+        const char *data;
+    };
+
+  static const HeaderDesc Headers[]=
+    {
+        {MIN_ROW,           "MinMx"},
+        {FREQ_ROW,          "Freq"},
+        {TRIGGER_ROW,       "Trigg"},
+        {VOLTAGE_OFFSET_ROW,"Offset"},
+        {ARMING_ROW,        "Arming" },
+        {-1,""},
+    };
+
 void DSODisplay::drawStatsBackGround()
 {
     AutoGfx autogfx;
@@ -468,20 +478,15 @@ void DSODisplay::drawStatsBackGround()
 #define BG_COLOR LIGHT_GREEN    
     tft->VLine(DSO_INFO_START_COLUMN, 0,BG_STATS_HEIGHT,BG_COLOR);
     tft->VLine(319, 0,BG_STATS_HEIGHT,BG_COLOR);
-        
-
-    tft->setTextColor(BLACK,BG_COLOR);
-    //drawInfoHeader(AVRG_ROW ,   "Avrg",BG_COLOR);
-    drawInfoHeader(MIN_ROW,     "MinMx",BG_COLOR);
-    //drawInfoHeader(MAX_ROW,     "Max",BG_COLOR);  
-    drawInfoHeader(FREQ_ROW,    "Freq",BG_COLOR);
-    drawInfoHeader(TRIGGER_ROW, "Trigg",BG_COLOR);
-    drawInfoHeader(VOLTAGE_OFFSET_ROW, "Offset",BG_COLOR);
-    drawInfoHeader(ARMING_ROW, "Arming",BG_COLOR);
-    //drawInfoHeader(10,          "Offst",BG_COLOR);
+    tft->setTextColor(BLACK,BG_COLOR);  
+    const HeaderDesc *h=Headers;
+    while(h->row!=-1)
+    {
+        drawInfoHeader(h->row,     h->data,BG_COLOR);
+        h++;
+    }
     tft->setTextColor(BG_COLOR,BLACK);
-    oldMode=DSO_CAPTURE_MODE_INVALIDE;
-    
+    oldMode=DSO_CAPTURE_MODE_INVALIDE;    
 }
 
 
@@ -546,10 +551,10 @@ void  DSODisplay::drawArmingTriggeredMode(DSO_ArmingMode arming,bool triggered)
     const char *armingString="?";
     switch(arming)
     {
-        case DSO_CAPTURE_SINGLE: armingString="Single";break;
-        case DSO_CAPTURE_MULTI: armingString="Repeat";break;
-        case DSO_CAPTURE_CONTINUOUS: armingString="Run";break;
-            default:            xAssert(0);            break;
+        case DSO_CAPTURE_SINGLE:    armingString="Single";  break;
+        case DSO_CAPTURE_MULTI:     armingString="Repeat";  break;
+        case DSO_CAPTURE_CONTINUOUS:armingString="Run";     break;
+            default:                xAssert(0);             break;
     }   
     int color;
     AutoGfx autogfx;    
@@ -603,45 +608,6 @@ void DSODisplay::drawAutoSetupStep(int i )
      
  }
 
-/**
- * 
- * @param triggered
- */
-#if 0
-DSO_ArmingMode lastMode=DSO_CAPTURE_MODE_INVALIDE;
-bool lastTriggered=false;
-
-void  DSODisplay::drawTriggeredState(DSO_ArmingMode mode, bool triggered)
-{
-    if(lastMode==mode && lastTriggered==triggered) return; // nothing to do
-    lastMode=mode;
-    lastTriggered=triggered;
-    
-    if(mode!=DSO_CAPTURE_SINGLE)
-    {
-       tft->setTextColor(BLACK,BLACK);  
-       tft->setCursor(90, 0); 
-       tft->print("Triggd"/*,90*/);
-       tft->setTextColor(BG_COLOR,BLACK);  
-       return;
-    }
-    const char *s="Wait...";
-    
-    int bg=BLACK;
-    int fg=BG_COLOR;;
-        
-    if(triggered)
-    {
-        s="Triggd";
-        tft->setTextColor(bg,fg);
-    }else
-    {
-         tft->setTextColor(fg,bg);
-    }
-    tft->print(90, 0,s/*,90*/);
-    tft->setTextColor(fg,bg);
-}
-#endif
 /**
  * 
  */
