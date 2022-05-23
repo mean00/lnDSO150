@@ -47,6 +47,12 @@
 static void prettyPrint(float x,int mx);
 
 
+#define VALUE_Y_POSITION(x)  tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(DisplayLine[x])*DSO_CHAR_HEIGHT-5);
+#define TITLE_SQUARE(x,color)         tft->square(color, \
+            DSO_INFO_START_COLUMN,             DSO_HEIGHT_OFFSET+(HeaderLine[x]-1)*DSO_CHAR_HEIGHT, \
+            320-DSO_INFO_START_COLUMN,         DSO_CHAR_HEIGHT);
+
+
 static ili9341 *tft;
 extern DSO_portArbitrer *arbitrer;
 static DSO_ArmingMode oldMode=DSO_CAPTURE_MODE_INVALIDE;
@@ -62,11 +68,27 @@ extern const uint8_t *getSplash();
 
 
 #define MIN_ROW                 0
-#define MAX_ROW                 2
-#define FREQ_ROW                4
-#define TRIGGER_ROW             6
-#define VOLTAGE_OFFSET_ROW      8
+#define MAX_ROW                 1
+#define FREQ_ROW                2
+#define TRIGGER_ROW             3
+#define VOLTAGE_OFFSET_ROW      4
 
+static const int DisplayLine[10]=
+{
+2,//#define MIN_ROW                 0
+3,//#define MAX_ROW                 2
+5,//#define FREQ_ROW                4
+7,//#define TRIGGER_ROW             6
+9//#define VOLTAGE_OFFSET_ROW      8
+};
+static const int HeaderLine[10]=
+{
+1,//#define MIN_ROW                 0
+1, // MAX
+4,//#define FREQ_ROW                4
+6,//#define TRIGGER_ROW             6
+8//#define VOLTAGE_OFFSET_ROW      8
+};
 
 class AutoGfx
 {
@@ -126,10 +148,11 @@ static const uint16_t *getHzBackGround(int line,bool &repeat)
  * @param line
  * @param info
  */
+
+
 static void printMeasurement(int line, const float f)
-{
-    
-    tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(line+1)*DSO_CHAR_HEIGHT-5);
+{    
+    VALUE_Y_POSITION(line);    
     prettyPrint(f,320-4-DSO_INFO_START_COLUMN);
 }
 /**
@@ -232,25 +255,27 @@ void  DSODisplay::drawMinMax(float mn, float mx)
 {
     AutoGfx autogfx;
     tft->setTextColor(WHITE,BLACK);
-    printMeasurement(MIN_ROW+1, mn);
-    printMeasurement(MAX_ROW+1, mx);    
+    printMeasurement(MIN_ROW, mn);
+    printMeasurement(MAX_ROW, mx);    
 }
+/**
+ * 
+ */
 void  DSODisplay::drawFq(int f)
 {
     AutoGfx autogfx;
     if(f==0)
     {
-        tft->square(0,
-            DSO_INFO_START_COLUMN,             DSO_HEIGHT_OFFSET+(FREQ_ROW+1)*DSO_CHAR_HEIGHT+3-5,
-            320-DSO_INFO_START_COLUMN,         DSO_CHAR_HEIGHT);
-        tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(FREQ_ROW+1+1)*DSO_CHAR_HEIGHT-5);
+        TITLE_SQUARE(FREQ_ROW,0);
+        VALUE_Y_POSITION(FREQ_ROW);        
         tft->print("---");
         return;            
     }
     const char *t= fq2Text(f)  ;
     tft->setTextColor(WHITE,BLACK);
-    int line=FREQ_ROW+1;
-    tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(line+1)*DSO_CHAR_HEIGHT-5);
+    //int line=FREQ_ROW+1;
+    VALUE_Y_POSITION(FREQ_ROW);
+    //tft->setCursor(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(displayLine[line]+1)*DSO_CHAR_HEIGHT-5);
     tft->printUpTo(t,320-DSO_INFO_START_COLUMN);
 }
 
@@ -393,11 +418,8 @@ static void drawInfo(int line, const char *info,int color)
  */
 static void drawInfoHeader(int line, const char *info,int color)
 {
-
-    tft->square(color,
-            DSO_INFO_START_COLUMN,             DSO_HEIGHT_OFFSET+(line)*DSO_CHAR_HEIGHT+3-LINE_OFFSET,
-            320-DSO_INFO_START_COLUMN,         DSO_CHAR_HEIGHT);
-    tft->print(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+(line+1)*DSO_CHAR_HEIGHT-LINE_OFFSET,info);
+    TITLE_SQUARE(line,color);
+    tft->print(DSO_INFO_START_COLUMN+2, DSO_HEIGHT_OFFSET+HeaderLine[line]*DSO_CHAR_HEIGHT-LINE_OFFSET,info);
 }
 
 
@@ -413,7 +435,7 @@ void DSODisplay::printTriggerValue( float volt,bool hilight)
         tft->setTextColor(BLACK,WHITE);
     else
         tft->setTextColor(WHITE,BLACK);
-    printMeasurement(TRIGGER_ROW+1, volt);
+    printMeasurement(TRIGGER_ROW, volt);
 }
 
 
@@ -429,7 +451,7 @@ void DSODisplay::printOffsetValue( float volt,bool hilight)
         tft->setTextColor(BLACK,WHITE);
     else
         tft->setTextColor(WHITE,BLACK);
-    printMeasurement(VOLTAGE_OFFSET_ROW+1, volt);
+    printMeasurement(VOLTAGE_OFFSET_ROW, volt);
 }
 
 /**
@@ -438,16 +460,16 @@ void DSODisplay::printOffsetValue( float volt,bool hilight)
 void DSODisplay::drawStatsBackGround()
 {
     AutoGfx autogfx;
-
+#define BG_STATS_HEIGHT (240-20)
 #define BG_COLOR LIGHT_GREEN    
-    tft->VLine(DSO_INFO_START_COLUMN, 0,240,BG_COLOR);
-    tft->VLine(319, 0,240,BG_COLOR);
+    tft->VLine(DSO_INFO_START_COLUMN, 0,BG_STATS_HEIGHT,BG_COLOR);
+    tft->VLine(319, 0,BG_STATS_HEIGHT,BG_COLOR);
         
 
     tft->setTextColor(BLACK,BG_COLOR);
     //drawInfoHeader(AVRG_ROW ,   "Avrg",BG_COLOR);
-    drawInfoHeader(MIN_ROW,     "Min",BG_COLOR);
-    drawInfoHeader(MAX_ROW,     "Max",BG_COLOR);  
+    drawInfoHeader(MIN_ROW,     "MinMx",BG_COLOR);
+    //drawInfoHeader(MAX_ROW,     "Max",BG_COLOR);  
     drawInfoHeader(FREQ_ROW,    "Freq",BG_COLOR);
     drawInfoHeader(TRIGGER_ROW, "Trigg",BG_COLOR);
     drawInfoHeader(VOLTAGE_OFFSET_ROW, "Offset",BG_COLOR);
@@ -507,6 +529,7 @@ void DSODisplay::drawVolt(const char *v, bool highlight)    { genericDraw(VOLTAG
 void DSODisplay::drawTrigger(const char *v, bool highlight) { genericDraw(TRIGGER_MODE,v,highlight);}
 void DSODisplay::drawTime(const char *v, bool highlight)    { genericDraw(TIME_MODE,   v,highlight);}
 void DSODisplay::drawCoupling(const char *v, bool highlight){ genericDraw(ARMING_MODE, v,highlight);}
+void DSODisplay::drawStat(const char *v, bool highlight)    { genericDraw(STAT_MODE,   v,highlight);}
 
 
 /**
@@ -616,6 +639,7 @@ void  DSODisplay::printString(int x, int y, const char *text)
     tft->setTextColor(WHITE,BLACK);
     tft->setCursor(x, y);
     tft->print(text);              
+    tft->setFontSize(ili9341::SmallFont);
 }
 /**
  * 

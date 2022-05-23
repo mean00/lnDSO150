@@ -24,7 +24,7 @@ extern uint16_t calibrationDC[];
 #define DSO_EVT_COUPLING (1<<2)
 
 extern void dsoInitUsb();
-
+extern void showCaptured();
 /**
  *
  * @param evt
@@ -127,6 +127,7 @@ void mainLoop()
             DSODisplay::drawCoupling(control->geCouplingStateAsText(),false);
             DSOCapture::setCouplingMode(control->getCouplingState()==DSOControl::DSO_COUPLING_AC);
         }
+        showCaptured();
     }
 }
 // EOF

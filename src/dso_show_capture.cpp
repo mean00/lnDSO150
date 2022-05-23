@@ -8,6 +8,8 @@ extern uint8_t    *displayData;
 uint32_t lastRefresh=0;
 static float voltageOffset=0.0;
 extern uint32_t lnGetCycle32();
+void  captured();
+void  showCaptured();
 
 /**
  * 
@@ -90,6 +92,42 @@ void showCapture()
     DSOCapture::startCapture(240);
     DSODisplay::drawWaveForm(nb,displayData);
     DSODisplay::drawMinMax(vMin,vMax);
+
+    captured();
            
 }
+
+int lastCapture=0;
+/**
+ */
+
+void  captured()
+{
+    lastCapture=lnGetMs() & 0xffff;
+}
+/**
+ */
+void  showCaptured()
+{
+    int now=lnGetMs() & 0xffff;
+    if(now<lastCapture)
+    {
+        now=0xffff+now-lastCapture;
+    }else
+    {
+        now=now-lastCapture;
+    }
+    bool triggered=false;
+    if(now<50)
+    {
+        triggered=true;
+    }else
+    {
+        triggered=false;
+    }
+    #warning FIXME : Arming mode
+     //DSODisplay::drawTriggeredState(DSO_CAPTURE_MULTI,triggered);
+}
+
+
 // EOF

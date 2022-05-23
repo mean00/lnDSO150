@@ -26,9 +26,10 @@ typedef enum
 {
             INVALID_MODE=0,
             VOLTAGE_MODE=1,
-            TIME_MODE=2,
+            TIME_MODE   =2,
             TRIGGER_MODE=3,
-            ARMING_MODE=4,
+            STAT_MODE   =4,
+            ARMING_MODE =5,
             VOLTAGE_OFFSET_MODE=VOLTAGE_MODE+0x80,
             TIME_MODE_ALT=TIME_MODE+0x80,
             TRIGGER_MODE_ALT=TRIGGER_MODE+0x80,
@@ -39,6 +40,7 @@ public:
 public:
             static void  init(ili9341 *d);
             static void  cleanup();
+            
             static void  drawWaveForm(int count,const uint8_t *data);
             static void  drawMinMax(float mn, float mx);
             static void  drawFq(int fq);
@@ -47,6 +49,7 @@ public:
             static void  drawVolt(const char *v, bool highlight);
             static void  drawTrigger(const char *v, bool highlight);
             static void  drawTime(const char *v, bool highlight);            
+            static void  drawStat(const char *v, bool highlight);
             static void  drawCoupling(const char *v, bool highlight);            
             // /// individual item on the screen 
             

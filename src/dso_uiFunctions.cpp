@@ -136,6 +136,24 @@ extern void setVoltageOffset(float v);
     DSOCapture::setTimeBase((DSOCapture::DSO_TIME_BASE )ctime);
     DSOCapture::startCapture(240);
  }
+//--
+/**
+  *
+  * @param on
+  */
+ void stat_redraw(bool on)
+ {
+     Logger("stat redraw : redraw %d\n",on);
+     DSODisplay::drawStat("XXXXX",on);
+ }
+ /**
+  *
+  * @param inc
+  */
+ void stat_incdec(int inc)
+ {
+    Logger("stat : %d\n",inc);
+ } 
 
  //---------
 extern  const UI_eventCallbacks voltOffset,voltOkb,triggerValueMenu;
@@ -144,6 +162,8 @@ const UI_eventCallbacks voltOffset={DSOControl::DSO_BUTTON_VOLTAGE,  &voltMenu, 
 const UI_eventCallbacks triggerMenu=      {DSOControl::DSO_BUTTON_TRIGGER, &triggerValueMenu,&voltTrigger_redraw,      &voltTrigger_incdec};
 const UI_eventCallbacks triggerValueMenu= {DSOControl::DSO_BUTTON_TRIGGER, &triggerMenu,     &voltTriggerValue_redraw, &voltTriggerValue_incdec};
 const UI_eventCallbacks timeMenu= {DSOControl::DSO_BUTTON_TIME,NULL, &time_redraw,  &time_incdec};
+const UI_eventCallbacks statMenu= {DSOControl::DSO_BUTTON_OK,NULL, &stat_redraw,  &stat_incdec}; //STAT_MODE
+
 
 #define NB_TOP_MENU 8
 
@@ -155,7 +175,7 @@ static const UI_eventCallbacks  *topMenus[NB_TOP_MENU]=
      &voltMenu,     // 3: DSO_BUTTON_VOLTAGE,
      &timeMenu,     // 4: DSO_BUTTON_TIME,
      &triggerMenu,  // 5: DSO_BUTTON_TRIGGER,
-     NULL,          // 6: DSO_BUTTON_OK
+     &statMenu,     // 6: DSO_BUTTON_OK
      NULL,          // 7: xx
  };
  static const UI_eventCallbacks *currentMenu=NULL;
