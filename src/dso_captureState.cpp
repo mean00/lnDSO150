@@ -2,7 +2,7 @@
 #include "dso_captureState.h"
 
 static DSO_ArmingMode              armingMode=DSO_CAPTURE_MULTI;
-static bool captureStateCapturing=false;
+static bool captureStateCapturing=true;
 
  /**
   *
