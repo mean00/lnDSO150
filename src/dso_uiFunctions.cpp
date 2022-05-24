@@ -3,12 +3,12 @@
 #include "dso_display.h"
 
 #include "dso_capture.h"
+#include "dso_captureState.h"
 
 struct UI_eventCallbacks;
 typedef void redrawProto(bool onoff);
 typedef void incdecProto(int count);
 extern DSOControl          *control;
-extern DSO_ArmingMode       armingMode;
 extern void redrawEverything();
 extern void autoSetup();
 extern float getVoltageOffset();
@@ -151,7 +151,7 @@ const char *ArmingAsString[3]=
  void arming_redraw(bool on)
  {
      Logger("stat redraw : redraw %d\n",on);
-     DSODisplay::drawArming(ArmingAsString[armingMode],on);
+     DSODisplay::drawArming(ArmingAsString[DSOCaptureState::getArmingMode()],on);
  }
  /**
   *
@@ -160,13 +160,13 @@ const char *ArmingAsString[3]=
  void arming_incdec(int inc)
  {
     Logger("arming : %d\n",inc);
-    DSOCapture::stopCapture();
-    int a=(int)armingMode;
+    DSOCaptureState::stopCapture();
+    int a=(int)DSOCaptureState::getArmingMode();
     a=a+inc;
     while(a<0) a+=2;
     a=a&1;
-    armingMode=(DSO_ArmingMode)a;
-    DSOCapture::startCapture(240);    
+    DSOCaptureState::setArmingMode((DSO_ArmingMode)a);
+    DSOCaptureState::startCapture();    
  } 
 
  //---------
@@ -221,24 +221,6 @@ static const UI_eventCallbacks  *topMenus[NB_TOP_MENU]=
  /**
   *
   */
- void processStartStop()
- {
-     // toggle start /stop
-    switch(DSOCapture::state())
-    {
-        case DSOCapture:: CAPTURE_STOPPED:
-            DSOCapture::startCapture(240);
-            break;
-        case DSOCapture:: CAPTURE_RUNNING:
-        case DSOCapture:: CAPTURE_DONE:
-            DSOCapture::stopCapture();
-            break;
-
-    }
- }
- /**
-  *
-  */
  void processUiEvent()
  {
      while(1)
@@ -255,7 +237,7 @@ static const UI_eventCallbacks  *topMenus[NB_TOP_MENU]=
 
                         if(key==DSOControl::DSO_BUTTON_ROTARY)
                         {
-                            processStartStop();
+                            DSOCaptureState::userPress();
                             return;
                         }
 

@@ -2,9 +2,9 @@
 #include "dso_display.h"
 #include "dso_control.h"
 #include "dso_capture.h"
+#include "dso_captureState.h"
 #include "lnDso_fp.h"
 extern float      *captureBuffer;
-extern DSO_ArmingMode              armingMode;
 extern uint8_t    *displayData;
 uint32_t lastRefresh=0;
 static float voltageOffset=0.0;
@@ -90,17 +90,7 @@ void showCapture()
 //    int after=lnGetCycle32();Logger("Conv 2 display =%d\n",after-before);
 
     // we can ask for the next one now
-    switch(armingMode)
-    {
-        case DSO_CAPTURE_MULTI: 
-            DSOCapture::startCapture(240);
-            break;
-        case DSO_CAPTURE_SINGLE:
-
-            break;
-        default: xAssert(0);
-            break;
-    }
+    DSOCaptureState::captureProcessed();
     DSODisplay::drawWaveForm(nb,displayData);
     DSODisplay::drawMinMax(vMin,vMax);
 

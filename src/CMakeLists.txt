@@ -21,6 +21,7 @@ ADD_LIBRARY(  sourceLib
                 dso_autoSetup.cpp
                 dso_show_capture.cpp
                 dso_test.cpp
+                dso_captureState.cpp
                 ${USB_SRC}
                 )
 TARGET_COMPILE_DEFINITIONS(sourceLib PRIVATE "-DLN_GIT_REV=\"${git_rev}\"")
