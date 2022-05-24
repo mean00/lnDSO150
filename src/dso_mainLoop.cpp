@@ -10,7 +10,7 @@
 //--
 xFastEventGroup            *evtGroup;
 extern DSOControl          *control;
-DSO_ArmingMode              armingMode=DSO_CAPTURE_CONTINUOUS;
+DSO_ArmingMode              armingMode=DSO_CAPTURE_MULTI;
 
 extern void processUiEvent();
 extern void initUiEvent();

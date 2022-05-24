@@ -141,8 +141,7 @@ extern void setVoltageOffset(float v);
 const char *ArmingAsString[3]=
 {
     "Sing", //DSO_CAPTURE_SINGLE=0,
-    "Multi", //DSO_CAPTURE_MULTI,    
-    "Run", //DSO_CAPTURE_CONTINUOUS,
+    "Multi", //DSO_CAPTURE_MULTI,        
 };
 
 /**
@@ -164,8 +163,8 @@ const char *ArmingAsString[3]=
     DSOCapture::stopCapture();
     int a=(int)armingMode;
     a=a+inc;
-    while(a<0) a+=3;
-    while(a>=3) a-=3;
+    while(a<0) a+=2;
+    a=a&1;
     armingMode=(DSO_ArmingMode)a;
     DSOCapture::startCapture(240);    
  } 
