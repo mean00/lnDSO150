@@ -26,7 +26,7 @@ extern uint16_t calibrationDC[];
 #define DSO_EVT_COUPLING (1<<2)
 
 extern void dsoInitUsb();
-extern void showCaptured();
+extern void showTriggerState();
 /**
  *
  * @param evt
@@ -106,14 +106,17 @@ void mainLoop()
 #endif
 
     // and go!
+    int loop=0;
     while(1)
     {
         xDelay(1); // if we go too fast , it will be stuck (?)
-        int evt=evtGroup->waitEvents(0xff,2*1000);
+        int evt=evtGroup->waitEvents(0xff,100);
         if(!evt)
         {
-            showCaptured();
-            Logger("*\n");
+            showTriggerState();
+            loop &= 0xff;
+            if(!loop)
+                Logger("*\n");
             continue;
         }
 
@@ -131,7 +134,7 @@ void mainLoop()
             DSODisplay::drawCoupling(control->geCouplingStateAsText(),false);
             DSOCapture::setCouplingMode(control->getCouplingState()==DSOControl::DSO_COUPLING_AC);
         }
-        showCaptured();
+        showTriggerState();
     }
 }
 // EOF

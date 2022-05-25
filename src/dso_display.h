@@ -50,14 +50,10 @@ public:
             static void  drawTime(const char *v, bool highlight);            
             static void  drawArming(const char *v, bool highlight);
             static void  drawCoupling(const char *v, bool highlight);            
-            // /// individual item on the screen 
-            
+            // individual item on the screen             
             static void  drawVerticalTrigger(bool drawOrErase,int column);
-            static void  drawVoltageTrigger(bool drawOrErase, int line);
-  
-      //      static void  drawStats(CaptureStats &stats);
+            static void  drawVoltageTrigger(bool drawOrErase, int line);      
             static void  drawStatsBackGround();
-//            static void  printVoltTimeTriggerMode(const char *volt, const char *time,DSOCapture::TriggerMode mode,DSO_ArmingMode arming);
             static void  drawMode(MODE_TYPE mode);
             static MODE_TYPE getMode();
             static void  setMode(MODE_TYPE t);
@@ -66,7 +62,7 @@ public:
             
             static void  drawAutoSetup();
             static void  drawAutoSetupStep(int x);
-            static void  drawArmingTriggeredMode(DSO_ArmingMode mode,bool triggered);
+            static void  drawTriggered(bool triggered);
 
             
             static void  drawSplash();

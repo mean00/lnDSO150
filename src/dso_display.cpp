@@ -541,32 +541,6 @@ void DSODisplay::drawTime(const char *v, bool highlight)    { genericDraw(TIME_M
 void DSODisplay::drawCoupling(const char *v, bool highlight){ genericDraw(STAT_MODE, v,highlight);}
 void DSODisplay::drawArming(const char *v, bool highlight)  { genericDraw(ARMING_MODE ,   v,highlight);}
 
-#if 0
-/**
- * 
- * @param mode
- */
-void  DSODisplay::drawArmingTriggeredMode(DSO_ArmingMode arming,bool triggered)
-{       
-    const char *armingString="?";
-    switch(arming)
-    {
-        case DSO_CAPTURE_SINGLE:    armingString="Single";  break;
-        case DSO_CAPTURE_MULTI:     armingString="Repeat";  break;
-        case DSO_CAPTURE_CONTINUOUS:armingString="Run";     break;
-            default:                xAssert(0);             break;
-    }   
-    int color;
-    AutoGfx autogfx;    
-    if(triggered)
-        color=WHITE;
-    else
-        color=ILI_RED;
-    tft->setTextColor(color,BLACK);
-    VALUE_Y_POSITION(ARMING_ROW);    
-    tft->printUpTo(armingString,320-DSO_INFO_START_COLUMN);
-}
-#endif
 /**
  * 
  * @return 
@@ -663,4 +637,24 @@ void DSODisplay::drawSplash()
     xDelay(100);
 }
 
+/**
+ * 
+ * @param mode
+ */
+void  DSODisplay::drawTriggered(bool triggered)
+{      
+#define LED_X_OFFSET 10
+#define LED_Y_OFFSET 4
+#define LED_WIDTH ((320-DSO_INFO_START_COLUMN-LED_X_OFFSET*2)) 
+#define LED_HEIGHT 12
+    int color;
+    AutoGfx autogfx;    
+    if(triggered)
+        color=GREEN;
+    else
+        color=ILI_RED;
+    tft->square(color,
+                DSO_INFO_START_COLUMN+LED_X_OFFSET,  LED_Y_OFFSET,
+                LED_WIDTH, LED_HEIGHT);
+}
 // EOF

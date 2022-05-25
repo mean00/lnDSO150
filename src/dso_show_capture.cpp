@@ -10,7 +10,7 @@ uint32_t lastRefresh=0;
 static float voltageOffset=0.0;
 extern uint32_t lnGetCycle32();
 void  captured();
-void  showCaptured();
+void  showTriggerState();
 
 /**
  * 
@@ -109,7 +109,7 @@ void  captured()
 /**
  */
 bool lastTriggered=false;
-void  showCaptured()
+void  showTriggerState()
 {
     int now=lnGetMs() & 0xffff;
     if(now<lastCapture)
@@ -129,8 +129,7 @@ void  showCaptured()
     }
     if(triggered!=lastTriggered)
     {
-        #warning FIXME : Arming mode
-        //
+        DSODisplay::drawTriggered(triggered);
     }
     lastTriggered=triggered;
 }
