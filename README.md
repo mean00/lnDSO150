@@ -6,7 +6,7 @@ It is a follow up of the other firmware (DSO_STM32Duino) with the following chan
 * Simpler codebase, better architecture
 * Rewrite using lnArduino instead of stm32duino
 * Support for GD32F1,GD32F3,GD32VF1, STM32F1 and CH32F103
-* Support for original DSO150 and some clones (FINRSI)
+* Support for original DSO150 and some clones (FNIRSI)
 
 ![screenshot](assets/web/front.jpg?raw=true "front")
 
@@ -19,6 +19,7 @@ __Features__ :
 * Trigger up/down
 * Auto setup (long press Volt)
 * Only supports modified unit where rotary encoder is connected to PB14/PB15, see wiki. The rotary encoder will NOT work with unmodified DSO
+* Usb support (DFU)
 
 
 
