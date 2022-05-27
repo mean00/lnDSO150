@@ -8,7 +8,7 @@ IF("${LN_ARCH}" STREQUAL "RISCV") # RISCV
   IF(WIN32)    
     SET(PLATFORM_TOOLCHAIN_PATH /c/gd32/toolchain/bin/) # Use /c/foo or c:\foo depending if you use mingw cmake or win32 cmake
   ELSE(WIN32)
-    SET(PLATFORM_TOOLCHAIN_PATH /opt/gd32/toolchain2/bin/)
+    SET(PLATFORM_TOOLCHAIN_PATH /opt/gd32/toolchain/bin/)
   ENDIF(WIN32)
 ELSE()
    SET(PLATFORM_PREFIX arm-none-eabi-)
