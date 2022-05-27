@@ -559,10 +559,12 @@ int         DSOCapture::timeBaseToFrequency(DSOCapture::DSO_TIME_BASE timeBase)
         CASE(10MS,  100) 
         CASE(20MS,  50) 
         CASE(50MS,  20) 
+#if 0        
         CASE(100MS, 10) 
         CASE(200MS, 5) 
         CASE(500MS, 2) 
         CASE(1S,    1)     
+#endif        
     }
     xAssert(0);
     return 0;
