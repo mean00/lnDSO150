@@ -15,8 +15,8 @@ public:
             bool getAmplitude();
             
 protected:
-            int            pinAmp;
-            int            pinSignal;
+            lnPin            pinAmp;
+            lnPin            pinSignal;
             lnTimer        *_timer;
             int             _fq;
             bool            _large;

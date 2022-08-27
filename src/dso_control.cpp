@@ -57,7 +57,7 @@ int ampMapping[16]=
 };
 
 
-#define ButtonToPin(x)    (PB0+(x))
+#define ButtonToPin(x)    (lnPin)(PB0+(x))
 //#define pinAsInput(x)     lnPinMode(ButtonToPin(x),lnINPUT_FLOATING);
 
 #define attachRE(x)       lnExtiAttachInterrupt(ButtonToPin(x),LN_EDGE_FALLING,_myInterruptRE,(void *)x );
@@ -70,7 +70,7 @@ static void pinAsInput(int x)
 {
      if(x & DSO_CONTROL_BUTTON_PORT_A)
      {
-        lnPinMode(PA0+(x&(DSO_CONTROL_BUTTON_PORT_A-1)),lnINPUT_PULLUP);
+        lnPinMode((lnPin)(PA0+(x&(DSO_CONTROL_BUTTON_PORT_A-1))),lnINPUT_PULLUP);
      }else
      {
         lnPinMode(ButtonToPin(x),lnINPUT_PULLUP);
@@ -198,7 +198,7 @@ DSOControl::DSOControl(ControlEventCb *c)
 
             
     for(int i=0;i<4;i++)    
-        lnPinMode(SENSEL_PIN+i,lnOUTPUT); // SENSEL            
+        lnPinMode((lnPin)(SENSEL_PIN+i),lnOUTPUT); // SENSEL            
             
     uint32_t oldDir=arbitrer->currentDirection(0), oldDir2=arbitrer->currentDirection(1);
     uint32_t oldVal=arbitrer->currentValue();        
@@ -341,7 +341,7 @@ void DSOControl::runLoop()
             int shift=ButtonMapping[i];
             int mask;
             if(shift & DSO_CONTROL_BUTTON_PORT_A)
-                mask=!lnDigitalRead(PA0+(shift &(DSO_CONTROL_BUTTON_PORT_A-1)));
+                mask=!lnDigitalRead((lnPin)(PA0+(shift &(DSO_CONTROL_BUTTON_PORT_A-1))));
             else
                 mask=1<<ButtonMapping[i];
             

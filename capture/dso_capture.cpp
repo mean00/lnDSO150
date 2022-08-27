@@ -434,7 +434,7 @@ bool DSOCapture::startCapture(int nb)
                             return _adc->startTriggeredDma(DSO_CAPTURE_INTERNAL_BUFFER_SIZE,internalAdcBuffer);
                             break;
         case   Trigger_Run:
-                            return _adc->startDmaTransfer(DSO_CAPTURE_INTERNAL_BUFFER_SIZE,internalAdcBuffer);
+                            return _adc->startDmaTransfer(nb,internalAdcBuffer); // no need to get the full buffer
                             break;
     }
     xAssert(0);    
