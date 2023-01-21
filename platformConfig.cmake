@@ -17,7 +17,7 @@ ELSE() # -------------  ARM -----------
       SET(PLATFORM_TOOLCHAIN_PATH  "/c/dev/arm83/bin")
    ELSE()
      SET(PLATFORM_CLANG_PATH     "/arm/prebuilt1502/bin" CACHE INTERNAL "")
-     SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/Arduino_stm32/arm-gcc-2021q4/bin" CACHE INTERNAL "")
+     SET(PLATFORM_TOOLCHAIN_PATH "/arm/113/bin" CACHE INTERNAL "")
      SET(PLATFORM_CLANG_VERSION} "-15" CACHE INTERNAL "")
    ENDIF()
 ENDIF()
