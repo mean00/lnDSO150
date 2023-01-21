@@ -20,7 +20,11 @@ ENDIF("${LN_ARCH}" STREQUAL "RISCV")
 
 IF("${LN_ARCH}" STREQUAL "ARM")
       IF("${LN_MCU}" STREQUAL "M3")
-        add_subdirectory(qfp)
+        IF(USE_CLANG)
+          MESSAGE(STATUS "Clang is being used, disabling asm floating point")
+        ELSE(USE_CLANG)
+          add_subdirectory(qfp)
+        ENDIF(USE_CLANG)
       ENDIF("${LN_MCU}" STREQUAL "M3")
 ENDIF("${LN_ARCH}" STREQUAL "ARM")
 
