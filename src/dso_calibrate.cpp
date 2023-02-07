@@ -133,7 +133,7 @@ bool DSOCalibrate::zeroCalibrate_()
     doCalibrate(calibrationDC,YELLOW,"",DSOControl::DSO_COUPLING_DC);       
     doCalibrate(calibrationAC,GREEN, "",DSOControl::DSO_COUPLING_AC);    
     const char *msg="Restart the unit.";
-    
+    DSO_GFX::center("@- saving -@",8);
     if(!saveCalibrationData())
     {
         msg="Failed to save cal";
