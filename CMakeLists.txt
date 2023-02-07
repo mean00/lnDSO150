@@ -14,6 +14,7 @@ MESSAGE(STATUS "===============")
 #____________________
 # Options
 #____________________
+SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 SET(USE_CLANG      ON  CACHE INTERNAL "")
 SET(LN_LTO "-flto")
