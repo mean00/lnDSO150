@@ -71,7 +71,9 @@ void showCapture()
     // capture->volt              31k cycle
     // Volt -> display            27k cycle
 
-    
+    // we can ask for the next one now
+    DSOCaptureState::captureProcessed();
+
     
     //int before=lnGetCycle32();
     float displayGain2=displayGain*2.;
@@ -89,8 +91,6 @@ void showCapture()
     }
 //    int after=lnGetCycle32();Logger("Conv 2 display =%d\n",after-before);
 
-    // we can ask for the next one now
-    DSOCaptureState::captureProcessed();
     DSODisplay::drawWaveForm(nb,displayData);
     DSODisplay::drawMinMax(vMin,vMax);
 
