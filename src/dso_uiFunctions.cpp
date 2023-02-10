@@ -13,7 +13,6 @@ extern void redrawEverything();
 extern void autoSetup();
 extern float getVoltageOffset();
 extern void setVoltageOffset(float v);
-
  /**
   */
 

@@ -24,9 +24,11 @@ extern uint16_t calibrationDC[];
 #define DSO_EVT_UI       (1<<0)
 #define DSO_EVT_CAPTURE  (1<<1)
 #define DSO_EVT_COUPLING (1<<2)
+#define DSO_EVT_USB      (1<<3)
 
 extern void dsoInitUsb();
 extern void showTriggerState();
+extern void processUsbEvent();
 /**
  *
  * @param evt
@@ -124,7 +126,12 @@ void mainLoop()
         {
             processUiEvent();
         }
-
+#ifdef DSO_ENABLE_USB
+        if(evt & DSO_EVT_USB)
+        {
+            processUsbEvent();
+        }
+#endif
         if(evt & DSO_EVT_CAPTURE)
         {
             showCapture();

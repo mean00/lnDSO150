@@ -9,6 +9,13 @@
 lnUsbStack *usb =NULL;
 lnUsbCDC *cdc=NULL;
 #define MEVENT(x)        case lnUsbStack::USB_##x: Logger(#x); break;
+
+void processUsbEvent()
+{
+  
+}
+
+
 /**
 */
 void dsoUsbEvent(void *cookie, lnUsbStack::lnUsbStackEvents event)
@@ -59,10 +66,12 @@ void cdcEventHandler(void *cookie,int interface,lnUsbCDC::lnUsbCDCEvents event,u
         }
           break;
       case lnUsbCDC::CDC_SESSION_START:
-          Logger("CDC SESSION START\n");
+          Logger("CDC SESSION START\n");  
+          cdc->clear_input_buffers();
           break;
       case lnUsbCDC::CDC_SESSION_END:
           Logger("CDC SESSION END\n");
+          cdc->clear_input_buffers();
           break;
       case lnUsbCDC::CDC_SET_SPEED:
           break;
