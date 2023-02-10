@@ -20,10 +20,10 @@ extern void setVoltageOffset(float v);
 
  struct UI_eventCallbacks
  {
-     const int         myKey;
-     const UI_eventCallbacks    *next;
-     const redrawProto  *redraw;
-     const incdecProto  *incdec;
+     const  int                     myKey;
+     const  UI_eventCallbacks       *next;
+            redrawProto             *redraw;
+            incdecProto             *incdec;
  };
 
 

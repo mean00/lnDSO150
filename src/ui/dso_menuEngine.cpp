@@ -223,7 +223,7 @@ next:
                   _sem.take(200);
                   
                   int event;
-                  while(event=_control->getQButtonEvent())
+                  while(  (event=_control->getQButtonEvent()) )
                   {
                     if(event==DSO_EVENT_Q(DSOControl::DSO_BUTTON_OK,EVENT_SHORT_PRESS))
                         return;
