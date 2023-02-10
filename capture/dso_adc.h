@@ -70,9 +70,9 @@ typedef   int  (LN_GetDelayUs)(int currentLocation, int triggerLocation, int loo
  */
 struct lnDSOADCCallbacks
 {
-    const LN_GetWatchdogCb *getWatchdog;
-    const LN_Lookup        *lookup;
-    const LN_GetDelayUs    *getDelayUs;
+    LN_GetWatchdogCb *getWatchdog;
+    LN_Lookup        *lookup;
+    LN_GetDelayUs    *getDelayUs;
 };
 
 
