@@ -36,6 +36,7 @@ QTcpSocket *current_connection=NULL;
 
 void disc()
 {
+    printf("Disconnect!\n");
     alive=false;
 }
 
@@ -55,6 +56,7 @@ void handleConnection(QTcpSocket *sock)
     }
     current_connection=NULL;
     printf("Closing connection\n");
+    cdc_handler(cdc_cookie, 0, lnUsbCDC::CDC_SESSION_END, 0);
 	sock->close();
 	delete sock;
 }
