@@ -8,12 +8,12 @@ class tusb_desc_device_t
 {
 
 };
-const char  **device_descriptor;
-tusb_desc_device_qualifier_t  desc_device_qualifier;
-tusb_desc_device_t desc_device;
+extern  const char  **device_descriptor;
+extern  tusb_desc_device_qualifier_t  desc_device_qualifier;
+extern tusb_desc_device_t desc_device;
 
-uint8_t  *desc_fs_configuration;
-uint8_t *desc_hs_configuration;
+extern uint8_t  *desc_fs_configuration;
+extern uint8_t *desc_hs_configuration;
 
 class lnUsbStack
 {

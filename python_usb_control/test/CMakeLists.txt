@@ -31,7 +31,7 @@ include_directories( ${STUBS} )
 
 ADD_LIBRARY(gen_pb STATIC ${PB}/messaging.pb.cpp)
 #
-ADD_EXECUTABLE(cpp main.cpp ../../src/dso_usbd.cpp)
+ADD_EXECUTABLE(cpp main.cpp ../../src/dso_usbd.cpp pseudo_usb.cpp)
 TARGET_LINK_LIBRARIES(cpp gen_pb )
 TARGET_LINK_LIBRARIES(cpp Qt6::Network Qt6::Core)
 
