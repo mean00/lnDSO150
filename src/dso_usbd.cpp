@@ -14,7 +14,142 @@ void processUsbEvent()
 {
   
 }
+/**
 
+  The format is 
+    "DO" => connect
+    "S" => start of frame
+      Size = 16 bits, LSB
+      [...] = data
+    "E" => end of frame
+
+*/
+#define PROLOG()  uint8_t c; \
+                  int n=_cdc->read(&c,1); \
+                  if(!n) return;
+
+#define EPILOG() goto again;
+
+#define PB_BUFFER_SIZE 64
+
+class usb_automaton
+{
+  public:
+      enum USB_COMMUNICATION_STATE
+      {
+        STATE_BEGIN,
+        STATE_BEGIN2,
+        STATE_HEAD,
+        STATE_SIZE1,
+        STATE_SIZE2,
+        STATE_BODY,
+        STATE_TAIL,
+      };
+  public:
+      usb_automaton(lnUsbCDC *cdc)
+      {
+        _cdc=cdc;
+        _state = STATE_BEGIN;
+      }
+      void process_data()
+      {
+        again:
+        switch(_state)
+        {
+          case STATE_BEGIN:
+                {
+                  PROLOG()
+                  if(c=='D')
+                  {
+                    _state=STATE_BEGIN2;
+                  }
+                  EPILOG()
+                }
+                break;
+          case STATE_BEGIN2:
+                {
+                  PROLOG()
+                  if( c=='O')
+                  {
+                    Logger("Connected\n");
+                    _state=STATE_HEAD;
+                  }else
+                  {
+                    _state = STATE_BEGIN;
+                  }
+                  EPILOG()
+                }
+                break;     
+          case STATE_HEAD:
+          {
+                  PROLOG()
+                  if(c=='S')
+                  {
+                    _state= STATE_SIZE1;                     
+                  }
+                  EPILOG()
+                  break;
+          }
+          case STATE_SIZE1:
+          {
+                  PROLOG()
+                  _size=c;
+                  _state= STATE_SIZE2;
+                  EPILOG()
+                  break;
+          }
+          case STATE_SIZE2:
+          {
+                  PROLOG()
+                  _size=_size+(c<<8);
+                  _dex=0;
+                  _state= STATE_BODY;
+                  EPILOG()
+                  break;
+          }
+          case STATE_BODY:
+          {
+                  PROLOG()
+                  _buffer[_dex++]=c;
+                  if(_dex > PB_BUFFER_SIZE)
+                  {
+                      _state=STATE_HEAD;                      
+                  }
+                  if(_dex==_size)
+                  {
+                    _state=STATE_TAIL;
+                  }
+                  EPILOG()
+                  break;
+          }
+          case STATE_TAIL:
+          {
+                  PROLOG()
+                  if(c=='E')
+                  {
+                      Logger("Got command of %d bytes\n",_size);
+                  }else
+                  {
+                      Logger("BadTail");
+                  }                  
+                  _state=STATE_HEAD;
+                  goto again;
+          }
+          break;
+          
+          default:
+              xAssert(0);                           
+        }
+      }
+protected:
+    USB_COMMUNICATION_STATE _state;
+    lnUsbCDC                *_cdc;
+    int                      _size;
+    int                      _dex;
+    uint8_t                  _buffer[PB_BUFFER_SIZE];
+};
+
+usb_automaton *automaton=NULL;
 
 /**
 */
@@ -56,22 +191,17 @@ void cdcEventHandler(void *cookie,int interface,lnUsbCDC::lnUsbCDCEvents event,u
     switch (event)
     {
       case lnUsbCDC::CDC_DATA_AVAILABLE:
-        {
-          int n=cdc->read(buffer,32);
-          if(n)
-          {
-            cdc->write((uint8_t *)">",1);
-            cdc->write(buffer,n);
-          }
-        }
+          automaton->process_data();
           break;
       case lnUsbCDC::CDC_SESSION_START:
           Logger("CDC SESSION START\n");  
-          cdc->clear_input_buffers();
+           automaton=new usb_automaton(cdc);
           break;
       case lnUsbCDC::CDC_SESSION_END:
           Logger("CDC SESSION END\n");
           cdc->clear_input_buffers();
+          delete automaton;
+          automaton = NULL;
           break;
       case lnUsbCDC::CDC_SET_SPEED:
           break;
