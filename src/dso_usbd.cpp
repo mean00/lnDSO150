@@ -14,16 +14,7 @@ void processUsbEvent()
 {
   
 }
-/**
 
-  The format is 
-    "DO" => connect
-    "S" => start of frame
-      Size = 16 bits, LSB
-      [...] = data
-    "E" => end of frame
-
-*/
 #define PROLOG()  uint8_t c; \
                   int n=_cdc->read(&c,1); \
                   if(!n) return;
@@ -31,7 +22,19 @@ void processUsbEvent()
 #define EPILOG() goto again;
 
 #define PB_BUFFER_SIZE 64
-
+/**
+  This is a simple framer that extracts frames
+  from a CDC stream
+  It is reasonnably robust
+   The format is 
+    "DO" => connect
+        <= "OD"
+    "S" => start of frame
+      Size = 16 bits, LSB
+      [...] = data
+    "E" => end of frame
+*/
+const uint8_t reply[2]={'O','D'};
 class usb_automaton
 {
   public:
@@ -51,6 +54,39 @@ class usb_automaton
         _cdc=cdc;
         _state = STATE_BEGIN;
       }
+      /*
+      */
+      bool send_message(int sz, const uint8_t *d)
+      {
+        uint8_t tmp[3]={'S',(uint8_t )(sz&0xff), (uint8_t )(sz>>8)};
+        if(3!=_cdc->write(tmp,3))
+        {
+          return false;
+        }
+        while(sz)
+        {
+          int r=_cdc->write(d,sz);
+          if(r)
+          {
+            d+=r;
+            sz-=r;
+          }else
+          {
+            Logger("Cannot write!\n");
+            return false;
+          }
+        }
+        // send tail
+        const uint8_t tail = 'E';
+        if(1!=_cdc->write(&tail,1))
+        {
+          return false;
+        }
+        _cdc->flush();
+        return true;
+      }
+      /*
+      */
       void process_data()
       {
         again:
@@ -73,6 +109,7 @@ class usb_automaton
                   {
                     Logger("Connected\n");
                     _state=STATE_HEAD;
+                    _cdc->write(reply,2);
                   }else
                   {
                     _state = STATE_BEGIN;
@@ -128,6 +165,7 @@ class usb_automaton
                   if(c=='E')
                   {
                       Logger("Got command of %d bytes\n",_size);
+                      send_message(_dex, _buffer);
                   }else
                   {
                       Logger("BadTail");
