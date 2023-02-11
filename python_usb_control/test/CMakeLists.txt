@@ -18,15 +18,20 @@ MESSAGE(STATUS "===============")
 # Options
 #____________________
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+find_package(Qt6 REQUIRED COMPONENTS Core Network)
+qt_standard_project_setup()
 #
 ADD_DEFINITIONS("-g3")
 #
 SET(PB ${CMAKE_CURRENT_SOURCE_DIR}/../tmp)
+SET(TCP ${CMAKE_CURRENT_SOURCE_DIR}/tcp)
 include_directories( ${PB} )
+include_directories( ${TCP} )
 ADD_LIBRARY(gen_pb STATIC ${PB}/messaging.pb.cpp)
 #
 ADD_EXECUTABLE(cpp main.cpp)
-TARGET_LINK_LIBRARIES(cpp gen_pb)
+TARGET_LINK_LIBRARIES(cpp gen_pb )
+TARGET_LINK_LIBRARIES(cpp Qt6::Network Qt6::Core)
 
 
 MESSAGE(STATUS "\tFinal name is ${EXTENSION}")
