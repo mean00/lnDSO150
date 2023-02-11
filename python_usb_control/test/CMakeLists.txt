@@ -24,12 +24,14 @@ qt_standard_project_setup()
 ADD_DEFINITIONS("-g3")
 #
 SET(PB ${CMAKE_CURRENT_SOURCE_DIR}/../tmp)
-SET(TCP ${CMAKE_CURRENT_SOURCE_DIR}/tcp)
+SET(STUBS ${CMAKE_CURRENT_SOURCE_DIR}/stubs)
+
 include_directories( ${PB} )
-include_directories( ${TCP} )
+include_directories( ${STUBS} )
+
 ADD_LIBRARY(gen_pb STATIC ${PB}/messaging.pb.cpp)
 #
-ADD_EXECUTABLE(cpp main.cpp)
+ADD_EXECUTABLE(cpp main.cpp ../../src/dso_usbd.cpp)
 TARGET_LINK_LIBRARIES(cpp gen_pb )
 TARGET_LINK_LIBRARIES(cpp Qt6::Network Qt6::Core)
 
