@@ -1,0 +1,33 @@
+
+
+
+syntax = "proto2";
+        
+import "defs/defines.proto";
+        
+
+message setVoltageRange
+{
+    required VOLTAGE volt = 1;
+}
+/*
+
+message MsgType2
+{
+    required bool value = 1;
+}
+
+message MsgType3
+{
+    required int32 value1 = 1;
+    required int32 value2 = 2;
+}
+*/
+message UnionMessage
+{
+    optional setVoltageRange msg1 = 1;
+    /*
+    optional MsgType2 msg2 = 2;
+    optional MsgType3 msg3 = 3;
+    */
+}

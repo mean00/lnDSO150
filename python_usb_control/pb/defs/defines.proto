@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+enum VOLTAGE {
+      DSO_VOLTAGE_GND   = 0;  // 0
+      DSO_VOLTAGE_5MV   = 1;  // 1
+      DSO_VOLTAGE_10MV  = 2; // 2
+      DSO_VOLTAGE_20MV  = 3; // 3
+      DSO_VOLTAGE_50MV  = 4; // 4
+      DSO_VOLTAGE_100MV = 5;    // 5  
+      DSO_VOLTAGE_200MV = 6;// 6
+      DSO_VOLTAGE_500MV = 7;// 7
+      DSO_VOLTAGE_1V    = 8;   // 8
+      DSO_VOLTAGE_2V    = 9;   // 9
+      DSO_VOLTAGE_5V    = 10;   // 10
+}
