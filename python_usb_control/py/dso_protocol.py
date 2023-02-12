@@ -1,14 +1,8 @@
-import socket
 import sys
 from abc  import *
 from typing import Any
 import importlib
 
-sys.path.append('../tmp_py')
-sys.path.append('../tmp_py/defs')
-
-import messaging_pb2
-import defs
 
 
 #
@@ -32,25 +26,6 @@ class IO(metaclass=ABCMeta):
 #
 #
 #
-
-class NetworkingIO(IO):
-    def __init__(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        pass
-
-    def init(self):
-        try:
-            self.socket.connect(("localhost", 3000))
-            return True
-        except:
-            return False
-
-    def read(self,max):
-        return self.socket.recv(max)
-    
-    def write(self,data:bytearray):
-        return self.socket.send(data)
-
 
 #
 #
@@ -122,33 +97,4 @@ class Messaging:
                 r =  automaton.get_message()
                 return r
 
-
-
- 
-n = NetworkingIO()
-if n.init() is False:
-    print("Cannot connect")
-    exit(1)
-n.write (bytearray(b'DO'))
-# Wait for DO
-data=n.read(2)
-if (data == b'OD'): #and (data[1] == b'D'):
-    print("Handshake ok")
-else:
-    print("Handshake failure "+str(data))
-# Send dummy message
-messager = Messaging(n)
-
-print("Sending ping",flush=True)
-person = messaging_pb2.setVoltageRange()
-person.volt = defs.defines_pb2.DSO_VOLTAGE_1V #defs.DSO_VOLTAGE_10MV
-msg = person.SerializeToString()
-messager.send_message(bytearray(msg))
-#msg=[0,1,2]
-
-#messager.send_message(bytearray(msg))
-print("Reading pong",flush=True)
-reply=messager.read_message()
-print(str(msg)+":"+str(reply),flush=True)
-print("OK",flush=True)
 
