@@ -34,3 +34,10 @@ enum TIMEBASE {
       DSO_TIME_BASE_20MS      =  10;
       DSO_TIME_BASE_50MS      =  11;
 }
+
+enum TRIGGER {
+      DSO_TRIGGER_RISING      = 0;
+      DSO_TRIGGER_FALLING     = 1;
+      DSO_TRIGGER_BOTH        = 2;
+      DSO_TRIGGER_RUN         = 3;
+}

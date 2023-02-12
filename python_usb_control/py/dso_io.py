@@ -34,11 +34,13 @@ class IO(metaclass=ABCMeta):
 class NetworkingIO(IO):
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connected = False
         pass
 
     def init(self):
         try:
             self.socket.connect(("localhost", 3000))
+            self.connected = True
             return True
         except:
             return False

@@ -10,7 +10,7 @@ import dso_io
 import dso_protocol
 import dso_api
 
-import defs
+from defs import defines_pb2
 
 
 
@@ -26,7 +26,14 @@ if n.handshake()==False:
 print("Handshake ok")
 
 api = dso_api.DSO_API(n)
-api.set_voltage_range(defs.defines_pb2.DSO_VOLTAGE_1V)
+
+api.set_time_base(defines_pb2.DSO_TIME_BASE_2MS)
+tb= api.get_time_base()
+print("<TB:>"+str(tb))
+
+api.set_voltage_range(defines_pb2.DSO_VOLTAGE_1V)
+volt = api.get_voltage()
+print("<VT:>"+str(volt))
 
 print("OK",flush=True)
 

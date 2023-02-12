@@ -6,6 +6,10 @@ syntax = "proto2";
 import "defs/defines.proto";
         
 
+message msg_query
+{
+     required int32 dummy = 1;
+}
 
 message msg_reply
 {
@@ -13,11 +17,15 @@ message msg_reply
 }
 message msg_set_voltage
 {
-    required VOLTAGE volt = 1;
+    required VOLTAGE voltage = 1;
 }
 message msg_set_timebase
 {
     required TIMEBASE timebase = 1;
+}
+message msg_set_trigger
+{
+    required TRIGGER trigger = 1;
 }
 
 
@@ -25,9 +33,14 @@ message msg_set_timebase
 message UnionMessage
 {
     oneof msg {
-      msg_reply          msg_r = 1;
-      msg_set_voltage    msg_sv = 2;
-      msg_set_timebase   msg_stb = 3;
+      msg_reply          msg_r      = 1;
+      msg_set_voltage    msg_sv     = 2;
+      msg_set_timebase   msg_stb    = 3;
+      msg_set_trigger    msg_str    = 4;
+      
+      msg_query          msg_gv     = 5;
+      msg_query          msg_gtb    = 6;
+      msg_query          msg_gtr    = 7;
     }
 }
 
