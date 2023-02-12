@@ -1,5 +1,11 @@
 syntax = "proto2";
 
+enum STATUS {
+      OK                = 0;
+      KO                = 1;
+
+}
+
 enum VOLTAGE {
       DSO_VOLTAGE_GND   = 0;  // 0
       DSO_VOLTAGE_5MV   = 1;  // 1
@@ -12,4 +18,19 @@ enum VOLTAGE {
       DSO_VOLTAGE_1V    = 8;   // 8
       DSO_VOLTAGE_2V    = 9;   // 9
       DSO_VOLTAGE_5V    = 10;   // 10
+}
+
+enum TIMEBASE {
+      DSO_TIME_BASE_10US      =  0;
+      DSO_TIME_BASE_20US      =  1;
+      DSO_TIME_BASE_50US      =  2;
+      DSO_TIME_BASE_100US     =  3;
+      DSO_TIME_BASE_200US     =  4;
+      DSO_TIME_BASE_500US     =  5;
+      DSO_TIME_BASE_1MS       =  6;
+      DSO_TIME_BASE_2MS       =  7;
+      DSO_TIME_BASE_5MS       =  8;
+      DSO_TIME_BASE_10MS      =  9;
+      DSO_TIME_BASE_20MS      =  10;
+      DSO_TIME_BASE_50MS      =  11;
 }

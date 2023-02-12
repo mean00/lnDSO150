@@ -6,28 +6,28 @@ syntax = "proto2";
 import "defs/defines.proto";
         
 
-message setVoltageRange
+
+message msg_reply
+{
+    required STATUS s =1;
+}
+message msg_set_voltage
 {
     required VOLTAGE volt = 1;
 }
-/*
-
-message MsgType2
+message msg_set_timebase
 {
-    required bool value = 1;
+    required TIMEBASE timebase = 1;
 }
 
-message MsgType3
-{
-    required int32 value1 = 1;
-    required int32 value2 = 2;
-}
-*/
+
+
 message UnionMessage
 {
-    optional setVoltageRange msg1 = 1;
-    /*
-    optional MsgType2 msg2 = 2;
-    optional MsgType3 msg3 = 3;
-    */
+    oneof msg {
+      msg_reply          msg_r = 1;
+      msg_set_voltage    msg_sv = 2;
+      msg_set_timebase   msg_stb = 3;
+    }
 }
+
