@@ -2,6 +2,12 @@ import socket
 import sys
 from abc  import *
 from typing import Any
+import importlib
+
+sys.path.append('../tmp_py')
+
+import messaging_pb2
+
 
 #
 #
