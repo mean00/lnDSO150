@@ -5,8 +5,10 @@ from typing import Any
 import importlib
 
 sys.path.append('../tmp_py')
+sys.path.append('../tmp_py/defs')
 
 import messaging_pb2
+import defs
 
 
 #
@@ -136,9 +138,15 @@ else:
     print("Handshake failure "+str(data))
 # Send dummy message
 messager = Messaging(n)
-msg=[0,1,2]
+
 print("Sending ping",flush=True)
+person = messaging_pb2.setVoltageRange()
+person.volt = defs.defines_pb2.DSO_VOLTAGE_1V #defs.DSO_VOLTAGE_10MV
+msg = person.SerializeToString()
 messager.send_message(bytearray(msg))
+#msg=[0,1,2]
+
+#messager.send_message(bytearray(msg))
 print("Reading pong",flush=True)
 reply=messager.read_message()
 print(str(msg)+":"+str(reply),flush=True)
