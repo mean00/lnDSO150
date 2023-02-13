@@ -4,8 +4,11 @@ include_directories(ui)
 
 
 IF(LN_ENABLE_USBD)
+   include_directories(${CMAKE_SOURCE_DIR}/python_usb_control/pb_c)
+   
    include(${AF_FOLDER}/libraries/tinyUsb/tiny.cmake)
-   SET(USB_SRC dso_usbd.cpp)
+   SET(PB_MESSAGES ${CMAKE_SOURCE_DIR}/python_usb_control/pb_c/messaging.pb.cpp)
+   SET(USB_SRC dso_usbd.cpp dso_usbd_api.cpp ${PB_MESSAGES})   
    LN_APPEND_FLAGS(dso_mainLoop.cpp -DDSO_ENABLE_USB)
 ENDIF(LN_ENABLE_USBD)
 
@@ -22,8 +25,14 @@ ADD_LIBRARY(  sourceLib
                 dso_show_capture.cpp
                 dso_test.cpp
                 dso_captureState.cpp
-                ${USB_SRC}
+                ${USB_SRC}                
                 )
+
+
+IF(LN_ENABLE_USBD)
+    target_include_directories(sourceLib PRIVATE ${CMAKE_SOURCE_DIR}/externals/nanopb/)
+ENDIF(LN_ENABLE_USBD)
+
 TARGET_COMPILE_DEFINITIONS(sourceLib PRIVATE "-DLN_GIT_REV=\"${git_rev}\"")
                 
 IF(NOT USE_VANILLA_HW)

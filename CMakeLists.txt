@@ -17,7 +17,7 @@ MESSAGE(STATUS "===============")
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 SET(USE_CLANG      ON  CACHE INTERNAL "")
-SET(LN_LTO "-flto")
+#SET(LN_LTO "-flto")
 SET(LN_ENABLE_I2C  OFF CACHE INTERNAL "")
 SET(LN_ENABLE_SPI  OFF CACHE INTERNAL "")
 SET(LN_USB_NB_CDC  1 CACHE INTERNAL "")
@@ -126,6 +126,14 @@ IF(LN_ENABLE_USBD)
     USE_LIBRARY(tinyUsb)
     SET(EXTENSION "${EXTENSION}_USB")
 ENDIF(LN_ENABLE_USBD)
+
+IF(LN_ENABLE_USBD)
+    SET(NPB ${CMAKE_SOURCE_DIR}/externals/nanopb)    
+    include_directories( ${NPB} )    
+    #ADD_LIBRARY(nanopb ${NPB}/pb_decode.c ${NPB}/pb_encode.c )
+    ADD_SUBDIRECTORY( ${NPB} )
+ENDIF(LN_ENABLE_USBD)
+
 #____________________
 # Build
 #____________________
@@ -133,9 +141,9 @@ GENERATE_GD32_FIRMWARE(lnDSO)
 TARGET_LINK_LIBRARIES( lnDSO  captureLib )
 TARGET_LINK_LIBRARIES( lnDSO  sourceLib )
 IF(LN_ENABLE_USBD)
-    TARGET_LINK_LIBRARIES( lnDSO  gd32_usb_usbd)
+    TARGET_LINK_LIBRARIES( lnDSO  gd32_usb_usbd nanopb)
 ENDIF()
-TARGET_LINK_LIBRARIES( lnDSO  simplerILI9341 ${DSO_EXTRA_LIB} assets ${FP_LIB})
+TARGET_LINK_LIBRARIES( lnDSO  simplerILI9341 ${DSO_EXTRA_LIB} assets ${FP_LIB} )
 
   add_custom_command(TARGET lnDSO
                    POST_BUILD
