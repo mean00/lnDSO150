@@ -7,6 +7,7 @@
 #
 #-----------------------------------------------------------------------------
 PROJECT(pb_test NONE) # the NONE is very important !
+SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 cmake_minimum_required(VERSION 3.0)
 
 enable_language(C CXX ) # this is important too!
@@ -28,13 +29,15 @@ SET(STUBS ${CMAKE_CURRENT_SOURCE_DIR}/stubs)
 
 include_directories( ${PB} )
 include_directories( ${STUBS} )
+include_directories(../../externals/nanopb)
+include_directories(../../src)
 
 ADD_LIBRARY(gen_pb STATIC ${PB}/messaging.pb.cpp)
 #
 ADD_SUBDIRECTORY(../../externals/nanopb nanopb)
-include_directories(../../externals/nanopb)
+
 #
-ADD_EXECUTABLE(cpp main.cpp ../../src/dso_usbd.cpp pseudo_usb.cpp)
+ADD_EXECUTABLE(cpp main.cpp ../../src/dso_usbd.cpp pseudo_usb.cpp api_stubs.cpp)
 TARGET_LINK_LIBRARIES(cpp gen_pb nanopb)
 TARGET_LINK_LIBRARIES(cpp Qt6::Network Qt6::Core)
 

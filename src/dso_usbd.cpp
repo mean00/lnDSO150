@@ -5,9 +5,14 @@
 #include "cdc_descriptor.h"
 #include "include/lnUsbDFUrt.h"
 
+
+#include "dso_usbd_api.h"
+
 #include "pb_common.h"
 #include "pb_encode.h"
 #include "pb_decode.h"
+
+#include "messaging.pb.h"
 
 lnUsbStack *usb =NULL;
 lnUsbCDC *cdc=NULL;
@@ -17,7 +22,6 @@ void message_received(int size,const uint8_t *data);
 */
 void processUsbEvent()
 {
-  
 }
 
 #define PROLOG()  uint8_t c; \
@@ -268,11 +272,66 @@ void dsoInitUsb()
     lnUsbDFURT::addDFURTCb(goDfu);
     usb->start();
 }
+
+static void send_reply(const UnionMessage &msg)
+{
+  uint8_t buffer[PB_BUFFER_SIZE];
+  pb_ostream_t o = pb_ostream_from_buffer(buffer, PB_BUFFER_SIZE);
+  if(false== pb_encode(&o, &UnionMessage_msg, &msg))
+  {
+    Logger("Failed to encode\n");
+  }
+  if(automaton)
+    automaton->send_message(o.bytes_written, buffer);
+}
+
+void rusb_reply(bool reply)
+{
+  UnionMessage msg;
+  msg.which_msg = UnionMessage_msg_r_tag;
+  if(reply)
+    msg.msg.msg_r.s = STATUS_OK;
+  else
+    msg.msg.msg_r.s = STATUS_KO;
+  send_reply(msg);
+}
+
+/**
+*/
 void message_received(int size,const uint8_t *data)
 {
   // decode..
+  UnionMessage msg;
+  pb_istream_t s = pb_istream_from_buffer(data, size);
+;
+  if(!pb_decode(&s, &UnionMessage_msg, &msg))
+  {
+    Logger("Error decoding pb message!");
+    return;
+  }
+  #define XXX(x)  case UnionMessage_msg_##x##_tag 
+  switch(msg.which_msg)
+  {
+    XXX(sv):  // voltage
+            rusb_reply( DSO_API::setVoltage( msg.msg.msg_sv.voltage) );
+            break;
+    XXX(stb): // timebase
+            rusb_reply( DSO_API::setTimeBase( msg.msg.msg_stb.timebase) );
+            break;
+    XXX(str): // trigger
+            rusb_reply( DSO_API::setTrigger( msg.msg.msg_str.trigger) );
+            break;
+    XXX(gv):  // voltage
+            break;
+    XXX(gtb): // timebase
+            break;
+    XXX(gtr): // trigger
+            break;
 
-
+    default:
+        Logger("Unknown message received");
+        break;
+  }
 }
 // EOF
 

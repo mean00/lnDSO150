@@ -101,7 +101,7 @@ int pseudoUsbServer( )
     if(n>maxSize)
         n=maxSize;
     int r= current_connection->read((char *)buffer,n);
-    printf("Got %d \n",r);
+    //printf("Got %d \n",r);
     return r;
  }
  /**
