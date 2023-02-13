@@ -23,7 +23,7 @@ qt_standard_project_setup()
 #
 ADD_DEFINITIONS("-g3")
 #
-SET(PB ${CMAKE_CURRENT_SOURCE_DIR}/../tmp)
+SET(PB ${CMAKE_CURRENT_SOURCE_DIR}/../pb_c)
 SET(STUBS ${CMAKE_CURRENT_SOURCE_DIR}/stubs)
 
 include_directories( ${PB} )
@@ -31,8 +31,11 @@ include_directories( ${STUBS} )
 
 ADD_LIBRARY(gen_pb STATIC ${PB}/messaging.pb.cpp)
 #
+ADD_SUBDIRECTORY(../../externals/nanopb nanopb)
+include_directories(../../externals/nanopb)
+#
 ADD_EXECUTABLE(cpp main.cpp ../../src/dso_usbd.cpp pseudo_usb.cpp)
-TARGET_LINK_LIBRARIES(cpp gen_pb )
+TARGET_LINK_LIBRARIES(cpp gen_pb nanopb)
 TARGET_LINK_LIBRARIES(cpp Qt6::Network Qt6::Core)
 
 

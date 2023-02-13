@@ -5,11 +5,16 @@
 #include "cdc_descriptor.h"
 #include "include/lnUsbDFUrt.h"
 
+#include "pb_common.h"
+#include "pb_encode.h"
+#include "pb_decode.h"
 
 lnUsbStack *usb =NULL;
 lnUsbCDC *cdc=NULL;
 #define MEVENT(x)        case lnUsbStack::USB_##x: Logger(#x); break;
-
+void message_received(int size,const uint8_t *data);
+/**
+*/
 void processUsbEvent()
 {
   
@@ -165,7 +170,7 @@ class usb_automaton
                   if(c=='E')
                   {
                       Logger("Got command of %d bytes\n",_size);
-                      send_message(_dex, _buffer);
+                      message_received(_dex, _buffer);
                   }else
                   {
                       Logger("BadTail");
@@ -263,5 +268,11 @@ void dsoInitUsb()
     lnUsbDFURT::addDFURTCb(goDfu);
     usb->start();
 }
+void message_received(int size,const uint8_t *data)
+{
+  // decode..
 
+
+}
 // EOF
+
