@@ -26,10 +26,10 @@ int DSO_API::getVoltage()
 }
 int DSO_API::getTimeBase()
 {
-    return 1;
+    return 2;
 }
 int DSO_API::getTrigger()
 {
-    return 1;
+    return 3;
 }
 

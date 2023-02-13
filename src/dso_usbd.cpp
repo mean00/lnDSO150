@@ -24,9 +24,7 @@ void processUsbEvent()
 {
 }
 
-#define PROLOG()  uint8_t c; \
-                  int n=_cdc->read(&c,1); \
-                  if(!n) return;
+#define PROLOG()   Logger("Running automaton : State = %d, val=0x%x\n",_state,c);
 
 #define EPILOG() goto again;
 
@@ -98,7 +96,11 @@ class usb_automaton
       */
       void process_data()
       {
-        again:
+    again:
+        
+        uint8_t c; 
+        int n=_cdc->read(&c,1); 
+        if(!n) return;
         switch(_state)
         {
           case STATE_BEGIN:
@@ -107,6 +109,9 @@ class usb_automaton
                   if(c=='D')
                   {
                     _state=STATE_BEGIN2;
+                  }else
+                  {
+                    Logger("Wrong handshake :%x\n",c);
                   }
                   EPILOG()
                 }
@@ -121,7 +126,10 @@ class usb_automaton
                     _cdc->write(reply,2);
                   }else
                   {
-                    _state = STATE_BEGIN;
+                    if(c=='D')
+                      _state = STATE_BEGIN2;
+                    else
+                      _state = STATE_BEGIN;
                   }
                   EPILOG()
                 }
@@ -129,9 +137,13 @@ class usb_automaton
           case STATE_HEAD:
           {
                   PROLOG()
+                  _size=0;
                   if(c=='S')
                   {
                     _state= STATE_SIZE1;                     
+                  }else
+                  {
+                    Logger("Wrong head :%x\n",c);
                   }
                   EPILOG()
                   break;
@@ -159,6 +171,7 @@ class usb_automaton
                   _buffer[_dex++]=c;
                   if(_dex > PB_BUFFER_SIZE)
                   {
+                    Logger("Overflow\n");
                       _state=STATE_HEAD;                      
                   }
                   if(_dex==_size)
@@ -180,7 +193,7 @@ class usb_automaton
                       Logger("BadTail");
                   }                  
                   _state=STATE_HEAD;
-                  goto again;
+                  EPILOG()
           }
           break;
           
@@ -282,7 +295,10 @@ static void send_reply(const UnionMessage &msg)
     Logger("Failed to encode\n");
   }
   if(automaton)
+  {
+    Logger("Reply sent\n");
     automaton->send_message(o.bytes_written, buffer);
+  }
 }
 
 void rusb_reply(bool reply)

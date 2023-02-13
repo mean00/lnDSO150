@@ -69,12 +69,11 @@ class automat:
                         self.state = 4
                     return True
             case 4:
-                    print("Message of len "+str(self.dex))
+                    #print("<< Message of len "+str(self.dex))
                     if v!=0x45:
-                        print("BAD TAIL:"+str(v),flush=True)
+                        print("but BAD TAIL:"+str(v),flush=True)
                         self.result = False
-                    else:
-                        print("Got MSG ",flush=True)
+                    else:                        
                         self.result = True
                     return False
 

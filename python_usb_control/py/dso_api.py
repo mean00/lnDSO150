@@ -17,8 +17,8 @@ class DSO_API:
     #
     #
         
-    def except_reply(self, expected):
-        print("simple_send\n")
+    def expect_reply(self, expected):
+        #print("expect reply\n")
         data = self.messager.read_message()
         msg = messaging_pb2.UnionMessage().FromString(data)
         #print(str(msg)+"->"+expected)
@@ -30,8 +30,8 @@ class DSO_API:
     #
     #        
     def wait_reply(self):     
-        print("simple_send\n")   
-        msg = self.except_reply("msg_r")
+        #print("wait_reply\n")   
+        msg = self.expect_reply("msg_r")
         if msg is None:
             print("Unexpected reply\n")
             return False
@@ -39,7 +39,7 @@ class DSO_API:
         #print("::"+str(r))
         match r:
             case defines_pb2.OK:
-                print("reply OK\n");
+                #print("reply OK\n");
                 return True # ok
             case _ :
                 print("Call failure\n")
@@ -48,8 +48,9 @@ class DSO_API:
     #
     #
     def simple_send(self,msg):
-        print("simple_send\n")
+        
         data = msg.SerializeToString()
+        #print(">>simple_send, size= "+str(len(data))+"\n")
         self.messager.send_message(data)
         return self.wait_reply()
     #
@@ -57,6 +58,7 @@ class DSO_API:
     #
     def set_voltage_range(self, value):
         to_send = messaging_pb2.UnionMessage()
+        to_send.msg_sv.SetInParent()
         to_send.msg_sv.voltage = value
         return self.simple_send(to_send)
     #
@@ -64,32 +66,57 @@ class DSO_API:
     #        
     def set_time_base(self, value):
         to_send = messaging_pb2.UnionMessage()
+        to_send.msg_stb.SetInParent()
         to_send.msg_stb.timebase = value
         return self.simple_send(to_send)     
+    #
+    #
+    #
+    def set_trigger(self, value):
+        to_send = messaging_pb2.UnionMessage()
+        to_send.msg_str.SetInParent()
+        to_send.msg_str.trigger = value
+        return self.simple_send(to_send)             
     #
     #
     #         
     def get_time_base(self):
         to_send = messaging_pb2.UnionMessage()
+        to_send.msg_gtb.SetInParent()
+        to_send.msg_gtb.dummy = 0
         data = to_send.SerializeToString()
         self.messager.send_message(data)
-        reply = self.except_reply("msg_gtb")
+        reply = self.expect_reply("msg_stb")
         if reply is None:
             print("cant get reply to set time base")
             return None
-        return defines_pb2.TIMEBASE(reply.msg_gtb.timebase)
+        return reply.msg_stb.timebase
     #
     #
     #
     def get_voltage(self):
         to_send = messaging_pb2.UnionMessage()
+        to_send.msg_gv.SetInParent()
+        to_send.msg_gv.dummy = 0
         data = to_send.SerializeToString()
         self.messager.send_message(data)
-        reply = self.except_reply("msg_gv")
+        reply = self.expect_reply("msg_sv")
         if reply is None:
             print("cant get reply to set time base")
             return None
-        return defines_pb2.VOLTAGE(reply.msg_gv.voltage)     
+        return reply.msg_sv.voltage
+
+    def get_trigger(self):
+        to_send = messaging_pb2.UnionMessage()
+        to_send.msg_gtr.SetInParent()
+        to_send.msg_gtr.dummy = 0
+        data = to_send.SerializeToString()
+        self.messager.send_message(data)
+        reply = self.expect_reply("msg_str")
+        if reply is None:
+            print("cant get reply to set trigger")
+            return None
+        return reply.msg_str.trigger
 
 #-- EOF --       
    
