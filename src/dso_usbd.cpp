@@ -20,9 +20,6 @@ lnUsbCDC *cdc=NULL;
 void message_received(int size,const uint8_t *data);
 /**
 */
-void processUsbEvent()
-{
-}
 
 #define PROLOG()   Logger("Running automaton : State = %d, val=0x%x\n",_state,c);
 
@@ -36,6 +33,8 @@ void processUsbEvent()
    The format is 
     "DO" => connect
         <= "OD"
+
+    then for each frame ...
     "S" => start of frame
       Size = 16 bits, LSB
       [...] = data

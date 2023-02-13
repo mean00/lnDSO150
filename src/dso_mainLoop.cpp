@@ -42,8 +42,10 @@ extern void processUsbEvent();
          case DSOControl::DSOEventControl: evtGroup->setEvents(DSO_EVT_UI);break;
          default: xAssert(0);break;
      }
-
  }
+
+
+
 /**
  *
  * @param evt
