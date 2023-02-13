@@ -282,6 +282,9 @@ void dsoInitUsb()
     cdc=new lnUsbCDC(0);
     cdc->setEventHandler(cdcEventHandler,NULL);
     lnUsbDFURT::addDFURTCb(goDfu);
+
+    DSO_API::init();
+
     usb->start();
 }
 
