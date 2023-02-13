@@ -20,7 +20,7 @@ bool DSO_API::setTrigger(int a)  //DSOCapture::TriggerMode tm);
     return true;
 }
 
-int DSO_API::getVolage()
+int DSO_API::getVoltage()
 {
     return 1;
 }

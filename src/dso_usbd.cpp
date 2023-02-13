@@ -321,11 +321,28 @@ void message_received(int size,const uint8_t *data)
     XXX(str): // trigger
             rusb_reply( DSO_API::setTrigger( msg.msg.msg_str.trigger) );
             break;
+
+#define NNREPLY(api, tag, field, type)            \
+                int voltage = DSO_API::api; \
+                UnionMessage msg; \
+                msg.which_msg = UnionMessage_msg_##tag##_tag; \
+                msg.msg.msg_##tag.field=(type)voltage; \
+                send_reply(msg); 
+
     XXX(gv):  // voltage
+            {
+              NNREPLY(getVoltage() , sv, voltage , VOLTAGE);
+            }
             break;
     XXX(gtb): // timebase
+          {
+              NNREPLY(getTimeBase() , stb, timebase , TIMEBASE);
+            }    
             break;
     XXX(gtr): // trigger
+            {
+              NNREPLY(getTrigger() , str, trigger , TRIGGER);
+            }    
             break;
 
     default:

@@ -18,31 +18,37 @@ class DSO_API:
     #
         
     def except_reply(self, expected):
+        print("simple_send\n")
         data = self.messager.read_message()
         msg = messaging_pb2.UnionMessage().FromString(data)
-        print(str(msg))
-        if not (msg.HasField(expected) is None):
+        #print(str(msg)+"->"+expected)
+        if msg.HasField(expected) is None:
             print("Wrong reply to query")
             return None
         return msg
     #
     #
     #        
-    def wait_reply(self):
+    def wait_reply(self):     
+        print("simple_send\n")   
         msg = self.except_reply("msg_r")
         if msg is None:
+            print("Unexpected reply\n")
             return False
         r = msg.msg_r.s
+        #print("::"+str(r))
         match r:
-            case 0:
+            case defines_pb2.OK:
+                print("reply OK\n");
                 return True # ok
             case _ :
-                print("Call failure")
+                print("Call failure\n")
                 return False
     #
     #
     #
     def simple_send(self,msg):
+        print("simple_send\n")
         data = msg.SerializeToString()
         self.messager.send_message(data)
         return self.wait_reply()

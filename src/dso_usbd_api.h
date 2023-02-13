@@ -8,7 +8,7 @@ public:
         static bool setTimeBase(int) ; //DSOCapture::DSO_TIME_BASE gb);
         static bool setTrigger(int) ; //DSOCapture::TriggerMode tm);
 
-        static int getVolage();
+        static int getVoltage();
         static int getTimeBase();
         static int getTrigger();
 };
