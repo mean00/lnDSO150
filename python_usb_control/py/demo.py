@@ -1,4 +1,5 @@
 import sys
+import time
 from abc  import *
 from typing import Any
 import importlib
@@ -28,23 +29,42 @@ print("Handshake ok")
 
 api = dso_api.DSO_API(n)
 
+print("setting trigger\n")
+api.set_trigger(defines_pb2.DSO_TRIGGER_FALLING)
+
+
 print("setting timebase\n")
-api.set_time_base(defines_pb2.DSO_TIME_BASE_2MS)
+for i in range(11):
+    print("Setting timebase to "+str(defines_pb2.TIMEBASE.Name(i)))
+    api.set_time_base(i)
+    print( "  Reading back : "+ str(api.get_time_base()))
+    time.sleep(1.)
 print("getting timebase\n")
-tb= api.get_time_base()
-print("<TB:>"+str(tb))
+
+api.set_time_base(defines_pb2.DSO_TIME_BASE_1MS)
 
 print("setting voltage\n")
+for i in range(10):
+    print("Setting voltage to "+str(defines_pb2.VOLTAGE.Name(i)))
+    api.set_voltage_range(i)
+    print( "  Reading back : "+ str(api.get_voltage_range()))
+    time.sleep(1.)
+
 api.set_voltage_range(defines_pb2.DSO_VOLTAGE_1V)
 print("getting voltage\n")
-volt = api.get_voltage()
-print("<VT:>"+str(volt))
+
+for i in range(4):
+    print("Setting trigger to "+str(defines_pb2.TRIGGER.Name(i)))
+    api.set_trigger(i)
+    print( "  Reading back : "+ str(api.get_trigger()))
+    time.sleep(1.)
+
 
 print("setting trigger\n")
 api.set_trigger(defines_pb2.DSO_TRIGGER_FALLING)
 print("getting trigger\n")
 trg = api.get_trigger()
-print("<TR:>"+str(trg))
+
 
 
 

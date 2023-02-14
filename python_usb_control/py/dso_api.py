@@ -90,11 +90,11 @@ class DSO_API:
         if reply is None:
             print("cant get reply to set time base")
             return None
-        return reply.msg_stb.timebase
+        return defines_pb2.TIMEBASE.Name(reply.msg_stb.timebase)
     #
     #
     #
-    def get_voltage(self):
+    def get_voltage_range(self):
         to_send = messaging_pb2.UnionMessage()
         to_send.msg_gv.SetInParent()
         to_send.msg_gv.dummy = 0
@@ -104,7 +104,7 @@ class DSO_API:
         if reply is None:
             print("cant get reply to set time base")
             return None
-        return reply.msg_sv.voltage
+        return defines_pb2.VOLTAGE.Name(reply.msg_sv.voltage)
 
     def get_trigger(self):
         to_send = messaging_pb2.UnionMessage()
@@ -116,7 +116,7 @@ class DSO_API:
         if reply is None:
             print("cant get reply to set trigger")
             return None
-        return reply.msg_str.trigger
+        return defines_pb2.TRIGGER.Name(reply.msg_str.trigger)
 
 #-- EOF --       
    

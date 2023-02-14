@@ -23,6 +23,9 @@ enum usb_queue_commands
      SET_TRIGGER    = 3,
 };
 
+extern void redrawEverything();
+extern void initUiEvent();
+
 /**
 
 */
@@ -134,6 +137,8 @@ int DSO_API::getTrigger()   { return (int)DSOCapture::getTriggerMode();     }
                 xAssert(0);
                 break;
         }
+        redrawEverything();
+        initUiEvent();
         DSOCapture::startCapture(240);
     }
 }
