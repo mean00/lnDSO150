@@ -15,7 +15,8 @@ from defs import defines_pb2
 
 
  
-n = dso_io.NetworkingIO()
+#n = dso_io.NetworkingIO()
+n = dso_io.UsbCDC()
 if n.init() is False:
     print("Cannot connect")
     exit(1)

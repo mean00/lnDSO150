@@ -9,10 +9,11 @@
 #include "dso_usbd_api.h"
 #include "dso_capture.h"
 #include "messaging.pb.h"
+#include "dso_events.h"
 
 #define USB_QUEUE_SIZE 5
 #warning this is duplicated
-#define DSO_EVT_USB      (1<<3) 
+
 extern xFastEventGroup            *evtGroup;;
 
 enum usb_queue_commands
@@ -110,18 +111,6 @@ int DSO_API::getVoltage()   { return (int)DSOCapture::getVoltageRange();    }
 int DSO_API::getTimeBase()  { return (int)DSOCapture::getTimeBase;          }
 int DSO_API::getTrigger()   { return (int)DSOCapture::getTriggerMode();     }
 
-/**
-DSOCapture::stopCapture();
-DSOCapture::setTimeBase((DSOCapture::DSO_TIME_BASE )ctime);
-DSOCapture::startCapture(240);
-
-DSOCapture::stopCapture();
-DSOCapture::setTriggerMode((DSOCapture::TriggerMode)v);
-DSOCapture::startCapture(240);
-
-DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE )range);
-
-*/
  
  void processUsbEvent()
 {
