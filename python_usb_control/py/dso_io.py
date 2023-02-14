@@ -63,7 +63,7 @@ class UsbCDC(IO):
         device=""
         self.ser=""
         for  port in serial.tools.list_ports.comports():
-            if port.vid==0x1eaf and port.pid==0x24 :
+            if port.vid==0x1d50 and port.pid==0x6021 :
                 print("Found DSO as "+port.device)
                 self.device=port.device
         if(self.device is None):
@@ -73,10 +73,12 @@ class UsbCDC(IO):
         return True
      
     def read(self,max):
-        return self.ser.read(max)
+        a= self.ser.read(max)
+        #print(str(a))
+        return a
     
     def write(self,data:bytearray):
-        return self.ser.recv(data)
+        return self.ser.write(data)
 
 
 

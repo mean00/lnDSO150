@@ -40,7 +40,7 @@ void message_received(int size,const uint8_t *data);
       [...] = data
     "E" => end of frame
 */
-const uint8_t reply[2]={'O','D'};
+const uint8_t connect_reply[2]={'O','D'};
 class usb_automaton
 {
   public:
@@ -122,7 +122,8 @@ class usb_automaton
                   {
                     Logger("Connected\n");
                     _state=STATE_HEAD;
-                    _cdc->write(reply,2);
+                    _cdc->write(connect_reply,2);
+                     _cdc->flush();
                   }else
                   {
                     if(c=='D')
