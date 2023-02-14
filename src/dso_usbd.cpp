@@ -331,6 +331,11 @@ void message_received(int size,const uint8_t *data)
   #define XXX(x)  case UnionMessage_msg_##x##_tag 
   switch(msg.which_msg)
   {
+
+
+    XXX(stv): // trigger voltage
+            rusb_reply( DSO_API::setTriggerValue( msg.msg.msg_stv.trigger_value) );
+            break;
     XXX(sv):  // voltage
             rusb_reply( DSO_API::setVoltage( msg.msg.msg_sv.voltage) );
             break;
@@ -347,6 +352,13 @@ void message_received(int size,const uint8_t *data)
                 msg.which_msg = UnionMessage_msg_##tag##_tag; \
                 msg.msg.msg_##tag.field=(type)voltage; \
                 send_reply(msg); 
+
+    XXX(gtv):  // trigger voltage
+            {
+              NNREPLY(getTriggerValue() , stv, trigger_value , float);
+            }
+            break;
+
 
     XXX(gv):  // voltage
             {

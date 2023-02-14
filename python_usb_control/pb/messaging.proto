@@ -27,6 +27,10 @@ message msg_set_trigger
 {
     required TRIGGER trigger = 1;
 }
+message msg_set_trigger_value
+{
+    required float trigger_value = 1;
+}
 
 
 
@@ -41,6 +45,8 @@ message UnionMessage
       msg_query          msg_gv     = 5;
       msg_query          msg_gtb    = 6;
       msg_query          msg_gtr    = 7;
+      msg_set_trigger_value msg_stv = 8;
+      msg_query          msg_gtv    = 9;
     }
 }
 

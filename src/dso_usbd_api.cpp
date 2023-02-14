@@ -12,7 +12,6 @@
 #include "dso_events.h"
 
 #define USB_QUEUE_SIZE 5
-#warning this is duplicated
 
 extern xFastEventGroup            *evtGroup;;
 
@@ -21,6 +20,7 @@ enum usb_queue_commands
      SET_VOLT       = 1,
      SET_TIMEBASE   = 2,
      SET_TRIGGER    = 3,
+     SET_TRIGGER_VALUE = 4,
 };
 
 extern void redrawEverything();
@@ -32,19 +32,24 @@ extern void initUiEvent();
 class UsbQueue
 {
 public:
+        struct msg
+        {
+            uint32_t command;
+            uint32_t value;
+        };
         static UsbQueue *usb_queue;
         /**
         */
         UsbQueue()
         {
-            _queue =  xQueueCreate( USB_QUEUE_SIZE, sizeof(uint32_t)); // normally at most one in the queue...
+            _queue =  xQueueCreate( USB_QUEUE_SIZE, sizeof(msg)); // normally at most one in the queue...
                              
         }
         /**
         */
         bool pop_next(usb_queue_commands& cmd, uint32_t &val)
         {
-            uint32_t r;
+            msg r;
              if (pdFALSE== xQueueReceive(
                                _queue,
                                &r,
@@ -53,15 +58,15 @@ public:
                 {
                     return false;
                 }
-            cmd=(usb_queue_commands)(r>>24);
-            val=r&0xffffff;
+            cmd=(usb_queue_commands)r.command;
+            val=r.value;
             return true;
         }
         /**
         */
         bool post(usb_queue_commands cmd, const uint32_t val)
         {
-            uint32_t r=(cmd<<24)+val;
+            msg r={cmd,val};            
             if(pdTRUE==xQueueSendToBack(
                                _queue,
                                &r,
@@ -92,7 +97,7 @@ bool DSO_API::setVoltage(int a)
 {
     UsbQueue::usb_queue->post(SET_VOLT,a);
     return true;
-} //DSOCapture::DSO_VOLTAGE_RANGE r){}
+}
 /**
 
 */
@@ -100,7 +105,7 @@ bool DSO_API::setTimeBase(int a)
 {
     UsbQueue::usb_queue->post(SET_TIMEBASE,a);
     return true;
-} //DSOCapture::DSO_TIME_BASE gb){}
+}
 /**
 
 */
@@ -108,11 +113,21 @@ bool DSO_API::setTrigger(int a)
 {
     UsbQueue::usb_queue->post(SET_TRIGGER,a);
     return true;
-} //DSOCapture::TriggerMode tm){}
+} 
 
-int DSO_API::getVoltage()   { return (int)DSOCapture::getVoltageRange();    }
-int DSO_API::getTimeBase()  { return (int)DSOCapture::getTimeBase;          }
-int DSO_API::getTrigger()   { return (int)DSOCapture::getTriggerMode();     }
+/**
+
+*/
+bool DSO_API::setTriggerValue(float a) 
+{
+    uint32_t  i=*(uint32_t *)&a;
+    UsbQueue::usb_queue->post(SET_TRIGGER_VALUE,i);
+    return true;
+} 
+int DSO_API::getVoltage()           { return (int)DSOCapture::getVoltageRange();    }
+int DSO_API::getTimeBase()          { return (int)DSOCapture::getTimeBase();          }
+int DSO_API::getTrigger()           { return (int)DSOCapture::getTriggerMode();     }
+float DSO_API::getTriggerValue()    { return DSOCapture::getTriggerVoltage();     }
 
  
  void processUsbEvent()
@@ -133,6 +148,12 @@ int DSO_API::getTrigger()   { return (int)DSOCapture::getTriggerMode();     }
             case SET_TRIGGER:            
                     DSOCapture::setTriggerMode((DSOCapture::TriggerMode)val);
                     break;
+            case SET_TRIGGER_VALUE:
+                    {
+                    float f=*(float *)&val; // brute cast
+                    DSOCapture::setTriggerVoltage(f);
+                    break;
+                    }
             default:
                 xAssert(0);
                 break;

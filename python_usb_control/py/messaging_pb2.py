@@ -15,7 +15,7 @@ _sym_db = _symbol_database.Default()
 from defs import defines_pb2 as defs_dot_defines__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0fmessaging.proto\x1a\x12\x64\x65\x66s/defines.proto\"\x1a\n\tmsg_query\x12\r\n\x05\x64ummy\x18\x01 \x02(\x05\"\x1f\n\tmsg_reply\x12\x12\n\x01s\x18\x01 \x02(\x0e\x32\x07.STATUS\",\n\x0fmsg_set_voltage\x12\x19\n\x07voltage\x18\x01 \x02(\x0e\x32\x08.VOLTAGE\"/\n\x10msg_set_timebase\x12\x1b\n\x08timebase\x18\x01 \x02(\x0e\x32\t.TIMEBASE\",\n\x0fmsg_set_trigger\x12\x19\n\x07trigger\x18\x01 \x02(\x0e\x32\x08.TRIGGER\"\xfd\x01\n\x0cUnionMessage\x12\x1b\n\x05msg_r\x18\x01 \x01(\x0b\x32\n.msg_replyH\x00\x12\"\n\x06msg_sv\x18\x02 \x01(\x0b\x32\x10.msg_set_voltageH\x00\x12$\n\x07msg_stb\x18\x03 \x01(\x0b\x32\x11.msg_set_timebaseH\x00\x12#\n\x07msg_str\x18\x04 \x01(\x0b\x32\x10.msg_set_triggerH\x00\x12\x1c\n\x06msg_gv\x18\x05 \x01(\x0b\x32\n.msg_queryH\x00\x12\x1d\n\x07msg_gtb\x18\x06 \x01(\x0b\x32\n.msg_queryH\x00\x12\x1d\n\x07msg_gtr\x18\x07 \x01(\x0b\x32\n.msg_queryH\x00\x42\x05\n\x03msg')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0fmessaging.proto\x1a\x12\x64\x65\x66s/defines.proto\"\x1a\n\tmsg_query\x12\r\n\x05\x64ummy\x18\x01 \x02(\x05\"\x1f\n\tmsg_reply\x12\x12\n\x01s\x18\x01 \x02(\x0e\x32\x07.STATUS\",\n\x0fmsg_set_voltage\x12\x19\n\x07voltage\x18\x01 \x02(\x0e\x32\x08.VOLTAGE\"/\n\x10msg_set_timebase\x12\x1b\n\x08timebase\x18\x01 \x02(\x0e\x32\t.TIMEBASE\",\n\x0fmsg_set_trigger\x12\x19\n\x07trigger\x18\x01 \x02(\x0e\x32\x08.TRIGGER\".\n\x15msg_set_trigger_value\x12\x15\n\rtrigger_value\x18\x01 \x02(\x02\"\xc7\x02\n\x0cUnionMessage\x12\x1b\n\x05msg_r\x18\x01 \x01(\x0b\x32\n.msg_replyH\x00\x12\"\n\x06msg_sv\x18\x02 \x01(\x0b\x32\x10.msg_set_voltageH\x00\x12$\n\x07msg_stb\x18\x03 \x01(\x0b\x32\x11.msg_set_timebaseH\x00\x12#\n\x07msg_str\x18\x04 \x01(\x0b\x32\x10.msg_set_triggerH\x00\x12\x1c\n\x06msg_gv\x18\x05 \x01(\x0b\x32\n.msg_queryH\x00\x12\x1d\n\x07msg_gtb\x18\x06 \x01(\x0b\x32\n.msg_queryH\x00\x12\x1d\n\x07msg_gtr\x18\x07 \x01(\x0b\x32\n.msg_queryH\x00\x12)\n\x07msg_stv\x18\x08 \x01(\x0b\x32\x16.msg_set_trigger_valueH\x00\x12\x1d\n\x07msg_gtv\x18\t \x01(\x0b\x32\n.msg_queryH\x00\x42\x05\n\x03msg')
 
 
 
@@ -24,6 +24,7 @@ _MSG_REPLY = DESCRIPTOR.message_types_by_name['msg_reply']
 _MSG_SET_VOLTAGE = DESCRIPTOR.message_types_by_name['msg_set_voltage']
 _MSG_SET_TIMEBASE = DESCRIPTOR.message_types_by_name['msg_set_timebase']
 _MSG_SET_TRIGGER = DESCRIPTOR.message_types_by_name['msg_set_trigger']
+_MSG_SET_TRIGGER_VALUE = DESCRIPTOR.message_types_by_name['msg_set_trigger_value']
 _UNIONMESSAGE = DESCRIPTOR.message_types_by_name['UnionMessage']
 msg_query = _reflection.GeneratedProtocolMessageType('msg_query', (_message.Message,), {
   'DESCRIPTOR' : _MSG_QUERY,
@@ -60,6 +61,13 @@ msg_set_trigger = _reflection.GeneratedProtocolMessageType('msg_set_trigger', (_
   })
 _sym_db.RegisterMessage(msg_set_trigger)
 
+msg_set_trigger_value = _reflection.GeneratedProtocolMessageType('msg_set_trigger_value', (_message.Message,), {
+  'DESCRIPTOR' : _MSG_SET_TRIGGER_VALUE,
+  '__module__' : 'messaging_pb2'
+  # @@protoc_insertion_point(class_scope:msg_set_trigger_value)
+  })
+_sym_db.RegisterMessage(msg_set_trigger_value)
+
 UnionMessage = _reflection.GeneratedProtocolMessageType('UnionMessage', (_message.Message,), {
   'DESCRIPTOR' : _UNIONMESSAGE,
   '__module__' : 'messaging_pb2'
@@ -80,6 +88,8 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _MSG_SET_TIMEBASE._serialized_end=193
   _MSG_SET_TRIGGER._serialized_start=195
   _MSG_SET_TRIGGER._serialized_end=239
-  _UNIONMESSAGE._serialized_start=242
-  _UNIONMESSAGE._serialized_end=495
+  _MSG_SET_TRIGGER_VALUE._serialized_start=241
+  _MSG_SET_TRIGGER_VALUE._serialized_end=287
+  _UNIONMESSAGE._serialized_start=290
+  _UNIONMESSAGE._serialized_end=617
 # @@protoc_insertion_point(module_scope)

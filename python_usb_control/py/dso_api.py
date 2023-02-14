@@ -118,5 +118,24 @@ class DSO_API:
             return None
         return defines_pb2.TRIGGER.Name(reply.msg_str.trigger)
 
+    def set_trigger_value(self, value):
+        to_send = messaging_pb2.UnionMessage()
+        to_send.msg_stv.SetInParent()
+        to_send.msg_stv.trigger_value = value
+        return self.simple_send(to_send)             
+
+    def get_trigger_value(self):
+        to_send = messaging_pb2.UnionMessage()
+        to_send.msg_gtv.SetInParent()
+        to_send.msg_gtr.dummy = 0
+        data = to_send.SerializeToString()
+        self.messager.send_message(data)
+        reply = self.expect_reply("msg_stv")
+        if reply is None:
+            print("cant get reply to set trigger")
+            return None
+        return reply.msg_stv.trigger_value
+
+
 #-- EOF --       
    

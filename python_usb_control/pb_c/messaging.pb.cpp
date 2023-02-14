@@ -21,6 +21,9 @@ PB_BIND(msg_set_timebase, msg_set_timebase, AUTO)
 PB_BIND(msg_set_trigger, msg_set_trigger, AUTO)
 
 
+PB_BIND(msg_set_trigger_value, msg_set_trigger_value, AUTO)
+
+
 PB_BIND(UnionMessage, UnionMessage, AUTO)
 
 

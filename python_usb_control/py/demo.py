@@ -29,8 +29,24 @@ print("Handshake ok")
 
 api = dso_api.DSO_API(n)
 
-print("setting trigger\n")
+#default configuration
+print("setup\n")
 api.set_trigger(defines_pb2.DSO_TRIGGER_FALLING)
+api.set_time_base(defines_pb2.DSO_TIME_BASE_1MS)
+api.set_voltage_range(defines_pb2.DSO_VOLTAGE_1V)
+
+
+print("setting trigger value\n")
+if False:
+    trigger_voltage = -2.
+    while trigger_voltage < 2.:
+        print("Setting trigger value to "+str(trigger_voltage))
+        api.set_trigger_value(trigger_voltage)
+        print( "  Reading back : "+ str(api.get_trigger_value()))
+        time.sleep(2)
+        trigger_voltage = trigger_voltage +0.4
+    print("getting timebase\n")
+
 
 
 print("setting timebase\n")
