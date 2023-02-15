@@ -303,7 +303,10 @@ static void send_reply(const UnionMessage &msg)
     automaton->send_message(o.bytes_written, buffer);
   }
 }
-
+static void send_raw_message(int size, const uint8_t *data)
+{
+    automaton->send_message(size,data);
+}
 void rusb_reply(bool reply)
 {
   UnionMessage msg;

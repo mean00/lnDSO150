@@ -47,6 +47,9 @@ message UnionMessage
       msg_query          msg_gtr    = 7;
       msg_set_trigger_value msg_stv = 8;
       msg_query          msg_gtv    = 9;
+
+      msg_query          msg_data   = 12;
+      msg_reply          msg_rdata  = 13; // if the status is ok, it is followed immedately by a raw screen dump
     }
 }
 

@@ -24,6 +24,14 @@ int DSO_API::getVoltage()
 {
     return 1;
 }
+bool DSO_API::setTriggerValue(float f)
+{
+    return true;
+}
+float DSO_API::getTriggerValue()
+{
+    return 1.;
+}
 int DSO_API::getTimeBase()
 {
     return 2;
@@ -31,5 +39,9 @@ int DSO_API::getTimeBase()
 int DSO_API::getTrigger()
 {
     return 3;
+}
+void DSO_API::init()
+{
+    return ;
 }
 

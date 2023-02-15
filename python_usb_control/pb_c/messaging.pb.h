@@ -47,6 +47,8 @@ typedef struct _UnionMessage {
         msg_query msg_gtr;
         msg_set_trigger_value msg_stv;
         msg_query msg_gtv;
+        msg_query msg_data;
+        msg_reply msg_rdata; /* if the status is ok, it is followed immedately by a raw screen dump */
     } msg;
 } UnionMessage;
 
@@ -87,6 +89,8 @@ extern "C" {
 #define UnionMessage_msg_gtr_tag                 7
 #define UnionMessage_msg_stv_tag                 8
 #define UnionMessage_msg_gtv_tag                 9
+#define UnionMessage_msg_data_tag                12
+#define UnionMessage_msg_rdata_tag               13
 
 /* Struct field encoding specification for nanopb */
 #define msg_query_FIELDLIST(X, a) \
@@ -128,7 +132,9 @@ X(a, STATIC,   ONEOF,    MESSAGE,  (msg,msg_gv,msg.msg_gv),   5) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (msg,msg_gtb,msg.msg_gtb),   6) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (msg,msg_gtr,msg.msg_gtr),   7) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (msg,msg_stv,msg.msg_stv),   8) \
-X(a, STATIC,   ONEOF,    MESSAGE,  (msg,msg_gtv,msg.msg_gtv),   9)
+X(a, STATIC,   ONEOF,    MESSAGE,  (msg,msg_gtv,msg.msg_gtv),   9) \
+X(a, STATIC,   ONEOF,    MESSAGE,  (msg,msg_data,msg.msg_data),  12) \
+X(a, STATIC,   ONEOF,    MESSAGE,  (msg,msg_rdata,msg.msg_rdata),  13)
 #define UnionMessage_CALLBACK NULL
 #define UnionMessage_DEFAULT NULL
 #define UnionMessage_msg_msg_r_MSGTYPE msg_reply
@@ -140,6 +146,8 @@ X(a, STATIC,   ONEOF,    MESSAGE,  (msg,msg_gtv,msg.msg_gtv),   9)
 #define UnionMessage_msg_msg_gtr_MSGTYPE msg_query
 #define UnionMessage_msg_msg_stv_MSGTYPE msg_set_trigger_value
 #define UnionMessage_msg_msg_gtv_MSGTYPE msg_query
+#define UnionMessage_msg_msg_data_MSGTYPE msg_query
+#define UnionMessage_msg_msg_rdata_MSGTYPE msg_reply
 
 extern const pb_msgdesc_t msg_query_msg;
 extern const pb_msgdesc_t msg_reply_msg;
