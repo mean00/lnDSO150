@@ -45,7 +45,10 @@ class automat:
         return bytearray(self.data)
     #
     def run(self):
-        v=self.io.read(1)[0]
+        block=self.io.read(1)
+        if len(block)==0:
+            return True
+        v=block[0]
         match self.state:
             case 0:
                 if v==0x53:
