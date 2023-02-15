@@ -247,22 +247,28 @@ void goDfu()
 void cdcEventHandler(void *cookie,int interface,lnUsbCDC::lnUsbCDCEvents event,uint32_t payload)
 {
   uint8_t buffer[32];
-
-    switch (event)
+  
+  switch (event)
     {
       case lnUsbCDC::CDC_DATA_AVAILABLE:
+        if(automaton)
           automaton->process_data();
-          break;
-      case lnUsbCDC::CDC_SESSION_START:
-          Logger("CDC SESSION START\n");  
-           automaton=new usb_automaton(cdc);
-          break;
-      case lnUsbCDC::CDC_SESSION_END:
-          Logger("CDC SESSION END\n");
+        else
           cdc->clear_input_buffers();
+        break;
+      case lnUsbCDC::CDC_SESSION_START:
+        Logger("CDC SESSION START\n");  
+        automaton=new usb_automaton(cdc);
+        break;
+      case lnUsbCDC::CDC_SESSION_END:        
+        Logger("CDC SESSION END\n");
+        cdc->clear_input_buffers();
+        if(automaton)
+        {
           delete automaton;
-          automaton = NULL;
-          break;
+        }
+        automaton = NULL;
+        break;
       case lnUsbCDC::CDC_SET_SPEED:
           break;
       default:
@@ -317,7 +323,12 @@ void rusb_reply(bool reply)
     msg.msg.msg_r.s = STATUS_KO;
   send_reply(msg);
 }
-
+/**
+*/
+void rusb_raw_message(int nb, const uint8_t *d)
+{
+   automaton->send_message(nb,d);
+}
 /**
 */
 void message_received(int size,const uint8_t *data)
@@ -334,8 +345,9 @@ void message_received(int size,const uint8_t *data)
   #define XXX(x)  case UnionMessage_msg_##x##_tag 
   switch(msg.which_msg)
   {
-
-
+    XXX(data): // get data
+            DSO_API::getData();
+            break;
     XXX(stv): // trigger voltage
             rusb_reply( DSO_API::setTriggerValue( msg.msg.msg_stv.trigger_value) );
             break;
@@ -355,6 +367,7 @@ void message_received(int size,const uint8_t *data)
                 msg.which_msg = UnionMessage_msg_##tag##_tag; \
                 msg.msg.msg_##tag.field=(type)voltage; \
                 send_reply(msg); 
+
 
     XXX(gtv):  // trigger voltage
             {

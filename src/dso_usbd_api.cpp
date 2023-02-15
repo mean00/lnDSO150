@@ -8,6 +8,7 @@
 #include "lnArduino.h"
 #include "dso_usbd_api.h"
 #include "dso_capture.h"
+#include "dso_display.h"
 #include "messaging.pb.h"
 #include "dso_events.h"
 
@@ -21,11 +22,14 @@ enum usb_queue_commands
      SET_TIMEBASE   = 2,
      SET_TRIGGER    = 3,
      SET_TRIGGER_VALUE = 4,
+     GET_DATA       = 5,
 };
 
 extern void redrawEverything();
 extern void initUiEvent();
-
+extern void rusb_reply(bool );
+extern void rusb_raw_message(int nb, const uint8_t *d);
+extern uint8_t    *displayData;
 /**
 
 */
@@ -114,6 +118,13 @@ bool DSO_API::setTrigger(int a)
     UsbQueue::usb_queue->post(SET_TRIGGER,a);
     return true;
 } 
+/**
+*/
+ bool DSO_API::getData(void)
+ {
+    UsbQueue::usb_queue->post(GET_DATA,0);
+    return true;
+ }
 
 /**
 
@@ -139,6 +150,15 @@ float DSO_API::getTriggerValue()    { return DSOCapture::getTriggerVoltage();   
         DSOCapture::stopCapture();
         switch(cmd)
         {
+            case GET_DATA:
+                    // Send a reply OK then a raw message with the data
+                    {
+                        rusb_reply(true);
+                        // Send screen buffer
+                        rusb_raw_message(DSO_WAVEFORM_WIDTH,displayData);
+
+                    }
+                    break;
             case SET_VOLT:
                     DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE )val);
                     break;

@@ -35,6 +35,10 @@ api.set_trigger(defines_pb2.DSO_TRIGGER_FALLING)
 api.set_time_base(defines_pb2.DSO_TIME_BASE_1MS)
 api.set_voltage_range(defines_pb2.DSO_VOLTAGE_1V)
 
+print("Asking for data")
+data = api.get_data()
+print(str(len(data))+str(data))
+exit(1)
 
 print("setting trigger value\n")
 if False:
@@ -80,8 +84,6 @@ print("setting trigger\n")
 api.set_trigger(defines_pb2.DSO_TRIGGER_FALLING)
 print("getting trigger\n")
 trg = api.get_trigger()
-
-
 
 
 print("OK",flush=True)

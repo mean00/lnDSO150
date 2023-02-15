@@ -79,6 +79,26 @@ class DSO_API:
         return self.simple_send(to_send)             
     #
     #
+    #
+    def get_data(self):
+        to_send = messaging_pb2.UnionMessage()
+        to_send.msg_data.SetInParent()
+        to_send.msg_data.dummy = 0
+        data = to_send.SerializeToString()
+        self.messager.send_message(data)
+        reply = self.expect_reply("msg_rdata")
+        if reply is None:
+            print("cant get reply to set time base")
+            return None
+        #
+        if reply.msg_rdata.s!=defines_pb2.OK:
+            print("read data ko")
+            return None
+        # the next message are plain screen dump
+        return  self.messager.read_message()
+
+    #
+    #
     #         
     def get_time_base(self):
         to_send = messaging_pb2.UnionMessage()
