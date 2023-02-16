@@ -147,7 +147,9 @@ float DSO_API::getTriggerValue()    { return DSOCapture::getTriggerVoltage();   
     uint32_t val;
     while(UsbQueue::usb_queue->pop_next(cmd,val))
     {
-        DSOCapture::stopCapture();
+        
+        // Fast path that does not require a redraw or a start/stop capture
+        bool processed = false;
         switch(cmd)
         {
             case GET_DATA:
@@ -156,31 +158,41 @@ float DSO_API::getTriggerValue()    { return DSOCapture::getTriggerVoltage();   
                         rusb_reply(true);
                         // Send screen buffer
                         rusb_raw_message(DSO_WAVEFORM_WIDTH,displayData);
-
+                        processed = true;
                     }
                     break;
-            case SET_VOLT:
-                    DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE )val);
-                    break;
-            case SET_TIMEBASE:
-                    DSOCapture::setTimeBase((DSOCapture::DSO_TIME_BASE )val);
-                    break;
-            case SET_TRIGGER:            
-                    DSOCapture::setTriggerMode((DSOCapture::TriggerMode)val);
-                    break;
-            case SET_TRIGGER_VALUE:
-                    {
-                    float f=*(float *)&val; // brute cast
-                    DSOCapture::setTriggerVoltage(f);
-                    break;
-                    }
-            default:
-                xAssert(0);
+            default:                            
                 break;
         }
-        redrawEverything();
-        initUiEvent();
-        DSOCapture::startCapture(240);
+        // slow path, we are changing the setup
+        if(!processed)
+        {
+            DSOCapture::stopCapture();
+            switch(cmd)
+            {           
+                case SET_VOLT:
+                        DSOCapture::setVoltageRange((DSOCapture::DSO_VOLTAGE_RANGE )val);
+                        break;
+                case SET_TIMEBASE:
+                        DSOCapture::setTimeBase((DSOCapture::DSO_TIME_BASE )val);
+                        break;
+                case SET_TRIGGER:            
+                        DSOCapture::setTriggerMode((DSOCapture::TriggerMode)val);
+                        break;
+                case SET_TRIGGER_VALUE:
+                        {
+                        float f=*(float *)&val; // brute cast
+                        DSOCapture::setTriggerVoltage(f);
+                        break;
+                        }
+                default:
+                    xAssert(0);
+                    break;
+            }
+            redrawEverything();
+            initUiEvent();
+            DSOCapture::startCapture(240);
+        }
     }
 }
 // EOF
