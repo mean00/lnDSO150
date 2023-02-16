@@ -20,7 +20,7 @@
       <x>0</x>
       <y>10</y>
       <width>242</width>
-      <height>242</height>
+      <height>202</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -32,13 +32,13 @@
     <property name="minimumSize">
      <size>
       <width>242</width>
-      <height>242</height>
+      <height>202</height>
      </size>
     </property>
     <property name="maximumSize">
      <size>
       <width>242</width>
-      <height>242</height>
+      <height>202</height>
      </size>
     </property>
     <property name="verticalScrollBarPolicy">
@@ -46,32 +46,6 @@
     </property>
     <property name="horizontalScrollBarPolicy">
      <enum>Qt::ScrollBarAlwaysOff</enum>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButtonReq">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>10</y>
-      <width>88</width>
-      <height>34</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>NewCapture</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButtonCurrent">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>50</y>
-      <width>88</width>
-      <height>34</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Current</string>
     </property>
    </widget>
    <widget class="QLabel" name="labelVoltage">
@@ -103,8 +77,8 @@
    <widget class="QPushButton" name="pushButtonSave">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>90</y>
+      <x>250</x>
+      <y>10</y>
       <width>88</width>
       <height>34</height>
      </rect>

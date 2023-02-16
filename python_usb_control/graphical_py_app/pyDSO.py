@@ -94,8 +94,6 @@ class Ui(QtWidgets.QMainWindow):
         self.menuVoltage=self.findChild(QtWidgets.QMenu, 'menuVoltage')
         self.menuTimeBase=self.findChild(QtWidgets.QMenu, 'menuTimeBase')
         self.menuTrigger=self.findChild(QtWidgets.QMenu, 'menuTrigger')
-        self.newCapture=self.findChild(QtWidgets.QPushButton, 'pushButtonReq')
-        self.currentCapture=self.findChild(QtWidgets.QPushButton, 'pushButtonCurrent')
         self.buttonSave=self.findChild(QtWidgets.QPushButton, 'pushButtonSave')
         
         
@@ -129,14 +127,12 @@ class Ui(QtWidgets.QMainWindow):
         self.menuVoltageAg.triggered.connect(self.onVoltageChange)
         self.menuTimeBaseAg.triggered.connect(self.onTimeBaseChange)
         self.menuTriggerAg.triggered.connect(self.onTriggerChange)
-        self.newCapture.clicked.connect(self.onNewCapture)
-        self.currentCapture.clicked.connect(self.onCurrentCapture)
         self.buttonSave.clicked.connect(self.onSave)
         self.timer.timeout.connect(self.onCurrentCapture)
         self.show()
         self.timer.start(refresh_period )
     def onSave(self):
-        yOffset=120
+        yOffset=100
         zoom=2
         img = np.zeros((240*zoom+1+10,320*zoom+1+2+96,3), np.uint8)
         for x in range(0,240+1,24):
@@ -145,10 +141,12 @@ class Ui(QtWidgets.QMainWindow):
             cv.line(img,(0,y*zoom),(240*zoom-1,y*zoom),(0,128,0),1)
 
         cv.line(img,(0,yOffset*zoom),(240*zoom-1,yOffset*zoom),(0,255,0),1)
-        cv.line(img,(120*zoom,0),(120*zoom,240*zoom-1),(0,255,0),1)
+        cv.line(img,(100*zoom,0),(100*zoom,240*zoom-1),(0,255,0),1)
         # add legend
-        cv.putText(img,"Volt:"+self.voltage.friendlyName()+"/div", (240*zoom+10,24), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
-        cv.putText(img,"Time:"+self.timebase.friendlyName()+"/div", (240*zoom+10,64), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
+        vname =  defines_pb2.VOLTAGE.Name( self.voltage ).removeprefix('DSO_VOLTAGE_')
+        tname =  defines_pb2.TIMEBASE.Name( self.timebase ).removeprefix('DSO_TIME_BASE_')
+        cv.putText(img,"Volt:"+vname+"/div", (240*zoom+10,24), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
+        cv.putText(img,"Time:"+tname+"/div", (240*zoom+10,64), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
         l=len(self.data)
         last=int(self.data[0]*self.scale)
         for x in range(0,l):
@@ -158,8 +156,6 @@ class Ui(QtWidgets.QMainWindow):
         cv.imwrite("output.png",img)
         #cv.imshow("dso", img)
 
-    def onNewCapture(self):
-        pass
     def onCurrentCapture(self):
         self.data=self.dso_api.get_data()
         self.drawWaveForm(self.data)
@@ -193,11 +189,15 @@ class Ui(QtWidgets.QMainWindow):
         bgnd = QtWidgets.QGraphicsRectItem(QtCore.QRectF(0, 0, 240, 240)) 
         bgnd.setBrush( black )
         self.scene.addItem(bgnd)
-        for i in range(0,240,24):
+        for i in range(0,240,20):
             hline=QLineF(0,i,239,i)
             self.scene.addLine(hline,darkGreen)
             vline=QLineF(i,0,i,239)
             self.scene.addLine(vline,darkGreen)
+        hline=QLineF(0,100,239,100)
+        self.scene.addLine(hline,lightGreen)
+        hline=QLineF(120,0,120,239)
+        self.scene.addLine(hline,lightGreen)
     def drawWaveForm(self, data):
         self.drawGrid()
         volt=self.dso_api.get_voltage_range()
