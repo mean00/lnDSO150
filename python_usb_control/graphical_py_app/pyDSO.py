@@ -24,10 +24,12 @@ def valuenum_in_enum( enum_wrapper, valuenum):
             return False
 
 #___________________________________
-def fill_menu( inst, wrapper, parent_menu,parent_parent, current):
+def fill_menu( inst, wrapper, parent_menu,parent_parent, current, prefix):
     for v in range(0,20):
         if valuenum_in_enum(wrapper, v):
             name =  wrapper.Name(v)
+            name = name.removeprefix(prefix)
+            #print("::"+name+"::"+prefix)
             menu = QAction( name, inst)
             menu.setCheckable(True)
             menu.setData(v)
@@ -58,6 +60,7 @@ class Ui(QtWidgets.QMainWindow):
     timebase= defines_pb2.DSO_TIME_BASE_1MS
     trigger=  defines_pb2.DSO_TRIGGER_FALLING
     yellow=QColor(qRgb(255,255,0))
+    timer = None
     
     def alert(self, txt):    
         msg = QMessageBox()
@@ -101,13 +104,15 @@ class Ui(QtWidgets.QMainWindow):
         self.labelVoltage=self.findChild(QtWidgets.QLabel, 'labelVoltage')
         self.labelTimeBase=self.findChild(QtWidgets.QLabel, 'labelTimeBase')
 
+        self.timer = QTimer()
+
         #self.labelTimeBase.setText(defines_pb2.TIMEBASE.Name(self.timebase))
         #self.labelVoltage.setText( defines_pb2.VOLTAGE.Name(self.voltage))
 
 
         self.menuVoltageAg = QtWidgets.QActionGroup(self.menuVoltage)
         self.menuVoltageAg.setExclusive(True)
-        fill_menu( self, defines_pb2.VOLTAGE, self.menuVoltageAg, self.menuVoltage, self.voltage)
+        fill_menu( self, defines_pb2.VOLTAGE, self.menuVoltageAg, self.menuVoltage, self.voltage,'DSO_VOLTAGE_')
         #for v in range(0,20):
             #if self.valuenum_in_enum(defines_pb2.VOLTAGE, v):
                 #name =  defines_pb2.VOLTAGE.Name(v)
@@ -123,12 +128,12 @@ class Ui(QtWidgets.QMainWindow):
         
         self.menuTimeBaseAg = QtWidgets.QActionGroup(self.menuTimeBase)
         self.menuTimeBaseAg.setExclusive(True)
-        fill_menu( self, defines_pb2.TIMEBASE, self.menuTimeBaseAg, self.menuTimeBase, self.timebase)
+        fill_menu( self, defines_pb2.TIMEBASE, self.menuTimeBaseAg, self.menuTimeBase, self.timebase,"DSO_TIME_BASE_")
             
             
         self.menuTriggerAg = QtWidgets.QActionGroup(self.menuTrigger)
         self.menuTriggerAg.setExclusive(True)
-        fill_menu( self, defines_pb2.TRIGGER, self.menuTriggerAg, self.menuTrigger, self.trigger)
+        fill_menu( self, defines_pb2.TRIGGER, self.menuTriggerAg, self.menuTrigger, self.trigger,"DSO_TRIGGER_")
         #for v in range(0,20):
             #if self.valuenum_in_enum(defines_pb2.TRIGGER, v):
                 #name =  defines_pb2.TRIGGER.Name(v)
@@ -146,8 +151,9 @@ class Ui(QtWidgets.QMainWindow):
         self.newCapture.clicked.connect(self.onNewCapture)
         self.currentCapture.clicked.connect(self.onCurrentCapture)
         self.buttonSave.clicked.connect(self.onSave)
+        self.timer.timeout.connect(self.onCurrentCapture)
         self.show()
-        
+        self.timer.start(200 )
     def onSave(self):
         yOffset=120
         zoom=2
@@ -211,17 +217,19 @@ class Ui(QtWidgets.QMainWindow):
             vline=QLineF(i,0,i,239)
             self.scene.addLine(vline,darkGreen)
     def volt2pix(self, volt):
-          y=int(volt*self.scale)+120
+          #y=int(volt*self.scale)+120
+          y = volt
           return int(y)
     def drawWaveForm(self, data):
         self.drawGrid()
         volt=self.dso_api.get_voltage_range()
-        
+        volt = 1. 
         self.scale=-24./volt
         l=len(data)
         last=self.volt2pix(data[0])
         for x in range(0,l):
             y=self.volt2pix(data[x])
+            #print(str(y))
             line=QLineF(x,last,x,y)
             self.scene.addLine(line,self.yellow)            
             last=y      
