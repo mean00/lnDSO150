@@ -103,12 +103,15 @@ class Ui(QtWidgets.QMainWindow):
         self.labelVoltage=self.findChild(QtWidgets.QLabel, 'labelVoltage')
         self.labelTimeBase=self.findChild(QtWidgets.QLabel, 'labelTimeBase')
 
+        name =  defines_pb2.TIMEBASE.Name( self.timebase ).removeprefix('DSO_TIME_BASE_')
+        self.labelTimeBase.setText(name)
+
+        name =  defines_pb2.VOLTAGE.Name( self.voltage ).removeprefix('DSO_VOLTAGE_')
+        self.labelVoltage.setText( name)
+
         self.timer = QTimer()
 
-        #self.labelTimeBase.setText(defines_pb2.TIMEBASE.Name(self.timebase))
-        #self.labelVoltage.setText( defines_pb2.VOLTAGE.Name(self.voltage))
-
-
+        
         self.menuVoltageAg = QtWidgets.QActionGroup(self.menuVoltage)
         self.menuVoltageAg.setExclusive(True)
         fill_menu( self, defines_pb2.VOLTAGE, self.menuVoltageAg, self.menuVoltage, self.voltage,'DSO_VOLTAGE_')
@@ -165,7 +168,8 @@ class Ui(QtWidgets.QMainWindow):
         print("New timebase "+str(v))
         self.timebase=v
         self.dso_api.set_time_base(v)
-        #self.labelTimeBase.setText(v.name)
+        name =  defines_pb2.TIMEBASE.Name( v ).removeprefix('DSO_TIME_BASE_')
+        self.labelTimeBase.setText( name )
         pass
     def onTriggerChange(self, n):
         v=n.data()
