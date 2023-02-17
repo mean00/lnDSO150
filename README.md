@@ -20,6 +20,10 @@ __Features__ :
 * Auto setup (long press Volt)
 * Only supports modified unit where rotary encoder is connected to PB14/PB15, see wiki. The rotary encoder will NOT work with unmodified DSO
 * Usb support (DFU)
+* Simple python app to control and get screenshot from the DSO150 (>=v2.3)
+
+If you have problems, the most likely cause is your DSO150 is using a unknown
+not-so-much compatible STM32F1 chip.
 
 
 
