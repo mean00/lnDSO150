@@ -131,27 +131,40 @@ class Ui(QtWidgets.QMainWindow):
         self.timer.timeout.connect(self.onCurrentCapture)
         self.show()
         self.timer.start(refresh_period )
+    def vol2pix(self, y, height):
+        tmp= y
+        if tmp < 0:
+            tmp=0
+        if tmp >= height:
+            tmp = height - 1
+        return tmp
     def onSave(self):
-        yOffset=100
+        yOffset=0
         zoom=2
-        img = np.zeros((240*zoom+1+10,320*zoom+1+2+96,3), np.uint8)
-        for x in range(0,240+1,24):
-            cv.line(img,(x*zoom,0),(x*zoom,240*zoom-1),(0,128,0),1)
-        for y in range(0,240+1,24):
-            cv.line(img,(0,y*zoom),(240*zoom-1,y*zoom),(0,128,0),1)
-
-        cv.line(img,(0,yOffset*zoom),(240*zoom-1,yOffset*zoom),(0,255,0),1)
-        cv.line(img,(100*zoom,0),(100*zoom,240*zoom-1),(0,255,0),1)
+        width=240
+        height=200
+        img = np.zeros((height*zoom+1+10,(width+80)*zoom+1+2+96,3), np.uint8)
+        for x in range(0,width+1,24):
+            cv.line(img,(x*zoom,0),(x*zoom,height*zoom-1),(0,128,0),1)
+        for y in range(0,height+1,24):
+            cv.line(img,(0,y*zoom),(width*zoom-1,y*zoom),(0,128,0),1)
+        
+        mid_x = int((width/2)*zoom-1)
+        mid_y = int((height/2)*zoom-1)
+        light_green = (0,255,0)
+        cv.line(img,  (0, mid_y)  ,  (width*zoom-1,mid_y)  , light_green ,1)
+        cv.line(img,  ( mid_x,0)  ,  (mid_x,height*zoom-1) , light_green ,1)
         # add legend
         vname =  defines_pb2.VOLTAGE.Name( self.voltage ).removeprefix('DSO_VOLTAGE_')
         tname =  defines_pb2.TIMEBASE.Name( self.timebase ).removeprefix('DSO_TIME_BASE_')
-        cv.putText(img,"Volt:"+vname+"/div", (240*zoom+10,24), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
-        cv.putText(img,"Time:"+tname+"/div", (240*zoom+10,64), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
+        cv.putText(img,"Volt:"+vname+"/div", (width*zoom+10,24), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
+        cv.putText(img,"Time:"+tname+"/div", (width*zoom+10,64), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
         l=len(self.data)
-        last=int(self.data[0]*self.scale)
+        last=self.vol2pix(self.data[0],  height)* zoom
         for x in range(0,l):
-            y=int(self.data[x]*self.scale)
-            cv.line(img,(x*zoom,(y+yOffset)*zoom),(x*zoom,(last+yOffset)*zoom),(0,255,255),1)
+            y=self.vol2pix(self.data[x],  height)
+            if x!=0:
+                cv.line(img,(x*zoom,(y+yOffset)*zoom),((x-1)*zoom,(last+yOffset)*zoom),(0,255,255),1)
             last=y
         cv.imwrite("output.png",img)
         #cv.imshow("dso", img)
