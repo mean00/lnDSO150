@@ -90,7 +90,6 @@ static singleButton _buttons[NB_BUTTONS];
 static int state;  // rotary state
 static int counter; // rotary counter
 
-static TaskHandle_t taskHandle;
 extern void useAdc2(bool use);
 int ints=0;
 /**
@@ -377,7 +376,7 @@ bool DSOControl::setup()
     attachRE(DSO_BUTTON_UP);
     attachRE(DSO_BUTTON_DOWN);
 #endif
-    xTaskCreate( trampoline, "Control", 250, this, DSO_CONTROL_TASK_PRIORITY, &taskHandle );       
+    lnCreateTask( trampoline, "Control", 250, this, DSO_CONTROL_TASK_PRIORITY);       
     return true;
 }
 /**

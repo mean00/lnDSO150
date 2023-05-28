@@ -108,7 +108,7 @@ void loop()
     
 //    testFunc2();
           
-    xTaskCreate(mainLoop_bounce, "mainLoop",1000,NULL,4,NULL);
+    lnCreateTask(mainLoop_bounce, "mainLoop",1000,NULL,4);
 #if 1
     vTaskDelete(NULL);
 #else
