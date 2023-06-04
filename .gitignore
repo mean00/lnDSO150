@@ -19,3 +19,4 @@ CMakeSettings.json
 .cache
 compile_commands.json
 updat*.*
+*output*.png
