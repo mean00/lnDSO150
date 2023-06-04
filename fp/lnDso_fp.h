@@ -3,7 +3,7 @@
 #endif
 
 #if LN_ARCH == LN_ARCH_ARM
-    #if defined( LN_USE_FPU ) || defined(__clang__)
+    #if defined( LN_USE_FPU ) 
         #define LN_FP_MUL(a,b) (a*b)
         #define LN_FP_ADD(a,b) (a+b)
         #define LN_TO_INT(a)   (int)(a)
