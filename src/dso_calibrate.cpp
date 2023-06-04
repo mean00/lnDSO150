@@ -259,4 +259,59 @@ bool DSOCalibrate::decalibrate()
     nvm->write(NVM_CALIBRATION_AC,2,empty);
     return true;        
 }
+//
+
+class VccAdc : public  lnBaseAdc
+{
+public:
+                    VccAdc(int instance) : lnBaseAdc(instance)
+                    {
+                        
+                    }
+                    virtual ~VccAdc()
+                    {
+
+                    }
+//            int      getVref(); // direct value
+//    static  float    getVcc();  // Vcc value in mv
+            void     readVcc() { lnBaseAdc::readVcc();}
+            void     setup() { lnBaseAdc::setup();}
+};
+
+
+
+/**
+ * 
+ * @return 
+ */
+bool DSOCalibrate::vccAdcMenu()
+{        
+    DSO_GFX::setBigFont(false);
+    DSO_GFX::setTextColor(WHITE,BLACK);
+              
+    DSO_GFX::newPage("VCC");                  
+    
+    VccAdc *adc = new VccAdc(0);
+    adc->setup();
+
+    char buffer[80];
+
+    while(1)
+    {
+        adc->readVcc();
+        int raw=adc->getVref();
+        float volt = adc->getVcc()/1000.;
+        sprintf(buffer,"RAW:%d_____",raw);
+        DSO_GFX::printxy(5,2,buffer);
+        sprintf(buffer,"VOLT:%2.2f_____",volt);
+        DSO_GFX::printxy(5,4,buffer);
+        lnDelayMs(1000);
+    }
+
+    delete adc;
+    adc=NULL;
+    while(1) {};
+    return true;        
+}
+
 // EOF

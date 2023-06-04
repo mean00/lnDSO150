@@ -11,6 +11,7 @@ public:
   static bool zeroCalibrate();
   static bool decalibrate();
   static bool voltageCalibrate();
+  static bool vccAdcMenu();
 protected:
   static bool voltageCalibrate_();
   static bool zeroCalibrate_();

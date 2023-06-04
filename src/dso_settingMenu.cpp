@@ -55,7 +55,8 @@ const MenuItem  signalMenu[]=
 {
     {MenuItem::MENU_TITLE, "Test Signal",NULL},
     {MenuItem::MENU_SUBMENU, "Amplitude",(const void *)&amplitudeMenu},
-    {MenuItem::MENU_SUBMENU, "Frequency",(const void *)&fqMenu},
+    {MenuItem::MENU_SUBMENU, "Frequency",(const void *)&fqMenu},    
+    {MenuItem::MENU_CALL, "VCC ADC",(const void *)DSOCalibrate::vccAdcMenu},    
     {MenuItem::MENU_END, NULL,NULL}
 };
 

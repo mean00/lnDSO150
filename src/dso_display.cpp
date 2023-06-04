@@ -265,6 +265,7 @@ void  DSODisplay::drawMinMax(float mn, float mx)
     tft->setTextColor(ILI_WHITE,ILI_BLACK);
     printMeasurement(MIN_ROW, mn);
     printMeasurement(MAX_ROW, mx);    
+
 }
 /**
  * 
@@ -285,6 +286,7 @@ void  DSODisplay::drawFq(int f)
     tft->setTextColor(WHITE,BLACK);        
     tft->printUpTo(t,320-DSO_INFO_START_COLUMN);
 }
+
 
 /**
  * 
