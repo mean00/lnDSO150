@@ -29,9 +29,15 @@ OPTION(USE_USB                  "Enable USB support"                            
 OPTION(USE_SMALLFOOTPRINT       "Build for 64k flash targets"                       FALSE)
 OPTION(USE_GD32F3               "Build for GD32F303"                                FALSE)
 OPTION(USE_FNIRSI_BUTTON        "Use FNIRSI button layout"                          FALSE)
+IF(USE_NO_DEFAULT)
+
+ELSE()
 #SET(USE_SMALLFOOTPRINT TRUE CACHE INTERNAL "")
 #SET(LN_LTO "-flto" CACHE INTERNAL "")
-
+#SET(USE_GD32F3 TRUE CACHE INTERNAL "")
+  SET(USE_SMALLFOOTPRINT       TRUE CACHE INTERNAL "")
+  SET(USE_FNIRSI_BUTTON TRUE CACHE INTERNAL "")
+ENDIF()
 
 
 SET(AF_FOLDER  ${CMAKE_SOURCE_DIR}/lnArduino/)
@@ -88,10 +94,7 @@ IF("${LN_ARCH}" STREQUAL "RISCV")
     SET(FP_LIB rvfp)
 ELSEIF("${LN_ARCH}" STREQUAL "ARM")
     IF("${LN_MCU}" STREQUAL "M3")
-        IF(USE_CLANG)
-        ELSE(USE_CLANG)
-            SET(FP_LIB qfpm3)
-        ENDIF(USE_CLANG)
+        SET(FP_LIB qfpm3)
     ENDIF("${LN_MCU}" STREQUAL "M3")
 ENDIF("${LN_ARCH}" STREQUAL "RISCV")
 ADD_SUBDIRECTORY(fp)
