@@ -6,13 +6,14 @@
 #pragma once
 class DSOCalibrate
 {
-public:
-  static bool loadCalibrationData();
-  static bool zeroCalibrate();
-  static bool decalibrate();
-  static bool voltageCalibrate();
-  static bool vccAdcMenu();
-protected:
-  static bool voltageCalibrate_();
-  static bool zeroCalibrate_();
+  public:
+    static bool loadCalibrationData();
+    static bool zeroCalibrate();
+    static bool decalibrate();
+    static bool voltageCalibrate();
+    static bool vccAdcMenu();
+
+  protected:
+    static bool voltageCalibrate_();
+    static bool zeroCalibrate_();
 };

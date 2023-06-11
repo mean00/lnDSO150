@@ -1,71 +1,73 @@
 
 #include "dso_captureState.h"
 
-static DSO_ArmingMode              armingMode=DSO_CAPTURE_MULTI;
-static bool captureStateCapturing=true;
+static DSO_ArmingMode armingMode = DSO_CAPTURE_MULTI;
+static bool captureStateCapturing = true;
 
- /**
-  *
-  */
+/**
+ *
+ */
 void DSOCaptureState::toggleState()
 {
-    if(captureStateCapturing)     
+    if (captureStateCapturing)
         stopCapture();
     else
         startCapture();
 }
 /**
- * 
- * 
+ *
+ *
  */
 void DSOCaptureState::stopCapture()
 {
-    captureStateCapturing=false;
-    switch(DSOCapture::state())
+    captureStateCapturing = false;
+    switch (DSOCapture::state())
     {
-        case DSOCapture:: CAPTURE_RUNNING:
-        case DSOCapture:: CAPTURE_DONE:
-            DSOCapture::stopCapture();
-            break;
-        default:break;
+    case DSOCapture::CAPTURE_RUNNING:
+    case DSOCapture::CAPTURE_DONE:
+        DSOCapture::stopCapture();
+        break;
+    default:
+        break;
     }
 }
 
 /**
- * 
+ *
  */
 void DSOCaptureState::startCapture()
 {
-    captureStateCapturing=true;
-    switch(DSOCapture::state())
+    captureStateCapturing = true;
+    switch (DSOCapture::state())
     {
-        case DSOCapture:: CAPTURE_STOPPED:
-            DSOCapture::startCapture(240);
-            break;
-        default:
-            break;
+    case DSOCapture::CAPTURE_STOPPED:
+        DSOCapture::startCapture(240);
+        break;
+    default:
+        break;
     }
 }
 /**
- * 
+ *
  */
 void DSOCaptureState::captureProcessed()
 {
-    switch(armingMode)
+    switch (armingMode)
     {
-        case DSO_CAPTURE_MULTI: 
-            DSOCapture::startCapture(240);
-            break;
-        case DSO_CAPTURE_SINGLE:
-            DSOCapture::stopCapture();
-            break;
-        default: xAssert(0);
-            break;
+    case DSO_CAPTURE_MULTI:
+        DSOCapture::startCapture(240);
+        break;
+    case DSO_CAPTURE_SINGLE:
+        DSOCapture::stopCapture();
+        break;
+    default:
+        xAssert(0);
+        break;
     }
 }
 /**
  */
-DSO_ArmingMode  DSOCaptureState::getArmingMode()
+DSO_ArmingMode DSOCaptureState::getArmingMode()
 {
     return armingMode;
 }
@@ -73,23 +75,24 @@ DSO_ArmingMode  DSOCaptureState::getArmingMode()
  */
 void DSOCaptureState::setArmingMode(DSO_ArmingMode mode)
 {
-    armingMode=mode;
+    armingMode = mode;
 }
 /**
- * 
+ *
  */
 void DSOCaptureState::userPress()
 {
-    switch(armingMode)
+    switch (armingMode)
     {
-        case DSO_CAPTURE_MULTI: 
-            toggleState();
-            break;
-        case DSO_CAPTURE_SINGLE:
-            startCapture();
-            break;
-        default: xAssert(0);
-            break;
+    case DSO_CAPTURE_MULTI:
+        toggleState();
+        break;
+    case DSO_CAPTURE_SINGLE:
+        startCapture();
+        break;
+    default:
+        xAssert(0);
+        break;
     }
 }
-  // -- EOF --
+// -- EOF --

@@ -1,20 +1,20 @@
 #pragma once
-#include "lnArduino.h"
-#include "dso_display.h"
-#include "dso_control.h"
 #include "dso_capture.h"
+#include "dso_control.h"
+#include "dso_display.h"
+#include "lnArduino.h"
 
 /**
- * 
+ *
  */
 class DSOCaptureState
 {
-public:
+  public:
     static void startCapture();
     static void stopCapture();
-    static void toggleState();    
+    static void toggleState();
     static void captureProcessed();
     static void userPress();
-    static DSO_ArmingMode  getArmingMode();
+    static DSO_ArmingMode getArmingMode();
     static void setArmingMode(DSO_ArmingMode mode);
 };
