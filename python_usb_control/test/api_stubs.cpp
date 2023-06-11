@@ -1,22 +1,21 @@
 
-#include "lnArduino.h"
 #include "dso_usbd_api.h"
+#include "lnArduino.h"
 
-
-bool DSO_API::setVoltage(int a)  //DSOCapture::DSO_VOLTAGE_RANGE r);
+bool DSO_API::setVoltage(int a) // DSOCapture::DSO_VOLTAGE_RANGE r);
 {
-    printf("Got set voltage : %d\n",a );
+    printf("Got set voltage : %d\n", a);
     return true;
 }
-bool DSO_API::setTimeBase(int a)  //DSOCapture::DSO_TIME_BASE gb);
+bool DSO_API::setTimeBase(int a) // DSOCapture::DSO_TIME_BASE gb);
 {
-    printf("Got set time base : %d\n",a );
+    printf("Got set time base : %d\n", a);
     return true;
 }
 
-bool DSO_API::setTrigger(int a)  //DSOCapture::TriggerMode tm);
+bool DSO_API::setTrigger(int a) // DSOCapture::TriggerMode tm);
 {
-    printf("Got set trigger : %d\n",a );
+    printf("Got set trigger : %d\n", a);
     return true;
 }
 
@@ -42,6 +41,5 @@ int DSO_API::getTrigger()
 }
 void DSO_API::init()
 {
-    return ;
+    return;
 }
-

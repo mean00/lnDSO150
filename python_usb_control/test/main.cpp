@@ -1,6 +1,6 @@
-#include <iostream>
 #include <csignal>
 #include <ctime>
+#include <iostream>
 
 #include <QCoreApplication>
 #include <QObject>
@@ -8,27 +8,24 @@
 #include <QTcpSocket>
 #include <qnamespace.h>
 
-
 extern void pseudoUsbServer();
 extern void dsoInitUsb();
 /**
-*
-*
-*/
+ *
+ *
+ */
 
-
-int main( int argc, char **argv)
+int main(int argc, char **argv)
 {
-	QCoreApplication app(argc, argv);
-	
+    QCoreApplication app(argc, argv);
+
     pseudoUsbServer();
-	dsoInitUsb();
+    dsoInitUsb();
 
-	while(1)
-	{
-		QCoreApplication::processEvents();
-	}
+    while (1)
+    {
+        QCoreApplication::processEvents();
+    }
 
-	return 0;
+    return 0;
 }
-
