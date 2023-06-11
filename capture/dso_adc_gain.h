@@ -4,7 +4,7 @@
 
  */
 #pragma once
-
+#include "lnArduino.h"
 /**
  */
 class DSOInputGain
@@ -34,4 +34,7 @@ class DSOInputGain
     static int getOffset(int dc0ac1);
     static float getMultiplier();
     static bool readCalibrationValue();
+
+    // somehow private
+    static uint16_t *getCalibrationTable(int dc0ac1);
 };

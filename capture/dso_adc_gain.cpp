@@ -16,11 +16,14 @@
  * 3  /40
  */
 
+#include "lnArduino.h"
+#include "lnADC.h"
+
 #include "dso_adc_gain.h"
 #include "dso_adc_gain_priv.h"
 #include "dso_control.h"
-#include "lnADC.h"
-#include "lnArduino.h"
+
+
 
 extern DSOControl *control;
 
@@ -58,8 +61,8 @@ static const int gainMapping[DSO_NB_GAIN_RANGES] = {
 
     // 3,3,3 // Filler
 };
-uint16_t calibrationDC[DSO_NB_GAIN_RANGES + 1];
-uint16_t calibrationAC[DSO_NB_GAIN_RANGES + 1];
+uint16_t calibrationDC[DSO_NB_GAIN_RANGES + 1] = {0};
+uint16_t calibrationAC[DSO_NB_GAIN_RANGES + 1] = {0};
 float voltageFineTune[DSO_NB_GAIN_RANGES + 1];
 float multipliers[DSO_NB_GAIN_RANGES + 1];
 float raw_multipliers[DSO_NB_GAIN_RANGES + 1];
@@ -90,6 +93,16 @@ int DSOInputGain::getOffset(int dc0ac1)
     else
         return calibrationAC[(int)currentRange];
 }
+
+uint16_t *DSOInputGain::getCalibrationTable(int dc0ac1)
+{
+    if (dc0ac1 == 0)
+        return calibrationDC;
+    else
+        return calibrationAC;
+}
+
+
 /**
  *
  * @return

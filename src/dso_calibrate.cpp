@@ -55,8 +55,9 @@ bool DSOCalibrate::loadCalibrationData()
         Logger("AC:Wrong version %x vs expected %x\n", data[0], NVM_CALIBRATION_VERSION);
         return false;
     }
+    uint16_t *ac= DSOInputGain::getCalibrationTable(1);
     for (int i = 0; i < DSO_NB_GAIN_RANGES; i++)
-        calibrationAC[i] = data[i + 1];
+        ac[i] = data[i + 1];
 
     if (!nvm->read(NVM_CALIBRATION_DC, DSO_NB_GAIN_RANGES * 2 + 2, (uint8_t *)data))
     {
@@ -68,8 +69,9 @@ bool DSOCalibrate::loadCalibrationData()
         Logger("DC:Wrong version %x vs expected %x\n", data[0], NVM_CALIBRATION_VERSION);
         return false;
     }
+    uint16_t *dc= DSOInputGain::getCalibrationTable(0);
     for (int i = 0; i < DSO_NB_GAIN_RANGES; i++)
-        calibrationDC[i] = data[i + 1];
+        dc[i] = data[i + 1];
     return true;
 }
 
@@ -94,15 +96,17 @@ bool saveCalibrationData()
     uint16_t data[DSO_NB_GAIN_RANGES + 1];
 
     data[0] = NVM_CALIBRATION_VERSION;
+    uint16_t *ac= DSOInputGain::getCalibrationTable(1);
     for (int i = 0; i < DSO_NB_GAIN_RANGES; i++)
-        data[i + 1] = calibrationAC[i];
+        data[i + 1] = ac[i];
 
     if (!nvm->write(NVM_CALIBRATION_AC, DSO_NB_GAIN_RANGES * 2 + 2, (uint8_t *)data))
     {
         return false;
     }
+    uint16_t *dc= DSOInputGain::getCalibrationTable(1);
     for (int i = 0; i < DSO_NB_GAIN_RANGES; i++)
-        data[i + 1] = calibrationDC[i];
+        data[i + 1] = dc[i];
 
     if (!nvm->write(NVM_CALIBRATION_DC, DSO_NB_GAIN_RANGES * 2 + 2, (uint8_t *)data))
     {
@@ -126,8 +130,12 @@ bool DSOCalibrate::zeroCalibrate_()
     lnPin pin = PA0;
     calAdc->setSource(3, 3, 1000, 1, &pin);
 
-    doCalibrate(calibrationDC, YELLOW, "", DSOControl::DSO_COUPLING_DC);
-    doCalibrate(calibrationAC, GREEN, "", DSOControl::DSO_COUPLING_AC);
+    uint16_t *ac= DSOInputGain::getCalibrationTable(1);
+    uint16_t *dc= DSOInputGain::getCalibrationTable(0);
+
+
+    doCalibrate(dc, YELLOW, "", DSOControl::DSO_COUPLING_DC);
+    doCalibrate(ac, GREEN, "", DSOControl::DSO_COUPLING_AC);
     const char *msg = "Restart the unit.";
     DSO_GFX::center("@- saving -@", 8);
     if (!saveCalibrationData())
