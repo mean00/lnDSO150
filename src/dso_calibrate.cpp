@@ -55,7 +55,7 @@ bool DSOCalibrate::loadCalibrationData()
         Logger("AC:Wrong version %x vs expected %x\n", data[0], NVM_CALIBRATION_VERSION);
         return false;
     }
-    uint16_t *ac= DSOInputGain::getCalibrationTable(1);
+    uint16_t *ac = DSOInputGain::getCalibrationTable(1);
     for (int i = 0; i < DSO_NB_GAIN_RANGES; i++)
         ac[i] = data[i + 1];
 
@@ -69,7 +69,7 @@ bool DSOCalibrate::loadCalibrationData()
         Logger("DC:Wrong version %x vs expected %x\n", data[0], NVM_CALIBRATION_VERSION);
         return false;
     }
-    uint16_t *dc= DSOInputGain::getCalibrationTable(0);
+    uint16_t *dc = DSOInputGain::getCalibrationTable(0);
     for (int i = 0; i < DSO_NB_GAIN_RANGES; i++)
         dc[i] = data[i + 1];
     return true;
@@ -96,7 +96,7 @@ bool saveCalibrationData()
     uint16_t data[DSO_NB_GAIN_RANGES + 1];
 
     data[0] = NVM_CALIBRATION_VERSION;
-    uint16_t *ac= DSOInputGain::getCalibrationTable(1);
+    uint16_t *ac = DSOInputGain::getCalibrationTable(1);
     for (int i = 0; i < DSO_NB_GAIN_RANGES; i++)
         data[i + 1] = ac[i];
 
@@ -104,7 +104,7 @@ bool saveCalibrationData()
     {
         return false;
     }
-    uint16_t *dc= DSOInputGain::getCalibrationTable(1);
+    uint16_t *dc = DSOInputGain::getCalibrationTable(1);
     for (int i = 0; i < DSO_NB_GAIN_RANGES; i++)
         data[i + 1] = dc[i];
 
@@ -130,9 +130,8 @@ bool DSOCalibrate::zeroCalibrate_()
     lnPin pin = PA0;
     calAdc->setSource(3, 3, 1000, 1, &pin);
 
-    uint16_t *ac= DSOInputGain::getCalibrationTable(1);
-    uint16_t *dc= DSOInputGain::getCalibrationTable(0);
-
+    uint16_t *ac = DSOInputGain::getCalibrationTable(1);
+    uint16_t *dc = DSOInputGain::getCalibrationTable(0);
 
     doCalibrate(dc, YELLOW, "", DSOControl::DSO_COUPLING_DC);
     doCalibrate(ac, GREEN, "", DSOControl::DSO_COUPLING_AC);
