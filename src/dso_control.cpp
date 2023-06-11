@@ -35,7 +35,7 @@ int debugUp=0;
 int debugDown=0;
 
 
-int ampMapping[16]=
+const int ampMapping[16]=
 {
     1 , // GND          [0]
     
