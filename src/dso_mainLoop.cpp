@@ -8,6 +8,7 @@
 #include "dso_capture.h"
 #include "dso_calibrate.h"
 #include "dso_events.h"
+#include "gd32/nvm_gd32.h"
 //--
 xFastEventGroup            *evtGroup;
 extern DSOControl          *control;
@@ -67,6 +68,7 @@ extern void processUsbEvent();
 /**
  *
  */
+extern lnNvm               *nvm; 
 void mainLoop()
 {
     captureBuffer=new float[240];
@@ -87,7 +89,10 @@ void mainLoop()
 
     Logger("Loading calibration data\n");
     if(!DSOCalibrate::loadCalibrationData())
+    {
+        nvm->format();
         DSOCalibrate::zeroCalibrate();
+    }
 
 
     DSOCapture::setCouplingMode(control->getCouplingState()==DSOControl::DSO_COUPLING_AC);
