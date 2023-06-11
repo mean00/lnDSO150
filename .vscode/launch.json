@@ -11,7 +11,8 @@
           "svdFile" : "${workspaceRoot}/.vscode/STM32F103.svd",              
           //"executable": "buildF3/lnDSO_M4_mod_hstep_96M_USB.elf",
           //"executable": "buildF3/lnDSO_M4_mod_hstep_96M_USB.elf",
-          "executable": "buildFNIRSI/lnDSO_M3_mod_fnirsi_fstep_72M_small.elf",
+          //"executable": "buildFNIRSI/lnDSO_M3_mod_fnirsi_fstep_72M_small.elf",
+          "executable": "buildM4/lnDSO_M4_mod_hstep_96M_USB.elf",
 
           "request": "launch",
           "type": "cortex-debug",
@@ -19,7 +20,7 @@
           "servertype": "bmp",
           "interface": "swd",
           "device": "STM32F103",
-          "BMPGDBSerialPort" : "/dev/ttyBmpGdb",
+          "BMPGDBSerialPort" : "/dev/ttyBmpGdb2",
           "runToMain": true,
           "preLaunchCommands":[
           "b deadEnd",
@@ -31,6 +32,32 @@
           "break main"
           ]
 
-      }
+      },
+      {
+        "name": "Cortex Debug-attach",
+        "cwd": "${workspaceFolder}",
+        "armToolchainPath" : "/home/fx/Arduino_stm32/arm-gcc-2021q4/bin/",
+        "svdFile" : "${workspaceRoot}/.vscode/STM32F103.svd",              
+        "executable": "buildM4/lnDSO_M4_mod_hstep_96M_USB.elf",
+
+        "request": "attach",
+        "type": "cortex-debug",
+        "runToEntryPoint": "main",
+        "servertype": "bmp",
+        "interface": "swd",
+        "device": "STM32F103",
+        "BMPGDBSerialPort" : "/dev/ttyBmpGdb2",
+        "runToMain": true,
+        "preLaunchCommands":[
+        "b deadEnd",
+        "set mem inaccessible-by-default off",
+        "set confirm off"
+        ],
+        "preRestartCommands": [
+        "enable breakpoint",
+        "break main"
+        ]
+
+    }
   ]                                                                         
 }
