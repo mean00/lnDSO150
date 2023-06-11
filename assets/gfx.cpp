@@ -1,7 +1,7 @@
 //
 #include "lnArduino.h"
-#include "pattern.h"
 #include "pattern_decl.h"
+#include "pattern.h"
 #ifdef USE_SMALLFOOTPRINT
 #include "assets/gfx/generated/splash_small_compressed.h"
 const uint8_t *getSplash()
