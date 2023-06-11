@@ -1,9 +1,9 @@
+#include "lnArduino.h"
 #include "cdc_descriptor.h"
 #include "dso_version.h"
 #include "include/lnUsbCDC.h"
 #include "include/lnUsbDFUrt.h"
 #include "include/lnUsbStack.h"
-#include "lnArduino.h"
 
 #include "dso_usbd_api.h"
 

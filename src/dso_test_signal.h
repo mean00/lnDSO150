@@ -4,7 +4,7 @@
 /**
  */
 class lnTimer;
-
+#include "lnGPIO.h"
 class DSO_testSignal
 {
   public:

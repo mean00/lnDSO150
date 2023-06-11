@@ -4,7 +4,7 @@
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
 #pragma once
-
+#include "lnArduino.h"
 #define EVENT_LONG_PRESS 1
 #define EVENT_SHORT_PRESS 2
 
