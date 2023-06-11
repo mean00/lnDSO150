@@ -16,14 +16,12 @@
  * 3  /40
  */
 
-#include "lnArduino.h"
 #include "lnADC.h"
+#include "lnArduino.h"
 
 #include "dso_adc_gain.h"
 #include "dso_adc_gain_priv.h"
 #include "dso_control.h"
-
-
 
 extern DSOControl *control;
 
@@ -101,7 +99,6 @@ uint16_t *DSOInputGain::getCalibrationTable(int dc0ac1)
     else
         return calibrationAC;
 }
-
 
 /**
  *
