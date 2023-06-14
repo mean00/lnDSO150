@@ -190,7 +190,8 @@ bool DSOCalibrate::fiveVoltCalibrate_()
     DSOInputGain::InputGainRange range = DSOInputGain::MAX_VOLTAGE_8V;
     DSOInputGain::setGainRange(range);
     DSO_GFX::newPage("5V calibration");
-    DSO_GFX::center("Connect to 5v", 3);
+    DSO_GFX::center("Connect to 5v", 2);
+    DSO_GFX::printxy(2, 2, "Uncorrected voltage");
     DSO_GFX::bottomLine("@VOLT@=RESET    @OK@=SET");
 
     calAdc = new lnTimingAdc(0);
@@ -216,7 +217,7 @@ bool DSOCalibrate::fiveVoltCalibrate_()
         raw -= offset;
         v = (float)raw * mu;
 
-        sprintf(buffer, "Raw volt:%2.2f_____", v);
+        sprintf(buffer, "%2.2f_", v);
 
         if (v >= 4.4 && v <= 5.5)
         {
@@ -243,10 +244,6 @@ bool DSOCalibrate::fiveVoltCalibrate_()
             run = FIVE_RESET;
             break;
         default:
-            break;
-        }
-        if (control->getQButtonEvent() == DSO_EVENT_Q(DSOControl::DSO_BUTTON_OK, EVENT_SHORT_PRESS))
-        {
             break;
         }
         lnDelayMs(20); // yield
