@@ -20,6 +20,7 @@ MenuManager::MenuManager(DSOControl *ctl, const MenuItem *menu)
     _menu = menu;
     _instance = this;
     _control = ctl;
+    _wakeup.takeOwnership(); // this is always called from the main task
 }
 /**
  *
@@ -191,7 +192,7 @@ void MenuManager::runOne(const MenuItem *xtop)
  */
 void MenuManager::controlEvent()
 {
-    _sem.give();
+    _wakeup.setEvents(MENU_EVT_BIT);
 }
 
 /**
@@ -220,7 +221,7 @@ void MenuManager::runOne_(const MenuItem *xtop)
 next:
     while (1)
     {
-        _sem.take(200);
+        _wakeup.waitEvents(MENU_EVT_BIT, 200);
 
         int event;
         while ((event = _control->getQButtonEvent()))

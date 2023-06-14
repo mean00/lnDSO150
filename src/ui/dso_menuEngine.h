@@ -1,5 +1,6 @@
 #pragma once
 #include "lnArduino.h"
+#define MENU_EVT_BIT 0x100 // Careful, the bottom ones are used internally
 /**
  */
 class MenuItem
@@ -57,6 +58,6 @@ class MenuManager
     void drawOneLine(const MenuItem *xtop, int current, bool onoff);
     bool handlePress(const char *title, int n, const MenuItem *xtop, int current, int oldCurrent);
     void runOne_(const MenuItem *xtop);
-    xBinarySemaphore _sem;
+    lnFastEventGroup _wakeup;
     DSOControl *_control;
 };
