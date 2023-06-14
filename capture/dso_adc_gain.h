@@ -33,8 +33,11 @@ class DSOInputGain
     static DSOInputGain::InputGainRange getGainRange();
     static int getOffset(int dc0ac1);
     static float getMultiplier();
-    static bool readCalibrationValue();
+    static bool preComputeMultiplier();
+    static bool postComputeMultiplier();
 
     // somehow private
     static uint16_t *getCalibrationTable(int dc0ac1);
 };
+
+extern float vref_adc_mul; // The internal vref is around 1.2v but can be +- 0.04v

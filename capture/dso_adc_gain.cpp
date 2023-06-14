@@ -64,7 +64,7 @@ uint16_t calibrationAC[DSO_NB_GAIN_RANGES + 1] = {0};
 float voltageFineTune[DSO_NB_GAIN_RANGES + 1];
 float multipliers[DSO_NB_GAIN_RANGES + 1];
 float raw_multipliers[DSO_NB_GAIN_RANGES + 1];
-
+extern float vref_adc_mul;
 /**
  */
 bool DSOInputGain::setGainRange(DSOInputGain::InputGainRange range)
@@ -129,14 +129,20 @@ static void computeMultiplier(float *mul, int offset, float sta)
  *
  * @return
  */
-bool DSOInputGain::readCalibrationValue()
+bool DSOInputGain::preComputeMultiplier()
 {
-    float fvcc = lnBaseAdc::getVcc();
-
-    float stat;
     multipliers[0] = 0;
     computeMultiplier(multipliers, 1, G1a * G2 * G4);
     computeMultiplier(multipliers, 1 + 6, G1b * G2 * G4);
+
+    return true;
+}
+/**
+
+*/
+bool DSOInputGain::postComputeMultiplier()
+{
+    float fvcc = lnBaseAdc::getVcc() * vref_adc_mul;
 
     float mu = fvcc / (4095. * 1000.);
     for (int i = 0; i < DSO_NB_GAIN_RANGES; i++)

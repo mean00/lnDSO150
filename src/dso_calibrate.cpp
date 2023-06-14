@@ -17,11 +17,13 @@
 
 static void printCalibrationTemplate(const char *st1, const char *st2);
 static void doCalibrate(uint16_t *array, int color, const char *txt, DSOControl::DSOCoupling target);
-
+static void waitForCoupling(DSOControl::DSOCoupling target);
+static int averageADCRead();
 //
 lnTimingAdc *calAdc = NULL;
 extern DSOControl *control;
 extern lnNvm *nvm;
+extern float vref_adc_mul;
 
 /**
  *
@@ -37,6 +39,8 @@ static void waitOk()
         xDelay(10);
     }
 }
+
+float vref_adc_mul = 1.0;
 /**
  *
  * @return
@@ -44,6 +48,11 @@ static void waitOk()
 bool DSOCalibrate::loadCalibrationData()
 {
     uint16_t data[DSO_NB_GAIN_RANGES + 1];
+
+    if (!nvm->read(NVM_ADC_VREF_MULTIPLIER, sizeof(float), (uint8_t *)&vref_adc_mul))
+    {
+        vref_adc_mul = 1.; // 1.0086
+    }
 
     if (!nvm->read(NVM_CALIBRATION_AC, DSO_NB_GAIN_RANGES * 2 + 2, (uint8_t *)data))
     {
@@ -87,6 +96,28 @@ bool DSOCalibrate::zeroCalibrate()
     control->changeCb(oldCb);
     return r;
 }
+
+/**
+ *
+ * @return
+ */
+bool DSOCalibrate::fiveVoltCalibrate()
+{
+    //
+
+    DSOControl::ControlEventCb *oldCb = control->getCb();
+    control->changeCb(NULL);
+    // Force DC mode
+    DSO_GFX::newPage("5 V CALIBRATION");
+    waitForCoupling(DSOControl::DSO_COUPLING_DC);
+
+    // Catch control callback
+    bool r = true;
+    r = fiveVoltCalibrate_();
+    control->changeCb(oldCb);
+    return r;
+}
+
 /**
  *
  * @return
@@ -150,6 +181,100 @@ bool DSOCalibrate::zeroCalibrate_()
     };
     return true;
 }
+
+/**
+ */
+extern float raw_multipliers[];
+bool DSOCalibrate::fiveVoltCalibrate_()
+{
+    DSOInputGain::InputGainRange range = DSOInputGain::MAX_VOLTAGE_8V;
+    DSOInputGain::setGainRange(range);
+    DSO_GFX::newPage("5V calibration");
+    DSO_GFX::center("Connect to 5v", 3);
+    DSO_GFX::bottomLine("@VOLT@=RESET    @OK@=SET");
+
+    calAdc = new lnTimingAdc(0);
+    lnPin pin = PA0;
+    calAdc->setSource(3, 3, 1000, 1, &pin);
+
+    // Loop
+    float fvcc = lnBaseAdc::getVcc();
+    float mu = fvcc / (4095. * 1000.);
+    int offset = DSOInputGain::getOffset(0);
+    mu = mu * raw_multipliers[range];
+    char buffer[40];
+#define FIVE_WAIT 0
+#define FIVE_SET 1
+#define FIVE_RESET 2
+    int run = FIVE_WAIT;
+    float v;
+    //--
+    while (run == FIVE_WAIT)
+    {
+        bool valid = false;
+        int raw = averageADCRead();
+        raw -= offset;
+        v = (float)raw * mu;
+
+        sprintf(buffer, "Raw volt:%2.2f_____", v);
+
+        if (v >= 4.4 && v <= 5.5)
+        {
+            DSO_GFX::setTextColor(BLACK, GREEN);
+            valid = true;
+        }
+        else
+        {
+            DSO_GFX::setTextColor(BLACK, RED);
+            valid = false;
+        }
+
+        DSO_GFX::printxy(5, 3, buffer);
+        switch (control->getQButtonEvent())
+        {
+        case DSO_EVENT_Q(DSOControl::DSO_BUTTON_OK, EVENT_SHORT_PRESS):
+            if (valid)
+            {
+                run = FIVE_SET;
+                continue;
+            }
+            break;
+        case DSO_EVENT_Q(DSOControl::DSO_BUTTON_VOLTAGE, EVENT_SHORT_PRESS):
+            run = FIVE_RESET;
+            break;
+        default:
+            break;
+        }
+        if (control->getQButtonEvent() == DSO_EVENT_Q(DSOControl::DSO_BUTTON_OK, EVENT_SHORT_PRESS))
+        {
+            break;
+        }
+        lnDelayMs(20); // yield
+    }
+
+    delete calAdc;
+    calAdc = NULL;
+
+    switch (run)
+    {
+    case FIVE_SET:
+        vref_adc_mul = 5. / v;
+        break;
+    case FIVE_RESET:
+        vref_adc_mul = 1.0;
+        break;
+    default:
+        xAssert(0);
+        break;
+    }
+
+    nvm->write(NVM_ADC_VREF_MULTIPLIER, sizeof(vref_adc_mul), (uint8_t *)&vref_adc_mul);
+    DSOInputGain::preComputeMultiplier();
+    DSOInputGain::postComputeMultiplier();
+    DSO_GFX::clear(BLACK);
+    return true;
+}
+
 /**
  */
 void printCalibrationTemplate(const char *st1, const char *st2)
@@ -173,15 +298,18 @@ static void printCoupling(DSOControl::DSOCoupling cpl)
  *
  * @param target
  */
-static void waitForCoupling(DSOControl::DSOCoupling target)
+void waitForCoupling(DSOControl::DSOCoupling target)
 {
     DSOControl::DSOCoupling cpl = (DSOControl::DSOCoupling)-1;
     const char *st = "Set input to DC";
     if (target == DSOControl::DSO_COUPLING_AC)
         st = "Set input to AC";
     DSO_GFX::center(st, 4);
+    DSO_GFX::bottomLine("and press @OK@");
+
     while (1)
     {
+        lnDelayMs(100); // yield
         DSOControl::DSOCoupling newcpl = control->getCouplingState();
         if (newcpl == target)
             DSO_GFX::setTextColor(GREEN, BLACK);
@@ -221,7 +349,7 @@ void header(int color, const char *txt, DSOControl::DSOCoupling target)
  *
  * @return
  */
-static int averageADCRead()
+int averageADCRead()
 {
 #define NB_POINTS 16
     uint16_t samples[NB_POINTS];
@@ -263,6 +391,10 @@ bool DSOCalibrate::decalibrate()
     uint8_t empty[2] = {0xff, 0xff};
     nvm->write(NVM_CALIBRATION_DC, 2, empty);
     nvm->write(NVM_CALIBRATION_AC, 2, empty);
+
+    float one = 1.0;
+    nvm->write(NVM_ADC_VREF_MULTIPLIER, sizeof(one), (uint8_t *)&one);
+
     return true;
 }
 //
@@ -308,11 +440,15 @@ bool DSOCalibrate::vccAdcMenu()
     {
         adc->readVcc();
         int raw = adc->getVref();
-        float volt = adc->getVcc() / 1000.;
+        float volt = (adc->getVcc()) / 1000.;
+        float volt_adj = volt * vref_adc_mul;
         sprintf(buffer, "RAW:%d_____", raw);
-        DSO_GFX::printxy(5, 2, buffer);
+        DSO_GFX::printxy(5, 1, buffer);
         sprintf(buffer, "VOLT:%2.2f_____", volt);
-        DSO_GFX::printxy(5, 4, buffer);
+        DSO_GFX::printxy(5, 3, buffer);
+        sprintf(buffer, "ADJ:%2.2f_____", volt_adj);
+        DSO_GFX::printxy(5, 5, buffer);
+
         lnDelayMs(1000);
     }
 

@@ -20,7 +20,6 @@ extern void showCapture();
 //--
 float *captureBuffer;
 uint8_t *displayData;
-extern uint16_t calibrationDC[];
 
 extern void dsoInitUsb();
 extern void showTriggerState();
@@ -79,7 +78,7 @@ void mainLoop()
     DSOCapture::setVoltageRange(DSOCapture::DSO_VOLTAGE_1V);
     DSOCapture::setTimeBase(DSOCapture::DSO_TIME_BASE_1MS);
 
-    DSOInputGain::readCalibrationValue();
+    DSOInputGain::preComputeMultiplier();
     control->loadSettings();
 
     evtGroup = new xFastEventGroup;
@@ -92,6 +91,7 @@ void mainLoop()
         nvm->format();
         DSOCalibrate::zeroCalibrate();
     }
+    DSOInputGain::postComputeMultiplier();
 
     DSOCapture::setCouplingMode(control->getCouplingState() == DSOControl::DSO_COUPLING_AC);
     DSOCapture::setTriggerMode(DSOCapture::Trigger_Rising);

@@ -60,6 +60,7 @@ const MenuItem controlMenu[] = {{MenuItem::MENU_TITLE, "Control", NULL},
 const MenuItem calibrationMenu[] = {
     {MenuItem::MENU_TITLE, "Calibration", NULL},
     {MenuItem::MENU_CALL, "Basic Calibrate", (const void *)DSOCalibrate::zeroCalibrate},
+    {MenuItem::MENU_CALL, "5v Calibrate", (const void *)DSOCalibrate::fiveVoltCalibrate},
     //{MenuItem::MENU_CALL, "Fine Calibrate",(const void *)DSOCalibrate::voltageCalibrate},
     {MenuItem::MENU_CALL, "Wipe Calibration", (const void *)DSOCalibrate::decalibrate},
     {MenuItem::MENU_END, NULL, NULL}};
