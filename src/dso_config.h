@@ -1,6 +1,4 @@
 #pragma once
-#define DSO_VERSION_MAJOR 2
-#define DSO_VERSION_MINOR 0
 
 #define DSO_MAIN_TASK_PRIORITY 2
 #define DSO_CONTROL_TASK_PRIORITY 15
