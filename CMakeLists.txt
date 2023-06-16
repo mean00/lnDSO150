@@ -56,7 +56,7 @@ enable_language(C CXX ASM) # this is important too!
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-SET(LN_INITIAL_STACK_SIZE 1500 CACHE INTERNAL "") # Need a larger stack than default
+# SET(LN_INITIAL_STACK_SIZE 3000 CACHE INTERNAL "")
 
 add_subdirectory(${AF_FOLDER})
 

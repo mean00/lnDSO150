@@ -2,6 +2,7 @@
 #include "dso_adc_gain.h"
 #include "dso_calibrate.h"
 #include "dso_capture.h"
+#include "dso_config.h"
 #include "dso_control.h"
 #include "dso_display.h"
 #include "dso_gfx.h"
@@ -101,7 +102,7 @@ void loop()
 
     //    testFunc2();
 
-    lnCreateTask(mainLoop_bounce, "mainLoop", 1300, NULL, 4);
+    lnCreateTask(mainLoop_bounce, "mainLoop", DSO_MAIN_TASK_STACK, NULL, DSO_MAIN_TASK_PRIORITY);
 #if 1
     vTaskDelete(NULL);
 #else
