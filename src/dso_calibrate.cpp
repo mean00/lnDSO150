@@ -378,19 +378,21 @@ void doCalibrate(uint16_t *array, int color, const char *txt, DSOControl::DSOCou
         Logger("Range : %d val=%d\n", range, array[range]);
     }
 }
-
 /**
  *
  * @return
  */
 bool DSOCalibrate::decalibrate()
 {
-    uint8_t empty[2] = {0xff, 0xff};
+    uint8_t empty[4] = {0xff, 0xff, 0xff, 0xff};
     nvm->write(NVM_CALIBRATION_DC, 2, empty);
     nvm->write(NVM_CALIBRATION_AC, 2, empty);
 
     float one = 1.0;
-    nvm->write(NVM_ADC_VREF_MULTIPLIER, sizeof(one), (uint8_t *)&one);
+    if (!nvm->write(NVM_ADC_VREF_MULTIPLIER, sizeof(one), (uint8_t *)&one))
+    {
+        Logger("Failed to rst vref\n");
+    }
 
     return true;
 }

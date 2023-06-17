@@ -13,6 +13,7 @@ class DSOCalibrate
     static bool voltageCalibrate();
     static bool vccAdcMenu();
     static bool fiveVoltCalibrate();
+    static bool formatNvm();
 
   protected:
     static bool voltageCalibrate_();

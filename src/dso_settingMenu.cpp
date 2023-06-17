@@ -11,12 +11,14 @@
 #include "dso_version.h"
 #include "lnArduino.h"
 #include "lnCpuID.h"
+#include "nvmCore.h"
 
 extern DSO_testSignal *testSignal;
 static int currentFQ;
 static int largeAmplitude;
 static int invertedRotary = 0;
-
+extern lnNvm *nvm;
+bool formatNvm();
 #define MAKEFQITEM(name, val) static const MenuListItem name = {&currentFQ, val};
 
 MAKEFQITEM(fq100, 100)
@@ -77,6 +79,11 @@ static const char *getSwVersion()
 }
 extern const char *getScreenID();
 
+//
+const MenuItem miscMenu[] = {{MenuItem::MENU_TITLE, "Misc", NULL},
+                             {MenuItem::MENU_CALL, "Format user data", (const void *)formatNvm},
+                             {MenuItem::MENU_END, NULL, NULL}};
+
 //--
 const MenuItem infoMenu[] = {{MenuItem::MENU_TITLE, "Information", NULL},
                              {MenuItem::MENU_TEXT, "MC", (const void *)lnCpuID::idAsString},
@@ -90,6 +97,7 @@ const MenuItem topMenu[] = {{MenuItem::MENU_TITLE, "Main Menu", NULL},
                             //{MenuItem::MENU_CALL, "Button Test",(const void *)buttonTest},
                             {MenuItem::MENU_SUBMENU, "Calibration", (const void *)&calibrationMenu},
                             {MenuItem::MENU_SUBMENU, "Control", (const void *)&controlMenu},
+                            {MenuItem::MENU_SUBMENU, "Misc", (const void *)&miscMenu},
                             {MenuItem::MENU_SUBMENU, "Info", (const void *)&infoMenu},
                             {MenuItem::MENU_END, NULL, NULL}};
 
@@ -112,4 +120,17 @@ void menuManagement(DSOControl *control)
     testSignal->setAmplitude(largeAmplitude);
     control->invert(invertedRotary);
 }
+
+/**
+ */
+bool formatNvm()
+{
+
+    if (!nvm->format())
+    {
+        Logger("Failed to format\n");
+    }
+    return true;
+}
+
 // EOF
