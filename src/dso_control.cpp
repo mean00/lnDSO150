@@ -107,6 +107,9 @@ uint32_t DSOControl::snapshot()
 {
     uint32_t val;
     arbitrer->beginInput();
+    // when the code is aggressively inline, the gpio turnaround happens too quickly
+    // add an extra nop to let the GPIO stabilize
+    __asm__("nop");
     val = lnReadPort(1); // read all bits from portB
     val = 0xffff ^ val;  // active low, so invert it
     arbitrer->endInput();
