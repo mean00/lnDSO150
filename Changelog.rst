@@ -1,0 +1,5 @@
+- ADC / 5v calibration 
+- Switched to clang-17
+- Reformat user data if we cant load it
+- Added python demo to use a PC to control the DSO over USB
+- Some bugfixes

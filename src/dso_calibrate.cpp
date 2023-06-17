@@ -219,7 +219,7 @@ bool DSOCalibrate::fiveVoltCalibrate_()
 
         sprintf(buffer, "%2.2f_", v);
 
-        if (v >= 4.4 && v <= 5.5)
+        if (v >= 3.5 && v <= 6.5)
         {
             DSO_GFX::setTextColor(BLACK, GREEN);
             valid = true;
