@@ -85,32 +85,12 @@ void setup()
 
 /**
  *
- * @param a
- */
-void mainLoop_bounce(void *a)
-{
-    mainLoop();
-}
-/**
- *
  */
 void loop()
 {
 
     Logger("Starting DSO...\n");
-    //    testFunc();
-
-    //    testFunc2();
-
-    lnCreateTask(mainLoop_bounce, "mainLoop", DSO_MAIN_TASK_STACK, NULL, DSO_MAIN_TASK_PRIORITY);
-#if 1
-    vTaskDelete(NULL);
-#else
-    while (1)
-    {
-        xDelay(1000);
-    }
-#endif
+    mainLoop();
 }
 /**
  *
