@@ -27,12 +27,14 @@ OPTION(USE_USB                  "Enable USB support"                            
 OPTION(USE_SMALLFOOTPRINT       "Build for 64k flash targets"                       FALSE)
 OPTION(USE_GD32F3               "Build for GD32F303"                                FALSE)
 OPTION(USE_FNIRSI_BUTTON        "Use FNIRSI button layout"                          FALSE)
+
+
 IF(USE_NO_DEFAULT)
 
 ELSE()
-    SET(LN_LTO "-flto" CACHE INTERNAL "")
-    SET(USE_CLANG True CACHE INTERNAL "")
-    SET(USE_GD32F3 TRUE CACHE INTERNAL "")
+   SET(LN_LTO "-flto" CACHE INTERNAL "")
+   SET(USE_CLANG True CACHE INTERNAL "")
+    #SET(USE_GD32F3 TRUE CACHE INTERNAL "")
     #  SET(USE_SMALLFOOTPRINT       TRUE CACHE INTERNAL "")
     #SET(USE_FNIRSI_BUTTON TRUE CACHE INTERNAL "")
 ENDIF()
@@ -139,6 +141,12 @@ IF(LN_ENABLE_USBD)
     ADD_SUBDIRECTORY( ${NPB} )
 ENDIF(LN_ENABLE_USBD)
 
+IF(USE_CLANG)
+    SET(EXTENSION "${EXTENSION}_CLANG")
+ELSE()    
+    SET(EXTENSION "${EXTENSION}_GCC")
+ENDIF()
+
 #____________________
 # Build
 #____________________
@@ -176,6 +184,9 @@ IF(USE_ROTARY_FULL_STEP)
 ELSE()
      MESSAGE(STATUS "\tUsing rotary encoder Half step ")
 ENDIF()
+
+
+
 
 #
 
