@@ -37,7 +37,7 @@ static void charToPix(int x, int y, int &w, int &l)
     if (y < 0)
         l = 240 + FONT_SIZE_Y * y;
     else
-        l = FONT_SIZE_Y * y + 2 * FONT_SIZE_Y;
+        l = FONT_SIZE_Y * y + FONT_SIZE_Y;
 
     if (x < 0)
         w = 320 + FONT_SIZE_X * x;
