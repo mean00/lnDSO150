@@ -178,6 +178,7 @@ bool DSOCalibrate::zeroCalibrate_()
     calAdc = NULL;
     while (1)
     {
+        __asm__("nop");
     };
     return true;
 }
