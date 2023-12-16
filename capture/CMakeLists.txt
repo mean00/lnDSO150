@@ -7,4 +7,6 @@ ADD_LIBRARY(  captureLib
         
                 )
 
+target_link_libraries( captureLib lnArduino )                
+
         

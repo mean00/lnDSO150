@@ -48,3 +48,5 @@ IF("${LN_ARCH}" STREQUAL "RISCV")
     MESSAGE(STATUS "ILI9341 : Using PB8 instead of PB3 for LCD")
     TARGET_COMPILE_OPTIONS(sourceLib PRIVATE "-DUSE_PB8_INSTEAD_OF_PB3")
 ENDIF()
+
+target_link_libraries( sourceLib lnArduino )

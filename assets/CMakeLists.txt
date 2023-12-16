@@ -9,3 +9,5 @@ ADD_LIBRARY(assets
 )
 target_include_directories(assets PRIVATE   ${CMAKE_CURRENT_SOURCE_DIR}  )
 target_include_directories(assets PRIVATE   ${CMAKE_CURRENT_SOURCE_DIR}/../externals/simplerILI9341  )
+
+target_link_libraries( assets lnArduino )

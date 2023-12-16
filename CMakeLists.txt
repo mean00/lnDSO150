@@ -18,30 +18,40 @@ SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 SET(LN_ENABLE_I2C  OFF CACHE INTERNAL "")
 SET(LN_ENABLE_SPI  OFF CACHE INTERNAL "")
-SET(LN_USB_NB_CDC  1 CACHE INTERNAL "")
-SET(LN_USB_NB_HID  0 CACHE INTERNAL "")
-SET(LN_USB_DFU_RUNTIME 1 CACHE INTERNAL "")
 
 OPTION(USE_ROTARY_FULL_STEP     "Use full step for rotary encoder, else half step"  FALSE)
 OPTION(USE_USB                  "Enable USB support"                                FALSE)
 OPTION(USE_SMALLFOOTPRINT       "Build for 64k flash targets"                       FALSE)
-OPTION(USE_GD32F3               "Build for GD32F303"                                FALSE)
 OPTION(USE_FNIRSI_BUTTON        "Use FNIRSI button layout"                          FALSE)
-
 
 IF(USE_NO_DEFAULT)
 
-ELSE()
-   SET(LN_LTO "-flto" CACHE INTERNAL "")
-   SET(USE_CLANG True CACHE INTERNAL "")
-    #SET(USE_GD32F3 TRUE CACHE INTERNAL "")
-    #  SET(USE_SMALLFOOTPRINT       TRUE CACHE INTERNAL "")
-    #SET(USE_FNIRSI_BUTTON TRUE CACHE INTERNAL "")
+ELSE(USE_NO_DEFAULT)
+  include(./build_default.cmake)
+ENDIF(USE_NO_DEFAULT)
+
+
+SET(LN_USB_NB_CDC  1 CACHE INTERNAL "")
+SET(LN_USB_NB_HID  0 CACHE INTERNAL "")
+SET(LN_USB_DFU_RUNTIME 1 CACHE INTERNAL "")
+
+
+SET(LN_ENABLE_I2C   FALSE CACHE INTERNAL "")
+SET(LN_ENABLE_SPI   TRUE CACHE INTERNAL "")
+
+
+IF(LN_ENABLE_USBD)
+    ADD_DEFINITIONS("-DSTM32F103xB")
+    SET(LN_ENABLE_USBD  True CACHE INTERNAL "")
 ENDIF()
 
 
 SET(AF_FOLDER  ${CMAKE_SOURCE_DIR}/lnArduino/)
 include(./mcuSelect.cmake)
+
+SET(CMAKE_TOOLCHAIN_FILE ${AF_FOLDER}/lnArduino.cmake)
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${AF_FOLDER}/cmake CACHE INTERNAL "")
+
 include(./FindGitSvn.cmake)
 SET(CMAKE_TOOLCHAIN_FILE ${AF_FOLDER}/lnArduino.cmake)
 
@@ -88,7 +98,6 @@ ENDIF(USE_ROTARY_FULL_STEP)
 math(EXPR MCU_SPEED_M "${LN_MCU_SPEED}/1000000")
 SET(EXTENSION "${EXTENSION}_${MCU_SPEED_M}M")
 
-
 include_directories(src)
 
 #_______________________
@@ -118,6 +127,9 @@ ENDIF()
 include_directories(externals/simplerILI9341/cpp/platformExample/lnArduino)
 SET(ILI9341_DRIVER  platformExample/lnArduino/ili_ln8bits.cpp)
 ADD_SUBDIRECTORY(externals/simplerILI9341/cpp)
+
+
+
 include_directories(externals/simplerILI9341/cpp)
 #
 include_directories(capture)
@@ -128,8 +140,7 @@ ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(capture)
 #ADD_SUBDIRECTORY(testFunc)
 #
-IF(LN_ENABLE_USBD)
-    include(${AF_FOLDER}/setup.cmake)
+IF(LN_ENABLE_USBD)    
     USE_LIBRARY(tinyUsb)
     SET(EXTENSION "${EXTENSION}_USB")
 ENDIF(LN_ENABLE_USBD)
@@ -154,19 +165,11 @@ GENERATE_GD32_FIRMWARE(lnDSO)
 TARGET_LINK_LIBRARIES( lnDSO  captureLib )
 TARGET_LINK_LIBRARIES( lnDSO  sourceLib )
 IF(LN_ENABLE_USBD)
-    TARGET_LINK_LIBRARIES( lnDSO  gd32_usb_usbd nanopb)
+    TARGET_LINK_LIBRARIES( lnDSO  nanopb)
 ENDIF()
 TARGET_LINK_LIBRARIES( lnDSO  simplerILI9341 ${DSO_EXTRA_LIB} assets ${FP_LIB} )
 
-  add_custom_command(TARGET lnDSO
-                   POST_BUILD
-                   COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:lnDSO> $<TARGET_FILE:lnDSO>.tmp
-                   COMMAND python3 ${CMAKE_SOURCE_DIR}/lnDsoChecksum.py  $<TARGET_FILE:lnDSO>.tmp $<TARGET_FILE:lnDSO>.checksumed.bin
-                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                   COMMENT "Generating checksumed bin file"
-    )
-
-
+HASH_GD32_FIRMWARE(lnDSO)
 
 # Summary
 MESSAGE(STATUS "Configuration:")
