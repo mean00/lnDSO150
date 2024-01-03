@@ -1,6 +1,6 @@
 export PPP=/arm/tools_llvm/bin
-export CCC=$PPP/clang-17
-export CPP=$PPP/clang++-17
+export CCC=$PPP/clang-18
+export CPP=$PPP/clang++-18
 export ANA=$CCC
 set -x
 rm -Rf ../build/*
