@@ -132,7 +132,7 @@ ADD_SUBDIRECTORY(externals/simplerILI9341/cpp)
 
 
 include_directories(externals/simplerILI9341/cpp)
-target_link_libraries(simplerILI9341  PRIVATE lnArduino)
+#target_link_libraries(simplerILI9341  PRIVATE lnArduino)
 #
 include_directories(capture)
 USE_LIBRARY(NeVerMind)
