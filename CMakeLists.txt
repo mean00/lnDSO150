@@ -11,6 +11,7 @@ cmake_minimum_required(VERSION 3.0)
 MESSAGE(STATUS "===============")
 MESSAGE(STATUS "Starting lnDSO")
 MESSAGE(STATUS "===============")
+cmake_policy(SET CMP0079 NEW)
 #____________________
 # Options
 #____________________

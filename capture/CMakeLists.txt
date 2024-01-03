@@ -1,4 +1,4 @@
-ADD_LIBRARY(  captureLib
+ADD_LIBRARY(  captureLib STATIC
                 dso_capture_const.cpp
                 dso_adc_gain.cpp
                 dso_capture.cpp
@@ -6,7 +6,5 @@ ADD_LIBRARY(  captureLib
                 dso_frequency.cpp
         
                 )
-
-target_link_libraries( captureLib lnArduino )                
-
+target_link_libraries(captureLib lnArduino)
         

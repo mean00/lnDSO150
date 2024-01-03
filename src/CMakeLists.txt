@@ -15,7 +15,7 @@ ENDIF(LN_ENABLE_USBD)
 IF(USE_FNIRSI_BUTTON)
     ADD_DEFINITIONS("-DUSE_FNIRSI_BUTTON")
 ENDIF()
-ADD_LIBRARY(  sourceLib
+ADD_LIBRARY(  sourceLib STATIC
                 main.cpp dso_gfx.cpp dso_test_signal.cpp dso_control.cpp
                 dso_settingMenu.cpp  ui/dso_menuEngine.cpp dso_display.cpp
                 DSO_portBArbitrer.cpp
@@ -27,6 +27,7 @@ ADD_LIBRARY(  sourceLib
                 dso_captureState.cpp
                 ${USB_SRC}                
                 )
+target_link_libraries(sourceLib lnArduino tinyUsb)
 
 
 IF(LN_ENABLE_USBD)
