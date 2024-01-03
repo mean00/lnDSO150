@@ -27,7 +27,9 @@ ADD_LIBRARY(  sourceLib STATIC
                 dso_captureState.cpp
                 ${USB_SRC}                
                 )
-target_link_libraries(sourceLib lnArduino tinyUsb)
+IF(LN_ENABLE_USBD)
+    target_link_libraries(sourceLib lnArduino tinyUsb)
+ENDIF()
 
 
 IF(LN_ENABLE_USBD)
