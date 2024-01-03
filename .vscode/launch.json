@@ -1,63 +1,66 @@
 {
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-  "version": "0.2.0",
-  "configurations": [
-      {
-          "name": "Cortex Debug",
-          "cwd": "${workspaceFolder}",
-          "armToolchainPath" : "/home/fx/Arduino_stm32/arm-gcc-2021q4/bin/",
-          "svdFile" : "${workspaceRoot}/.vscode/STM32F103.svd",              
-          //"executable": "buildF3/lnDSO_M4_mod_hstep_96M_USB.elf",
-          //"executable": "buildF3/lnDSO_M4_mod_hstep_96M_USB.elf",
-          //"executable": "buildFNIRSI/lnDSO_M3_mod_fnirsi_fstep_72M_small.elf",
-          "executable": "buildM4/lnDSO_M4_mod_hstep_96M_USB.elf",
-
-          "request": "launch",
-          "type": "cortex-debug",
-          "runToEntryPoint": "main",
-          "servertype": "bmp",
-          "interface": "swd",
-          "device": "STM32F103",
-          "BMPGDBSerialPort" : "/dev/ttyBmpGdb2",
-          "runToMain": true,
-          "preLaunchCommands":[
-          "b deadEnd",
-          "set mem inaccessible-by-default off",
-          "set confirm off"
-          ],
-          "preRestartCommands": [
-          "enable breakpoint",
-          "break main"
-          ]
-
-      },
-      {
-        "name": "Cortex Debug-attach",
-        "cwd": "${workspaceFolder}",
-        "armToolchainPath" : "/home/fx/Arduino_stm32/arm-gcc-2021q4/bin/",
-        "svdFile" : "${workspaceRoot}/.vscode/STM32F103.svd",              
-        "executable": "buildM4/lnDSO_M4_mod_hstep_96M_USB.elf",
-
-        "request": "attach",
-        "type": "cortex-debug",
-        "runToEntryPoint": "main",
-        "servertype": "bmp",
-        "interface": "swd",
-        "device": "STM32F103",
-        "BMPGDBSerialPort" : "/dev/ttyBmpGdb2",
-        "runToMain": true,
-        "preLaunchCommands":[
-        "b deadEnd",
-        "set mem inaccessible-by-default off",
-        "set confirm off"
-        ],
-        "preRestartCommands": [
-        "enable breakpoint",
-        "break main"
-        ]
-
-    }
-  ]                                                                         
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Hosted",
+            "type": "lldb",
+            "request": "launch",            
+            "program": "${workspaceFolder}/hosted/build/lnBMP_hosted",
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+                        {
+                "name": "Arm",
+                "cwd": "${workspaceFolder}",
+                "svdFile" : "${workspaceRoot}/.vscode/STM32F103.svd",              
+                "gdbPath" : "${config:armToolchainPath}/arm-none-eabi-gdb",
+                "executable": "build/lnDSO_M4_mod_hstep_96M_USB_CLANG.elf",
+                "request": "launch",
+                "type": "cortex-debug",
+                "runToEntryPoint": "main",
+                "servertype": "bmp",
+                "interface": "swd",
+                "device": "STM32F103",
+                "BMPGDBSerialPort" : "/dev/ttyBmpGdb2",
+                "runToMain": true,
+                "preLaunchCommands":[
+                "b deadEnd",
+                "set mem inaccessible-by-default off",
+                "set confirm off"
+                ],
+                "preRestartCommands": [
+                "enable breakpoint",
+                "break main"
+                ]
+      
+            },
+            {
+              "name": "Arm-attach",
+              "cwd": "${workspaceFolder}",              
+              "svdFile" : "${workspaceRoot}/.vscode/STM32F103.svd",              
+              "executable": "build/lnDSO_M4_mod_hstep_96M_USB_CLANG.elf",
+              "gdbPath" : "${config:armToolchainPath}/arm-none-eabi-gdb",
+              "request": "attach",
+              "type": "cortex-debug",
+              "runToEntryPoint": "main",
+              "servertype": "bmp",
+              "interface": "swd",
+              "device": "STM32F103",
+              "BMPGDBSerialPort" : "/dev/ttyBmpGdb2",
+              "runToMain": true,
+              "preLaunchCommands":[
+              "b deadEnd",
+              "set mem inaccessible-by-default off",
+              "set confirm off"
+              ],
+              "preRestartCommands": [
+              "enable breakpoint",
+              "break main"
+              ]
+      
+          },
+    ]
 }
