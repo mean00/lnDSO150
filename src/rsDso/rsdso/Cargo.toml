@@ -1,0 +1,46 @@
+[package]
+name = "rsdso"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+default = ["native"]
+native = ["rnarduino"]
+hosted = []
+
+[dependencies]
+cty = "0.2.2"
+rnarduino = { path = "../../../lnArduino/rust/rnArduino", features = ["cdc"] , optional = true}
+ufmt = "*"
+heapless = { version = "*", features = ["ufmt-impl"] }
+numtoa = {version = "0.2.4"}
+
+[lib]
+name = "rsdso"
+path = "src/lib.rs"
+crate-type = ["staticlib"] # Creates static lib
+
+#[profile.dev]
+#codegen-units = 1
+#debug = true
+#lto = true
+#opt-level       = 's'
+
+#[profile.release]
+#codegen-units = 1
+#debug = true
+#lto = true
+#opt-level       = 's'
+
+
+[profile.dev]
+debug = true
+lto = false
+opt-level       = 0
+
+[profile.release]
+debug = true
+lto = true
+opt-level       = 0
