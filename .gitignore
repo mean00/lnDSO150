@@ -1,3 +1,4 @@
+src/rsDso/rsdso/target/.rustc_info.json
 src/rsDso/rsdso/target/*
 *.sw*
 .ccls*
