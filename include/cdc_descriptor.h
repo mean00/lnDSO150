@@ -1,7 +1,7 @@
 #pragma once
 #include "cdc/cdc.h"
-#include "dfu/dfu.h"
 #include "device/usbd.h"
+#include "dfu/dfu.h"
 #include "dso_version.h"
 
 #define _PID_MAP(itf, n) ((CFG_TUD_##itf) << (n))
