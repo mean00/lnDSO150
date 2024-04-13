@@ -526,7 +526,7 @@ int DSOControl::getRotaryValue()
  */
 void DSOControl::setInputGain(int val)
 {
-    int set = (val)&0xf; // 4 useful bits
+    int set = (val) & 0xf; // 4 useful bits
     int unset = (~set) & 0xf;
     volatile uint32_t *portA = lnGetGpioToggleRegister(0);
     uint32_t v = set + (unset << 16);
