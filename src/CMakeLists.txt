@@ -27,11 +27,13 @@ ADD_LIBRARY(  sourceLib STATIC
                 dso_captureState.cpp
                 ${USB_SRC}                
                 )
-add_subdirectory( rsDso )
+IF(LN_ENABLE_RUST)
+  add_subdirectory( rsDso )
+  target_link_libraries(sourceLib rsdso )
+ENDIF()
 IF(LN_ENABLE_USBD)
     target_link_libraries(sourceLib lnArduino tinyUsb)
 ENDIF()
-    target_link_libraries(sourceLib rsdso )
 
 IF(LN_ENABLE_USBD)
     target_include_directories(sourceLib PRIVATE ${CMAKE_SOURCE_DIR}/externals/nanopb/)
