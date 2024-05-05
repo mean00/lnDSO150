@@ -41,7 +41,7 @@ extern void testFunc();
 void setup()
 {
     Logger("Setuping up DSO...\n");
-    xMutex *PortBMutex = new xMutex;
+    lnMutex *PortBMutex = new lnMutex;
 
     // arbitrer must be created with screen already set up
     // ili must be first

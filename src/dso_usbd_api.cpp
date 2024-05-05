@@ -14,7 +14,7 @@
 
 #define USB_QUEUE_SIZE 5
 
-extern xFastEventGroup *evtGroup;
+extern lnFastEventGroup *evtGroup;
 ;
 
 enum usb_queue_commands

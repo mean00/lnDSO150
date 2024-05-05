@@ -12,7 +12,7 @@
 #include "DSO_portBArbitrer.h"
 /**
  */
-DSO_portArbitrer::DSO_portArbitrer(int port, xMutex *tex)
+DSO_portArbitrer::DSO_portArbitrer(int port, lnMutex *tex)
 {
     _directionPort = lnGetGpioDirectionRegister(port);
     _valuePort = lnGetGpioValueRegister(port);

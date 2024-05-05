@@ -10,7 +10,7 @@
 #include "lnArduino.h"
 #include "lnStopWatch.h"
 //--
-xFastEventGroup *evtGroup;
+lnFastEventGroup *evtGroup;
 extern DSOControl *control;
 DSO_ArmingMode armingMode = DSO_CAPTURE_MULTI;
 
@@ -81,7 +81,7 @@ void mainLoop()
     DSOInputGain::preComputeMultiplier();
     control->loadSettings();
 
-    evtGroup = new xFastEventGroup;
+    evtGroup = new lnFastEventGroup;
     evtGroup->takeOwnership();
     control->changeCb(ControlCb);
 

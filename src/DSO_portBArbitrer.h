@@ -6,7 +6,7 @@
 class DSO_portArbitrer
 {
   public:
-    DSO_portArbitrer(int port, xMutex *tex);
+    DSO_portArbitrer(int port, lnMutex *tex);
     void setInputDirectionValue(uint32_t v, uint32_t v2);
     void setInputValue(uint32_t v);
     void beginInput();
@@ -31,7 +31,7 @@ class DSO_portArbitrer
     }
 
   protected:
-    xMutex *_tex;
+    lnMutex *_tex;
     volatile uint32_t *_directionPort;
     uint32_t _oldDirection, _oldDirection2;
     uint32_t _inputDirection, _inputDirection2;

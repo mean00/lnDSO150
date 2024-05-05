@@ -15,7 +15,7 @@ static bool autoSetupFrequency();
 static void autoTrigger();
 
 static captureCb *oldCb;
-static xBinarySemaphore *sem = NULL;
+static lnBinarySemaphore *sem = NULL;
 static float *capture = NULL;
 
 extern void setVoltageOffset(float v);
@@ -33,7 +33,7 @@ void autoSetup()
     capture = captureBuffer;
     DSOCapture::stopCapture();
     if (!sem)
-        sem = new xBinarySemaphore;
+        sem = new lnBinarySemaphore;
 
     DSODisplay::drawAutoSetup();
     oldCb = DSOCapture::getCb();
