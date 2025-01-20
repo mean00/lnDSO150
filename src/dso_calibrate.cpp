@@ -427,29 +427,36 @@ class VccAdc : public lnBaseAdc
 bool DSOCalibrate::vccAdcMenu()
 {
     DSO_GFX::setBigFont(false);
-    DSO_GFX::setTextColor(WHITE, BLACK);
-
-    DSO_GFX::newPage("VCC");
+    DSO_GFX::clear(0);
+    DSO_GFX::printMenuTitle("VCC");
+    DSO_GFX::bottomLine("No exit");
 
     VccAdc *adc = new VccAdc(0);
     adc->setup();
 
     char buffer[80];
-
+    int step = 0;
+    const char *steps[4] = {
+        "-",
+        "/",
+        "|",
+        "\\",
+    };
     while (1)
     {
         adc->readVcc();
         int raw = adc->getVref();
         float volt = (adc->getVcc()) / 1000.;
         float volt_adj = volt * vref_adc_mul;
-        sprintf(buffer, "RAW:%d_____", raw);
-        DSO_GFX::printxy(5, 1, buffer);
-        sprintf(buffer, "VOLT:%2.2f_____", volt);
+        sprintf(buffer, "RAW: %04d_____", raw);
+        DSO_GFX::printxy(5, 2, buffer);
+        sprintf(buffer, "VOLT: %2.2f_____", volt);
         DSO_GFX::printxy(5, 3, buffer);
-        sprintf(buffer, "ADJ:%2.2f_____", volt_adj);
-        DSO_GFX::printxy(5, 5, buffer);
+        sprintf(buffer, "ADJ  : %2.2f_____", volt_adj);
+        DSO_GFX::printxy(5, 4, buffer);
+        DSO_GFX::printxy(10, 5, steps[step++ & 3]);
 
-        lnDelayMs(1000);
+        lnDelayMs(500);
     }
 
     delete adc;
