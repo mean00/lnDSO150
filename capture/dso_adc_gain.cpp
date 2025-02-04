@@ -16,8 +16,8 @@
  * 3  /40
  */
 
+#include "esprit.h"
 #include "lnADC.h"
-#include "lnArduino.h"
 
 #include "dso_adc_gain.h"
 #include "dso_adc_gain_priv.h"

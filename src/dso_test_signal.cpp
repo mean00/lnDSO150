@@ -4,7 +4,7 @@
  ****************************************************/
 
 #include "dso_test_signal.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnTimer.h"
 
 /**

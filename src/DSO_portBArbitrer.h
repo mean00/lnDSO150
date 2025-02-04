@@ -1,6 +1,6 @@
 
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 /**
  DSO_portArbitrer*/
 class DSO_portArbitrer

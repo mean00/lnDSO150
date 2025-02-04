@@ -9,7 +9,7 @@
 #include "dso_menuEngine.h"
 #include "dso_test_signal.h"
 #include "dso_version.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnCpuID.h"
 #include "nvmCore.h"
 

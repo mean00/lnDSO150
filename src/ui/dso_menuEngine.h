@@ -1,5 +1,5 @@
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 #define MENU_EVT_BIT 0x100 // Careful, the bottom ones are used internally
 /**
  */

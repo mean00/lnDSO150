@@ -9,7 +9,7 @@
 #include "dso_capture.h"
 #include "dso_display.h"
 #include "dso_events.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "messaging.pb.h"
 
 #define USB_QUEUE_SIZE 5

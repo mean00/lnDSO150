@@ -7,7 +7,7 @@
  ****************************************************/
 #include "dso_capture.h"
 #include "dso_display.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "math.h"
 
 static bool autoSetupVoltage(bool setTrigger);

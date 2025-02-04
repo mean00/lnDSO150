@@ -1,6 +1,7 @@
 //
-#include "lnArduino.h"
+#include "esprit.h"
 #include "pattern_decl.h"
+//
 #include "pattern.h"
 #ifdef USE_SMALLFOOTPRINT
 #include "assets/gfx/generated/splash_small_compressed.h"

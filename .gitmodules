@@ -1,12 +1,15 @@
 [submodule "adc"]
 	path = externals/adc
 	url = https://github.com/mean00/stm32duino_adc.git
-[submodule "lnArduino"]
-	path = lnArduino
-	url = https://github.com/mean00/lnArduino.git
 [submodule "externals/simplerILI9341"]
 	path = externals/simplerILI9341
 	url = https://github.com/mean00/simplerILI9341.git
 [submodule "fp/rvfp"]
 	path = fp/rvfp
 	url = https://github.com/pulp-platform/RVfplib.git
+[submodule "swindle"]
+	path = swindle
+	url = https://www.github.com/mean00/swindle
+[submodule "esprit"]
+	path = esprit
+	url = https://www.github.com/mean00/esprit

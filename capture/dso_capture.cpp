@@ -5,7 +5,7 @@
  ****************************************************/
 #include "dso_capture.h"
 #include "dso_adc.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnCpuID.h"
 #include "lnDso_fp.h"
 #include "pinConfiguration.h"
@@ -381,7 +381,8 @@ void DSOCapture::initialize(lnPin pin)
     // Use max # of cycles possible
     int adcInputClock = lnPeripherals::getClock(pADC0) / 2;
     int maxTimerFq = lnPeripherals::getClock(pTIMER3) / 4;
-    bool hasOverSampling = 0 + 1 * (lnCpuID::vendor() == lnCpuID::LN_MCU_GD32);
+    bool hasOverSampling = 0 + 1 * (lnCpuID::vendor() == lnCpuID::LN_VENDOR_GD);
+
     for (int i = 0; i < DSO_NB_TIMESCALE; i++)
     {
         timerADC[i].scale = lnADC_CLOCK_DIV_BY_2;

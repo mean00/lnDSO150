@@ -13,7 +13,7 @@
 #include "assets/gfx/generated/splash_decl.h"
 #include "dso_colors.h"
 #include "dso_version.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnCpuID.h"
 #include "math.h"
 #include "pattern_decl.h"

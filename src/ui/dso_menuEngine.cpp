@@ -5,7 +5,7 @@
 #include "dso_menuEngine.h"
 #include "dso_control.h"
 #include "dso_gfx.h"
-#include "lnArduino.h"
+#include "esprit.h"
 
 static MenuManager *_instance;
 #define USE_MENU_BUTTON DSOControl::DSO_BUTTON_ROTARY

@@ -1,9 +1,9 @@
 #include "cdc_descriptor.h"
 #include "dso_version.h"
+#include "esprit.h"
 #include "include/lnUsbCDC.h"
 #include "include/lnUsbDFUrt.h"
 #include "include/lnUsbStack.h"
-#include "lnArduino.h"
 
 #include "dso_usbd_api.h"
 
@@ -273,6 +273,8 @@ void cdcEventHandler(void *cookie, int interface, lnUsbCDC::lnUsbCDCEvents event
             delete automaton;
         }
         automaton = NULL;
+        break;
+    case lnUsbCDC::CDC_WRITE_AVAILABLE:
         break;
     case lnUsbCDC::CDC_SET_SPEED:
         break;

@@ -4,7 +4,7 @@
  * (c) mean 2019 fixounet@free.fr
  ****************************************************/
 #include "dso_capture.h"
-#include "lnArduino.h"
+#include "esprit.h"
 
 #define DEFAULT_VALUE 0x400 * 0x10000
 static int fdelta[16];

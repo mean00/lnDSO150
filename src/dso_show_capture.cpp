@@ -2,7 +2,7 @@
 #include "dso_captureState.h"
 #include "dso_control.h"
 #include "dso_display.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnDso_fp.h"
 extern float *captureBuffer;
 extern uint8_t *displayData;

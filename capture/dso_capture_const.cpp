@@ -1,6 +1,6 @@
 
 #include "dso_capture.h"
-#include "lnArduino.h"
+#include "esprit.h"
 
 /*
  * Partially filled global gain array

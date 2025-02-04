@@ -1,5 +1,7 @@
-#include "lnArduino.h"
+#include "esprit.h"
 #include "pfxfont.h"
+
+#define PROGMEM
 
 #ifdef USE_SMALLFOOTPRINT
 #include "Fonts/Arimo_Regular14pt7b_small.h"

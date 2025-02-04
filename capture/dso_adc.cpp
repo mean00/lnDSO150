@@ -12,8 +12,8 @@
 #include "dso_adc.h"
 #include "../private_include/lnADC_priv.h"
 #include "../private_include/lnPeripheral_priv.h"
+#include "esprit.h"
 #include "lnADC.h"
-#include "lnArduino.h"
 #include "lnCpuID.h"
 #include "lnDma.h"
 #include "lnTimer.h"
@@ -98,7 +98,7 @@ bool lnDSOAdc::setSource(int fq, lnPin pin, lnADC_DIVIDER divider, lnADC_CYCLES 
     lnPinMode(pin, lnADC_MODE);
     _pin = pin;
     // overSamplingLog2=0;
-    bool gd32 = lnCpuID::vendor() == lnCpuID::LN_MCU_GD32;
+    bool gd32 = (lnCpuID::vendor() == lnCpuID::LN_VENDOR_GD);
     _fq = fq;
     if (gd32)
     {

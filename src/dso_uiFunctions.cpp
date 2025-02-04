@@ -1,6 +1,6 @@
 #include "dso_control.h"
 #include "dso_display.h"
-#include "lnArduino.h"
+#include "esprit.h"
 
 #include "dso_capture.h"
 #include "dso_captureState.h"

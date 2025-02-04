@@ -14,9 +14,9 @@
 #include "DSO_portBArbitrer.h"
 #include "dso_config.h"
 #include "dso_control_internal.h"
+#include "esprit.h"
 #include "gd32/nvm_gd32.h"
 #include "lnADC.h"
-#include "lnArduino.h"
 #include "pinConfiguration.h"
 
 extern lnNvm *nvm;
@@ -202,7 +202,7 @@ DSOControl::DSOControl(ControlEventCb *c)
 #ifdef USE_RXTX_PIN_FOR_ROTARY
 #define PREPARE_PIN(x)                                                                                                 \
     lnPinMode(x, lnOUTPUT);                                                                                            \
-    digitalWrite(x, 1);                                                                                                \
+    lnDigitalWrite(x, 1);                                                                                              \
     lnPinMode(x, lnINPUT_PULLUP);
     PREPARE_PIN(ALT_ROTARY_LEFT)
     PREPARE_PIN(ALT_ROTARY_RIGHT)
@@ -251,7 +251,7 @@ DSOControl::DSOControl(ControlEventCb *c)
  */
 bool DSOControl::changeCb(ControlEventCb *newCb)
 {
-    noInterrupts();
+    lnNoInterrupt();
     _cb = newCb;
     // clear events when switching callback
     for (int button = DSO_BUTTON_UP; button <= DSO_BUTTON_OK; button++)
@@ -259,7 +259,7 @@ bool DSOControl::changeCb(ControlEventCb *newCb)
         _buttons[button].reset();
     }
     counter = 0;
-    interrupts();
+    lnInterrupts();
     return true;
 }
 /**
@@ -310,7 +310,7 @@ DSOControl::DSOCoupling DSOControl::getCouplingState()
 void DSOControl::runLoop()
 {
     xDelay(5);
-    int base = millis() & 0xffff;
+    int base = lnGetMs() & 0xffff;
 #ifdef USE_RXTX_PIN_FOR_ROTARY
     lnExtiEnableInterrupt(ALT_ROTARY_LEFT);
     lnExtiEnableInterrupt(ALT_ROTARY_RIGHT);
@@ -319,7 +319,7 @@ void DSOControl::runLoop()
     {
         static int next = (base + TICK) & 0xffff;
         ;
-        static int now = (millis() & 0xffff);
+        static int now = (lnGetMs() & 0xffff);
         static int wait;
 
         base = next & 0xffff;
@@ -487,10 +487,10 @@ int DSOControl::getQButtonEvent()
  */
 int DSOControl::getButtonEvents(DSOButton button)
 {
-    noInterrupts();
+    lnNoInterrupt();
     int evt = _buttons[button]._events;
     _buttons[button]._events = 0;
-    interrupts();
+    lnInterrupts();
     return evt;
 }
 
@@ -500,10 +500,10 @@ int DSOControl::getButtonEvents(DSOButton button)
  */
 int DSOControl::getRotaryValue()
 {
-    noInterrupts();
+    lnNoInterrupt();
     int evt = counter;
     counter = 0;
-    interrupts();
+    lnInterrupts();
     return evt;
 }
 
@@ -526,7 +526,7 @@ int DSOControl::getRotaryValue()
  */
 void DSOControl::setInputGain(int val)
 {
-    int set = (val)&0xf; // 4 useful bits
+    int set = (val) & 0xf; // 4 useful bits
     int unset = (~set) & 0xf;
     volatile uint32_t *portA = lnGetGpioToggleRegister(0);
     uint32_t v = set + (unset << 16);

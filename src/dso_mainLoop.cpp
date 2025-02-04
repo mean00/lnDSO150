@@ -5,9 +5,9 @@
 #include "dso_events.h"
 #include "dso_gfx.h"
 #include "dso_menuEngine.h"
+#include "esprit.h"
 #include "gd32/nvm_gd32.h"
 #include "ili_ln8bits.h"
-#include "lnArduino.h"
 #include "lnStopWatch.h"
 //--
 lnFastEventGroup *evtGroup;

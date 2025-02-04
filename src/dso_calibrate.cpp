@@ -11,9 +11,9 @@
 #include "dso_capture_input.h"
 #include "dso_control.h"
 #include "dso_gfx.h"
+#include "esprit.h"
 #include "gd32/nvm_gd32.h"
 #include "lnADC.h"
-#include "lnArduino.h"
 
 static void printCalibrationTemplate(const char *st1, const char *st2);
 static void doCalibrate(uint16_t *array, int color, const char *txt, DSOControl::DSOCoupling target);

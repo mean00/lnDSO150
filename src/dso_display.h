@@ -5,7 +5,7 @@
  ****************************************************/
 
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 enum DSO_ArmingMode
 {
     DSO_CAPTURE_SINGLE = 0,

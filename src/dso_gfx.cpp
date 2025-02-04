@@ -4,7 +4,7 @@
  */
 #include "dso_gfx.h"
 #include "DSO_portBArbitrer.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "simpler9341.h"
 
 #define FONT_SIZE_X 13
