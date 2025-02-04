@@ -274,6 +274,8 @@ void cdcEventHandler(void *cookie, int interface, lnUsbCDC::lnUsbCDCEvents event
         }
         automaton = NULL;
         break;
+    case lnUsbCDC::CDC_WRITE_AVAILABLE:
+        break;
     case lnUsbCDC::CDC_SET_SPEED:
         break;
     default:
