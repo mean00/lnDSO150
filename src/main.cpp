@@ -57,7 +57,7 @@ void setup()
 
     ili->setFontFamily(smallFont(), mediumFont(), bigFont());
     ili->setFontSize(ili9341::SmallFont);
-    ili->setTextColor(GREEN, BLACK);
+    ili->setTextColor(ILI_GREEN, ILI_BLACK);
 
     DSO_GFX::init(ili);
     DSODisplay::init(ili);

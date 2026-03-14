@@ -22,13 +22,13 @@
 #define XMAX(x, y) (((x) > (y)) ? (x) : (y))
 #define XMIN(x, y) (((x) < (y)) ? (x) : (y))
 
-#define LIGHT_GREEN ILI_MK_COLOR(0, 0x2f, 0) // careful the colors are also in genpattern.py
-#define DARK_GREEN ILI_MK_COLOR(0, 0x1f, 0)
+#define LIGHT_ILI_GREEN ILI_MK_COLOR(0, 0x2f, 0) // careful the colors are also in genpattern.py
+#define DARK_ILI_GREEN ILI_MK_COLOR(0, 0x1f, 0)
 
 #define AUTOCAL_BOX_WIDTH 200
 #define AUTOCAL_BOX_HEIGHT 80
 #define AUTOCAL_BORDER 10
-#define AUTOCAL_COLOR WHITE
+#define AUTOCAL_COLOR ILI_WHITE
 
 #define SCALE_STEP 20
 #define C_X 12
@@ -214,17 +214,17 @@ void DSODisplay::drawWaveForm(int count, const uint8_t *data)
     for (int j = 1; j < count - 1; j++)
     {
 
-        int color = YELLOW;
+        int color = ILI_YELLOW;
         int next = data[j]; // in pixel
         if (next == 0)
         {
             next = 1;
-            color = RED;
+            color = ILI_RED;
         }
         if (next > DSO_WAVEFORM_HEIGHT - 1)
         {
             next = DSO_WAVEFORM_HEIGHT - 1;
-            color = RED;
+            color = ILI_RED;
         }
         start = XMIN(last, next);
         sz = next - last;
@@ -277,7 +277,7 @@ void DSODisplay::drawFq(int f)
         return;
     }
     const char *t = fq2Text(f);
-    tft->setTextColor(WHITE, BLACK);
+    tft->setTextColor(ILI_WHITE, ILI_BLACK);
     tft->printUpTo(t, 320 - DSO_INFO_START_COLUMN);
 }
 
@@ -287,7 +287,7 @@ void DSODisplay::drawFq(int f)
 void DSODisplay::cleanup()
 {
     AutoGfx autogfx;
-    tft->setTextColor(LIGHT_GREEN, 0);
+    tft->setTextColor(LIGHT_ILI_GREEN, 0);
     tft->fillScreen(0);
 }
 
@@ -297,8 +297,8 @@ void DSODisplay::cleanup()
 void DSODisplay::drawGrid(void)
 {
     AutoGfx autogfx;
-    uint16_t fgColor = DARK_GREEN;
-    uint16_t hiLight = LIGHT_GREEN;
+    uint16_t fgColor = DARK_ILI_GREEN;
+    uint16_t hiLight = LIGHT_ILI_GREEN;
     for (int i = 0; i <= C_Y; i++)
     {
         tft->HLine(0, SCALE_STEP * i + DSO_WAVEFORM_OFFSET, SCALE_STEP * (C_X), fgColor);
@@ -323,7 +323,7 @@ void DSODisplay::drawGrid(void)
 void DSODisplay::drawVerticalTrigger(bool drawOrErase, int column)
 {
     if (drawOrErase)
-        tft->VLine(column, DSO_WAVEFORM_OFFSET + 1, DSO_WAVEFORM_HEIGHT - 1, RED);
+        tft->VLine(column, DSO_WAVEFORM_OFFSET + 1, DSO_WAVEFORM_HEIGHT - 1, ILI_RED);
     else
     {
         bool repeat;
@@ -353,7 +353,7 @@ void DSODisplay::drawVoltageTrigger(bool drawOrErase, int line)
 
     if (drawOrErase)
     {
-        tft->HLine(1, 1 + line, DSO_WAVEFORM_WIDTH - 2, BLUE);
+        tft->HLine(1, 1 + line, DSO_WAVEFORM_WIDTH - 2, ILI_BLUE);
     }
     else // erase
     {
@@ -420,9 +420,9 @@ void DSODisplay::printTriggerValue(float volt, bool hilight)
 {
     AutoGfx autogfx;
     if (hilight)
-        tft->setTextColor(BLACK, WHITE);
+        tft->setTextColor(ILI_BLACK, ILI_WHITE);
     else
-        tft->setTextColor(WHITE, BLACK);
+        tft->setTextColor(ILI_WHITE, ILI_BLACK);
     printMeasurement(TRIGGER_ROW, volt);
 }
 
@@ -435,9 +435,9 @@ void DSODisplay::printOffsetValue(float volt, bool hilight)
 {
     AutoGfx autogfx;
     if (hilight)
-        tft->setTextColor(BLACK, WHITE);
+        tft->setTextColor(ILI_BLACK, ILI_WHITE);
     else
-        tft->setTextColor(WHITE, BLACK);
+        tft->setTextColor(ILI_WHITE, ILI_BLACK);
     printMeasurement(VOLTAGE_OFFSET_ROW, volt);
 }
 
@@ -458,17 +458,17 @@ void DSODisplay::drawStatsBackGround()
 {
     AutoGfx autogfx;
 #define BG_STATS_HEIGHT (240 - 20)
-#define BG_COLOR LIGHT_GREEN
+#define BG_COLOR LIGHT_ILI_GREEN
     tft->VLine(DSO_INFO_START_COLUMN, 0, BG_STATS_HEIGHT, BG_COLOR);
     tft->VLine(319, 0, BG_STATS_HEIGHT, BG_COLOR);
-    tft->setTextColor(BLACK, BG_COLOR);
+    tft->setTextColor(ILI_BLACK, BG_COLOR);
     const HeaderDesc *h = Headers;
     while (h->row != -1)
     {
         drawInfoHeader(h->row, h->data, BG_COLOR);
         h++;
     }
-    tft->setTextColor(BG_COLOR, BLACK);
+    tft->setTextColor(BG_COLOR, ILI_BLACK);
     oldMode = DSO_CAPTURE_MODE_INVALIDE;
 }
 
@@ -485,11 +485,11 @@ static void genericDraw(int column, const char *v, bool highlight)
 {
     if (highlight)
     {
-        tft->setTextColor(BLACK, LIGHT_GREEN);
+        tft->setTextColor(ILI_BLACK, LIGHT_ILI_GREEN);
     }
     else
     {
-        tft->setTextColor(LIGHT_GREEN, BLACK);
+        tft->setTextColor(LIGHT_ILI_GREEN, ILI_BLACK);
     }
     lowBarPrint(column, v);
 
@@ -503,14 +503,14 @@ static void genericDraw(int column, const char *v, bool highlight)
     }
     else
     {
-        fg = LIGHT_GREEN;
+        fg = LIGHT_ILI_GREEN;
         button = ILI_BLACK;
         bg = ILI_BLACK;
     }
     AutoGfx autogfx;
     //(int x, int y, int w, int h, const char *text, int fontColor,int buttonColor,int bgColor)
     tft->centeredButton((column - 1) * DSO_LOW_BAR_BUTTON + 1, 240 - 20, DSO_LOW_BAR_BUTTON, 20, v, fg, button, bg);
-    tft->setTextColor(LIGHT_GREEN, BLACK);
+    tft->setTextColor(LIGHT_ILI_GREEN, ILI_BLACK);
 }
 /**
  *
@@ -582,7 +582,7 @@ void DSODisplay::printString(int x, int y, const char *text)
     AutoGfx autogfx;
 
     tft->setFontSize(ili9341::MediumFont);
-    tft->setTextColor(WHITE, BLACK);
+    tft->setTextColor(ILI_WHITE, ILI_BLACK);
     tft->setCursor(x, y);
     tft->print(text);
     tft->setFontSize(ili9341::SmallFont);
@@ -594,7 +594,7 @@ void DSODisplay::clearScreen()
 {
     AutoGfx autogfx;
 
-    tft->fillScreen(BLACK);
+    tft->fillScreen(ILI_BLACK);
 }
 /**
  *
@@ -604,10 +604,10 @@ void DSODisplay::drawSplash()
 {
     AutoGfx autogfx;
 
-    tft->fillScreen(BLACK);
-    tft->drawHSBitmap(splash_width, splash_height, 2, 2, WHITE, BLACK, getSplash());
+    tft->fillScreen(ILI_BLACK);
+    tft->drawHSBitmap(splash_width, splash_height, 2, 2, ILI_WHITE, ILI_BLACK, getSplash());
     tft->setFontSize(ili9341::SmallFont);
-    tft->setTextColor(WHITE, BLACK);
+    tft->setTextColor(ILI_WHITE, ILI_BLACK);
     tft->setCursor(140, 64);
     tft->print("lnDSO150");
     tft->setCursor(140, 84);
@@ -641,7 +641,7 @@ void DSODisplay::drawTriggered(bool triggered)
     int color;
     AutoGfx autogfx;
     if (triggered)
-        color = GREEN;
+        color = ILI_GREEN;
     else
         color = ILI_RED;
     tft->square(color, DSO_INFO_START_COLUMN + LED_X_OFFSET, LED_Y_OFFSET, LED_WIDTH, LED_HEIGHT);

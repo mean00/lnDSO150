@@ -152,7 +152,7 @@ bool saveCalibrationData()
 bool DSOCalibrate::zeroCalibrate_()
 {
     DSO_GFX::setBigFont(false);
-    DSO_GFX::setTextColor(WHITE, BLACK);
+    DSO_GFX::setTextColor(ILI_WHITE, ILI_BLACK);
 
     printCalibrationTemplate("Connect the probe to", "ground");
     waitOk();
@@ -164,8 +164,8 @@ bool DSOCalibrate::zeroCalibrate_()
     uint16_t *ac = DSOInputGain::getCalibrationTable(1);
     uint16_t *dc = DSOInputGain::getCalibrationTable(0);
 
-    doCalibrate(dc, YELLOW, "", DSOControl::DSO_COUPLING_DC);
-    doCalibrate(ac, GREEN, "", DSOControl::DSO_COUPLING_AC);
+    doCalibrate(dc, ILI_YELLOW, "", DSOControl::DSO_COUPLING_DC);
+    doCalibrate(ac, ILI_GREEN, "", DSOControl::DSO_COUPLING_AC);
     const char *msg = "Restart the unit.";
     DSO_GFX::center("@- saving -@", 8);
     if (!saveCalibrationData())
@@ -222,12 +222,12 @@ bool DSOCalibrate::fiveVoltCalibrate_()
 
         if (v >= 3.5 && v <= 6.5)
         {
-            DSO_GFX::setTextColor(BLACK, GREEN);
+            DSO_GFX::setTextColor(ILI_BLACK, ILI_GREEN);
             valid = true;
         }
         else
         {
-            DSO_GFX::setTextColor(BLACK, RED);
+            DSO_GFX::setTextColor(ILI_BLACK, ILI_RED);
             valid = false;
         }
 
@@ -269,7 +269,7 @@ bool DSOCalibrate::fiveVoltCalibrate_()
     nvm->write(NVM_ADC_VREF_MULTIPLIER, sizeof(vref_adc_mul), (uint8_t *)&vref_adc_mul);
     DSOInputGain::preComputeMultiplier();
     DSOInputGain::postComputeMultiplier();
-    DSO_GFX::clear(BLACK);
+    DSO_GFX::clear(ILI_BLACK);
     return true;
 }
 
@@ -310,9 +310,9 @@ void waitForCoupling(DSOControl::DSOCoupling target)
         lnDelayMs(100); // yield
         DSOControl::DSOCoupling newcpl = control->getCouplingState();
         if (newcpl == target)
-            DSO_GFX::setTextColor(GREEN, BLACK);
+            DSO_GFX::setTextColor(ILI_GREEN, ILI_BLACK);
         else
-            DSO_GFX::setTextColor(RED, BLACK);
+            DSO_GFX::setTextColor(ILI_RED, ILI_BLACK);
 
         if (cpl != newcpl)
         {

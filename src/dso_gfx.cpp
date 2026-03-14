@@ -58,7 +58,7 @@ void DSO_GFX_markup(const char *t)
         if (!next)
         {
             tft->print(t);
-            tft->setTextColor(WHITE, BLACK);
+            tft->setTextColor(ILI_WHITE, ILI_BLACK);
             return;
         }
         // Else just print the part till the @
@@ -71,9 +71,9 @@ void DSO_GFX_markup(const char *t)
         t = next + 1;
         inverted = !inverted;
         if (inverted)
-            tft->setTextColor(BLACK, WHITE);
+            tft->setTextColor(ILI_BLACK, ILI_WHITE);
         else
-            tft->setTextColor(WHITE, BLACK);
+            tft->setTextColor(ILI_WHITE, ILI_BLACK);
     }
 }
 /**
@@ -173,11 +173,11 @@ void DSO_GFX::clearBody(int color)
 void DSO_GFX::newPage(const char *title)
 {
     AutoLcd autolcd;
-    tft->fillScreen(BLACK);
-    tft->square(WHITE, 0, 0, 320, FONT_SIZE_Y + 4);
-    tft->setTextColor(BLACK, WHITE);
+    tft->fillScreen(ILI_BLACK);
+    tft->square(ILI_WHITE, 0, 0, 320, FONT_SIZE_Y + 4);
+    tft->setTextColor(ILI_BLACK, ILI_WHITE);
     DSO_GFX_center(title, 1);
-    tft->setTextColor(WHITE, BLACK);
+    tft->setTextColor(ILI_WHITE, ILI_BLACK);
 }
 
 /**
@@ -208,8 +208,8 @@ void DSO_GFX::printMenuTitle(const char *text)
     AutoLcd autolcd;
     int fg, bg;
     tft->getTextColor(fg, bg);
-    DSO_GFX::setTextColor(BLACK, BLUE);
-    tft->square(BLUE, 0, 0 + 8, 320, FONT_SIZE_Y);
+    DSO_GFX::setTextColor(ILI_BLACK, ILI_BLUE);
+    tft->square(ILI_BLUE, 0, 0 + 8, 320, FONT_SIZE_Y);
     DSO_GFX_center(text, 1);
     DSO_GFX::setTextColor(fg, bg);
 }

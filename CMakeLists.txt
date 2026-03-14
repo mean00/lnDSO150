@@ -55,20 +55,17 @@ endif()
 find_program(GRAPHVIZ_DOT_EXECUTABLE dot)
 
 if(GRAPHVIZ_DOT_EXECUTABLE)
-  set(GRAPH_OUTPUT "${CMAKE_BINARY_DIR}/deps.png")
-  add_custom_command(
-        OUTPUT ${GRAPH_OUTPUT}
-        COMMAND ${CMAKE_COMMAND} "--graphviz=graph.dot" .
-        COMMAND ${DOT_PATH} -Tpng graph.dot -o ${GRAPH_OUTPUT}
-        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-        COMMENT "Generating dependency graph..."
-        VERBATIM
-    )
 
-  # The 'ALL' keyword makes this run every time you build
-  add_custom_target(auto_dependency_graph ALL
-        DEPENDS ${GRAPH_OUTPUT}
-    )
+  message(STATUS "Generating dependency graph.")
+  set(DOT_FILE "${CMAKE_BINARY_DIR}/deps.dot")
+  set(PNG_FILE "dso_deps.png")
+  add_custom_target(graph ALL
+    COMMAND ${CMAKE_COMMAND} "--graphviz=${DOT_FILE}" ..
+    COMMAND ${GRAPHVIZ_DOT_EXECUTABLE} -Tpng deps.dot -o ${PNG_FILE}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMENT "Generating ${PNG_FILE}"
+    VERBATIM
+)
 else()
   message(STATUS "Graphviz 'dot' executable not found. Dependency graph target disabled.")
 endif()
@@ -156,6 +153,7 @@ include_directories(externals/simplerILI9341/cpp/platformExample/esprit)
 SET(ILI9341_DRIVER  platformExample/esprit/ili_ln8bits.cpp)
 ADD_SUBDIRECTORY(externals/simplerILI9341/cpp)
 
+target_link_libraries( simplerILI9341 PRIVATE esprit_dev)
 
 
 include_directories(externals/simplerILI9341/cpp)

@@ -79,7 +79,7 @@ void MenuManager::printMenuTitle(const char *text)
 void MenuManager::printBackHint()
 {
     DSO_GFX::printButton(-6, -1, 80, "Back", ILI_BLACK, ILI_BLUE, ILI_BLACK);
-    // DSO_GFX::setTextColor(BLACK,BLUE);
+    // DSO_GFX::setTextColor(ILI_BLACK,BLUE);
     // DSO_GFX::printxy(-5,-1,"Back");
     DSO_GFX::setTextColor(ILI_GREEN, ILI_BLACK);
 }
@@ -88,7 +88,7 @@ void MenuManager::printBackHint()
  */
 void MenuManager::run(void)
 {
-    DSO_GFX::clear(BLACK);
+    DSO_GFX::clear(ILI_BLACK);
     DSO_GFX::setBigFont(true);
     runOne(_menu);
 };
@@ -112,7 +112,7 @@ void MenuManager::drawOneLine(const MenuItem *xtop, int current, bool onoff)
     }
     break;
     case MenuItem::MENU_TEXT: {
-        DSO_GFX::setTextColor(WHITE, BLACK);
+        DSO_GFX::setTextColor(ILI_WHITE, ILI_BLACK);
         DSO_GFX::printxy(6, 1 + current, xtop[current].menuText);
         charcb *cb = (charcb *)xtop[current].cookie;
         DSO_GFX::setSmallFont();
@@ -136,7 +136,7 @@ void MenuManager::drawOneLine(const MenuItem *xtop, int current, bool onoff)
  */
 void MenuManager::redraw(const char *title, int n, const MenuItem *xtop, int current, int oldCurrent)
 {
-    DSO_GFX::clearBody(BLACK);
+    DSO_GFX::clearBody(ILI_BLACK);
     printMenuTitle(title);
     for (int i = 0; i < n; i++)
     {
@@ -168,7 +168,7 @@ void MenuManager_controlEvent(DSOControl::DSOEvent e)
  */
 void MenuManager::runOne(const MenuItem *xtop)
 {
-    DSO_GFX::clear(BLACK);
+    DSO_GFX::clear(ILI_BLACK);
     printBackHint();
     DSOControl::ControlEventCb *oldCb = _control->getCb();
     Logger("Entering menu\n");

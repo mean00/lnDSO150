@@ -107,7 +107,7 @@ const MenuItem topMenu[] = {{MenuItem::MENU_TITLE, "Main Menu", NULL},
  */
 void menuManagement(DSOControl *control)
 {
-    DSO_GFX::clear(BLACK);
+    DSO_GFX::clear(ILI_BLACK);
     const MenuItem *tem = topMenu;
 
     currentFQ = testSignal->getFrequency();
