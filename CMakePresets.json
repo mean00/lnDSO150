@@ -1,0 +1,43 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21
+  },
+  "configurePresets": [
+    {
+      "name": "normal",
+      "hidden": false,
+      "cacheVariables": {
+        "USE_ROTARY_FULL_STEP": "True",
+        "USE_USB": "True",
+        "LN_ENABLE_USBD": "True",
+        "SIMPLER_ILI9341_2BPP_SUPPORT": "True",
+        "SIMPLER_ILI9341_FONT_COMPRESSION": "True"
+      }
+    },
+    {
+      "name": "gd32f3",
+      "hidden": false,
+      "cacheVariables": {
+        "USE_GD32F3": "True",
+        "USE_ROTARY_FULL_STEP": "True",
+        "USE_USB": "True",
+        "LN_ENABLE_USBD": "True",
+        "SIMPLER_ILI9341_2BPP_SUPPORT": "True",
+        "SIMPLER_ILI9341_FONT_COMPRESSION": "True"
+      }
+    },
+    {
+      "name": "fnirsi",
+      "hidden": false,
+      "cacheVariables": {
+        "USE_ROTARY_FULL_STEP": "True",
+        "USE_FNIRSI_BUTTON": "True",
+        "USE_USB": "False",
+        "LN_ENABLE_USBD": "False",
+        "USE_SMALLFOOTPRINT": "True"
+      }
+    }
+  ]
+}

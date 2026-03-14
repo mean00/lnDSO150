@@ -26,13 +26,8 @@ OPTION(USE_ROTARY_FULL_STEP     "Use full step for rotary encoder, else half ste
 OPTION(USE_USB                  "Enable USB support"                                FALSE)
 OPTION(USE_SMALLFOOTPRINT       "Build for 64k flash targets"                       FALSE)
 OPTION(USE_FNIRSI_BUTTON        "Use FNIRSI button layout"                          FALSE)
-
-IF(USE_NO_DEFAULT)
-
-ELSE(USE_NO_DEFAULT)
-  include(./build_default.cmake)
-ENDIF(USE_NO_DEFAULT)
-
+OPTION(SIMPLER_ILI9341_2BPP_SUPPORT "Use grey colors"                               FALSE)
+OPTION(SIMPLER_ILI9341_FONT_COMPRESSION  "Use font compression"                     FALSE )
 
 SET(LN_USB_NB_CDC  1 CACHE INTERNAL "")
 SET(LN_USB_NB_HID  0 CACHE INTERNAL "")
@@ -211,6 +206,9 @@ MESSAGE(STATUS "\tBuild folder ${CMAKE_BINARY_DIR}")
 MESSAGE(STATUS "\tUsing ${LN_MCU} based MCU at ${LN_MCU_SPEED} Hz")
 MESSAGE(STATUS "\tUsing ${LN_MCU_FLASH_SIZE} kB of flash (small = ${USE_SMALLFOOTPRINT})")
 MESSAGE(STATUS "\tUSB control enabled : ${LN_ENABLE_USBD}")
+MESSAGE(STATUS "\t2BPP font  : ${SIMPLER_ILI9341_2BPP_SUPPORT}")
+MESSAGE(STATUS "\tfont compression  : ${SIMPLER_ILI9341_FONT_COMPRESSION}")
+MESSAGE(STATUS "\tSmall Footprint : ${USE_SMALLFOOTPRINT}")
 if(USE_VANILLA_HW)
   MESSAGE(STATUS "\tUsing vanilla HW")
 else(USE_VANILLA_HW)
