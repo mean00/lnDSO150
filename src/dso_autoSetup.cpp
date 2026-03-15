@@ -171,7 +171,7 @@ void autoTrigger()
     float trigger = (xMax + xMin) / 2;
     DSOCapture::setTriggerVoltage(trigger);
 
-    if (((xMax - xMin)) > 0.1)
+    if (((xMax - xMin)) > 0.1f)
         DSOCapture::setTriggerMode(DSOCapture::Trigger_Rising);
     else
         DSOCapture::setTriggerMode(DSOCapture::Trigger_Run);

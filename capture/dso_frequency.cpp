@@ -39,7 +39,7 @@ int DSOCapture::computeFrequency()
         float f = fint;
         // Period is f*1/base
         // so fq=base/f
-        f = (((float)timerBases[currentTimeBase].fq) * 1000.) / f;
+        f = (((float)timerBases[currentTimeBase].fq) * 1000.f) / f;
         return (int)f;
     }
     else

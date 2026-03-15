@@ -49,9 +49,9 @@ void rayIli::sendByte(int byte)
 } // 8 bytes
 void rayIli::sendWord_i(int byte)
 {
-    uint32_t r = (byte >> 11) & 0x1f;
+    uint32_t b = (byte >> 11) & 0x1f;
     uint32_t g = (byte >> 5) & 0x3f;
-    uint32_t b = (byte >> 0) & 0x1f;
+    uint32_t r = (byte >> 0) & 0x1f;
 
     uint32_t ix = s.x * 2;
     uint32_t iy = s.y * 2;

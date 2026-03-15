@@ -27,25 +27,52 @@ void DSO_portArbitrer::endLCD()
 {
 }
 //-----------------------------------------------
-#include "dso_control.h"
+#include "dso_calibrate.h"
 //-----------------------------------------------
-bool DSOControl::changeCb(ControlEventCb *newCb)
+bool DSOCalibrate::loadCalibrationData()
 {
     return true;
 }
-int DSOControl::getRotaryValue()
+bool DSOCalibrate::zeroCalibrate()
 {
-    return 0;
+    return true;
 }
-int DSOControl::getQButtonEvent()
+bool DSOCalibrate::decalibrate()
 {
-    return 0;
+    return true;
 }
-void DSOControl::purgeEvent()
+bool DSOCalibrate::voltageCalibrate()
 {
+    return true;
 }
-bool DSOControl::getButtonState(DSOControl::DSOButton button)
+bool DSOCalibrate::vccAdcMenu()
 {
-    return false;
+    return true;
 }
+bool DSOCalibrate::fiveVoltCalibrate()
+{
+    return true;
+}
+bool DSOCalibrate::formatNvm()
+{
+    return true;
+}
+bool DSOCalibrate::voltageCalibrate_()
+{
+    return true;
+}
+bool DSOCalibrate::zeroCalibrate_()
+{
+    return true;
+}
+bool DSOCalibrate::fiveVoltCalibrate_()
+{
+    return true;
+}
+//--------------------------------------
+const char *getScreenID()
+{
+    return "?????";
+}
+
 // EOF

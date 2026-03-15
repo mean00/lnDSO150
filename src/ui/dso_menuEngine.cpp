@@ -142,6 +142,10 @@ void MenuManager::redraw(const char *title, int n, const MenuItem *xtop, int cur
     {
         drawOneLine(xtop, i, i == current);
     }
+#ifdef DSO_SIM
+    extern void sim_redraw();
+    sim_redraw();
+#endif
 }
 
 void MenuManager::blink(int current, const char *text)
@@ -172,7 +176,7 @@ void MenuManager::runOne(const MenuItem *xtop)
     printBackHint();
     DSOControl::ControlEventCb *oldCb = _control->getCb();
     Logger("Entering menu\n");
-
+#ifndef DSO_SIM
     // Wait for the key to be released
     while (1)
     {
@@ -180,6 +184,7 @@ void MenuManager::runOne(const MenuItem *xtop)
             break;
         xDelay(50);
     }
+#endif
     _control->changeCb(MenuManager_controlEvent);
     _control->purgeEvent();
     runOne_(xtop);

@@ -21,7 +21,7 @@
       "hidden": false,
       "cacheVariables": {
         "USE_GD32F3": "True",
-        "USE_ROTARY_FULL_STEP": "True",
+        "USE_ROTARY_FULL_STEP": "False",
         "USE_USB": "True",
         "LN_ENABLE_USBD": "True",
         "SIMPLER_ILI9341_2BPP_SUPPORT": "True",

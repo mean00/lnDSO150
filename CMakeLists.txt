@@ -21,6 +21,7 @@ SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 SET(LN_ENABLE_I2C  OFF CACHE INTERNAL "")
 SET(LN_ENABLE_SPI  OFF CACHE INTERNAL "")
+#SET(LN_ENABLE_FLOAT_PRINTF ON CACHE INTERNAL "")
 
 OPTION(USE_ROTARY_FULL_STEP     "Use full step for rotary encoder, else half step"  FALSE)
 OPTION(USE_USB                  "Enable USB support"                                FALSE)
@@ -95,7 +96,7 @@ SET(LN_INITIAL_TASK_PRIORITY 4 CACHE INTERNAL "")
 add_subdirectory(${ESPRIT_ROOT})
 
 include(${ESPRIT_ROOT}/setup.cmake)
-
+include(colorFormatting)
 admGetGitRevision(${CMAKE_SOURCE_DIR} git_rev)
 
 SET(EXTENSION "_${LN_MCU}")
@@ -196,6 +197,27 @@ ENDIF()
 TARGET_LINK_LIBRARIES( lnDSO  PRIVATE simplerILI9341 ${DSO_EXTRA_LIB} assets ${FP_LIB} )
 
 HASH_GD32_FIRMWARE(lnDSO)
+# Build
+MESSAGE(STATUS "Build:")
+
+function(SUMMARY val name)
+  if("${${val}}")
+    set(col GREEN)
+  else()
+    set(col RED)
+  endif()
+  #messageWithColor(COLOR ${col} "\t"  ${name} ${val} ${${val}} )
+  messageWithColor(COLOR ${col} "\t"  ${name})
+endfunction()
+
+SUMMARY(USE_GD32F3               "Build for GD32F303")
+SUMMARY(USE_ROTARY_FULL_STEP     "Use full step for rotary encoder, else half step")
+SUMMARY(USE_USB                  "Enable USB support"                              )
+SUMMARY(USE_SMALLFOOTPRINT       "Build for 64k flash targets"                     )
+SUMMARY(USE_FNIRSI_BUTTON        "Use FNIRSI button layout"                        )
+SUMMARY(SIMPLER_ILI9341_2BPP_SUPPORT "Use grey colors"                             )
+SUMMARY(SIMPLER_ILI9341_FONT_COMPRESSION  "Use font compression"                   )
+
 
 # Summary
 MESSAGE(STATUS "Configuration:")

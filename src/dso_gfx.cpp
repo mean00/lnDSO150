@@ -7,8 +7,8 @@
 #include "esprit.h"
 #include "simpler9341.h"
 
-#define FONT_SIZE_X 13
-#define FONT_SIZE_Y 28
+#define FONT_SIZE_X 14
+#define FONT_SIZE_Y 30
 
 static ili9341 *tft = NULL;
 extern DSO_portArbitrer *arbitrer;
@@ -164,7 +164,7 @@ void DSO_GFX::clear(int color)
 void DSO_GFX::clearBody(int color)
 {
     AutoLcd autolcd;
-    tft->square(color, 0, FONT_SIZE_Y + 8, 320, 240 - FONT_SIZE_Y * 3 - 8);
+    tft->square(color, 0, FONT_SIZE_Y + 8, 320, 240 - FONT_SIZE_Y * 3);
 }
 /**
  *

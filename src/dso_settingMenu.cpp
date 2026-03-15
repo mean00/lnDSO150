@@ -45,7 +45,6 @@ const MenuItem amplitudeMenu[] = {{MenuItem::MENU_TITLE, "Amplitude", NULL},
 const MenuItem signalMenu[] = {{MenuItem::MENU_TITLE, "Test Signal", NULL},
                                {MenuItem::MENU_SUBMENU, "Amplitude", (const void *)&amplitudeMenu},
                                {MenuItem::MENU_SUBMENU, "Frequency", (const void *)&fqMenu},
-                               {MenuItem::MENU_CALL, "VCC ADC", (const void *)DSOCalibrate::vccAdcMenu},
                                {MenuItem::MENU_END, NULL, NULL}};
 
 #define MAKEINVERTITEM(name, val) static const MenuListItem name = {&invertedRotary, val};
@@ -64,7 +63,7 @@ const MenuItem calibrationMenu[] = {
     {MenuItem::MENU_CALL, "Basic Calibrate", (const void *)DSOCalibrate::zeroCalibrate},
     {MenuItem::MENU_CALL, "5v Calibrate", (const void *)DSOCalibrate::fiveVoltCalibrate},
     //{MenuItem::MENU_CALL, "Fine Calibrate",(const void *)DSOCalibrate::voltageCalibrate},
-    {MenuItem::MENU_CALL, "Wipe Calibration", (const void *)DSOCalibrate::decalibrate},
+    {MenuItem::MENU_CALL, "Wipe Calibr.", (const void *)DSOCalibrate::decalibrate},
     {MenuItem::MENU_END, NULL, NULL}};
 /**
  *
@@ -81,7 +80,8 @@ extern const char *getScreenID();
 
 //
 const MenuItem miscMenu[] = {{MenuItem::MENU_TITLE, "Misc", NULL},
-                             {MenuItem::MENU_CALL, "Format user data", (const void *)formatNvm},
+                             {MenuItem::MENU_CALL, "Format data", (const void *)formatNvm},
+                             {MenuItem::MENU_CALL, "VCC ADC", (const void *)DSOCalibrate::vccAdcMenu},
                              {MenuItem::MENU_END, NULL, NULL}};
 
 //--
@@ -105,6 +105,8 @@ const MenuItem topMenu[] = {{MenuItem::MENU_TITLE, "Main Menu", NULL},
  *
  * @param control
  */
+
+#ifndef DSO_SIM
 void menuManagement(DSOControl *control)
 {
     DSO_GFX::clear(ILI_BLACK);
@@ -120,9 +122,19 @@ void menuManagement(DSOControl *control)
     testSignal->setAmplitude(largeAmplitude);
     control->invert(invertedRotary);
 }
+#else
+void menuManagement(DSOControl *control)
+{
+    DSO_GFX::clear(ILI_BLACK);
+    const MenuItem *tem = topMenu;
 
+    MenuManager man(control, tem);
+    man.run();
+}
+#endif
 /**
  */
+#ifndef DSO_SIM
 bool formatNvm()
 {
 
@@ -132,5 +144,11 @@ bool formatNvm()
     }
     return true;
 }
+#else
+bool formatNvm()
+{
+    return true;
+}
 
+#endif
 // EOF

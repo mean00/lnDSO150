@@ -1,21 +1,7 @@
 
 include_directories(ui)
 
-
-
-IF(LN_ENABLE_USBD)
-  include_directories(${CMAKE_SOURCE_DIR}/python_usb_control/pb_c)
-
-  include(${ESPRIT_ROOT}/libraries/tinyUsb/tiny.cmake)
-  SET(PB_MESSAGES ${CMAKE_SOURCE_DIR}/python_usb_control/pb_c/messaging.pb.cpp)
-  SET(USB_SRC dso_usbd.cpp dso_usbd_api.cpp ${PB_MESSAGES})
-  LN_APPEND_FLAGS(dso_mainLoop.cpp -DDSO_ENABLE_USB)
-ENDIF(LN_ENABLE_USBD)
-
-IF(USE_FNIRSI_BUTTON)
-  ADD_DEFINITIONS("-DUSE_FNIRSI_BUTTON")
-ENDIF()
-ADD_LIBRARY(  sourceLib STATIC
+add_library(  sourceLib STATIC
                 main.cpp dso_gfx.cpp dso_test_signal.cpp dso_control.cpp
                 dso_settingMenu.cpp  ui/dso_menuEngine.cpp dso_display.cpp
                 DSO_portBArbitrer.cpp
@@ -25,32 +11,42 @@ ADD_LIBRARY(  sourceLib STATIC
                 dso_show_capture.cpp
                 dso_test.cpp
                 dso_captureState.cpp
-                ${USB_SRC}
                 )
 target_link_libraries(sourceLib PRIVATE esprit_dev)
-IF(LN_ENABLE_USBD)
-  target_link_libraries(sourceLib PRIVATE tinyUsb)
-ENDIF()
+
+macro(SET_OPTION cond flag)
+  if(${cond})
+    target_compile_definitions(sourceLib PRIVATE ${flag})
+  endif()
+endmacro()
+
+macro(SET_NO_OPTION cond flag)
+  if(NOT ${cond})
+    target_compile_definitions(sourceLib PRIVATE ${flag})
+  endif()
+endmacro()
 
 
-IF(LN_ENABLE_USBD)
+if(LN_ENABLE_USBD)
+  include(${ESPRIT_ROOT}/libraries/tinyUsb/tiny.cmake)
+  target_include_directories(sourceLib PRIVATE ${CMAKE_SOURCE_DIR}/python_usb_control/pb_c)
+  set(PB_MESSAGES ${CMAKE_SOURCE_DIR}/python_usb_control/pb_c/messaging.pb.cpp)
+  target_sources(sourceLib PRIVATE dso_usbd.cpp dso_usbd_api.cpp ${PB_MESSAGES})
+  target_compile_definitions(sourceLib PRIVATE DSO_ENABLE_USB)
   target_include_directories(sourceLib PRIVATE ${CMAKE_SOURCE_DIR}/externals/nanopb/)
-ENDIF(LN_ENABLE_USBD)
+  target_link_libraries(sourceLib PRIVATE tinyUsb)
+endif()
 
-TARGET_COMPILE_DEFINITIONS(sourceLib PRIVATE "-DLN_GIT_REV=\"${git_rev}\"")
+target_compile_definitions(sourceLib PRIVATE "-DLN_GIT_REV=\"${git_rev}\"")
 
-IF(NOT USE_VANILLA_HW)
-  TARGET_COMPILE_DEFINITIONS(sourceLib PRIVATE "-DUSE_RXTX_PIN_FOR_ROTARY")
-ENDIF( )
-
-IF(NOT USE_ROTARY_FULL_STEP)
-  TARGET_COMPILE_DEFINITIONS(sourceLib PRIVATE "-DDSO_ROTARY_FULL_STEP")
-ENDIF( )
+SET_OPTION(USE_FNIRSI_BUTTON USE_FNIRSI_BUTTON)
+SET_NO_OPTION(USE_VANILLA_HW USE_RXTX_PIN_FOR_ROTARY)
+SET_NO_OPTION(USE_ROTARY_FULL_STEP DSO_ROTARY_FULL_STEP)
 
 
-IF("${LN_ARCH}" STREQUAL "RISCV")
-  MESSAGE(STATUS "ILI9341 : Using PB8 instead of PB3 for LCD")
-  TARGET_COMPILE_OPTIONS(sourceLib PRIVATE "-DUSE_PB8_INSTEAD_OF_PB3")
-ENDIF()
+if("${LN_ARCH}" STREQUAL "RISCV")
+  message(STATUS "ILI9341 : Using PB8 instead of PB3 for LCD")
+  target_compile_options(sourceLib PRIVATE "-DUSE_PB8_INSTEAD_OF_PB3")
+endif()
 
 #target_link_libraries( sourceLib lnArduino )

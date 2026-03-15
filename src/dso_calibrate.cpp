@@ -24,6 +24,7 @@ lnTimingAdc *calAdc = NULL;
 extern DSOControl *control;
 extern lnNvm *nvm;
 extern float vref_adc_mul;
+extern void format_float_02_2f(float value, int post_digit);
 
 /**
  *
@@ -185,6 +186,7 @@ bool DSOCalibrate::zeroCalibrate_()
 
 /**
  */
+extern const char *getTextBuffer();
 extern float raw_multipliers[];
 bool DSOCalibrate::fiveVoltCalibrate_()
 {
@@ -218,7 +220,8 @@ bool DSOCalibrate::fiveVoltCalibrate_()
         raw -= offset;
         v = (float)raw * mu;
 
-        sprintf(buffer, "%2.2f_", v);
+        // sprintf(buffer, "%2.2f_", v);
+        format_float_02_2f(v, 2);
 
         if (v >= 3.5 && v <= 6.5)
         {
@@ -231,7 +234,7 @@ bool DSOCalibrate::fiveVoltCalibrate_()
             valid = false;
         }
 
-        DSO_GFX::printxy(5, 3, buffer);
+        DSO_GFX::printxy(5, 3, getTextBuffer());
         switch (control->getQButtonEvent())
         {
         case DSO_EVENT_Q(DSOControl::DSO_BUTTON_OK, EVENT_SHORT_PRESS):
@@ -446,17 +449,17 @@ bool DSOCalibrate::vccAdcMenu()
     {
         adc->readVcc();
         int raw = adc->getVref();
-        float volt = (adc->getVcc()) / 1000.;
+        float volt = (adc->getVcc()) / 1000.f;
         float volt_adj = volt * vref_adc_mul;
-        sprintf(buffer, "RAW: %04d_____", raw);
+        sprintf(buffer, "RAW: %04d", raw);
         DSO_GFX::printxy(5, 2, buffer);
-        sprintf(buffer, "VOLT: %2.2f_____", volt);
+        sprintf(buffer, "VOLT: %4d", (int)(1000.f * volt));
         DSO_GFX::printxy(5, 3, buffer);
-        sprintf(buffer, "ADJ  : %2.2f_____", volt_adj);
+        sprintf(buffer, "ADJ  : %4d", (int)(1000.f * volt_adj));
         DSO_GFX::printxy(5, 4, buffer);
         DSO_GFX::printxy(10, 5, steps[step++ & 3]);
 
-        lnDelayMs(500);
+        lnDelayMs(100);
     }
 
     delete adc;
