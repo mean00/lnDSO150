@@ -5,7 +5,11 @@ find_package(raylib 4.5 QUIET)
 
 set(DSO_TOP ${CMAKE_CURRENT_SOURCE_DIR}/../)
 set(DSO_SRC ${DSO_TOP}/src)
+set(DSO_ASSETS ${DSO_TOP}/assets)
 set(UI_FOLDER ${DSO_TOP}/src/ui)
+
+SET(SIMPLER_ILI9341_FONT_COMPRESSION ON CACHE INTERNAL "")
+SET(SIMPLER_ILI9341_2BPP_SUPPORT     ON CACHE INTERNAL "")
 
 add_definitions("-g3")
 
@@ -21,7 +25,9 @@ add_executable(${PROJECT_NAME} )
 target_sources(${PROJECT_NAME} PRIVATE main.cpp ili_ray.cpp stubs.cpp assets.cpp
       ${UI_FOLDER}/dso_menuEngine.cpp
       ${DSO_SRC}/dso_gfx.cpp ${DSO_SRC}/dso_display.cpp
-      ${DSO_TOP}/assets/gfx.cpp)
+      ${DSO_TOP}/assets/gfx.cpp
+      ${DSO_ASSETS}/fonts.cpp
+)
 target_include_directories(${PROJECT_NAME} PRIVATE ${UI_FOLDER} ${DSO_SRC} ${DSO_TOP} ${DSO_TOP}/include foo)
 
 
